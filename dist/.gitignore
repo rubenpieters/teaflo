@@ -12,4 +12,4 @@ node_modules/
 # Build
 build/
 /npm-debug.log
-js/purs.js
+js/purs.bundle.js
