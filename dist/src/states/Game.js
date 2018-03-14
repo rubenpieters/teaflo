@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 
+var gfx;
 
 var downLocX;
 var downLocY;
@@ -16,6 +17,12 @@ var bgGroup;
 var gameX = 2500;
 var gameY = 2000;
 
+var clickState = 0;
+var click0x;
+var click0y;
+
+var lines = [];
+
 export default class extends Phaser.State {
   init() { }
   preload() {
@@ -23,6 +30,8 @@ export default class extends Phaser.State {
   }
 
   create() {
+    gfx = this.game.add.graphics(0, 0);
+
     this.game.world.setBounds(-1000, -1000, 2000, 2000);
 
     boundsPoint = new Phaser.Point(0, 0);
@@ -45,7 +54,7 @@ export default class extends Phaser.State {
       sqr.drawRect(size * -0.5, size * -0.5, size, size);
       sqr.endFill();
       sqr.inputEnabled = true;
-      sqr.events.onInputDown.add((function(i) { return function() { console.log("clicked on " + i);};})(i), this);
+      sqr.events.onInputDown.add(this.bulbClick(i), this);
     }
 
     this.game.camera.x = (this.game.width * -0.5);
@@ -95,7 +104,7 @@ export default class extends Phaser.State {
 
   up(x) {
   }
-  
+
   hold(x) {
     // TODO: check if vars are undefined?
     const currentX = this.game.input.activePointer.x;
@@ -108,5 +117,27 @@ export default class extends Phaser.State {
     //this.game.camera.y = this.oldCamY - diffY;
     gameWorld.pivot.x = Phaser.Math.clamp(this.oldCamX - diffX * (0.5 / zoom), -gameX, gameX);
     gameWorld.pivot.y = Phaser.Math.clamp(this.oldCamY - diffY * (0.5 / zoom), -gameY, gameY);
+  }
+
+  bulbClick(i) {
+    return function(bulb) {
+      console.log("clicked on " + i);
+
+      if (clickState == 0) {
+        clickState = 1;
+        click0x = bulb.x;
+        click0y = bulb.y;
+        console.log("x " + click0x + " y " + click0y);
+      } else if (clickState == 1) {
+        console.log("creating line");
+        clickState = 0;
+        var line = this.game.add.graphics(0, 0, bgGroup);
+        console.log("x " + bulb.x + " y " + bulb.y);
+        line.lineStyle(5, 0x000000);
+        line.moveTo(click0x, click0y);
+        line.lineTo(bulb.x, bulb.y);
+        line.endFill();
+      }
+    }
   }
 }
