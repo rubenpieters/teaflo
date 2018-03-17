@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 
+import PS from 'js/purs.bundle.js';
+
 var gfx;
 
 var downLocX;
@@ -18,10 +20,11 @@ var gameX = 2500;
 var gameY = 2000;
 
 var clickState = 0;
-var click0x;
-var click0y;
+var click0;
 
 var lines = [];
+
+var connections = PS.initCxns;
 
 export default class extends Phaser.State {
   init() { }
@@ -42,7 +45,15 @@ export default class extends Phaser.State {
 
     bgGroup = this.game.add.group(gameWorld);
 
-    for (var i = 0; i < 1000; i++) {
+    const startSize = 15;
+    var startBulb = this.game.add.graphics(0, 0, bgGroup);
+    startBulb.beginFill(0xFFFFFF);
+    startBulb.drawRect(startSize * -0.5, startSize * -0.5, startSize, startSize);
+    startBulb.endFill();
+    startBulb.inputEnabled = true;
+    startBulb.events.onInputDown.add(this.bulbClick(0), this);
+
+    for (var i = 1; i <= 1000; i++) {
       var size = this.game.rnd.integerInRange(7, 9);
       var sqr = this.game.add.graphics(this.game.rnd.integerInRange(-gameX, gameX), this.game.rnd.integerInRange(-gameY, gameY), bgGroup);
       var clr = this.game.rnd.integerInRange(1,10);
@@ -125,19 +136,30 @@ export default class extends Phaser.State {
 
       if (clickState == 0) {
         clickState = 1;
-        click0x = bulb.x;
-        click0y = bulb.y;
-        console.log("x " + click0x + " y " + click0y);
+        click0 = {
+          x: bulb.x,
+          y: bulb.y,
+          id: i
+        };
+        console.log("x " + click0.x + " y " + click0.y);
       } else if (clickState == 1) {
+        const click1 = {
+          x: bulb.x,
+          y: bulb.y,
+          id: i
+        };
         console.log("creating line");
         clickState = 0;
         var line = this.game.add.graphics(0, 0, bgGroup);
         console.log("x " + bulb.x + " y " + bulb.y);
         line.lineStyle(5, 0x000000);
-        line.moveTo(click0x, click0y);
-        line.lineTo(bulb.x, bulb.y);
+        line.moveTo(click0.x, click0.y);
+        line.lineTo(click1.x, click1.y);
         line.endFill();
+
+        connections = PS.addLink({ from: click0, to: click1 })(connections);
+        console.log(PS.verifyLinks(connections));
       }
-    }
+    };
   }
 }

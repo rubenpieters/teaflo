@@ -12,7 +12,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "pulp test",
-    "build:cl": "pulp build -O -m Client.Main --to ../dist/js/purs.js",
+    "build:cl": "pulp browserify --standalone purs.bundle -m Client.Main --optimise --to ../dist/js/purs.bundle.js",
     "build:sv": "pulp build -O --to ../index.js",
     "build": "npm run build:cl && npm run build:sv"
   },

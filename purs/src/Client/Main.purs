@@ -14,9 +14,19 @@ import Data.StrMap as StrMap
 import Data.Tuple (Tuple(..))
 import Data.String as String
 import Data.SubRecord as SubRecord
+import Data.Maybe (Maybe(..))
+import Data.Array as Array
+import Data.Monoid
+import Data.Foldable
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (throw)
+
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Eq as Rep
+import Data.Generic.Rep.Show as Rep
+
+import Debug.Trace
 
 tupcMap ::
   SubJsonConfigContent -> Eff _ (StrMap Pos)
@@ -54,6 +64,92 @@ buttonMapConfig =
 
 buttonMap :: Eff _ (StrMap Pos)
 buttonMap = tupcMap buttonMapConfig
+
+type Bulb =
+  { x :: Int
+  , y :: Int
+  , id :: Int
+  }
+
+centerId :: Int
+centerId = 0
+
+type Connection =
+  { to :: Bulb
+  }
+
+type Connections =
+  Map Int (Array Connection)
+
+initCxns :: Connections
+initCxns = Map.empty
+
+addLink :: { from :: Bulb, to :: Bulb } -> Connections -> Connections
+addLink { from: from, to: to } cxns =
+  cxns # Map.alter addLink' closestToCenter.id
+  where
+    -- TODO
+    closestToCenter = from
+    furthestFromCenter = to
+    newCxn = { to: to }
+    addLink' (Just l) = Just (Array.cons newCxn l)
+    addLink' (Nothing) = Just ([newCxn])
+
+traverseConnections = traverseConnections' centerId
+
+traverseConnections' :: forall a.
+  (Monoid a) =>
+  Int ->
+  (Connection -> a) ->
+  Connections ->
+  a
+traverseConnections' id f cxns =
+  case cxns # Map.lookup id of
+    Just links ->
+      let
+        { result: result, nextIds: nextIds } = traverseLink f links
+      in
+        result <> (nextIds # foldMap (\i -> traverseConnections' i f cxns))
+    Nothing -> mempty
+
+traverseLink :: forall a.
+  (Monoid a) =>
+  (Connection -> a) ->
+  Array Connection ->
+  { result :: a, nextIds :: Array Int }
+traverseLink f links = case (Array.uncons links) of
+  Just { head: link, tail: t } ->
+    let
+      { result: result, nextIds: nextIds } = traverseLink f t
+    in
+      { result: f link <> result, nextIds: Array.cons link.to.id nextIds }
+  Nothing -> { result: mempty, nextIds: [] }
+
+newtype VerifyResult = VerifyResult
+  { valids :: Array Int
+  , invalids :: Array Int
+  }
+
+derive instance genericVerifyResult :: Generic VerifyResult _
+instance eqVerifyResult :: Eq VerifyResult where
+  eq = Rep.genericEq
+instance showVerifyResult :: Show VerifyResult where
+  show = Rep.genericShow
+
+instance semigroupVerifyResult :: Semigroup VerifyResult where
+  append
+    (VerifyResult { valids: valids1, invalids: invalids1 })
+    (VerifyResult { valids: valids2, invalids: invalids2 })
+    = (VerifyResult { valids: valids1 <> valids2, invalids: invalids1 <> invalids2 })
+
+instance monoidVerifyResult :: Monoid VerifyResult where
+  mempty = VerifyResult { valids: [], invalids: [] }
+
+verifyLinks :: Connections -> VerifyResult
+verifyLinks = traverseConnections f
+  where
+    f :: Connection -> VerifyResult
+    f cxn = VerifyResult { valids: [cxn.to.id], invalids: [] }
 
 main :: Eff _ Unit
 main = pure unit
