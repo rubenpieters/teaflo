@@ -18,6 +18,7 @@ import Data.Maybe (Maybe(..))
 import Data.Array as Array
 import Data.Monoid
 import Data.Foldable
+import Data.Newtype
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (throw)
@@ -84,14 +85,11 @@ type Connections =
 initCxns :: Connections
 initCxns = Map.empty
 
-addLink :: { from :: Bulb, to :: Bulb } -> Connections -> Connections
-addLink { from: from, to: to } cxns =
-  cxns # Map.alter addLink' closestToCenter.id
+addLink :: { closest :: Bulb, furthest :: Bulb } -> Connections -> Connections
+addLink { closest, furthest } cxns =
+  cxns # Map.alter addLink' closest.id
   where
-    -- TODO
-    closestToCenter = from
-    furthestFromCenter = to
-    newCxn = { to: to }
+    newCxn = { to: furthest }
     addLink' (Just l) = Just (Array.cons newCxn l)
     addLink' (Nothing) = Just ([newCxn])
 
@@ -125,10 +123,14 @@ traverseLink f links = case (Array.uncons links) of
       { result: f link <> result, nextIds: Array.cons link.to.id nextIds }
   Nothing -> { result: mempty, nextIds: [] }
 
-newtype VerifyResult = VerifyResult
+type VerifyResultR =
   { valids :: Array Int
   , invalids :: Array Int
   }
+
+newtype VerifyResult = VerifyResult VerifyResultR
+
+derive instance newtypeVerifyResult :: Newtype VerifyResult _
 
 derive instance genericVerifyResult :: Generic VerifyResult _
 instance eqVerifyResult :: Eq VerifyResult where
@@ -150,6 +152,9 @@ verifyLinks = traverseConnections f
   where
     f :: Connection -> VerifyResult
     f cxn = VerifyResult { valids: [cxn.to.id], invalids: [] }
+
+verifyLinksJs :: Connections -> VerifyResultR
+verifyLinksJs cxns = un VerifyResult (verifyLinks cxns)
 
 main :: Eff _ Unit
 main = pure unit

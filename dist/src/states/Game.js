@@ -25,6 +25,8 @@ var click0;
 var lines = [];
 
 var connections = PS.initCxns;
+var startNodes = [0];
+var validNodes = [];
 
 export default class extends Phaser.State {
   init() { }
@@ -148,17 +150,53 @@ export default class extends Phaser.State {
           y: bulb.y,
           id: i
         };
-        console.log("creating line");
         clickState = 0;
-        var line = this.game.add.graphics(0, 0, bgGroup);
-        console.log("x " + bulb.x + " y " + bulb.y);
-        line.lineStyle(5, 0x000000);
-        line.moveTo(click0.x, click0.y);
-        line.lineTo(click1.x, click1.y);
-        line.endFill();
 
-        connections = PS.addLink({ from: click0, to: click1 })(connections);
-        console.log(PS.verifyLinks(connections));
+        const fromDist = Phaser.Point.distance(new Phaser.Point(0, 0), new Phaser.Point(click0.x, click0.y));
+        const toDist = Phaser.Point.distance(new Phaser.Point(0, 0), new Phaser.Point(click1.x, click1.y));
+
+        var tup;
+        if (fromDist > toDist) {
+          tup = { closest: click1, furthest: click0 };
+        } else {
+          tup = { closest: click0, furthest: click1 };
+        }
+
+        if (Array.includes(validNodes, tup.furthest.id)) {
+          console.log("rejected");
+        } else {
+          console.log("creating line");
+
+          if (Array.includes(startNodes, tup.furthest.id)) {
+            console.log("end point is start node");
+            const index = startNodes.indexOf(tup.furthest.id);
+            startNodes.splice(index, 1);
+            validNodes.push(tup.furthest.id);
+          }
+
+          if (! Array.includes(startNodes, tup.closest.id)) {
+            console.log("new start node");
+            startNodes.push(tup.closest.id);
+          }
+
+          // draw line
+          var line = this.game.add.graphics(0, 0, bgGroup);
+          line.lineStyle(5, 0x000000);
+          line.moveTo(click0.x, click0.y);
+          line.lineTo(click1.x, click1.y);
+          line.endFill();
+
+          // add to connections
+          connections = PS.addLink(tup)(connections);
+
+          // verify costs/usage
+          const verifyResult = PS.verifyLinksJs(connections);
+          console.log(verifyResult);
+
+          // add to furthest valid nodes
+          // closest should already be a valid or start node
+          validNodes.push(tup.furthest.id);
+        }
       }
     };
   }
