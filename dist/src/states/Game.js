@@ -2,6 +2,11 @@ import Phaser from 'phaser';
 
 import PS from 'js/purs.bundle.js';
 
+const gameUiMap = PS.gameUiMap();
+
+var mouseOverMenu;
+var mouseOverText;
+
 var gfx;
 
 var downLocX;
@@ -68,6 +73,8 @@ export default class extends Phaser.State {
       sqr.endFill();
       sqr.inputEnabled = true;
       sqr.events.onInputDown.add(this.bulbClick(i), this);
+      sqr.events.onInputOver.add(this.bulbOver(i), this);
+      //sqr.events.onInputOut.add(this.bulbOut(i), this);
     }
 
     this.game.camera.x = (this.game.width * -0.5);
@@ -75,6 +82,29 @@ export default class extends Phaser.State {
 
     this.game.input.onDown.add(this.down, this);
     this.game.input.onUp.add(this.up, this);
+
+    // bottom right, mouseover menu
+
+//    mouseOverMenu = this.add.sprite(gameUiMap['1'].xLeft, gameUiMap['1'].yTop, 'bulb');
+//    console.log(gameUiMap['1']);
+//    mouseOverMenu.width = gameUiMap['1'].xRight - gameUiMap['1'].xLeft;
+//    mouseOverMenu.height = gameUiMap['1'].yBot - gameUiMap['1'].yTop;
+    mouseOverMenu = this.add.sprite(300, 200, 'bulb');
+    console.log(gameUiMap['1']);
+    mouseOverMenu.width = 100;
+    mouseOverMenu.height = 100;
+
+    mouseOverMenu.visible = false;
+
+    mouseOverText = this.add.text(300, 200, '', {
+      font: '20px Indie Flower',
+      fill: '#77BFA3'
+    });
+
+    mouseOverText.visible = false;
+
+    mouseOverText.padding.set(10, 16);
+    mouseOverText.anchor.setTo(0, 0);
   }
 
   render() {
@@ -200,4 +230,23 @@ export default class extends Phaser.State {
       }
     };
   }
+
+  bulbOver(i) {
+    return function (bulb, pointer) {
+      console.log("over " + i);
+      mouseOverMenu.visible = true;
+      mouseOverText.setText('ID: ' + i);
+      mouseOverText.visible = true;
+    };
+  }
+
+  bulbOut(i) {
+    return function (bulb, pointer) {
+      console.log("out " + i);
+      //mouseOverMenu.visible = false;
+      //mouseOverText.text = '';
+      //mouseOverText.visible = false;
+    };
+  }
+
 }

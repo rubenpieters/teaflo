@@ -66,6 +66,34 @@ buttonMapConfig =
 buttonMap :: Eff _ (StrMap Pos)
 buttonMap = tupcMap buttonMapConfig
 
+gameUiMapConfig :: SubJsonConfigContent
+gameUiMapConfig =
+  { subJsonConfig: SubRecord.mkSubRecord
+    { scale: 50
+    }
+  , content:
+    -- 1 2 3 4 5 6 7 8
+    [ "----------------"
+    , "----------------"
+    , "----------------"
+    , "----------------"
+    , "----------------"
+    , "----------------"
+    , "----------------"
+    , "----------------"
+    , "----------------"
+    , "----------------"
+    , "--------------11"
+    , "--------------11"
+    ]
+  }
+
+gameUiMap :: Eff _ (StrMap Pos)
+gameUiMap = tupcMap gameUiMapConfig
+
+--
+--
+
 type Bulb =
   { x :: Int
   , y :: Int
