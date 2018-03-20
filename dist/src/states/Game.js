@@ -33,6 +33,11 @@ var connections = PS.initCxns;
 var startNodes = [0];
 var validNodes = [];
 
+// game resources
+var resourceText;
+
+var growth = 100;
+
 export default class extends Phaser.State {
   init() { }
   preload() {
@@ -52,29 +57,34 @@ export default class extends Phaser.State {
 
     bgGroup = this.game.add.group(gameWorld);
 
-    const startSize = 15;
-    var startBulb = this.game.add.graphics(0, 0, bgGroup);
-    startBulb.beginFill(0xFFFFFF);
-    startBulb.drawRect(startSize * -0.5, startSize * -0.5, startSize, startSize);
-    startBulb.endFill();
-    startBulb.inputEnabled = true;
-    startBulb.events.onInputDown.add(this.bulbClick(0), this);
+    this.mkBulb({ id: 0, size: 15, group: bgGroup, x: 0, y: 0, color: 0xFFFFFF });
 
-    for (var i = 1; i <= 1000; i++) {
-      var size = this.game.rnd.integerInRange(7, 9);
-      var sqr = this.game.add.graphics(this.game.rnd.integerInRange(-gameX, gameX), this.game.rnd.integerInRange(-gameY, gameY), bgGroup);
-      var clr = this.game.rnd.integerInRange(1,10);
-      if (clr === 1) {
-        sqr.beginFill(0xFF0000);
-      } else {
-        sqr.beginFill(0x666666);
+    const levels1 = 2;
+    const quadrants1 = 3;
+    const color1 = 0x666666;
+    for (var level = 0; level <= levels1; level++) {
+      for (var quadrant = 0; quadrant <= quadrants1; quadrant++) {
+        for (var i = 0; i <= 1; i++) {
+          const size = this.game.rnd.integerInRange(7, 9);
+          const pos = this.rndXY({ ampMin: 50, ampMax: 250, level: level, levels: levels1, quadrant: quadrant });
+          // TODO create unique id
+          this.mkBulb({ id: i, size: size, group: bgGroup, x: pos.x, y: pos.y, color: color1 });
+        }
       }
-      sqr.drawRect(size * -0.5, size * -0.5, size, size);
-      sqr.endFill();
-      sqr.inputEnabled = true;
-      sqr.events.onInputDown.add(this.bulbClick(i), this);
-      sqr.events.onInputOver.add(this.bulbOver(i), this);
-      //sqr.events.onInputOut.add(this.bulbOut(i), this);
+    }
+
+    const levels2 = 3;
+    const quadrants2 = 3;
+    const color2 = 0xAAAAAA;
+    for (var level = 0; level <= levels2; level++) {
+      for (var quadrant = 0; quadrant <= quadrants2; quadrant++) {
+        for (var i = 0; i <= 1; i++) {
+          const size = this.game.rnd.integerInRange(9, 11);
+          const pos = this.rndXY({ ampMin: 200, ampMax: 700, level: level, levels: levels2, quadrant: quadrant });
+          // TODO create unique id
+          this.mkBulb({ id: i, size: size, group: bgGroup, x: pos.x, y: pos.y, color: color2 });
+        }
+      }
     }
 
     this.game.camera.x = (this.game.width * -0.5);
@@ -105,6 +115,50 @@ export default class extends Phaser.State {
 
     mouseOverText.padding.set(10, 16);
     mouseOverText.anchor.setTo(0, 0);
+
+    // bottom, resource values
+    resourceText = this.add.text(-375, 275, 'growth: 100', {
+      font: '20px Indie Flower',
+      fill: '#77BFA3'
+    });
+
+  }
+
+  rndXY(o) {
+    const ampMin = o.ampMin;
+    const ampMax = o.ampMax;
+    const level = o.level;
+    const levels = o.levels;
+    const quadrant = o.quadrant;
+
+    const levelAmp = (ampMax - ampMin) / (levels + 1);
+
+    var φ = Phaser.Math.degToRad(this.game.rnd.integerInRange(quadrant * 90, (quadrant + 1) * 90));
+    var r = this.game.rnd.integerInRange(ampMin + (level * levelAmp), ampMin + ((level + 1) * levelAmp));
+    var x = r * Math.cos(φ);
+    var y = r * Math.sin(φ);
+
+    return { x: x, y: y };
+  }
+
+  mkBulb(o) {
+    const size = o.size;
+    const group = o.group;
+    const color = o.color;
+    const id = o.id;
+    const x = o.x;
+    const y = o.y;
+
+    var bulb = this.game.add.graphics(x, y, group);
+    bulb.beginFill(color);
+    bulb.drawRect(size * -0.5, size * -0.5, size, size);
+    bulb.endFill();
+    bulb.inputEnabled = true;
+    bulb.events.onInputDown.add(this.bulbClick(id), this);
+    bulb.events.onInputOver.add(this.bulbOver(id), this);
+    //bulb.events.onInputOut.add(this.bulbOut(id), this);
+
+    return bulb;
   }
 
   render() {
@@ -182,8 +236,8 @@ export default class extends Phaser.State {
         };
         clickState = 0;
 
-        const fromDist = Phaser.Point.distance(new Phaser.Point(0, 0), new Phaser.Point(click0.x, click0.y));
-        const toDist = Phaser.Point.distance(new Phaser.Point(0, 0), new Phaser.Point(click1.x, click1.y));
+        const fromDist = Phaser.Math.distance(0, 0, click0.x, click0.y);
+        const toDist = Phaser.Math.distance(0, 0, click1.x, click1.y);
 
         var tup;
         if (fromDist > toDist) {
@@ -191,6 +245,8 @@ export default class extends Phaser.State {
         } else {
           tup = { closest: click0, furthest: click1 };
         }
+        tup.distance = Phaser.Point.distance(new Phaser.Point(click0.x, click0.y), new Phaser.Point(click1.x, click1.y)) / 20;
+        console.log("distance: " + tup.distance);
 
         if (Array.includes(validNodes, tup.furthest.id)) {
           console.log("rejected");
@@ -220,7 +276,7 @@ export default class extends Phaser.State {
           connections = PS.addLink(tup)(connections);
 
           // verify costs/usage
-          const verifyResult = PS.verifyLinksJs(connections);
+          const verifyResult = PS.calcResource(connections);
           console.log(verifyResult);
 
           // add to furthest valid nodes
@@ -249,4 +305,8 @@ export default class extends Phaser.State {
     };
   }
 
+  setGrowth(x) {
+    growth = x;
+    resourceText.setText('growth: ' + x);
+  }
 }

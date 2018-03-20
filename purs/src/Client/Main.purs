@@ -17,6 +17,7 @@ import Data.SubRecord as SubRecord
 import Data.Maybe (Maybe(..))
 import Data.Array as Array
 import Data.Monoid
+import Data.Monoid.Endo
 import Data.Foldable
 import Data.Newtype
 
@@ -105,6 +106,7 @@ centerId = 0
 
 type Connection =
   { to :: Bulb
+  , distance :: Number
   }
 
 type Connections =
@@ -113,11 +115,11 @@ type Connections =
 initCxns :: Connections
 initCxns = Map.empty
 
-addLink :: { closest :: Bulb, furthest :: Bulb } -> Connections -> Connections
-addLink { closest, furthest } cxns =
+addLink :: { closest :: Bulb, furthest :: Bulb, distance :: Number } -> Connections -> Connections
+addLink { closest, furthest, distance } cxns =
   cxns # Map.alter addLink' closest.id
   where
-    newCxn = { to: furthest }
+    newCxn = { to: furthest, distance: distance }
     addLink' (Just l) = Just (Array.cons newCxn l)
     addLink' (Nothing) = Just ([newCxn])
 
@@ -180,6 +182,50 @@ verifyLinks = traverseConnections f
   where
     f :: Connection -> VerifyResult
     f cxn = VerifyResult { valids: [cxn.to.id], invalids: [] }
+
+type ResourceResult =
+  { growth :: Number
+  }
+
+initialResources :: ResourceResult
+initialResources = { growth: 100.0 }
+
+calcResource :: Connections -> ResourceResult
+calcResource cxns = un Endo (calcResource' cxns) initialResources
+
+calcResource' :: Connections -> Endo ResourceResult
+calcResource' = traverseConnections f
+  where
+    f :: Connection -> Endo ResourceResult
+    f cxn = Endo (f' cxn)
+    f' :: Connection -> ResourceResult -> ResourceResult
+    f' { to, distance } { growth } = { growth: growth - distance }
+
+{-
+calcResources' ::
+  Int ->
+  Connections ->
+  ResourceResult
+calcResources' id cxns =
+  case cxns # Map.lookup id of
+    Just links ->
+      let
+        { result: result, nextIds: nextIds } = traverseLink links
+      in
+        result <> (nextIds # foldMap (\i -> traverseConnections' i cxns))
+    Nothing -> mempty
+
+calcResourcesLink ::
+  Array Connection ->
+  { result :: ResourceResult, nextIds :: Array Int }
+calcResourcesLink links = case (Array.uncons links) of
+  Just { head: link, tail: t } ->
+    let
+      { result: result, nextIds: nextIds } = traverseLink f t
+    in
+      { result: f link <> result, nextIds: Array.cons link.to.id nextIds }
+  Nothing -> { result: mempty, nextIds: [] }
+-}
 
 verifyLinksJs :: Connections -> VerifyResultR
 verifyLinksJs cxns = un VerifyResult (verifyLinks cxns)
