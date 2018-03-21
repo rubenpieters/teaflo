@@ -33,6 +33,8 @@ var connections = PS.initCxns;
 var startNodes = [0];
 var validNodes = [];
 
+var bulbId = 0;
+
 // game resources
 var resourceText;
 
@@ -57,7 +59,7 @@ export default class extends Phaser.State {
 
     bgGroup = this.game.add.group(gameWorld);
 
-    this.mkBulb({ id: 0, size: 15, group: bgGroup, x: 0, y: 0, color: 0xFFFFFF });
+    this.mkBulb({ size: 15, group: bgGroup, x: 0, y: 0, color: 0xFFFFFF });
 
     const levels1 = 2;
     const quadrants1 = 3;
@@ -67,8 +69,7 @@ export default class extends Phaser.State {
         for (var i = 0; i <= 1; i++) {
           const size = this.game.rnd.integerInRange(7, 9);
           const pos = this.rndXY({ ampMin: 50, ampMax: 250, level: level, levels: levels1, quadrant: quadrant });
-          // TODO create unique id
-          this.mkBulb({ id: i, size: size, group: bgGroup, x: pos.x, y: pos.y, color: color1 });
+          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color1 });
         }
       }
     }
@@ -82,7 +83,7 @@ export default class extends Phaser.State {
           const size = this.game.rnd.integerInRange(9, 11);
           const pos = this.rndXY({ ampMin: 200, ampMax: 700, level: level, levels: levels2, quadrant: quadrant });
           // TODO create unique id
-          this.mkBulb({ id: i, size: size, group: bgGroup, x: pos.x, y: pos.y, color: color2 });
+          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color2 });
         }
       }
     }
@@ -145,9 +146,11 @@ export default class extends Phaser.State {
     const size = o.size;
     const group = o.group;
     const color = o.color;
-    const id = o.id;
     const x = o.x;
     const y = o.y;
+
+    const id = bulbId;
+    bulbId += 1;
 
     var bulb = this.game.add.graphics(x, y, group);
     bulb.beginFill(color);
