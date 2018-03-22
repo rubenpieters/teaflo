@@ -46,6 +46,10 @@ var resources = {
   yellow: 0
 };
 
+var resourceMap = {};
+
+resourceMap[0] = resources;
+
 export default class extends Phaser.State {
   init() { }
   preload() {
@@ -266,7 +270,7 @@ export default class extends Phaser.State {
         } else {
           console.log("creating line");
 
-          const verifyResult = PS.verifyCost(resources)(tup.furthest.resource);
+          const verifyResult = PS.verifyCost(resourceMap[tup.closest.id])(tup.furthest.resource);
           console.log(verifyResult);
           if (verifyResult.canBuy) {
             // draw line
@@ -284,7 +288,7 @@ export default class extends Phaser.State {
             validNodes.push(tup.furthest.id);
 
             // update resources
-            resources = verifyResult.newResources;
+            resourceMap[tup.furthest.id] = verifyResult.newResources;
           }
         }
       }
@@ -295,7 +299,13 @@ export default class extends Phaser.State {
     return function (bulb, pointer) {
       console.log("over " + i);
       mouseOverMenu.visible = true;
-      mouseOverText.setText('ID: ' + i);
+      const res = resourceMap[i];
+      if (typeof res !== "undefined") {
+        const resourceText = 'W: ' + res.white + 'B: ' + res.blue;
+        mouseOverText.setText('ID: ' + i + '\n' + resourceText);
+      } else {
+        mouseOverText.setText('ID: ' + i);
+      }
       mouseOverText.visible = true;
     };
   }
