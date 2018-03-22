@@ -30,15 +30,21 @@ var click0;
 var lines = [];
 
 var connections = PS.initCxns;
-var startNodes = [0];
-var validNodes = [];
+var validNodes = [0];
 
 var bulbId = 0;
 
 // game resources
 var resourceText;
 
-var growth = 100;
+var resources = {
+  growth: 100,
+  white: 0,
+  blue: 0,
+  red: 0,
+  green: 0,
+  yellow: 0
+};
 
 export default class extends Phaser.State {
   init() { }
@@ -69,7 +75,7 @@ export default class extends Phaser.State {
         for (var i = 0; i <= 1; i++) {
           const size = this.game.rnd.integerInRange(7, 9);
           const pos = this.rndXY({ ampMin: 50, ampMax: 250, level: level, levels: levels1, quadrant: quadrant });
-          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color1 });
+          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color1, resource: PS.bulbType1 });
         }
       }
     }
@@ -82,8 +88,7 @@ export default class extends Phaser.State {
         for (var i = 0; i <= 1; i++) {
           const size = this.game.rnd.integerInRange(9, 11);
           const pos = this.rndXY({ ampMin: 200, ampMax: 700, level: level, levels: levels2, quadrant: quadrant });
-          // TODO create unique id
-          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color2 });
+          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color2, resource: PS.bulbType2 });
         }
       }
     }
@@ -148,6 +153,7 @@ export default class extends Phaser.State {
     const color = o.color;
     const x = o.x;
     const y = o.y;
+    const resource = o.resource;
 
     const id = bulbId;
     bulbId += 1;
@@ -157,9 +163,9 @@ export default class extends Phaser.State {
     bulb.drawRect(size * -0.5, size * -0.5, size, size);
     bulb.endFill();
     bulb.inputEnabled = true;
-    bulb.events.onInputDown.add(this.bulbClick(id), this);
-    bulb.events.onInputOver.add(this.bulbOver(id), this);
-    //bulb.events.onInputOut.add(this.bulbOut(id), this);
+    bulb.events.onInputDown.add(this.bulbClick(id, resource), this);
+    bulb.events.onInputOver.add(this.bulbOver(id, resource), this);
+    //bulb.events.onInputOut.add(this.bulbOut(id, resource), this);
 
     return bulb;
   }
@@ -219,7 +225,7 @@ export default class extends Phaser.State {
     gameWorld.pivot.y = Phaser.Math.clamp(this.oldCamY - diffY * (0.5 / zoom), -gameY, gameY);
   }
 
-  bulbClick(i) {
+  bulbClick(i, resource) {
     return function(bulb) {
       console.log("clicked on " + i);
 
@@ -228,14 +234,16 @@ export default class extends Phaser.State {
         click0 = {
           x: bulb.x,
           y: bulb.y,
-          id: i
+          id: i,
+          resource: resource
         };
         console.log("x " + click0.x + " y " + click0.y);
       } else if (clickState == 1) {
         const click1 = {
           x: bulb.x,
           y: bulb.y,
-          id: i
+          id: i,
+          resource: resource
         };
         clickState = 0;
 
@@ -253,44 +261,37 @@ export default class extends Phaser.State {
 
         if (Array.includes(validNodes, tup.furthest.id)) {
           console.log("rejected");
+        } else if (! Array.includes(validNodes, tup.closest.id)) {
+          console.log("new start node, rejected");
         } else {
           console.log("creating line");
 
-          if (Array.includes(startNodes, tup.furthest.id)) {
-            console.log("end point is start node");
-            const index = startNodes.indexOf(tup.furthest.id);
-            startNodes.splice(index, 1);
-            validNodes.push(tup.furthest.id);
-          }
-
-          if (! Array.includes(startNodes, tup.closest.id)) {
-            console.log("new start node");
-            startNodes.push(tup.closest.id);
-          }
-
-          // draw line
-          var line = this.game.add.graphics(0, 0, bgGroup);
-          line.lineStyle(5, 0x000000);
-          line.moveTo(click0.x, click0.y);
-          line.lineTo(click1.x, click1.y);
-          line.endFill();
-
-          // add to connections
-          connections = PS.addLink(tup)(connections);
-
-          // verify costs/usage
-          const verifyResult = PS.calcResource(connections);
+          const verifyResult = PS.verifyCost(resources)(tup.furthest.resource);
           console.log(verifyResult);
+          if (verifyResult.canBuy) {
+            // draw line
+            var line = this.game.add.graphics(0, 0, bgGroup);
+            line.lineStyle(5, 0x000000);
+            line.moveTo(click0.x, click0.y);
+            line.lineTo(click1.x, click1.y);
+            line.endFill();
 
-          // add to furthest valid nodes
-          // closest should already be a valid or start node
-          validNodes.push(tup.furthest.id);
+            // add to connections
+            connections = PS.addLink(tup)(connections);
+
+            // add to furthest valid nodes
+            // closest should already be a valid or start node
+            validNodes.push(tup.furthest.id);
+
+            // update resources
+            resources = verifyResult.newResources;
+          }
         }
       }
     };
   }
 
-  bulbOver(i) {
+  bulbOver(i, resource) {
     return function (bulb, pointer) {
       console.log("over " + i);
       mouseOverMenu.visible = true;
@@ -299,7 +300,7 @@ export default class extends Phaser.State {
     };
   }
 
-  bulbOut(i) {
+  bulbOut(i, resource) {
     return function (bulb, pointer) {
       console.log("out " + i);
       //mouseOverMenu.visible = false;
@@ -309,7 +310,7 @@ export default class extends Phaser.State {
   }
 
   setGrowth(x) {
-    growth = x;
+    resources.growth = x;
     resourceText.setText('growth: ' + x);
   }
 }

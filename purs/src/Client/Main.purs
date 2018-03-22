@@ -20,6 +20,7 @@ import Data.Monoid
 import Data.Monoid.Endo
 import Data.Foldable
 import Data.Newtype
+import Data.SubRecord
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (throw)
@@ -229,6 +230,115 @@ calcResourcesLink links = case (Array.uncons links) of
 
 verifyLinksJs :: Connections -> VerifyResultR
 verifyLinksJs cxns = un VerifyResult (verifyLinks cxns)
+
+data Color
+  = White
+  | Blue
+  | Red
+  | Green
+  | Yellow
+
+type Resource =
+  { color :: Color
+  , amount :: Int
+  }
+
+bulbType1 :: BulbType
+bulbType1 = ResourceBulb
+  { gain:
+    { growth: 0.0
+    , white: 1
+    , blue: 0
+    , red: 0
+    , green: 0
+    , yellow: 0
+    }
+  , cost:
+    { growth: 0.0
+    , white: 0
+    , blue: 0
+    , red: 0
+    , green: 0
+    , yellow: 0
+    }
+  }
+
+bulbType2 :: BulbType
+bulbType2 = ResourceBulb
+  { gain:
+    { growth: 0.0
+    , white: 0
+    , blue: 1
+    , red: 0
+    , green: 0
+    , yellow: 0
+    }
+  , cost:
+    { growth: 0.0
+    , white: 2
+    , blue: 0
+    , red: 0
+    , green: 0
+    , yellow: 0
+    }
+  }
+
+data BulbType
+  = ResourceBulb
+      { gain :: Resources
+      , cost :: Resources
+      }
+
+type ResourcesR =
+  ( growth :: Number
+  , white :: Int
+  , blue :: Int
+  , red :: Int
+  , green :: Int
+  , yellow :: Int
+  )
+
+type Resources = Record ResourcesR
+
+minus :: Resources -> Resources -> Resources
+minus
+  { growth: growth0, white: white0, blue: blue0, red: red0, green: green0, yellow: yellow0 }
+  { growth: growth1, white: white1, blue: blue1, red: red1, green: green1, yellow: yellow1 }
+  =
+  { growth: growth0 - growth1
+  , white: white0 - white1
+  , blue: blue0 - blue1
+  , red: red0 - red1
+  , green: green0 - green1
+  , yellow: yellow0 - yellow1
+  }
+
+plus :: Resources -> Resources -> Resources
+plus
+  { growth: growth0, white: white0, blue: blue0, red: red0, green: green0, yellow: yellow0 }
+  { growth: growth1, white: white1, blue: blue1, red: red1, green: green1, yellow: yellow1 }
+  =
+  { growth: growth0 + growth1
+  , white: white0 + white1
+  , blue: blue0 + blue1
+  , red: red0 + red1
+  , green: green0 + green1
+  , yellow: yellow0 + yellow1
+  }
+
+isValid :: Resources -> Boolean
+isValid
+  { growth: growth, white: white, blue: blue, red: red, green: green, yellow: yellow }
+  =
+  growth > 0.0 && white >= 0 && blue >= 0 && red >= 0 && green >= 0 && yellow >= 0
+
+verifyCost ::
+  Resources -> BulbType -> { canBuy :: Boolean, newResources :: Resources }
+verifyCost res (ResourceBulb { gain, cost }) =
+  { canBuy: checkResources, newResources: newResources `plus` gain }
+  where
+  newResources = res `minus` cost
+  checkResources = newResources # isValid
 
 main :: Eff _ Unit
 main = pure unit
