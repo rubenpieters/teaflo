@@ -50,6 +50,23 @@ var resourceMap = {};
 
 resourceMap[0] = resources;
 
+
+function nextId() {
+  const v = bulbId;
+  bulbId++;
+  return v;
+};
+
+function integerInRange(g) {
+  return function(x) {
+    return function(y) {
+      return function() {
+        return g.rnd.integerInRange(x, y);
+      };
+    };
+  };
+};
+
 export default class extends Phaser.State {
   init() { }
   preload() {
@@ -57,6 +74,11 @@ export default class extends Phaser.State {
   }
 
   create() {
+    var board = PS.gen({ nextId: nextId, integerInRange: integerInRange(this.game) })();
+    console.log("board");
+    console.log(board);
+
+
     gfx = this.game.add.graphics(0, 0);
 
     this.game.world.setBounds(-1000, -1000, 2000, 2000);
@@ -336,4 +358,5 @@ export default class extends Phaser.State {
     resources.growth = x;
     resourceText.setText('growth: ' + x);
   }
+
 }

@@ -5,6 +5,8 @@ import Data.Maybe (Maybe(..)) as Exported
 
 import Prelude
 
+import Shared.Board
+
 import Tupc
 
 import Data.Map (Map)
@@ -359,6 +361,13 @@ verifyCost res (ResourceBulb { gain, cost }) =
   where
   newResources = res `minus` cost
   checkResources = newResources # isValid
+
+gen :: forall e r.
+  { nextId :: Eff e Int
+  , integerInRange :: Int -> Int -> Eff e Int
+  | r } ->
+  Eff e Board
+gen k = generateBoard k boardData
 
 main :: Eff _ Unit
 main = pure unit

@@ -4,12 +4,17 @@ import Prelude
 
 import Shared.Node
 
+import Data.Foldable (length)
 import Data.Traversable (for)
 
 import Math as Math
 import Data.Int (toNumber)
+import Data.Maybe (Maybe(..))
 import Data.Array as Array
+import Data.Array ((!!))
 import Data.Enum (enumFromTo)
+
+import Control.Monad.Eff.Exception.Unsafe (unsafeThrow)
 
 newtype Node = Node
   { id :: Int
@@ -26,8 +31,6 @@ generateBoard :: forall f r.
   Monad f =>
   { nextId :: f Int
   , integerInRange :: Int -> Int -> f Int
-  -- TODO: implement chooseSet in terms of integerInRange?
-  , chooseSet :: forall x. Array x -> f x
   | r } ->
   BoardData ->
   f Board
@@ -36,7 +39,7 @@ generateBoard k boardData = do
   (levels :: Array (Array Node)) <- for boardData $ \level -> do
     let sectionData = generateSectionData level
     (x :: Array (Array Node)) <- for sectionData $ \section -> do
-      generateSection k section { amount: level.amount, nodeTypes: level.nodeTypes}
+      generateSection k section { amount: level.amount }
     pure (Array.concat x)
   pure (Board { nodes: Array.cons startNode (Array.concat levels) })
 
@@ -49,10 +52,9 @@ generateStartNode = do
 type LevelData =
   { ampMin :: Int
   , ampMax :: Int
-  , quadrants :: Int
+  , quadrants :: Array (Array NodeType)
   , levels :: Int
   , amount :: Int
-  , nodeTypes :: Array NodeType
   }
 
 type BoardData = Array LevelData
@@ -61,31 +63,44 @@ boardData :: BoardData
 boardData =
   [ { ampMin: 0
     , ampMax: 0
-    , quadrants: 1
+    , quadrants:
+      [ [Start]
+      ]
     , levels: 1
     , amount: 1
-    , nodeTypes: [Start]
     }
   , { ampMin: 50
     , ampMax: 250
-    , quadrants: 4
+    , quadrants:
+      [ [basicNode 1]
+      , [basicNode 1]
+      , [basicNode 1]
+      , [basicNode 1]
+      ]
     , levels: 3
     , amount: 2
-    , nodeTypes: [Start]
     }
   , { ampMin: 200
     , ampMax: 700
-    , quadrants: 4
+    , quadrants:
+      [ [blueNode 2]
+      , [redNode 2]
+      , [greenNode 2]
+      , [yellowNode 2]
+      ]
     , levels: 4
     , amount: 2
-    , nodeTypes: [Start]
     }
   , { ampMin: 600
     , ampMax: 800
-    , quadrants: 4
+    , quadrants:
+      [ [Start]
+      , [Start]
+      , [Start]
+      , [Start]
+      ]
     , levels: 2
     , amount: 3
-    , nodeTypes: [Start]
     }
   ]
 
@@ -94,42 +109,44 @@ type SectionData =
   , ampMax :: Int
   , angleMin :: Int
   , angleMax :: Int
+  , nodeTypes :: Array NodeType
   }
 
 generateSectionData :: forall r.
   { ampMin :: Int
   , ampMax :: Int
-  , quadrants :: Int
+  , quadrants :: Array (Array NodeType)
   , levels :: Int
   | r } ->
   Array SectionData
 generateSectionData { ampMin, ampMax, quadrants, levels } = do
-  level <- enumFromTo 1 levels
-  quadrant <- enumFromTo 1 quadrants
+  (level :: Int) <- enumFromTo 1 levels
+  (quadrant :: { i :: Int, x :: Array NodeType }) <-
+    quadrants # Array.mapWithIndex (\i x -> { i: i, x: x })
   let levelAmp = (ampMax - ampMin) / levels
-  let quadrantSize = 360 / quadrants
+  let quadrantSize = 360 / (length quadrants)
   pure $
     { ampMin: ampMin + ((level - 1) * levelAmp)
     , ampMax: ampMin + (level * levelAmp)
-    , angleMin: (quadrant - 1) * quadrantSize
-    , angleMax: quadrant * quadrantSize
+    , angleMin: quadrant.i * quadrantSize
+    , angleMax: (quadrant.i + 1) * quadrantSize
+    , nodeTypes: quadrant.x
     }
 
 generateSection :: forall f r.
   Monad f =>
   { nextId :: f Int
   , integerInRange :: Int -> Int -> f Int
-  , chooseSet :: forall x. Array x -> f x
   | r } ->
   SectionData ->
-  { amount :: Int, nodeTypes :: Array NodeType } ->
+  { amount :: Int } ->
   f (Array Node)
-generateSection k { ampMin, ampMax, angleMin, angleMax } { amount, nodeTypes } =
+generateSection k { ampMin, ampMax, angleMin, angleMax, nodeTypes } { amount } =
   for (enumFromTo 1 amount) $ \i -> do
     r <- k.integerInRange ampMin ampMax <#> toNumber
     φ <- k.integerInRange angleMin angleMax <#> toNumber >>> deg2Rad
     id <- k.nextId
-    nodeType <- k.chooseSet nodeTypes
+    nodeType <- (chooseSet k) nodeTypes
     pure (Node { id: id
                , x: r * Math.cos φ
                , y: r * Math.sin φ
@@ -138,3 +155,15 @@ generateSection k { ampMin, ampMax, angleMin, angleMax } { amount, nodeTypes } =
 
 deg2Rad :: Number -> Number
 deg2Rad x = x * Math.pi / 180.0
+
+chooseSet :: forall f a r.
+  Monad f =>
+  { integerInRange :: Int -> Int -> f Int
+  | r } ->
+  Array a -> f a
+chooseSet k l = do
+  let len = length l
+  i <- k.integerInRange 0 (len - 1)
+  pure $ case l !! i of
+    Just x -> x
+    Nothing -> unsafeThrow "chooseSet error: should not happen"
