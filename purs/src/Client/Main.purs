@@ -283,6 +283,26 @@ bulbType2 = ResourceBulb
     }
   }
 
+bulbType3 :: BulbType
+bulbType3 = ResourceBulb
+  { gain:
+    { growth: 0.0
+    , white: 0
+    , blue: 0
+    , red: 0
+    , green: 0
+    , yellow: 0
+    }
+  , cost:
+    { growth: 0.0
+    , white: 0
+    , blue: 2
+    , red: 0
+    , green: 0
+    , yellow: 0
+    }
+  }
+
 data BulbType
   = ResourceBulb
       { gain :: Resources

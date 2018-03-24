@@ -14,7 +14,8 @@
     "purescript-quickcheck": "^4.6.2",
     "purescript-newtype": "^2.0.0",
     "purescript-monoid": "^3.3.0",
-    "purescript-subrecord": "^0.1.0"
+    "purescript-subrecord": "^0.1.0",
+    "purescript-math": "^2.1.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"

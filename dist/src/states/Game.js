@@ -97,6 +97,19 @@ export default class extends Phaser.State {
       }
     }
 
+    const levels3 = 1;
+    const quadrants3 = 3;
+    const color3 = 0x3333EE;
+    for (var level = 0; level <= levels3; level++) {
+      for (var quadrant = 0; quadrant <= quadrants3; quadrant++) {
+        for (var i = 0; i <= 4; i++) {
+          const size = this.game.rnd.integerInRange(15, 17);
+          const pos = this.rndXY({ ampMin: 600, ampMax: 800, level: level, levels: levels3, quadrant: quadrant });
+          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color3, resource: PS.bulbType3 });
+        }
+      }
+    }
+
     this.game.camera.x = (this.game.width * -0.5);
     this.game.camera.y = (this.game.height * -0.5);
 
