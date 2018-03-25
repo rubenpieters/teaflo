@@ -83,10 +83,10 @@ boardData =
   , { ampMin: 200
     , ampMax: 700
     , quadrants:
-      [ [blueNode 2]
-      , [redNode 2]
-      , [greenNode 2]
-      , [yellowNode 2]
+      [ [blueNode 1]
+      , [redNode 1]
+      , [greenNode 1]
+      , [yellowNode 1]
       ]
     , levels: 4
     , amount: 2

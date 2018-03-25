@@ -43,7 +43,8 @@ var resources = {
   blue: 0,
   red: 0,
   green: 0,
-  yellow: 0
+  yellow: 0,
+  vp: 0
 };
 
 var resourceMap = {};
@@ -116,6 +117,7 @@ export default class extends Phaser.State {
       font: '20px Indie Flower',
       fill: '#77BFA3'
     });
+    mouseOverText.lineSpacing = -20;
 
     mouseOverText.visible = false;
 
@@ -281,8 +283,11 @@ export default class extends Phaser.State {
       mouseOverMenu.visible = true;
       const res = resourceMap[i];
       if (typeof res !== "undefined") {
-        const resourceText = 'W: ' + res.white + 'B: ' + res.blue;
-        mouseOverText.setText('ID: ' + i + '\n' + resourceText);
+        const resourceText =
+                'W:' + res.white + ' VP:' + res.vp +
+                '\nB:' + res.blue + ' R:' + res.red +
+                '\nG:' + res.green + 'Y:' + res.yellow;
+        mouseOverText.setText('I: ' + i + '\n' + resourceText);
       } else {
         mouseOverText.setText('ID: ' + i);
       }
