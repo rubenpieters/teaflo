@@ -74,7 +74,7 @@ export default class extends Phaser.State {
   }
 
   create() {
-    var board = PS.gen({ nextId: nextId, integerInRange: integerInRange(this.game) })();
+    var board = PS.generateBoardJS({ nextId: nextId, integerInRange: integerInRange(this.game) })();
     console.log("board");
     console.log(board);
 
@@ -91,46 +91,7 @@ export default class extends Phaser.State {
 
     bgGroup = this.game.add.group(gameWorld);
 
-    this.mkBulb({ size: 15, group: bgGroup, x: 0, y: 0, color: 0xFFFFFF });
-
-    const levels1 = 2;
-    const quadrants1 = 3;
-    const color1 = 0x666666;
-    for (var level = 0; level <= levels1; level++) {
-      for (var quadrant = 0; quadrant <= quadrants1; quadrant++) {
-        for (var i = 0; i <= 1; i++) {
-          const size = this.game.rnd.integerInRange(7, 9);
-          const pos = this.rndXY({ ampMin: 50, ampMax: 250, level: level, levels: levels1, quadrant: quadrant });
-          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color1, resource: PS.bulbType1 });
-        }
-      }
-    }
-
-    const levels2 = 3;
-    const quadrants2 = 3;
-    const color2 = 0xAAAAAA;
-    for (var level = 0; level <= levels2; level++) {
-      for (var quadrant = 0; quadrant <= quadrants2; quadrant++) {
-        for (var i = 0; i <= 1; i++) {
-          const size = this.game.rnd.integerInRange(9, 11);
-          const pos = this.rndXY({ ampMin: 200, ampMax: 700, level: level, levels: levels2, quadrant: quadrant });
-          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color2, resource: PS.bulbType2 });
-        }
-      }
-    }
-
-    const levels3 = 1;
-    const quadrants3 = 3;
-    const color3 = 0x3333EE;
-    for (var level = 0; level <= levels3; level++) {
-      for (var quadrant = 0; quadrant <= quadrants3; quadrant++) {
-        for (var i = 0; i <= 4; i++) {
-          const size = this.game.rnd.integerInRange(15, 17);
-          const pos = this.rndXY({ ampMin: 600, ampMax: 800, level: level, levels: levels3, quadrant: quadrant });
-          this.mkBulb({ size: size, group: bgGroup, x: pos.x, y: pos.y, color: color3, resource: PS.bulbType3 });
-        }
-      }
-    }
+    PS.drawBoardJS({ drawNode: this.drawNode(this) })(board)();
 
     this.game.camera.x = (this.game.width * -0.5);
     this.game.camera.y = (this.game.height * -0.5);
@@ -169,44 +130,28 @@ export default class extends Phaser.State {
 
   }
 
-  rndXY(o) {
-    const ampMin = o.ampMin;
-    const ampMax = o.ampMax;
-    const level = o.level;
-    const levels = o.levels;
-    const quadrant = o.quadrant;
+  drawNode(t) {
+    return function(o) {
+      return function() {
+        const id = o.id;
+        const x = o.x;
+        const y = o.y;
+        const nodeType = o.nodeType;
+        const size = 8;
 
-    const levelAmp = (ampMax - ampMin) / (levels + 1);
+        const node = t.game.add.graphics(x, y, bgGroup);
+        node.beginFill(PS.nodeColorJS(nodeType));
+        node.drawRect(size * -0.5, size * -0.5, size, size);
+        node.endFill();
+        node.inputEnabled = true;
 
-    var φ = Phaser.Math.degToRad(this.game.rnd.integerInRange(quadrant * 90, (quadrant + 1) * 90));
-    var r = this.game.rnd.integerInRange(ampMin + (level * levelAmp), ampMin + ((level + 1) * levelAmp));
-    var x = r * Math.cos(φ);
-    var y = r * Math.sin(φ);
+        node.events.onInputDown.add(t.bulbClick(id, nodeType), t);
+        node.events.onInputOver.add(t.bulbOver(id, nodeType), t);
+        //bulb.events.onInputOut.add(this.bulbOut(id, nodeType), this);
 
-    return { x: x, y: y };
-  }
-
-  mkBulb(o) {
-    const size = o.size;
-    const group = o.group;
-    const color = o.color;
-    const x = o.x;
-    const y = o.y;
-    const resource = o.resource;
-
-    const id = bulbId;
-    bulbId += 1;
-
-    var bulb = this.game.add.graphics(x, y, group);
-    bulb.beginFill(color);
-    bulb.drawRect(size * -0.5, size * -0.5, size, size);
-    bulb.endFill();
-    bulb.inputEnabled = true;
-    bulb.events.onInputDown.add(this.bulbClick(id, resource), this);
-    bulb.events.onInputOver.add(this.bulbOver(id, resource), this);
-    //bulb.events.onInputOut.add(this.bulbOut(id, resource), this);
-
-    return bulb;
+        return node;
+      };
+    };
   }
 
   render() {
@@ -264,7 +209,7 @@ export default class extends Phaser.State {
     gameWorld.pivot.y = Phaser.Math.clamp(this.oldCamY - diffY * (0.5 / zoom), -gameY, gameY);
   }
 
-  bulbClick(i, resource) {
+  bulbClick(i, nodeType) {
     return function(bulb) {
       console.log("clicked on " + i);
 
@@ -274,7 +219,7 @@ export default class extends Phaser.State {
           x: bulb.x,
           y: bulb.y,
           id: i,
-          resource: resource
+          nodeType: nodeType
         };
         console.log("x " + click0.x + " y " + click0.y);
       } else if (clickState == 1) {
@@ -282,7 +227,7 @@ export default class extends Phaser.State {
           x: bulb.x,
           y: bulb.y,
           id: i,
-          resource: resource
+          nodeType: nodeType
         };
         clickState = 0;
 
@@ -305,7 +250,7 @@ export default class extends Phaser.State {
         } else {
           console.log("creating line");
 
-          const verifyResult = PS.verifyCost(resourceMap[tup.closest.id])(tup.furthest.resource);
+          const verifyResult = PS.verifyCost(resourceMap[tup.closest.id])(tup.furthest.nodeType);
           console.log(verifyResult);
           if (verifyResult.canBuy) {
             // draw line
@@ -330,7 +275,7 @@ export default class extends Phaser.State {
     };
   }
 
-  bulbOver(i, resource) {
+  bulbOver(i, nodeType) {
     return function (bulb, pointer) {
       console.log("over " + i);
       mouseOverMenu.visible = true;
@@ -345,7 +290,7 @@ export default class extends Phaser.State {
     };
   }
 
-  bulbOut(i, resource) {
+  bulbOut(i, nodeType) {
     return function (bulb, pointer) {
       console.log("out " + i);
       //mouseOverMenu.visible = false;
