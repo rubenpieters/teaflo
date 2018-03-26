@@ -25,4 +25,5 @@ nodeColor (ResourceNode { name }) | name == "blue" = 0x1289A7
 nodeColor (ResourceNode { name }) | name == "red" = 0xEA2027
 nodeColor (ResourceNode { name }) | name == "green" = 0x009432
 nodeColor (ResourceNode { name }) | name == "yellow" = 0xFFC312
+nodeColor (VictoryNode { name }) = 0xFFBF00
 nodeColor _ = 0x000000

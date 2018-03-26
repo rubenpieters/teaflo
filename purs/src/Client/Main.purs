@@ -25,6 +25,7 @@ import Data.Monoid.Endo
 import Data.Foldable
 import Data.Newtype
 import Data.SubRecord
+import Data.Decimal as Decimal
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (throw)
@@ -110,7 +111,7 @@ centerId :: Int
 centerId = 0
 
 type Connection =
-  { to :: Bulb
+  { to :: Node
   , distance :: Number
   }
 
@@ -120,10 +121,11 @@ type Connections =
 initCxns :: Connections
 initCxns = Map.empty
 
-addLink :: { closest :: Bulb, furthest :: Bulb, distance :: Number } -> Connections -> Connections
+addLink :: { closest :: Node, furthest :: Node, distance :: Number } -> Connections -> Connections
 addLink { closest, furthest, distance } cxns =
-  cxns # Map.alter addLink' closest.id
+  cxns # Map.alter addLink' closest'.id
   where
+    (Node closest') = closest
     newCxn = { to: furthest, distance: distance }
     addLink' (Just l) = Just (Array.cons newCxn l)
     addLink' (Nothing) = Just ([newCxn])
@@ -154,46 +156,29 @@ traverseLink f links = case (Array.uncons links) of
   Just { head: link, tail: t } ->
     let
       { result: result, nextIds: nextIds } = traverseLink f t
+      (Node toNode) = link.to
     in
-      { result: f link <> result, nextIds: Array.cons link.to.id nextIds }
+      { result: f link <> result, nextIds: Array.cons toNode.id nextIds }
   Nothing -> { result: mempty, nextIds: [] }
-
-type VerifyResultR =
-  { valids :: Array Int
-  , invalids :: Array Int
-  }
-
-newtype VerifyResult = VerifyResult VerifyResultR
-
-derive instance newtypeVerifyResult :: Newtype VerifyResult _
-
-derive instance genericVerifyResult :: Generic VerifyResult _
-instance eqVerifyResult :: Eq VerifyResult where
-  eq = Rep.genericEq
-instance showVerifyResult :: Show VerifyResult where
-  show = Rep.genericShow
-
-instance semigroupVerifyResult :: Semigroup VerifyResult where
-  append
-    (VerifyResult { valids: valids1, invalids: invalids1 })
-    (VerifyResult { valids: valids2, invalids: invalids2 })
-    = (VerifyResult { valids: valids1 <> valids2, invalids: invalids1 <> invalids2 })
-
-instance monoidVerifyResult :: Monoid VerifyResult where
-  mempty = VerifyResult { valids: [], invalids: [] }
-
-verifyLinks :: Connections -> VerifyResult
-verifyLinks = traverseConnections f
-  where
-    f :: Connection -> VerifyResult
-    f cxn = VerifyResult { valids: [cxn.to.id], invalids: [] }
 
 type ResourceResult =
   { growth :: Number
+  , white :: Int
+  , blue :: Int
+  , red :: Int
+  , green :: Int
+  , yellow :: Int
   }
 
 initialResources :: ResourceResult
-initialResources = { growth: 100.0 }
+initialResources =
+  { growth: 100.0
+  , white: 0
+  , blue: 0
+  , red: 0
+  , green: 0
+  , yellow: 0
+  }
 
 calcResource :: Connections -> ResourceResult
 calcResource cxns = un Endo (calcResource' cxns) initialResources
@@ -204,42 +189,31 @@ calcResource' = traverseConnections f
     f :: Connection -> Endo ResourceResult
     f cxn = Endo (f' cxn)
     f' :: Connection -> ResourceResult -> ResourceResult
-    f' { to, distance } { growth } = { growth: growth - distance }
-
-{-
-calcResources' ::
-  Int ->
-  Connections ->
-  ResourceResult
-calcResources' id cxns =
-  case cxns # Map.lookup id of
-    Just links ->
+    f' { to, distance } { growth, white, blue, red, green, yellow } =
       let
-        { result: result, nextIds: nextIds } = traverseLink links
+        (Node node) = to
+        gain = node.nodeType # nodeGain
       in
-        result <> (nextIds # foldMap (\i -> traverseConnections' i cxns))
-    Nothing -> mempty
-
-calcResourcesLink ::
-  Array Connection ->
-  { result :: ResourceResult, nextIds :: Array Int }
-calcResourcesLink links = case (Array.uncons links) of
-  Just { head: link, tail: t } ->
-    let
-      { result: result, nextIds: nextIds } = traverseLink f t
-    in
-      { result: f link <> result, nextIds: Array.cons link.to.id nextIds }
-  Nothing -> { result: mempty, nextIds: [] }
--}
-
-verifyLinksJs :: Connections -> VerifyResultR
-verifyLinksJs cxns = un VerifyResult (verifyLinks cxns)
+        { growth: growth - distance
+        , white: white + gain.white
+        , blue: blue + gain.blue
+        , red: red + gain.red
+        , green: green + gain.green
+        , yellow: yellow + gain.yellow
+        }
 
 verifyCost ::
-  Resources -> NodeType -> { canBuy :: Boolean, newResources :: Resources }
+  Resources ->
+  NodeType ->
+  { canBuy :: Boolean, newResources :: Resources }
 verifyCost res Start = { canBuy: true, newResources: res }
 verifyCost res (ResourceNode { gain, cost }) =
   { canBuy: checkResources, newResources: newResources `plus` gain }
+  where
+  newResources = res `minus` cost
+  checkResources = newResources # isValid
+verifyCost res (VictoryNode { vp, cost }) =
+  { canBuy: checkResources, newResources: newResources }
   where
   newResources = res `minus` cost
   checkResources = newResources # isValid
@@ -259,6 +233,19 @@ drawBoardJS :: forall e r.
 drawBoardJS k board = drawBoard k board
 
 nodeColorJS = nodeColor
+
+resourceText :: Resources -> String
+resourceText { growth, white, blue, red, green, yellow } =
+  "gr:" <> show (growth #
+    Decimal.fromNumber >>>
+    Decimal.toSignificantDigits 4 >>>
+    Decimal.toNumber
+    ) <>
+  " W: " <> show white <>
+  " B: " <> show blue <>
+  " R: " <> show red <>
+  " G: " <> show green <>
+  " Y: " <> show yellow
 
 main :: Eff _ Unit
 main = pure unit

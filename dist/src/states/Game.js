@@ -51,6 +51,7 @@ var resourceMap = {};
 
 resourceMap[0] = resources;
 
+var totals = resources;
 
 function nextId() {
   const v = bulbId;
@@ -125,7 +126,7 @@ export default class extends Phaser.State {
     mouseOverText.anchor.setTo(0, 0);
 
     // bottom, resource values
-    resourceText = this.add.text(-375, 275, 'growth: 100', {
+    resourceText = this.add.text(-375, 275, 'Totals -- ' + PS.resourceText(totals), {
       font: '20px Indie Flower',
       fill: '#77BFA3'
     });
@@ -265,6 +266,12 @@ export default class extends Phaser.State {
             // add to connections
             connections = PS.addLink(tup)(connections);
 
+            // calc totals
+            var result = PS.calcResource(connections);
+            console.log("totals:");
+            console.log(result);
+            this.setTotals(result);
+
             // add to furthest valid nodes
             // closest should already be a valid or start node
             validNodes.push(tup.furthest.id);
@@ -284,7 +291,7 @@ export default class extends Phaser.State {
       const res = resourceMap[i];
       if (typeof res !== "undefined") {
         const resourceText =
-                'W:' + res.white + ' VP:' + res.vp +
+                'W:' + res.white +
                 '\nB:' + res.blue + ' R:' + res.red +
                 '\nG:' + res.green + 'Y:' + res.yellow;
         mouseOverText.setText('I: ' + i + '\n' + resourceText);
@@ -304,9 +311,9 @@ export default class extends Phaser.State {
     };
   }
 
-  setGrowth(x) {
-    resources.growth = x;
-    resourceText.setText('growth: ' + x);
+  setTotals(x) {
+    totals = x;
+    resourceText.setText('Totals -- ' + PS.resourceText(totals));
   }
 
 }
