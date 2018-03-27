@@ -234,6 +234,8 @@ drawBoardJS k board = drawBoard k board
 
 nodeColorJS = nodeColor
 
+nodeTextJS = nodeText
+
 resourceText :: Resources -> String
 resourceText { growth, white, blue, red, green, yellow } =
   "gr:" <> show (growth #

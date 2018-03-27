@@ -25,5 +25,10 @@ nodeColor (ResourceNode { name }) | name == "blue" = 0x1289A7
 nodeColor (ResourceNode { name }) | name == "red" = 0xEA2027
 nodeColor (ResourceNode { name }) | name == "green" = 0x009432
 nodeColor (ResourceNode { name }) | name == "yellow" = 0xFFC312
-nodeColor (VictoryNode { name }) = 0xFFBF00
+nodeColor (VictoryNode { name }) = 0xDA70D6
 nodeColor _ = 0x000000
+
+nodeText :: NodeType -> String
+nodeText Start = "Start"
+nodeText (ResourceNode { name }) = "resource:\n" <> name
+nodeText (VictoryNode { vp }) = "victory:\n" <> "B:" <> (show vp.blue) <> " R:" <> (show vp.red) <> "\nG:" <> (show vp.green) <> " Y:" <> (show vp.yellow)

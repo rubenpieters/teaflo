@@ -296,7 +296,7 @@ export default class extends Phaser.State {
                 '\nG:' + res.green + 'Y:' + res.yellow;
         mouseOverText.setText('I: ' + i + '\n' + resourceText);
       } else {
-        mouseOverText.setText('ID: ' + i);
+        mouseOverText.setText('ID: ' + i + '\n' + (PS.nodeTextJS(nodeType)));
       }
       mouseOverText.visible = true;
     };
