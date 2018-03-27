@@ -32,11 +32,11 @@ generateBoard :: forall f r.
   { nextId :: f Int
   , integerInRange :: Int -> Int -> f Int
   | r } ->
-  BoardData ->
+  (forall s. { integerInRange :: Int -> Int -> f Int | s } -> BoardData f) ->
   f Board
 generateBoard k boardData = do
   startNode <- generateStartNode
-  (levels :: Array (Array Node)) <- for boardData $ \level -> do
+  (levels :: Array (Array Node)) <- for (boardData k) $ \level -> do
     let sectionData = generateSectionData level
     (x :: Array (Array Node)) <- for sectionData $ \section -> do
       generateSection k section { amount: level.amount }
@@ -49,22 +49,26 @@ generateStartNode :: forall f.
 generateStartNode = do
   pure (Node { id: 0, x: 0.0, y: 0.0, nodeType: Start })
 
-type LevelData =
+type LevelData f =
   { ampMin :: Int
   , ampMax :: Int
-  , quadrants :: Array (Array NodeType)
+  , quadrants :: Array (f NodeType)
   , levels :: Int
   , amount :: Int
   }
 
-type BoardData = Array LevelData
+type BoardData f = Array (LevelData f)
 
-boardData :: BoardData
-boardData =
+boardData :: forall f r.
+  Monad f =>
+  { integerInRange :: Int -> Int -> f Int
+  | r } ->
+  BoardData f
+boardData k =
   [ { ampMin: 0
     , ampMax: 0
     , quadrants:
-      [ [Start]
+      [ pure Start
       ]
     , levels: 1
     , amount: 1
@@ -72,10 +76,10 @@ boardData =
   , { ampMin: 50
     , ampMax: 250
     , quadrants:
-      [ [basicNode 1]
-      , [basicNode 1]
-      , [basicNode 1]
-      , [basicNode 1]
+      [ pure (basicNode 1)
+      , pure (basicNode 1)
+      , pure (basicNode 1)
+      , pure (basicNode 1)
       ]
     , levels: 3
     , amount: 2
@@ -83,10 +87,10 @@ boardData =
   , { ampMin: 200
     , ampMax: 700
     , quadrants:
-      [ [blueNode 1]
-      , [redNode 1]
-      , [greenNode 1]
-      , [yellowNode 1]
+      [ pure (blueNode 1)
+      , pure (redNode 1)
+      , pure (greenNode 1)
+      , pure (yellowNode 1)
       ]
     , levels: 4
     , amount: 2
@@ -94,34 +98,34 @@ boardData =
   , { ampMin: 600
     , ampMax: 800
     , quadrants:
-      [ [Start]
-      , [Start]
-      , [Start]
-      , [Start]
+      [ k.integerInRange 1 10 >>= blueNode >>> pure
+      , pure Start
+      , pure Start
+      , pure Start
       ]
     , levels: 2
     , amount: 3
     }
   ]
 
-type SectionData =
+type SectionData f =
   { ampMin :: Int
   , ampMax :: Int
   , angleMin :: Int
   , angleMax :: Int
-  , nodeTypes :: Array NodeType
+  , nodeTypes :: f NodeType
   }
 
-generateSectionData :: forall r.
+generateSectionData :: forall f r.
   { ampMin :: Int
   , ampMax :: Int
-  , quadrants :: Array (Array NodeType)
+  , quadrants :: Array (f NodeType)
   , levels :: Int
   | r } ->
-  Array SectionData
+  Array (SectionData f)
 generateSectionData { ampMin, ampMax, quadrants, levels } = do
   (level :: Int) <- enumFromTo 1 levels
-  (quadrant :: { i :: Int, x :: Array NodeType }) <-
+  (quadrant :: { i :: Int, x :: f NodeType }) <-
     quadrants # Array.mapWithIndex (\i x -> { i: i, x: x })
   let levelAmp = (ampMax - ampMin) / levels
   let quadrantSize = 360 / (length quadrants)
@@ -138,7 +142,7 @@ generateSection :: forall f r.
   { nextId :: f Int
   , integerInRange :: Int -> Int -> f Int
   | r } ->
-  SectionData ->
+  SectionData f ->
   { amount :: Int } ->
   f (Array Node)
 generateSection k { ampMin, ampMax, angleMin, angleMax, nodeTypes } { amount } =
@@ -146,7 +150,7 @@ generateSection k { ampMin, ampMax, angleMin, angleMax, nodeTypes } { amount } =
     r <- k.integerInRange ampMin ampMax <#> toNumber
     φ <- k.integerInRange angleMin angleMax <#> toNumber >>> deg2Rad
     id <- k.nextId
-    nodeType <- (chooseSet k) nodeTypes
+    nodeType <- nodeTypes
     pure (Node { id: id
                , x: r * Math.cos φ
                , y: r * Math.sin φ
