@@ -13,6 +13,10 @@ import Data.Maybe (Maybe(..))
 import Data.Array as Array
 import Data.Array ((!!))
 import Data.Enum (enumFromTo)
+import Data.SubRecord
+import Data.SubRecord.Builder as SubRecord
+import Data.Record as Record
+import Data.Symbol (class IsSymbol, SProxy(..))
 
 import Control.Monad.Eff.Exception.Unsafe (unsafeThrow)
 
@@ -98,15 +102,32 @@ boardData k =
   , { ampMin: 600
     , ampMax: 800
     , quadrants:
-      [ k.integerInRange 1 10 >>= blueNode >>> pure
-      , pure Start
-      , pure Start
-      , pure Start
+      [ victoryNode k { color1: SProxy :: SProxy "red", color2: SProxy :: SProxy "green", color3: SProxy :: SProxy "yellow" }
+      , victoryNode k { color1: SProxy :: SProxy "green", color2: SProxy :: SProxy "yellow", color3: SProxy :: SProxy "blue" }
+      , victoryNode k { color1: SProxy :: SProxy "yellow", color2: SProxy :: SProxy "blue", color3: SProxy :: SProxy "red" }
+      , victoryNode k { color1: SProxy :: SProxy "blue", color2: SProxy :: SProxy "red", color3: SProxy :: SProxy "green" }
       ]
     , levels: 2
     , amount: 3
     }
   ]
+
+victoryNode k colors = do
+  a <- k.integerInRange 1 5
+  choice <- k.integerInRange 1 3
+  pure $ VictoryNode
+    { vp: choiceToColors { choice: choice, val1: a, val2: (5 - a) } colors
+    , cost: defaultResources
+    , name: "victory"
+    }
+
+choiceToColors { choice: 1, val1, val2 } { color1, color2, color3 } =
+  Record.set color1 val1 (Record.set color2 val2 defaultResources)
+choiceToColors { choice: 2, val1, val2 } { color1, color2, color3 } =
+  Record.set color1 val1 (Record.set color3 val2 defaultResources)
+choiceToColors { choice: 3, val1, val2 } { color1, color2, color3 } =
+  Record.set color2 val1 (Record.set color3 val2 defaultResources)
+choiceToColors _ _ = unsafeThrow "invalid choice"
 
 type SectionData f =
   { ampMin :: Int

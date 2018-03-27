@@ -65,7 +65,7 @@ data NodeType
       , name :: String
       }
   | VictoryNode
-      { vp :: Result -> { vp :: Int }
+      { vp :: Resources
       , cost :: Resources
       , name :: String
       }
