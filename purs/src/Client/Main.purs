@@ -202,6 +202,27 @@ calcResource' = traverseConnections f
         , yellow: yellow + gain.yellow
         }
 
+type VPResult =
+  { vp :: Int
+  }
+
+calcVP :: ResourceResult -> Connections -> VPResult
+calcVP totals cxns = un Endo (calcVP' totals cxns) { vp: 0 }
+
+calcVP' :: ResourceResult -> Connections -> Endo VPResult
+calcVP' totals = traverseConnections f
+  where
+  f :: Connection -> Endo VPResult
+  f cxn = Endo (f' cxn)
+  f' :: Connection -> VPResult -> VPResult
+  f' { to, distance } r@{ vp } =
+    let
+      (Node node) = to
+    in case node.nodeType of
+      VictoryNode { vp: gain } ->
+        { vp:  vp + ((gain `times` totals) # sumColors) }
+      _ -> r
+
 verifyCost ::
   Resources ->
   NodeType ->

@@ -272,6 +272,10 @@ export default class extends Phaser.State {
             console.log(result);
             this.setTotals(result);
 
+            var vp = PS.calcVP(result)(connections);
+            console.log("vp");
+            console.log(vp);
+
             // add to furthest valid nodes
             // closest should already be a valid or start node
             validNodes.push(tup.furthest.id);

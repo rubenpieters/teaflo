@@ -41,6 +41,23 @@ plus
   , yellow: yellow0 + yellow1
   }
 
+times :: Resources -> Resources -> Resources
+times
+  { growth: growth0, white: white0, blue: blue0, red: red0, green: green0, yellow: yellow0 }
+  { growth: growth1, white: white1, blue: blue1, red: red1, green: green1, yellow: yellow1 }
+  =
+  { growth: growth0 * growth1
+  , white: white0 * white1
+  , blue: blue0 * blue1
+  , red: red0 * red1
+  , green: green0 * green1
+  , yellow: yellow0 * yellow1
+  }
+
+sumColors :: Resources -> Int
+sumColors { growth, white, blue, red, green, yellow } =
+  white + blue + red + green + yellow
+
 isValid :: Resources -> Boolean
 isValid
   { growth, white, blue, red, green, yellow }
