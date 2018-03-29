@@ -37,14 +37,14 @@ import Data.Generic.Rep.Show as Rep
 import Debug.Trace
 
 tupcMap ::
-  SubJsonConfigContent -> Eff _ (StrMap Pos)
+  SubJsonConfigContent -> Eff _ (StrMap EnrichedPos)
 tupcMap x = do
   map <- fromJson { throw: throw } x
   pure $ convert map
   where
-    convert :: Map Char Pos -> StrMap Pos
+    convert :: Map Char EnrichedPos -> StrMap EnrichedPos
     convert =
-      (Map.toUnfoldable :: Map Char Pos -> Array (Tuple Char Pos)) >>>
+      (Map.toUnfoldable :: Map Char EnrichedPos -> Array (Tuple Char EnrichedPos)) >>>
       map (\(Tuple k v) -> Tuple (String.singleton k) v) >>>
       StrMap.fromFoldable
 
@@ -56,21 +56,21 @@ buttonMapConfig =
   , content:
     -- 1 2 3 4 5 6 7 8
     [ "----------------"
-    , "----------------"
     , "----1------1----"
     , "----------------"
-    , "------2--2------"
+    , "-----2----2-----"
+    , "------3--3------"
     , "----------------"
-    , "------2--2------"
-    , "----------------"
-    , "----------------"
+    , "------3--3------"
+    , "-----4----4-----"
+    , "-----5----5-----"
     , "----------------"
     , "----------------"
     , "----------------"
     ]
   }
 
-buttonMap :: Eff _ (StrMap Pos)
+buttonMap :: Eff _ (StrMap EnrichedPos)
 buttonMap = tupcMap buttonMapConfig
 
 gameUiMapConfig :: SubJsonConfigContent
@@ -95,7 +95,7 @@ gameUiMapConfig =
     ]
   }
 
-gameUiMap :: Eff _ (StrMap Pos)
+gameUiMap :: Eff _ (StrMap EnrichedPos)
 gameUiMap = tupcMap gameUiMapConfig
 
 --
