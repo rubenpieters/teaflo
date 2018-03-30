@@ -1,6 +1,6 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser-ce';
 
-import PS from 'js/purs.bundle.js';
+import * as PS from 'js/purs.bundle';
 
 const buttonMap = PS.buttonMap();
 
