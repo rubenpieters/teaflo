@@ -4,6 +4,9 @@ import PS from 'js/purs.bundle.js';
 
 const buttonMap = PS.buttonMap();
 
+var connected = false;
+var socket;
+
 export default class extends Phaser.State {
   init() { }
   preload() { }
@@ -53,7 +56,9 @@ export default class extends Phaser.State {
     });
     mapGen.setTextBounds(buttonMap['5'].xLeft, buttonMap['5'].yTop, buttonMap['5'].xWidth, buttonMap['5'].yHeight);
 
+    console.log("connecting to server");
 
+    connectToServer();
   }
 
   render() {
@@ -61,6 +66,20 @@ export default class extends Phaser.State {
 
   startGame() {
     this.state.start('Game');
+  }
+
+}
+
+async function connectToServer() {
+  if (! connected) {
+    socket = new WebSocket('ws://localhost:8080');
+    socket.onopen = function() {
+      console.log("connected");
+      socket.onmessage = function(msg) { PS.onServerStrMessageJS(msg.data)(); };
+      connected = true;
+    };
+  } else {
+    console.log("already connected!");
   }
 }
 

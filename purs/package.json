@@ -8,13 +8,15 @@
   },
   "dependencies": {
     "decimal.js": "^10.0.0",
+    "express": "^4.16.3",
+    "path": "^0.12.7",
     "uws": "^9.14.0"
   },
   "devDependencies": {},
   "scripts": {
     "test": "pulp test",
     "build:cl": "pulp browserify --standalone purs.bundle -m Client.Main --optimise --to ../client/js/purs.bundle.js",
-    "build:sv": "pulp build -O --to ../server/index.js",
+    "build:sv": "pulp build -m Server.Main --optimise --to server.js",
     "build": "npm run build:cl && npm run build:sv"
   },
   "repository": {

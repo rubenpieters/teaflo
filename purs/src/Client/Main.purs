@@ -8,6 +8,7 @@ import Prelude
 import Shared.Node
 import Shared.Board
 import Client.Draw
+import Client.Network
 
 import Tupc
 
@@ -35,6 +36,8 @@ import Data.Generic.Rep.Eq as Rep
 import Data.Generic.Rep.Show as Rep
 
 import Debug.Trace
+
+-- UI
 
 tupcMap ::
   SubJsonConfigContent -> Eff _ (StrMap EnrichedPos)
@@ -98,8 +101,7 @@ gameUiMapConfig =
 gameUiMap :: Eff _ (StrMap EnrichedPos)
 gameUiMap = tupcMap gameUiMapConfig
 
---
---
+-- Node
 
 type Bulb =
   { x :: Int
@@ -269,6 +271,10 @@ resourceText { growth, white, blue, red, green, yellow } =
   " R: " <> show red <>
   " G: " <> show green <>
   " Y: " <> show yellow
+
+-- Network
+
+onServerStrMessageJS = onServerStrMessage
 
 main :: Eff _ Unit
 main = pure unit
