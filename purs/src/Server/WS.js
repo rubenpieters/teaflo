@@ -8,11 +8,11 @@ exports.mkServer = function(config){
   return function() {
     const PORT = config.port;
 
-    const DIST = path.join(__dirname, 'client', 'dist');
-    const JS = path.join(DIST, 'client', 'js');
-    const ASSETS = path.join(DIST, 'client', 'assets');
-    const INDEX = path.join(DIST, 'client', 'index.html');
-    console.log('dist folder: ' + DIST);
+    const BUILD = path.join(__dirname, '..', 'client', 'build');
+    const JS = path.join(BUILD, 'js');
+    const ASSETS = path.join(BUILD, 'assets');
+    const INDEX = path.join(BUILD, 'index.html');
+    console.log('build folder: ' + BUILD);
 
     const app = express();
     app.get('/', function(req, res) { res.sendFile(INDEX); });

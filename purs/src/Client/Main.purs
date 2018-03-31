@@ -35,7 +35,6 @@ import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Eq as Rep
 import Data.Generic.Rep.Show as Rep
 
-import Debug.Trace
 
 -- UI
 

@@ -72,7 +72,8 @@ export default class extends Phaser.State {
 
 async function connectToServer() {
   if (! connected) {
-    socket = new WebSocket('ws://localhost:8080');
+    let HOST: string = location.origin.replace(/^https?/, 'ws')
+    socket = new WebSocket(HOST);
     socket.onopen = function() {
       console.log("connected");
       socket.onmessage = function(msg) { PS.onServerStrMessageJS(msg.data)(); };
@@ -82,4 +83,3 @@ async function connectToServer() {
     console.log("already connected!");
   }
 }
-

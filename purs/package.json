@@ -14,6 +14,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "setup": "npm install && bower install",
     "test": "pulp test",
     "build:cl": "pulp browserify --standalone purs.bundle -m Client.Main --optimise --to ../client/js/purs.bundle.js",
     "build:sv": "pulp build -m Server.Main --optimise --to server.js",

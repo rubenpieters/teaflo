@@ -1,0 +1,7 @@
+{
+  "name": "teaflo-build",
+  "version": "0.0.1",
+  "scripts": {
+    "heroku-prebuild": "npm install -g bower purescript pulp && npm run-script setup --prefix purs && npm run-script setup --prefix client && npm run-script build --prefix purs && npm run-script deploy --prefix client"
+  }
+}
