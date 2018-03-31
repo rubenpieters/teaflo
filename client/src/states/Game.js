@@ -4,8 +4,12 @@ import PS from 'js/purs.bundle.js';
 
 const gameUiMap = PS.gameUiMap();
 
-var mouseOverMenu;
-var mouseOverText;
+var resourceMenu;
+var totalText;
+var branchText;
+
+var effectMenu;
+var effectMenuText;
 
 var gfx;
 
@@ -35,8 +39,6 @@ var validNodes = [0];
 var bulbId = 0;
 
 // game resources
-var resourceText;
-
 var resources = {
   growth: 100,
   white: 0,
@@ -101,35 +103,46 @@ export default class extends Phaser.State {
     this.game.input.onDown.add(this.down, this);
     this.game.input.onUp.add(this.up, this);
 
-    // bottom right, mouseover menu
+    // left - effects menu
 
-//    mouseOverMenu = this.add.sprite(gameUiMap['1'].xLeft, gameUiMap['1'].yTop, 'bulb');
-//    console.log(gameUiMap['1']);
-//    mouseOverMenu.width = gameUiMap['1'].xRight - gameUiMap['1'].xLeft;
-//    mouseOverMenu.height = gameUiMap['1'].yBot - gameUiMap['1'].yTop;
-    mouseOverMenu = this.add.sprite(300, 200, 'bulb');
-    console.log(gameUiMap['1']);
-    mouseOverMenu.width = 100;
-    mouseOverMenu.height = 100;
+    resourceMenu = this.game.add.graphics(gameUiMap['1'].xLeft - 400, gameUiMap['1'].yTop - 300);
+    resourceMenu.beginFill(0x227744);
+    resourceMenu.drawRect(0, 0, gameUiMap['1'].xWidth, gameUiMap['1'].yHeight);
+    resourceMenu.endFill();
 
-    mouseOverMenu.visible = false;
-
-    mouseOverText = this.add.text(300, 200, '', {
+    totalText = this.add.text(0, 0, 'Totals\n' + PS.resourceText(totals), {
       font: '20px Indie Flower',
-      fill: '#77BFA3'
+      fill: '#77BFA3',
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+      wordWrap: true
     });
-    mouseOverText.lineSpacing = -20;
+    totalText.setTextBounds(gameUiMap['3'].xLeft - 400, gameUiMap['3'].yTop - 300, gameUiMap['3'].xWidth, gameUiMap['3'].yHeight);
 
-    mouseOverText.visible = false;
-
-    mouseOverText.padding.set(10, 16);
-    mouseOverText.anchor.setTo(0, 0);
-
-    // bottom, resource values
-    resourceText = this.add.text(-375, 275, 'Totals -- ' + PS.resourceText(totals), {
+    branchText = this.add.text(0, 0, 'Branch\n*hover over node\nto see branch\nresources*', {
       font: '20px Indie Flower',
-      fill: '#77BFA3'
+      fill: '#77BFA3',
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+      wordWrap: true
     });
+    branchText.setTextBounds(gameUiMap['4'].xLeft - 400, gameUiMap['4'].yTop - 300, gameUiMap['4'].xWidth, gameUiMap['4'].yHeight);
+
+    // right - effects menu
+
+    effectMenu = this.game.add.graphics(gameUiMap['2'].xLeft - 400, gameUiMap['2'].yTop - 300);
+    effectMenu.beginFill(0x227744);
+    effectMenu.drawRect(0, 0, gameUiMap['2'].xWidth, gameUiMap['2'].yHeight);
+    effectMenu.endFill();
+
+    effectMenuText = this.add.text(0, 0, '', {
+      font: '20px Indie Flower',
+      fill: '#77BFA3',
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    });
+    effectMenuText.setTextBounds(gameUiMap['2'].xLeft - 400, gameUiMap['2'].yTop - 300, gameUiMap['2'].xWidth, gameUiMap['2'].yHeight);
+    //effectMenuText.lineSpacing = -20;
 
   }
 
@@ -140,7 +153,7 @@ export default class extends Phaser.State {
         const x = o.x;
         const y = o.y;
         const nodeType = o.nodeType;
-        const size = 8;
+        const size = 15;
 
         const node = t.game.add.graphics(x, y, bgGroup);
         node.beginFill(PS.nodeColorJS(nodeType));
@@ -291,18 +304,18 @@ export default class extends Phaser.State {
   bulbOver(i, nodeType) {
     return function (bulb, pointer) {
       console.log("over " + i);
-      mouseOverMenu.visible = true;
+      effectMenuText.setText('ID: ' + i + '\n' + (PS.nodeTextJS(nodeType)));
+
       const res = resourceMap[i];
       if (typeof res !== "undefined") {
-        const resourceText =
+        const branchTextStr =
                 'W:' + res.white +
                 '\nB:' + res.blue + ' R:' + res.red +
                 '\nG:' + res.green + 'Y:' + res.yellow;
-        mouseOverText.setText('I: ' + i + '\n' + resourceText);
+        branchText.setText('Branch:\n' + branchTextStr);
       } else {
-        mouseOverText.setText('ID: ' + i + '\n' + (PS.nodeTextJS(nodeType)));
+        branchText.setText('Branch\n*node\nnot\nconnected*');
       }
-      mouseOverText.visible = true;
     };
   }
 
@@ -312,12 +325,13 @@ export default class extends Phaser.State {
       //mouseOverMenu.visible = false;
       //mouseOverText.text = '';
       //mouseOverText.visible = false;
+      branchText.setText('Branch\n*hover\nover node\nto see\nbranch\nresources*');
     };
   }
 
   setTotals(x) {
     totals = x;
-    resourceText.setText('Totals -- ' + PS.resourceText(totals));
+    totalText.setText('Totals\n' + PS.resourceText(totals));
   }
 
 }

@@ -7,6 +7,8 @@ const buttonMap = PS.buttonMap();
 var connected = false;
 var socket;
 
+const showTopAmount = 3;
+
 export default class extends Phaser.State {
   init() { }
   preload() { }
@@ -55,6 +57,18 @@ export default class extends Phaser.State {
       boundsAlignV: "middle",
     });
     mapGen.setTextBounds(buttonMap['5'].xLeft, buttonMap['5'].yTop, buttonMap['5'].xWidth, buttonMap['5'].yHeight);
+
+    let showTopHeight: number = buttonMap['3'].yHeight / showTopAmount;
+    for (var i = 0; i <= showTopAmount; i++) {
+      let showTop: Phaser.Text = this.add.text(0, 0, "x", {
+      font: '20px Indie Flower',
+      fill: '#D3D3D3',
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    });
+      showTop.setTextBounds(buttonMap['3'].xLeft, buttonMap['3'].yTop + i * showTopHeight, buttonMap['3'].xWidth, showTopHeight);
+
+    }
 
     console.log("connecting to server");
 

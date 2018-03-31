@@ -82,18 +82,18 @@ gameUiMapConfig =
     }
   , content:
     -- 1 2 3 4 5 6 7 8
-    [ "----------------"
+    [ "11------------22"
+    , "33--------------"
+    , "----------------"
+    , "33--------------"
+    , "44--------------"
+    , "----------------"
+    , "44--------------"
     , "----------------"
     , "----------------"
     , "----------------"
     , "----------------"
-    , "----------------"
-    , "----------------"
-    , "----------------"
-    , "----------------"
-    , "----------------"
-    , "--------------11"
-    , "--------------11"
+    , "11------------22"
     ]
   }
 
@@ -260,15 +260,15 @@ nodeTextJS = nodeText
 
 resourceText :: Resources -> String
 resourceText { growth, white, blue, red, green, yellow } =
-  "gr:" <> show (growth #
+  "gr: " <> show (growth #
     Decimal.fromNumber >>>
     Decimal.toSignificantDigits 4 >>>
     Decimal.toNumber
     ) <>
-  " W: " <> show white <>
-  " B: " <> show blue <>
-  " R: " <> show red <>
-  " G: " <> show green <>
+  "\nW: " <> show white <>
+  "\nB: " <> show blue <>
+  "R: " <> show red <>
+  "\nG: " <> show green <>
   " Y: " <> show yellow
 
 -- Network
