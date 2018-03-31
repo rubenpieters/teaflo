@@ -2,6 +2,7 @@
   "name": "teaflo-build",
   "version": "0.0.1",
   "scripts": {
-    "heroku-prebuild": "npm install -g bower purescript pulp webpack && npm run-script setup --prefix purs && npm run-script setup --prefix client && npm run-script build --prefix purs && npm run-script deploy --prefix client"
+    "heroku-prebuild": "export NPM_CONFIG_PRODUCTION=false && export NODE_ENV= && npm run-script setup --prefix purs && npm run-script setup --prefix client && npm run-script build --prefix purs && npm run-script deploy --prefix client",
+    "heroku-postbuild": "export NPM_CONFIG_PRODUCTION=true && export NODE_ENV=production"
   }
 }
