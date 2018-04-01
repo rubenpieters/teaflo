@@ -5,5 +5,6 @@
     "globalDeps": "npm install -g bower@1.8.4 pulp@12.0.1 purescript@0.11.7 typescript@2.7.2 webpack@3.11.0",
     "heroku-prebuild": "npm run-script globalDeps && npm run-script setup --prefix purs && npm run-script setup --prefix client",
     "heroku-postbuild": "npm run-script build --prefix purs && npm run-script deploy --prefix client"
-  }
+  },
+  "devDependencies": {}
 }

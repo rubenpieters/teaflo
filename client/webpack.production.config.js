@@ -32,6 +32,8 @@ module.exports = {
     definePlugin,
     new CleanWebpackPlugin(['build']),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+/* commented due to 'Unexpected token: name' errors, maybe use different minifier?
     new webpack.optimize.UglifyJsPlugin({
       drop_console: true,
       minimize: true,
@@ -39,6 +41,8 @@ module.exports = {
         comments: false
       }
     }),
+*/
+
     new webpack.optimize.CommonsChunkPlugin({ name: 'vendor' /* chunkName= */ , filename: 'js/vendor.bundle.js' /* filename= */ }),
     new HtmlWebpackPlugin({
       filename: 'index.html', // path.resolve(__dirname, 'build', 'index.html'),
