@@ -86,8 +86,7 @@ export default class extends Phaser.State {
 
 async function connectToServer() {
   if (! connected) {
-    //let HOST: string = location.origin.replace(/^https?/, 'ws')
-    let HOST: string = 'ws://teaflo.herokuapp.com:42463'
+    let HOST: string = location.origin.replace(/^http/, 'ws')
     socket = new WebSocket(HOST);
     socket.onopen = function() {
       console.log("connected");
