@@ -8,7 +8,7 @@ import Data.Foldable (length)
 import Data.Traversable (for)
 
 import Math as Math
-import Data.Int (toNumber)
+import Data.Int as Int
 import Data.Maybe (Maybe(..))
 import Data.Array as Array
 import Data.Array ((!!))
@@ -168,8 +168,8 @@ generateSection :: forall f r.
   f (Array Node)
 generateSection k { ampMin, ampMax, angleMin, angleMax, nodeTypes } { amount } =
   for (enumFromTo 1 amount) $ \i -> do
-    r <- k.integerInRange ampMin ampMax <#> toNumber
-    φ <- k.integerInRange angleMin angleMax <#> toNumber >>> deg2Rad
+    r <- k.integerInRange ampMin ampMax <#> Int.toNumber
+    φ <- k.integerInRange angleMin angleMax <#> Int.toNumber >>> deg2Rad
     id <- k.nextId
     nodeType <- nodeTypes
     pure (Node { id: id

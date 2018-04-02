@@ -11,6 +11,9 @@ import Data.Generic.Rep.Show (genericShow)
 
 -- message from client to server
 data ClientMessage
+  = RefreshCurrentTop
+  | SubmitSolution
+    --{ solution :: , mapId ::  }
 
 derive instance genericClientMessage :: Rep.Generic ClientMessage _
 instance encodeJsonClientMessage :: EncodeJson ClientMessage

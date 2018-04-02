@@ -2,7 +2,7 @@ module Server.Main where
 
 import Prelude
 
-import Server.WS
+import Server.WS as WS
 
 import Shared.ClientMessage
 import Shared.ServerMessage
@@ -23,49 +23,104 @@ import Control.Monad.Eff.Console (CONSOLE, log)
 import Node.Process as Node
 
 main :: Eff _ Unit
-main = startServer
-
-startServer :: Eff _ Unit
-startServer = do
+main = do
+  -- initialize server
   log "Server started"
   envPort <- Node.lookupEnv "PORT"
   let parsedPort = case (envPort >>= Int.fromString) of
         Just p -> p
         Nothing -> 8080
   log ("binding to port: " <> show parsedPort)
-  wss <- mkServer { port: parsedPort }
-  wss # onClConnect (onSocketConnection wss)
-  pure unit
+  wss <- WS.mkServer { port: parsedPort }
+  wss # WS.onClConnect (onSocketConnection k)
+  -- initialize db connection
+  -- TODO
+  where
+  k =
+    { log: log
+    , onClMessage: WS.onClMessage
+    , onClDisconnect: WS.onClDisconnect
+    , sendMessage: WS.sendMessage
+    , getCurrentTop: pure { top: [1,2,3] }
+    }
 
-onSocketConnection ::
-  (Server ClientMessage ServerMessage) ->
-  (Client ServerMessage ClientMessage) ->
-  Eff _ Unit
-onSocketConnection server client = do
-  log ("Player Connect")
-  client # onClMessage (onClientStrMessage server client)
-  client # onClDisconnect (onDisconnect)
-  client # sendMessage (CurrentTop { top: [1,2,3] })
+onSocketConnection :: forall f client r.
+  Monad f =>
+  { log :: String -> f Unit
+  , onClMessage :: (String -> f Unit) -> client -> f Unit
+  , onClDisconnect :: f Unit -> client -> f Unit
+  , sendMessage :: ServerMessage -> client -> f Unit
+  , getCurrentTop :: f { top :: Array Int }
+  | r } ->
+  client ->
+  f Unit
+onSocketConnection k client = do
+  k.log ("Player Connect")
+  -- set event handlers
+  client # k.onClMessage (onClientStrMessage k client)
+  client # k.onClDisconnect (onDisconnect k)
+  -- read current top solutions and send to client
+  refreshCurrentTop k client
 
-onClientStrMessage ::
-  (Server ClientMessage ServerMessage) ->
-  (Client ServerMessage ClientMessage) ->
+refreshCurrentTop :: forall f client r.
+  Monad f =>
+  { log :: String -> f Unit
+  , sendMessage :: ServerMessage -> client -> f Unit
+  , getCurrentTop :: f { top :: Array Int }
+  | r } ->
+  client ->
+  f Unit
+refreshCurrentTop k client = do
+  currentTop <- k.getCurrentTop
+  client # k.sendMessage (CurrentTop currentTop)
+
+onClientStrMessage :: forall f client r.
+  Monad f =>
+  { log :: String -> f Unit
+  , onClMessage :: (String -> f Unit) -> client -> f Unit
+  , onClDisconnect :: f Unit -> client -> f Unit
+  , sendMessage :: ServerMessage -> client -> f Unit
+  , getCurrentTop :: f { top :: Array Int }
+  | r } ->
+  client ->
   String ->
-  Eff _ Unit
-onClientStrMessage server client message = do
-  log ("received message " <> message)
+  f Unit
+onClientStrMessage k client message = do
+  k.log ("received message " <> message)
   let eSvMsg = jsonParser message >>= decodeJson
   case eSvMsg of
-    Left errs -> log ("malformed message")
-    Right (clMsg :: ClientMessage) -> onClientMessage server client clMsg
+    Left errs -> k.log ("malformed message")
+    Right (clMsg :: ClientMessage) -> onClientMessage k client clMsg
 
-onClientMessage ::
-  (Server ClientMessage ServerMessage) ->
-  (Client ServerMessage ClientMessage) ->
+onClientMessage :: forall f client r.
+  Monad f =>
+  { log :: String -> f Unit
+  , onClMessage :: (String -> f Unit) -> client -> f Unit
+  , onClDisconnect :: f Unit -> client -> f Unit
+  , sendMessage :: ServerMessage -> client -> f Unit
+  , getCurrentTop :: f { top :: Array Int }
+--  , addNewTop
+  | r } ->
+  client ->
   ClientMessage ->
-  Eff _ Unit
-onClientMessage server client _ = pure unit
+  f Unit
+onClientMessage k client (RefreshCurrentTop) = do
+  refreshCurrentTop k client
+onClientMessage k client (SubmitSolution) = do
+  -- validate submitted solution
+  -- if not validated, inform client
+  -- if validated, check against current top
+  -- if better, add current solution as top
+  -- if not better, inform client
+  pure unit
 
-onDisconnect :: Eff _ Unit
-onDisconnect = do
-  log ("Player Disconnect")
+onDisconnect :: forall f client r.
+  Monad f =>
+  { log :: String -> f Unit
+  , onClMessage :: (String -> f Unit) -> client -> f Unit
+  , onClDisconnect :: f Unit -> client -> f Unit
+  , sendMessage :: ServerMessage -> client -> f Unit
+  | r } ->
+  f Unit
+onDisconnect k = do
+  k.log ("Player Disconnect")
