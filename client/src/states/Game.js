@@ -268,7 +268,19 @@ export default class extends Phaser.State {
 
           const verifyResult = PS.verifyCost(resourceMap[tup.closest.id])(tup.furthest.nodeType);
           console.log(verifyResult);
-          if (verifyResult.canBuy) {
+
+          var verifyAngle = true;
+          // if closest node is not startNode
+          if (!(tup.closest.x == 0 && tup.closest.y == 0)) {
+            const angleNewLine = Phaser.Math.radToDeg(Phaser.Math.angleBetween(tup.closest.x, tup.closest.y, tup.furthest.x, tup.furthest.y));
+            const angleCenter = Phaser.Math.radToDeg(Phaser.Math.angleBetween(0, 0, tup.closest.x, tup.closest.y));
+            console.log("newline: " + angleNewLine);
+            console.log("center: " + angleCenter);
+            verifyAngle = (Phaser.Math.wrapAngle(angleCenter - angleNewLine)) <= 90 && (Phaser.Math.wrapAngle(angleCenter - angleNewLine)) >= -90;
+            console.log("verify: " + verifyAngle);
+          }
+
+          if (verifyResult.canBuy && verifyAngle) {
             // draw line
             var line = this.game.add.graphics(0, 0, bgGroup);
             line.lineStyle(5, 0x000000);
