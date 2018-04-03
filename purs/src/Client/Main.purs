@@ -221,7 +221,7 @@ calcVP' totals = traverseConnections f
       (Node node) = to
     in case node.nodeType of
       VictoryNode { vp: gain } ->
-        { vp:  vp + ((gain `times` totals) # sumColors) }
+        { vp:  vp + ((gain `times` (Resources totals)) # sumColors) }
       _ -> r
 
 verifyCost ::
@@ -258,7 +258,7 @@ nodeColorJS = nodeColor
 
 nodeTextJS = nodeText
 
-resourceText :: Resources -> String
+resourceText :: Record ResourcesR -> String
 resourceText { growth, white, blue, red, green, yellow } =
   "gr: " <> show (growth #
     Decimal.fromNumber >>>

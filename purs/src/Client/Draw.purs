@@ -31,4 +31,4 @@ nodeColor _ = 0x000000
 nodeText :: NodeType -> String
 nodeText Start = "Start"
 nodeText (ResourceNode { name }) = "resource:\n" <> name
-nodeText (VictoryNode { vp }) = "victory:\n" <> "B:" <> (show vp.blue) <> " R:" <> (show vp.red) <> "\nG:" <> (show vp.green) <> " Y:" <> (show vp.yellow)
+nodeText (VictoryNode { vp: (Resources vp) }) = "victory:\n" <> "B:" <> (show vp.blue) <> " R:" <> (show vp.red) <> "\nG:" <> (show vp.green) <> " Y:" <> (show vp.yellow)

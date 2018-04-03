@@ -20,6 +20,13 @@ import Data.Symbol (class IsSymbol, SProxy(..))
 
 import Control.Monad.Eff.Exception.Unsafe (unsafeThrow)
 
+import Data.Argonaut.Decode.Class (class DecodeJson)
+import Data.Argonaut.Decode.Generic.Rep (genericDecodeJson)
+import Data.Argonaut.Encode.Class (class EncodeJson)
+import Data.Argonaut.Encode.Generic.Rep (genericEncodeJson)
+import Data.Generic.Rep as Rep
+import Data.Generic.Rep.Show (genericShow)
+
 newtype Node = Node
   { id :: Int
   , x :: Number
@@ -27,9 +34,25 @@ newtype Node = Node
   , nodeType :: NodeType
   }
 
+derive instance genericNode :: Rep.Generic Node _
+instance encodeJsonNode :: EncodeJson Node
+  where encodeJson = genericEncodeJson
+instance decodeJsonNode :: DecodeJson Node
+  where decodeJson = genericDecodeJson
+instance showNode :: Show Node
+  where show = genericShow
+
 newtype Board = Board
   { nodes :: Array Node
   }
+
+derive instance genericBoard :: Rep.Generic Board _
+instance encodeJsonBoard :: EncodeJson Board
+  where encodeJson = genericEncodeJson
+instance decodeJsonBoard :: DecodeJson Board
+  where decodeJson = genericDecodeJson
+instance showBoard :: Show Board
+  where show = genericShow
 
 generateBoard :: forall f r.
   Monad f =>
@@ -116,8 +139,8 @@ victoryNode k colors = do
   a <- k.integerInRange 1 5
   choice <- k.integerInRange 1 3
   pure $ VictoryNode
-    { vp: choiceToColors { choice: choice, val1: a, val2: (5 - a) } colors
-    , cost: defaultResources
+    { vp: Resources $ choiceToColors { choice: choice, val1: a, val2: (5 - a) } colors
+    , cost: Resources $ defaultResources
     , name: "victory"
     }
 
