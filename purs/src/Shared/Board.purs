@@ -3,6 +3,7 @@ module Shared.Board where
 import Prelude
 
 import Shared.Node
+import Shared.MathUtils
 
 import Data.Foldable (length)
 import Data.Traversable (for)
@@ -200,9 +201,6 @@ generateSection k { ampMin, ampMax, angleMin, angleMax, nodeTypes } { amount } =
                , y: r * Math.sin φ
                , nodeType: nodeType
                })
-
-deg2Rad :: Number -> Number
-deg2Rad x = x * Math.pi / 180.0
 
 chooseSet :: forall f a r.
   Monad f =>

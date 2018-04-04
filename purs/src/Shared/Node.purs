@@ -10,6 +10,7 @@ import Data.Argonaut.Encode.Class (class EncodeJson)
 import Data.Argonaut.Encode.Generic.Rep (genericEncodeJson)
 import Data.Generic.Rep as Rep
 import Data.Generic.Rep.Show (genericShow)
+import Data.Generic.Rep.Eq (genericEq)
 
 type ResourcesR =
   ( growth :: Number
@@ -29,6 +30,8 @@ instance decodeJsonResources :: DecodeJson Resources
   where decodeJson = genericDecodeJson
 instance showResources :: Show Resources
   where show = genericShow
+instance eqResources :: Eq Resources
+  where eq = genericEq
 
 minus :: Resources -> Resources -> Resources
 minus
@@ -109,6 +112,8 @@ instance decodeJsonNodeType :: DecodeJson NodeType
   where decodeJson = genericDecodeJson
 instance showNodeType :: Show NodeType
   where show = genericShow
+instance eqNodeType :: Eq NodeType
+  where eq = genericEq
 
 nodeGain :: NodeType -> Record ResourcesR
 nodeGain Start = defaultResources
