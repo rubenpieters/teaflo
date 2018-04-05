@@ -28,12 +28,14 @@ import Data.Argonaut.Encode.Generic.Rep (genericEncodeJson)
 import Data.Generic.Rep as Rep
 import Data.Generic.Rep.Show (genericShow)
 
-newtype Node = Node
-  { id :: Int
+type NodeR =
+  ( id :: Int
   , x :: Number
   , y :: Number
   , nodeType :: NodeType
-  }
+  )
+
+newtype Node = Node (Record NodeR)
 
 derive instance genericNode :: Rep.Generic Node _
 instance encodeJsonNode :: EncodeJson Node
@@ -213,4 +215,3 @@ chooseSet k l = do
   pure $ case l !! i of
     Just x -> x
     Nothing -> unsafeThrow "chooseSet error: should not happen"
-

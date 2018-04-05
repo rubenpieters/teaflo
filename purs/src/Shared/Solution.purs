@@ -6,8 +6,12 @@ import Shared.MathUtils as MathUtils
 import Shared.Node
 import Shared.Board
 
+import Data.Foldable (elem)
 import Data.Either (Either(..))
 import Data.Map (Map(..))
+import Data.Map as Map
+import Data.Maybe (Maybe(..))
+import Data.Array as Array
 
 import Control.Monad.Eff.Exception.Unsafe (unsafeThrow)
 
@@ -50,14 +54,74 @@ instance showSolution :: Show (Solution x)
 
 data RejectReason
   = Angle
+  | FurthestConnected
+  | ClosestNotConnected
+  | NotEnoughResources
+
+findClosest ::
+  { node1 :: Record NodeR, node2 :: Record NodeR } ->
+  { closest :: Record NodeR, furthest :: Record NodeR }
+findClosest { node1, node2 } =
+  let
+    dist1 = MathUtils.distance { point1: { x: 0.0, y: 0.0 }, point2: node1}
+    dist2 = MathUtils.distance { point1: { x: 0.0, y: 0.0 }, point2: node2}
+  in if (dist1 > dist2)
+    then { closest: node2, furthest: node1 }
+    else { closest: node1, furthest: node2 }
 
 addConnection ::
-  -- distance = distance from to
-  -- fromResources at the 'from' node, precalculated
-  { from :: Node, to :: Node, distance :: Number, fromResources :: Record ResourcesR } ->
+  { from :: Node
+  , to :: Node
+  -- resources at the 'from' node, precalculated
+  , fromResources :: Record ResourcesR
+  -- ids of already connected nodes
+  , connectedNodeIds :: Array Int
+  } ->
   Solution Verified ->
-  Either { rejectReason :: RejectReason } { newSolution :: Solution Verified }
-addConnection { from, to, distance } sol = Left { rejectReason: Angle }
+  Either { rejectReason :: Array RejectReason } { newSolution :: Solution Verified, newResources :: Resources }
+addConnection { from: (Node from), to: (Node to), fromResources, connectedNodeIds } (Solution sol) =
+  let
+    { closest, furthest } = findClosest { node1: from, node2: to }
+    distance = MathUtils.distance { point1: from, point2: to }
+    -- TODO: verify distance, check with current growth
+    verifyFurthest = not $ connectedNodeIds # elem furthest.id
+    verifyClosest = connectedNodeIds # elem closest.id
+    verifyNodeAngle = verifyAngle { closest: (Node closest), furthest: (Node furthest) }
+    { canBuy: verifyCost, newResources } = verifyCost (Resources fromResources) furthest.nodeType
+    (verifyList :: Array RejectReason) =
+      [ ifFalse verifyFurthest FurthestConnected
+      , ifFalse verifyClosest ClosestNotConnected
+      , ifFalse verifyNodeAngle Angle
+      -- TODO: not enough resource message should contain more information
+      , ifFalse verifyCost NotEnoughResources
+      ] # Array.catMaybes
+    in
+      if verifyList # Array.null
+        then Left { rejectReason: verifyList }
+        else Right { newSolution: Solution (sol # addLink { closest: (Node closest)
+                                                          , furthest: (Node furthest)
+                                                          , distance: distance
+                                                          }
+                                            )
+                   , newResources: newResources
+                   }
+  --Left { rejectReason: [Angle] }
+
+addLink ::
+  { closest :: Node, furthest :: Node, distance :: Number } ->
+  Map Int (Array Connection) ->
+  Map Int (Array Connection)
+addLink { closest, furthest, distance } cxns =
+  cxns # Map.alter addLink' closest'.id
+  where
+    (Node closest') = closest
+    newCxn = Connection { to: furthest, distance: distance }
+    addLink' (Just l) = Just (Array.cons newCxn l)
+    addLink' (Nothing) = Just ([newCxn])
+
+ifFalse :: forall a. Boolean -> a -> Maybe a
+ifFalse false a = Just a
+ifFalse true _ = Nothing
 
 verifyAngle ::
   { closest :: Node, furthest :: Node } ->
@@ -68,3 +132,19 @@ verifyAngle { closest: (Node closest), furthest: (Node furthest) } =
   angleNewLine = MathUtils.rad2Deg (MathUtils.angleBetween { point1: closest, point2: furthest })
   angleCenter = MathUtils.rad2Deg (MathUtils.angleBetween { point1: { x: 0.0, y: 0.0 }, point2: closest })
   verifyAngle = MathUtils.wrapAngle (angleCenter - angleNewLine)
+
+verifyCost ::
+  Resources ->
+  NodeType ->
+  { canBuy :: Boolean, newResources :: Resources }
+verifyCost res Start = { canBuy: true, newResources: res }
+verifyCost res (ResourceNode { gain, cost }) =
+  { canBuy: checkResources, newResources: newResources `plus` gain }
+  where
+  newResources = res `minus` cost
+  checkResources = newResources # isValid
+verifyCost res (VictoryNode { vp, cost }) =
+  { canBuy: checkResources, newResources: newResources }
+  where
+  newResources = res `minus` cost
+  checkResources = newResources # isValid
