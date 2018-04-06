@@ -78,7 +78,12 @@ addConnection ::
   , connectedNodeIds :: Array Int
   } ->
   Solution Verified ->
-  Either { rejectReason :: Array RejectReason } { newSolution :: Solution Verified, newResources :: Resources }
+  Either
+    { rejectReason :: Array RejectReason }
+    { newSolution :: Solution Verified
+    , newResources :: Resources
+    , furthestId :: Int
+    }
 addConnection { from: (Node from), to: (Node to), fromResources, connectedNodeIds } (Solution sol) =
   let
     { closest, furthest } = findClosest { node1: from, node2: to }
@@ -104,6 +109,7 @@ addConnection { from: (Node from), to: (Node to), fromResources, connectedNodeId
                                                           }
                                             )
                    , newResources: newResources
+                   , furthestId: furthest.id
                    }
   --Left { rejectReason: [Angle] }
 

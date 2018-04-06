@@ -247,67 +247,40 @@ export default class extends Phaser.State {
         };
         clickState = 0;
 
-        const fromDist = Phaser.Math.distance(0, 0, click0.x, click0.y);
-        const toDist = Phaser.Math.distance(0, 0, click1.x, click1.y);
+        const verify = PS.addConnectionJS({ from: click0
+                                          , to: click1
+                                          // TODO: this can be undefined
+                                          , fromResources: resourceMap[click0.id]
+                                          , connectedNodeIds: validNodes
+                                          })(connections);
+        console.log(verify);
+        if (verify.added) {
+          // draw line
+          var line = this.game.add.graphics(0, 0, bgGroup);
+          line.lineStyle(5, 0x000000);
+          line.moveTo(click0.x, click0.y);
+          line.lineTo(click1.x, click1.y);
+          line.endFill();
 
-        var tup;
-        if (fromDist > toDist) {
-          tup = { closest: click1, furthest: click0 };
-        } else {
-          tup = { closest: click0, furthest: click1 };
-        }
-        tup.distance = Phaser.Point.distance(new Phaser.Point(click0.x, click0.y), new Phaser.Point(click1.x, click1.y)) / 20;
-        console.log("distance: " + tup.distance);
+          // add to connections
+          connections = verify.newSolution;
 
-        if (Array.includes(validNodes, tup.furthest.id)) {
-          console.log("rejected");
-        } else if (! Array.includes(validNodes, tup.closest.id)) {
-          console.log("new start node, rejected");
-        } else {
-          console.log("creating line");
+          // calc totals
+          var result = PS.calcResource(connections);
+          console.log("totals:");
+          console.log(result);
+          this.setTotals(result);
 
-          const verifyResult = PS.verifyCost(resourceMap[tup.closest.id])(tup.furthest.nodeType);
-          console.log(verifyResult);
+          var vp = PS.calcVP(result)(connections);
+          console.log("vp");
+          console.log(vp);
 
-          var verifyAngle = true;
-          // if closest node is not startNode
-          if (!(tup.closest.x == 0 && tup.closest.y == 0)) {
-            const angleNewLine = Phaser.Math.radToDeg(Phaser.Math.angleBetween(tup.closest.x, tup.closest.y, tup.furthest.x, tup.furthest.y));
-            const angleCenter = Phaser.Math.radToDeg(Phaser.Math.angleBetween(0, 0, tup.closest.x, tup.closest.y));
-            console.log("newline: " + angleNewLine);
-            console.log("center: " + angleCenter);
-            verifyAngle = (Phaser.Math.wrapAngle(angleCenter - angleNewLine)) <= 90 && (Phaser.Math.wrapAngle(angleCenter - angleNewLine)) >= -90;
-            console.log("verify: " + verifyAngle);
-          }
+          // add to furthest valid nodes
+          // closest should already be a valid or start node
+          validNodes.push(verify.furthestId);
 
-          if (verifyResult.canBuy && verifyAngle) {
-            // draw line
-            var line = this.game.add.graphics(0, 0, bgGroup);
-            line.lineStyle(5, 0x000000);
-            line.moveTo(click0.x, click0.y);
-            line.lineTo(click1.x, click1.y);
-            line.endFill();
-
-            // add to connections
-            connections = PS.addLink(tup)(connections);
-
-            // calc totals
-            var result = PS.calcResource(connections);
-            console.log("totals:");
-            console.log(result);
-            this.setTotals(result);
-
-            var vp = PS.calcVP(result)(connections);
-            console.log("vp");
-            console.log(vp);
-
-            // add to furthest valid nodes
-            // closest should already be a valid or start node
-            validNodes.push(tup.furthest.id);
-
-            // update resources
-            resourceMap[tup.furthest.id] = verifyResult.newResources;
-          }
+          // update resources
+          resourceMap[verify.furthestId] = verify.newResources;
         }
       }
     };

@@ -7,6 +7,7 @@ import Prelude
 
 import Shared.Node
 import Shared.Board
+import Shared.Solution
 import Client.Draw
 import Client.Network
 
@@ -19,6 +20,7 @@ import Data.StrMap as StrMap
 import Data.Tuple (Tuple(..))
 import Data.String as String
 import Data.SubRecord as SubRecord
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Array as Array
 import Data.Monoid
@@ -121,6 +123,39 @@ type Connections =
 
 initCxns :: Connections
 initCxns = Map.empty
+
+addConnectionJS ::
+  { from :: Record NodeR
+  , to :: Record NodeR
+  -- resources at the 'from' node, precalculated
+  , fromResources :: Record ResourcesR
+  -- ids of already connected nodes
+  , connectedNodeIds :: Array Int
+  } ->
+  Solution Verified ->
+  SubRecord
+    ( added :: Boolean
+    , rejectReason :: Array RejectReason
+    , newSolution :: Solution Verified
+    , newResources :: Resources
+    , furthestId :: Int
+    )
+addConnectionJS { from, to, fromResources, connectedNodeIds } sol =
+  case (addConnection
+    { from: Node from
+    , to: Node to
+    , fromResources: fromResources
+    , connectedNodeIds: connectedNodeIds
+    }) sol of
+      Left { rejectReason } ->
+        mkSubRecord { added: false, rejectReason: rejectReason }
+      Right { newSolution, newResources, furthestId } ->
+        mkSubRecord { added: true
+                    , newSolution: newSolution
+                    , newResources: newResources
+                    , furthestId: furthestId
+                    }
+
 
 addLink :: { closest :: Node, furthest :: Node, distance :: Number } -> Connections -> Connections
 addLink { closest, furthest, distance } cxns =
