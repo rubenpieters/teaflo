@@ -3,6 +3,7 @@ module Server.Main where
 import Prelude
 
 import Server.WS as WS
+import Server.DB as DB
 
 import Shared.ClientMessage
 import Shared.ServerMessage

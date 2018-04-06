@@ -20,7 +20,8 @@
     "purescript-symbols": "^3.0.0",
     "purescript-node-process": "^5.0.0",
     "purescript-foreign-callbacks": "*",
-    "purescript-node-postgres": "^4.1.0"
+    "purescript-node-postgres": "^4.1.0",
+    "purescript-simple-json": "^2.0.1"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"
