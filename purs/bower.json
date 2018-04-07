@@ -21,7 +21,8 @@
     "purescript-node-process": "^5.0.0",
     "purescript-foreign-callbacks": "*",
     "purescript-node-postgres": "^4.1.0",
-    "purescript-simple-json": "^2.0.1"
+    "purescript-simple-json": "^2.0.1",
+    "purescript-node-readline": "^3.1.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"
