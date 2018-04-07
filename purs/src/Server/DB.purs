@@ -21,7 +21,7 @@ import Control.Monad.Aff (Aff)
 
 import Data.Argonaut.Decode.Class (decodeJson)
 import Data.Argonaut.Encode.Class (encodeJson)
-import Data.Argonaut.Core (stringify)
+import Data.Argonaut.Core (Json, stringify)
 import Data.Argonaut.Parser (jsonParser)
 
 import Simple.JSON (readJSON)
@@ -59,10 +59,12 @@ instance decodeDBBoard :: Decode DBBoard where
     boardJson <- decode =<< readProp "boardJson" obj
     pure $ DBBoard { id: id, boardJson: boardJson }
 
--- stored data is exactly the purescript representation
--- not sure if good idea...
-toBoard :: Foreign -> Board
-toBoard = unsafeCoerce
+toBoard :: Foreign -> Either String Board
+toBoard obj = do
+  -- representation stored in DB is Argonaut Json
+  let (boardJson :: Json) = unsafeCoerce obj
+  decodedJson <- decodeJson boardJson
+  pure decodedJson
 
 --toBoard :: Foreign -> Either String Board
 --toBoard obj =
@@ -103,7 +105,7 @@ getBoard { id } c = do
   dbBoard <- c # PG.queryValue_ query
   pure $ case dbBoard of
     Nothing -> Left $ "No board for id " <> show id
-    Just x -> Right $ x # toBoard
+    Just x -> x # toBoard
 
 --------------------------------------
 -- Connection Info

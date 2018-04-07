@@ -69,7 +69,7 @@ run "setup" = setupDB
 run "test1" = log (stringify (encodeJson testBoard))
 run "test2" = onPostgres (\c -> c # DB.putBoard { id: 1, board: testBoard })
 run "test3" = onPostgres (\c -> c # PG.query_ (Query ("select boardJson from boards where id = 1") :: Query Foreign) >>= \x -> traceAny x (\_ -> pure unit))
-run "test4" = onPostgres (\c -> c # DB.getBoard { id: 1 } >>= \x -> traceAny x (\_ -> pure unit) *> liftEff $ log "success")
+run "test4" = onPostgres (\c -> c # DB.getBoard { id: 1 } >>= \x -> liftEff $ log (show x))
 run cmd = log ("unknown command " <> cmd)
 
 onPostgres :: forall eff a.
