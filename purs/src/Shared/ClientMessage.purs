@@ -12,6 +12,7 @@ import Data.Generic.Rep.Show (genericShow)
 -- message from client to server
 data ClientMessage
   = RefreshCurrentTop
+  | GetCurrentBoard
   | SubmitSolution
     --{ solution :: , mapId ::  }
 

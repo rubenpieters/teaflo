@@ -8,11 +8,11 @@ import Server.DB as DB
 
 import Data.Foreign (Foreign)
 
-import Control.Monad.Aff (Aff, launchAff_)
 import Control.Monad.Eff (kind Effect, Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (log)
 import Control.Monad.Eff.Exception (EXCEPTION)
+import Control.Monad.Aff (Aff, launchAff_)
 
 import Data.Argonaut.Decode.Class (decodeJson)
 import Data.Argonaut.Encode.Class (encodeJson)
@@ -76,7 +76,7 @@ onPostgres :: forall eff a.
   (Client -> Aff (db :: DB, exception :: EXCEPTION, fs :: FS | eff) Unit) ->
   Eff (db :: DB, exception :: EXCEPTION, fs :: FS | eff) Unit
 onPostgres aff = launchAff_ do
-  connectionInfo <- liftEff $ DB.connectionInfo
+  connectionInfo <- liftEff $ DB.connectionInfo "./credentials-heroku.json"
   pool <- liftEff $ PG.mkPool connectionInfo
   PG.withClient pool $ \c -> aff c
 

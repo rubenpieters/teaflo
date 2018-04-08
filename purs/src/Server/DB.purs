@@ -63,20 +63,7 @@ toBoard :: Foreign -> Either String Board
 toBoard obj = do
   -- representation stored in DB is Argonaut Json
   let (boardJson :: Json) = unsafeCoerce obj
-  decodedJson <- decodeJson boardJson
-  pure decodedJson
-
---toBoard :: Foreign -> Either String Board
---toBoard obj =
-{-  traceAny obj $ (\_ -> pure unit)
-  boardJson <- lmap show $ runExcept $ decode obj
-  traceAny boardJson $ (\_ -> pure unit)
-  parsedJson <- jsonParser boardJson
-  traceAny parsedJson $ (\_ -> pure unit)
-  decodedJson <- decodeJson parsedJson
-  traceAny decodedJson $ (\_ -> pure unit)
-  pure decodedJson
--}
+  decodeJson boardJson
 
 putBoard ::
   { id :: Int, board :: Board } ->
@@ -116,8 +103,8 @@ parseClientConfig s = case readJSON s of
   Left err -> throw (show err)
   Right config -> pure config
 
-connectionInfo :: Eff _ ConnectionInfo
-connectionInfo = do
-  credentialContents <- readTextFile UTF8 "./credentials-heroku.json"
+connectionInfo :: String -> Eff _ ConnectionInfo
+connectionInfo credentialsPath = do
+  credentialContents <- readTextFile UTF8 credentialsPath
   clientConfig <- parseClientConfig credentialContents
   pure $ PG.connectionInfoFromConfig clientConfig PG.defaultPoolConfig

@@ -27,3 +27,4 @@ onServerMessage ::
   ServerMessage ->
   Eff _ Unit
 onServerMessage (CurrentTop { top }) = log ("top " <> show top)
+onServerMessage (CurrentBoard { board }) = log ("board " <> show board)

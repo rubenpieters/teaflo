@@ -2,6 +2,8 @@ module Shared.ServerMessage where
 
 import Prelude
 
+import Shared.Board
+
 import Data.Argonaut.Decode.Class (class DecodeJson)
 import Data.Argonaut.Decode.Generic.Rep (genericDecodeJson)
 import Data.Argonaut.Encode.Class (class EncodeJson)
@@ -12,6 +14,7 @@ import Data.Generic.Rep.Show (genericShow)
 -- message from server to client
 data ServerMessage
   = CurrentTop { top :: Array Int }
+  | CurrentBoard { board :: Board }
 
 derive instance genericServerMessage :: Rep.Generic ServerMessage _
 instance encodeJsonServerMessage :: EncodeJson ServerMessage
