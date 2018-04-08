@@ -1,41 +1,38 @@
 module Client.Main (module Client.Main, module Exported) where
 
-import Tupc (Pos(..)) as Exported
-import Data.Maybe (Maybe(..)) as Exported
-
-import Prelude
-
-import Shared.Node
-import Shared.Board
-import Shared.Solution
 import Client.Draw
 import Client.Network
-
-import Tupc
-
-import Data.Map (Map)
-import Data.Map as Map
-import Data.StrMap (StrMap)
-import Data.StrMap as StrMap
-import Data.Tuple (Tuple(..))
-import Data.String as String
-import Data.SubRecord as SubRecord
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
-import Data.Array as Array
+import Data.Foldable
 import Data.Monoid
 import Data.Monoid.Endo
-import Data.Foldable
 import Data.Newtype
 import Data.SubRecord
-import Data.Decimal as Decimal
+import Prelude
+import Shared.Board
+import Shared.Node
+import Shared.Solution
+import Tupc
 
 import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (log, CONSOLE)
 import Control.Monad.Eff.Exception (throw)
 
+import Data.Array as Array
+import Data.Decimal as Decimal
+import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Eq as Rep
 import Data.Generic.Rep.Show as Rep
+import Data.Map (Map)
+import Data.Map as Map
+import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..)) as Exported
+import Data.StrMap (StrMap)
+import Data.StrMap as StrMap
+import Data.String as String
+import Data.SubRecord as SubRecord
+import Data.Tuple (Tuple(..))
+import Tupc (Pos(..)) as Exported
 
 
 -- UI
@@ -308,7 +305,17 @@ resourceText { growth, white, blue, red, green, yellow } =
 
 -- Network
 
-onServerStrMessageJS = onServerStrMessage
+onServerStrMessageJS :: forall eff r.
+  { onGetCurrentTop :: { top :: Array Int } -> Eff (console :: CONSOLE | eff) Unit
+  , onGetCurrentBoard :: { board :: Board } -> Eff (console :: CONSOLE | eff) Unit
+  | r } ->
+  String ->
+  Eff (console :: CONSOLE | eff) Unit
+onServerStrMessageJS k = onServerStrMessage
+  { log: log
+  , onGetCurrentTop: k.onGetCurrentTop
+  , onGetCurrentBoard: k.onGetCurrentBoard
+  }
 
 main :: Eff _ Unit
 main = pure unit

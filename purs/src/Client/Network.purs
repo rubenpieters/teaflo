@@ -2,6 +2,7 @@ module Client.Network where
 
 import Prelude
 
+import Shared.Board
 import Shared.ClientMessage
 import Shared.ServerMessage
 
@@ -14,17 +15,26 @@ import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson)
 import Data.Argonaut.Encode.Class (class EncodeJson, encodeJson)
 import Data.Argonaut.Parser (jsonParser)
 
-onServerStrMessage ::
+onServerStrMessage :: forall f r.
+  { log :: String -> f Unit
+  , onGetCurrentTop :: { top :: Array Int } -> f Unit
+  , onGetCurrentBoard :: { board :: Board } -> f Unit
+  | r } ->
   String ->
-  Eff _ Unit
-onServerStrMessage message = do
+  f Unit
+onServerStrMessage k message = do
   let eSvMsg = jsonParser message >>= decodeJson
   case eSvMsg of
-    Left errs -> log ("malformed message: " <> message)
-    Right (svMsg :: ServerMessage) -> onServerMessage svMsg
+    Left errs -> k.log ("malformed message: " <> message)
+    Right (svMsg :: ServerMessage) -> onServerMessage k svMsg
 
-onServerMessage ::
+onServerMessage :: forall f r.
+  { onGetCurrentTop :: { top :: Array Int } -> f Unit
+  , onGetCurrentBoard :: { board :: Board } -> f Unit
+  | r } ->
   ServerMessage ->
-  Eff _ Unit
-onServerMessage (CurrentTop { top }) = log ("top " <> show top)
-onServerMessage (CurrentBoard { board }) = log ("board " <> show board)
+  f Unit
+onServerMessage k (CurrentTop msg) = k.onGetCurrentTop msg
+--log ("top " <> show top)
+onServerMessage k (CurrentBoard msg) = k.onGetCurrentBoard msg
+--log ("board " <> show board)

@@ -4,6 +4,8 @@ import PS from 'js/purs.bundle.js';
 
 const gameUiMap = PS.gameUiMap();
 
+var board;
+
 var resourceMenu;
 var totalText;
 var branchText;
@@ -72,13 +74,18 @@ function integerInRange(g) {
 };
 
 export default class extends Phaser.State {
-  init() { }
+  init(givenBoard) {
+    if (typeof givenBoard === "undefined") {
+      board = PS.generateBoardJS({ nextId: nextId, integerInRange: integerInRange(this.game) })();
+    } else {
+      board = givenBoard;
+    }
+  }
   preload() {
     this.game.time.advancedTiming = true;
   }
 
   create() {
-    var board = PS.generateBoardJS({ nextId: nextId, integerInRange: integerInRange(this.game) })();
     console.log("board");
     console.log(board);
 
