@@ -113,7 +113,7 @@ onClientMessage :: forall f client r.
   f Unit
 onClientMessage k client (RefreshCurrentTop) = do
   refreshCurrentTop k client
-onClientMessage k client (SubmitSolution) = do
+onClientMessage k client (SubmitSolution { solution }) = do
   -- validate submitted solution
   -- if not validated, inform client
   -- if validated, check against current top

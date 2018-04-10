@@ -2,6 +2,8 @@ module Shared.ClientMessage where
 
 import Prelude
 
+import Shared.Solution
+
 import Data.Argonaut.Decode.Class (class DecodeJson)
 import Data.Argonaut.Decode.Generic.Rep (genericDecodeJson)
 import Data.Argonaut.Encode.Class (class EncodeJson)
@@ -13,7 +15,7 @@ import Data.Generic.Rep.Show (genericShow)
 data ClientMessage
   = RefreshCurrentTop
   | GetCurrentBoard
-  | SubmitSolution
+  | SubmitSolution { solution :: Solution Verified }
     --{ solution :: , mapId ::  }
 
 derive instance genericClientMessage :: Rep.Generic ClientMessage _

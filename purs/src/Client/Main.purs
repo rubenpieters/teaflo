@@ -110,6 +110,7 @@ type Bulb =
 centerId :: Int
 centerId = 0
 
+{-
 type Connection =
   { to :: Node
   , distance :: Number
@@ -117,9 +118,10 @@ type Connection =
 
 type Connections =
   Map Int (Array Connection)
+-}
 
-initCxns :: Connections
-initCxns = Map.empty
+initCxns :: Solution Verified
+initCxns = Solution Map.empty
 
 addConnectionJS ::
   { from :: Record NodeR
@@ -154,14 +156,14 @@ addConnectionJS { from, to, fromResources, connectedNodeIds } sol =
                     }
 
 
-addLink :: { closest :: Node, furthest :: Node, distance :: Number } -> Connections -> Connections
-addLink { closest, furthest, distance } cxns =
-  cxns # Map.alter addLink' closest'.id
+addLink :: { closest :: Node, furthest :: Node, distance :: Number } -> Solution Verified -> Solution Verified
+addLink { closest, furthest, distance } (Solution sol) =
+  Solution (sol # Map.alter addLink' closest'.id)
   where
     (Node closest') = closest
-    newCxn = { to: furthest, distance: distance }
+    newCxn = Connection { to: furthest, distance: distance }
     addLink' (Just l) = Just (Array.cons newCxn l)
-    addLink' (Nothing) = Just ([newCxn])
+    addLink' (Nothing) = Just [newCxn]
 
 traverseConnections = traverseConnections' centerId
 
@@ -169,15 +171,15 @@ traverseConnections' :: forall a.
   (Monoid a) =>
   Int ->
   (Connection -> a) ->
-  Connections ->
+  Solution Verified ->
   a
-traverseConnections' id f cxns =
-  case cxns # Map.lookup id of
+traverseConnections' id f sol'@(Solution sol) =
+  case sol # Map.lookup id of
     Just links ->
       let
         { result: result, nextIds: nextIds } = traverseLink f links
       in
-        result <> (nextIds # foldMap (\i -> traverseConnections' i f cxns))
+        result <> (nextIds # foldMap (\i -> traverseConnections' i f sol'))
     Nothing -> mempty
 
 traverseLink :: forall a.
@@ -186,12 +188,12 @@ traverseLink :: forall a.
   Array Connection ->
   { result :: a, nextIds :: Array Int }
 traverseLink f links = case (Array.uncons links) of
-  Just { head: link, tail: t } ->
+  Just { head: link'@(Connection link), tail: t } ->
     let
       { result: result, nextIds: nextIds } = traverseLink f t
       (Node toNode) = link.to
     in
-      { result: f link <> result, nextIds: Array.cons toNode.id nextIds }
+      { result: f link' <> result, nextIds: Array.cons toNode.id nextIds }
   Nothing -> { result: mempty, nextIds: [] }
 
 type ResourceResult =
@@ -213,16 +215,16 @@ initialResources =
   , yellow: 0
   }
 
-calcResource :: Connections -> ResourceResult
+calcResource :: Solution Verified -> ResourceResult
 calcResource cxns = un Endo (calcResource' cxns) initialResources
 
-calcResource' :: Connections -> Endo ResourceResult
+calcResource' :: Solution Verified -> Endo ResourceResult
 calcResource' = traverseConnections f
   where
     f :: Connection -> Endo ResourceResult
     f cxn = Endo (f' cxn)
     f' :: Connection -> ResourceResult -> ResourceResult
-    f' { to, distance } { growth, white, blue, red, green, yellow } =
+    f' (Connection { to, distance }) { growth, white, blue, red, green, yellow } =
       let
         (Node node) = to
         gain = node.nodeType # nodeGain
@@ -239,16 +241,16 @@ type VPResult =
   { vp :: Int
   }
 
-calcVP :: ResourceResult -> Connections -> VPResult
+calcVP :: ResourceResult -> Solution Verified -> VPResult
 calcVP totals cxns = un Endo (calcVP' totals cxns) { vp: 0 }
 
-calcVP' :: ResourceResult -> Connections -> Endo VPResult
+calcVP' :: ResourceResult -> Solution Verified -> Endo VPResult
 calcVP' totals = traverseConnections f
   where
   f :: Connection -> Endo VPResult
   f cxn = Endo (f' cxn)
   f' :: Connection -> VPResult -> VPResult
-  f' { to, distance } r@{ vp } =
+  f' (Connection { to, distance }) r@{ vp } =
     let
       (Node node) = to
     in case node.nodeType of
