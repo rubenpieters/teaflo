@@ -41,7 +41,7 @@ getCurrentTop ::
   { boardId :: Int
   } ->
   Client ->
-  Aff _ { top :: Array { vp :: Int, solutionId :: Int } }
+  Aff _ (Array { vp :: Int, solutionId :: Int })
 getCurrentTop { boardId } c = do
   let (query :: Query Foreign) = Query $
     "select vp, id from solutions" <>
@@ -51,7 +51,7 @@ getCurrentTop { boardId } c = do
   let (transform :: Foreign -> { vp :: Int, solutionId :: Int }) = unsafeCoerce
   dbResult <- c # PG.query_ query
   let transformed = dbResult <#> transform
-  pure { top: transformed }
+  pure transformed
 
 submitSolution ::
   { solutionId :: Int

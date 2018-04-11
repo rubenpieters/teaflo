@@ -1,34 +1,29 @@
 module Server.Main where
 
+import Data.Foreign.Callback
 import Prelude
-
-import Server.WS as WS
-import Server.DB as DB
-
 import Shared.Board
 import Shared.ClientMessage
 import Shared.ServerMessage
 import Shared.Solution
 
-import Data.Int as Int
-import Data.Maybe (Maybe(..))
-import Data.Either (Either(..))
-import Data.Foreign.Callback
-
-import Data.Argonaut.Core (stringify)
-import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson)
-import Data.Argonaut.Encode.Class (class EncodeJson, encodeJson)
-import Data.Argonaut.Parser (jsonParser)
-
+import Control.Monad.Aff (Aff, launchAff_)
 import Control.Monad.Eff (kind Effect, Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (throw)
-import Control.Monad.Aff (Aff, launchAff_)
-
-import Node.Process as Node
-
+import Data.Argonaut.Core (stringify)
+import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson)
+import Data.Argonaut.Encode.Class (class EncodeJson, encodeJson)
+import Data.Argonaut.Parser (jsonParser)
+import Data.Array as Array
+import Data.Either (Either(..))
+import Data.Int as Int
+import Data.Maybe (Maybe(..))
 import Database.Postgres as PG
+import Node.Process as Node
+import Server.DB as DB
+import Server.WS as WS
 
 main :: Eff _ Unit
 main = do
@@ -51,13 +46,17 @@ main = do
     , onClMessage: WS.onClMessage
     , onClDisconnect: WS.onClDisconnect
     , sendMessage: WS.sendMessage
-    , getCurrentTop: pure { top: [1,2,3] }
     , getCurrentBoard: \k -> launchAff_ $ do
         PG.withClient pool $ \c -> do
           eBoard <- c # DB.getBoard { id: 1 }
           case eBoard of
             Left err -> liftEff $ throw err
             Right board -> liftEff $ k board
+    , getCurrentTop: \k -> launchAff_ $ do
+        PG.withClient pool $ \c -> do
+          currentTop <- c # DB.getCurrentTop { boardId: 1 }
+          liftEff $ k currentTop
+    , submitSolution: \_ -> pure unit -- TODO
     }
 
 onSocketConnection :: forall f client r.
@@ -67,7 +66,8 @@ onSocketConnection :: forall f client r.
   , onClDisconnect :: f Unit -> client -> f Unit
   , sendMessage :: ServerMessage -> client -> f Unit
   , getCurrentBoard :: (Board -> f Unit) -> f Unit
-  , getCurrentTop :: f { top :: Array Int }
+  , getCurrentTop :: (Array { vp :: Int, solutionId :: Int } -> f Unit) -> f Unit
+  , submitSolution :: Solution -> f Unit
   | r } ->
   client ->
   f Unit
@@ -87,7 +87,8 @@ onClientStrMessage :: forall f client r.
   , onClDisconnect :: f Unit -> client -> f Unit
   , sendMessage :: ServerMessage -> client -> f Unit
   , getCurrentBoard :: (Board -> f Unit) -> f Unit
-  , getCurrentTop :: f { top :: Array Int }
+  , getCurrentTop :: (Array { vp :: Int, solutionId :: Int } -> f Unit) -> f Unit
+  , submitSolution :: Solution -> f Unit
   | r } ->
   client ->
   String ->
@@ -106,8 +107,8 @@ onClientMessage :: forall f client r.
   , onClDisconnect :: f Unit -> client -> f Unit
   , sendMessage :: ServerMessage -> client -> f Unit
   , getCurrentBoard :: (Board -> f Unit) -> f Unit
-  , getCurrentTop :: f { top :: Array Int }
---  , addNewTop
+  , getCurrentTop :: (Array { vp :: Int, solutionId :: Int } -> f Unit) -> f Unit
+  , submitSolution :: Solution -> f Unit
   | r } ->
   client ->
   ClientMessage ->
@@ -127,19 +128,20 @@ refreshCurrentTop :: forall f client r.
   Monad f =>
   { log :: String -> f Unit
   , sendMessage :: ServerMessage -> client -> f Unit
-  , getCurrentTop :: f { top :: Array Int }
+  , getCurrentTop :: (Array { vp :: Int, solutionId :: Int } -> f Unit) -> f Unit
   | r } ->
   client ->
   f Unit
 refreshCurrentTop k client = do
-  currentTop <- k.getCurrentTop
-  client # k.sendMessage (CurrentTop currentTop)
+  let afterFetch currentTop = client # k.sendMessage (CurrentTop {top: (currentTop <#> _.vp) })
+  k.getCurrentTop afterFetch
 
 submitSolution :: forall f client r.
   Monad f =>
   { log :: String -> f Unit
   , sendMessage :: ServerMessage -> client -> f Unit
-  , getCurrentTop :: f { top :: Array Int }
+  , getCurrentTop :: (Array { vp :: Int, solutionId :: Int } -> f Unit) -> f Unit
+  , submitSolution :: Solution -> f Unit
   | r } ->
   Solution ->
   client ->
@@ -151,7 +153,16 @@ submitSolution k sol client = do
   -- if validated, check against current top
   -- if better, add current solution as top
   -- if not better, inform client
-  pure unit
+  k.getCurrentTop afterFetch
+  where
+    afterFetch currentTop = do
+      let mLowestTop = Array.last currentTop
+      let addTop = case mLowestTop of
+            Just lowestTop -> 9999 > lowestTop.vp -- TODO: calc vp of sol
+            Nothing -> true
+      if addTop
+        then k.submitSolution sol
+        else pure unit -- TODO inform client, solution not better than current top
 
 
 getCurrentBoard :: forall f client r.
