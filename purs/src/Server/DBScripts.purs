@@ -4,9 +4,13 @@ import Prelude
 
 import Shared.Board
 import Shared.Node
+import Shared.Solution
 import Server.DB as DB
 
 import Data.Foreign (Foreign)
+import Data.Map (Map(..))
+import Data.Map (fromFoldable)
+import Data.Tuple (Tuple(..))
 
 import Control.Monad.Eff (kind Effect, Eff)
 import Control.Monad.Eff.Class (liftEff)
@@ -64,12 +68,24 @@ testBoard = Board
     ]
   }
 
+testSolution :: Number -> Solution
+testSolution x = Solution $
+  fromFoldable
+    [ Tuple 0 [Connection { to: Node { id: 1, x: 4.0, y: 4.0, nodeType: Start }, distance: x }]
+    ]
+
 run :: String -> Eff _ Unit
 run "setup" = setupDB
 run "test1" = log (stringify (encodeJson testBoard))
 run "test2" = onPostgres (\c -> c # DB.putBoard { id: 1, board: testBoard })
 run "test3" = onPostgres (\c -> c # PG.query_ (Query ("select boardJson from boards where id = 1") :: Query Foreign) >>= \x -> traceAny x (\_ -> pure unit))
 run "test4" = onPostgres (\c -> c # DB.getBoard { id: 1 } >>= \x -> liftEff $ log (show x))
+run "test5" = onPostgres (\c -> c # DB.submitSolution { solutionId: 1, boardId: 1, vp: 1, solution: testSolution 1.0 })
+run "test6" = onPostgres (\c -> c # DB.submitSolution { solutionId: 1, boardId: 1, vp: 2, solution: testSolution 2.0 })
+run "test7" = onPostgres (\c -> c # DB.submitSolution { solutionId: 1, boardId: 1, vp: 3, solution: testSolution 3.0 })
+run "test8" = onPostgres (\c -> c # DB.submitSolution { solutionId: 1, boardId: 1, vp: 4, solution: testSolution 4.0 })
+run "test9" = onPostgres (\c -> c # PG.query_ (Query ("select vp, solutionJson from solutions where boardId = 1") :: Query Foreign) >>= \x -> traceAny x (\_ -> pure unit))
+run "test10" = onPostgres (\c -> c # DB.getCurrentTop { boardId: 1 } >>= \x -> traceAny x (\_ -> pure unit))
 run cmd = log ("unknown command " <> cmd)
 
 onPostgres :: forall eff a.
@@ -86,7 +102,7 @@ onPostgres aff = launchAff_ do
 setupDB :: Eff _ Unit
 setupDB = do
   onPostgres $ \c -> do
-    PG.execute_ (Query setupBoardsTable) c
+    -- PG.execute_ (Query setupBoardsTable) c
     PG.execute_ (Query setupSolutionsTable) c
 
 setupBoardsTable :: String
@@ -101,6 +117,7 @@ setupSolutionsTable :: String
 setupSolutionsTable = """
   create table solutions (
     id integer not null,
+    boardId integer not null,
     vp integer not null,
     solutionJson jsonb
   )

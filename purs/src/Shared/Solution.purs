@@ -149,4 +149,3 @@ verifyCost res (VictoryNode { vp, cost }) =
   where
   newResources = res `minus` cost
   checkResources = newResources # isValid
-
