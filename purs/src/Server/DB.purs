@@ -42,7 +42,7 @@ getCurrentTop = pure { top: [1,2,3] }
 
 submitSolution ::
   { boardId :: Int
-  , solution :: Solution Verified
+  , solution :: Solution
   } ->
   Eff _ Unit
 submitSolution { boardId, solution } = pure unit

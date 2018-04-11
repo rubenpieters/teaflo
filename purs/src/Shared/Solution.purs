@@ -28,12 +28,7 @@ newtype Connection = Connection
   , distance :: Number
   }
 
-foreign import kind V
-
-foreign import data Verified :: V
-foreign import data Unverified :: V
-
-newtype Solution (x :: V) =
+newtype Solution =
   Solution (Map Int (Array Connection))
 
 derive instance genericConnection :: Rep.Generic Connection _
@@ -44,12 +39,12 @@ instance decodeJsonConnection :: DecodeJson Connection
 instance showConnection :: Show Connection
   where show = genericShow
 
-derive instance genericSolution :: Rep.Generic (Solution x) _
-instance encodeJsonSolutionVerified :: EncodeJson (Solution Verified)
+derive instance genericSolution :: Rep.Generic Solution _
+instance encodeJsonSolution :: EncodeJson Solution
   where encodeJson = genericEncodeJson
-instance decodeJsonSolutionVerified :: DecodeJson (Solution Verified)
+instance decodeJsonSolution :: DecodeJson Solution
   where decodeJson = genericDecodeJson
-instance showSolution :: Show (Solution x)
+instance showSolution :: Show Solution
   where show = genericShow
 
 data RejectReason
@@ -77,10 +72,10 @@ addConnection ::
   -- ids of already connected nodes
   , connectedNodeIds :: Array Int
   } ->
-  Solution Verified ->
+  Solution ->
   Either
     { rejectReason :: Array RejectReason }
-    { newSolution :: Solution Verified
+    { newSolution :: Solution
     , newResources :: Resources
     , furthestId :: Int
     }
@@ -154,3 +149,4 @@ verifyCost res (VictoryNode { vp, cost }) =
   where
   newResources = res `minus` cost
   checkResources = newResources # isValid
+

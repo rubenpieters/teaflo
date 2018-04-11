@@ -8,6 +8,7 @@ import Server.DB as DB
 import Shared.Board
 import Shared.ClientMessage
 import Shared.ServerMessage
+import Shared.Solution
 
 import Data.Int as Int
 import Data.Maybe (Maybe(..))
@@ -114,12 +115,7 @@ onClientMessage :: forall f client r.
 onClientMessage k client (RefreshCurrentTop) = do
   refreshCurrentTop k client
 onClientMessage k client (SubmitSolution { solution }) = do
-  -- validate submitted solution
-  -- if not validated, inform client
-  -- if validated, check against current top
-  -- if better, add current solution as top
-  -- if not better, inform client
-  pure unit
+  submitSolution k solution client
 onClientMessage k client (GetCurrentBoard) = do
   getCurrentBoard k client
 
@@ -138,6 +134,25 @@ refreshCurrentTop :: forall f client r.
 refreshCurrentTop k client = do
   currentTop <- k.getCurrentTop
   client # k.sendMessage (CurrentTop currentTop)
+
+submitSolution :: forall f client r.
+  Monad f =>
+  { log :: String -> f Unit
+  , sendMessage :: ServerMessage -> client -> f Unit
+  , getCurrentTop :: f { top :: Array Int }
+  | r } ->
+  Solution ->
+  client ->
+  f Unit
+submitSolution k sol client = do
+  -- validate submitted solution
+  -- if not validated, inform client
+  -- TODO
+  -- if validated, check against current top
+  -- if better, add current solution as top
+  -- if not better, inform client
+  pure unit
+
 
 getCurrentBoard :: forall f client r.
   Monad f =>

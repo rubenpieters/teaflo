@@ -120,7 +120,7 @@ type Connections =
   Map Int (Array Connection)
 -}
 
-initCxns :: Solution Verified
+initCxns :: Solution
 initCxns = Solution Map.empty
 
 addConnectionJS ::
@@ -131,11 +131,11 @@ addConnectionJS ::
   -- ids of already connected nodes
   , connectedNodeIds :: Array Int
   } ->
-  Solution Verified ->
+  Solution ->
   SubRecord
     ( added :: Boolean
     , rejectReason :: Array RejectReason
-    , newSolution :: Solution Verified
+    , newSolution :: Solution
     , newResources :: Resources
     , furthestId :: Int
     )
@@ -156,7 +156,7 @@ addConnectionJS { from, to, fromResources, connectedNodeIds } sol =
                     }
 
 
-addLink :: { closest :: Node, furthest :: Node, distance :: Number } -> Solution Verified -> Solution Verified
+addLink :: { closest :: Node, furthest :: Node, distance :: Number } -> Solution -> Solution
 addLink { closest, furthest, distance } (Solution sol) =
   Solution (sol # Map.alter addLink' closest'.id)
   where
@@ -171,7 +171,7 @@ traverseConnections' :: forall a.
   (Monoid a) =>
   Int ->
   (Connection -> a) ->
-  Solution Verified ->
+  Solution ->
   a
 traverseConnections' id f sol'@(Solution sol) =
   case sol # Map.lookup id of
@@ -215,10 +215,10 @@ initialResources =
   , yellow: 0
   }
 
-calcResource :: Solution Verified -> ResourceResult
+calcResource :: Solution -> ResourceResult
 calcResource cxns = un Endo (calcResource' cxns) initialResources
 
-calcResource' :: Solution Verified -> Endo ResourceResult
+calcResource' :: Solution -> Endo ResourceResult
 calcResource' = traverseConnections f
   where
     f :: Connection -> Endo ResourceResult
@@ -241,10 +241,10 @@ type VPResult =
   { vp :: Int
   }
 
-calcVP :: ResourceResult -> Solution Verified -> VPResult
+calcVP :: ResourceResult -> Solution -> VPResult
 calcVP totals cxns = un Endo (calcVP' totals cxns) { vp: 0 }
 
-calcVP' :: ResourceResult -> Solution Verified -> Endo VPResult
+calcVP' :: ResourceResult -> Solution -> Endo VPResult
 calcVP' totals = traverseConnections f
   where
   f :: Connection -> Endo VPResult

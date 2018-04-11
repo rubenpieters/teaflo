@@ -86,12 +86,22 @@ onPostgres aff = launchAff_ do
 setupDB :: Eff _ Unit
 setupDB = do
   onPostgres $ \c -> do
-    PG.execute_ (Query setup) c
+    PG.execute_ (Query setupBoardsTable) c
+    PG.execute_ (Query setupSolutionsTable) c
 
-setup :: String
-setup = """
+setupBoardsTable :: String
+setupBoardsTable = """
  create table boards (
     id integer not null,
     boardJson jsonb
+  )
+  """
+
+setupSolutionsTable :: String
+setupSolutionsTable = """
+  create table solutions (
+    id integer not null,
+    vp integer not null,
+    solutionJson jsonb
   )
   """

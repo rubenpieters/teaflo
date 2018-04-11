@@ -15,7 +15,7 @@ import Data.Generic.Rep.Show (genericShow)
 data ClientMessage
   = RefreshCurrentTop
   | GetCurrentBoard
-  | SubmitSolution { solution :: Solution Verified }
+  | SubmitSolution { solution :: Solution }
     --{ solution :: , mapId ::  }
 
 derive instance genericClientMessage :: Rep.Generic ClientMessage _
