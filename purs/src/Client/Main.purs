@@ -11,6 +11,7 @@ import Prelude
 import Shared.Board
 import Shared.Node
 import Shared.Solution
+import Shared.ClientMessage
 import Tupc
 
 import Control.Monad.Eff (Eff)
@@ -34,6 +35,10 @@ import Data.SubRecord as SubRecord
 import Data.Tuple (Tuple(..))
 import Tupc (Pos(..)) as Exported
 
+import Data.Argonaut.Core (stringify)
+import Data.Argonaut.Encode.Class (class EncodeJson, encodeJson)
+
+import Debug.Trace (traceAny, spy)
 
 -- UI
 
@@ -91,7 +96,7 @@ gameUiMapConfig =
     , "----------------"
     , "----------------"
     , "----------------"
-    , "----------------"
+    , "--------------55"
     , "11------------22"
     ]
   }
@@ -318,6 +323,26 @@ onServerStrMessageJS k = onServerStrMessage
   , onGetCurrentTop: k.onGetCurrentTop
   , onGetCurrentBoard: k.onGetCurrentBoard
   }
+
+foreign import data Socket :: Type
+
+foreign import unsafeEmit :: forall e. String -> Socket -> Eff e Unit
+
+emit :: forall msg.
+  (EncodeJson msg) =>
+  msg -> Socket -> Eff _ Unit
+emit msg socket = socket # unsafeEmit (stringify (encodeJson msg))
+
+submitSolution :: forall eff r.
+  { getSocket :: Eff (console :: CONSOLE | eff) Socket
+  | r } ->
+  Solution ->
+  Eff (console :: CONSOLE | eff) Unit
+submitSolution k sol = do
+  log "submitting..."
+  socket <- k.getSocket
+  log ("test")
+  (spy socket) # emit (SubmitSolution { solution: sol })
 
 main :: Eff _ Unit
 main = pure unit

@@ -48,7 +48,7 @@ export default class extends Phaser.State {
     playLocal.inputEnabled = true;
     playLocal.events.onInputOver.add(function() { playLocal.fill = '#88CFB4'; playLocal.setShadow(1.5,1.5,'rgb(0,0,0,0.15)', 3); }, this);
     playLocal.events.onInputOut.add(function() { playLocal.fill = '#77BFA3'; playLocal.setShadow(null);}, this);
-    playLocal.events.onInputDown.add(this.startGame(undefined), this);
+    playLocal.events.onInputDown.add(this.startGame({ board: undefined }), this);
 
     let mapGen = this.add.text(0, 0, mapGenText, {
       font: '30px Indie Flower',
@@ -79,9 +79,9 @@ export default class extends Phaser.State {
   render() {
   }
 
-  startGame(board) {
+  startGame(data) {
     return function() {
-      this.state.start('Game', true, false, board);
+      this.state.start('Game', true, false, { socket: socket, board: data.board });
     }
   }
 
@@ -104,7 +104,7 @@ export default class extends Phaser.State {
         playCurrent.inputEnabled = true;
         playCurrent.events.onInputOver.add(function() { playCurrent.fill = '#88CFB4'; playCurrent.setShadow(1.5,1.5,'rgb(0,0,0,0.15)', 3); }, t);
         playCurrent.events.onInputOut.add(function() { playCurrent.fill = '#77BFA3'; playCurrent.setShadow(null);}, t);
-        playCurrent.events.onInputDown.add(t.startGame(board), t);
+        playCurrent.events.onInputDown.add(t.startGame({ board: board }), t);
       }
     }
   }

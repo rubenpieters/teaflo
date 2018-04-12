@@ -4,6 +4,8 @@ import PS from 'js/purs.bundle.js';
 
 const gameUiMap = PS.gameUiMap();
 
+var socket;
+
 var board;
 
 var resourceMenu;
@@ -74,12 +76,17 @@ function integerInRange(g) {
 };
 
 export default class extends Phaser.State {
-  init(givenBoard) {
+  init(data) {
+    let givenBoard = data.board;
+    let givenSocket = data.socket;
+    // set board
     if (typeof givenBoard === "undefined") {
       board = PS.generateBoardJS({ nextId: nextId, integerInRange: integerInRange(this.game) })();
     } else {
       board = givenBoard;
     }
+    // set socket
+    socket = givenSocket;
   }
   preload() {
     this.game.time.advancedTiming = true;
@@ -151,6 +158,26 @@ export default class extends Phaser.State {
     effectMenuText.setTextBounds(gameUiMap['2'].xLeft - 400, gameUiMap['2'].yTop - 300, gameUiMap['2'].xWidth, gameUiMap['2'].yHeight);
     //effectMenuText.lineSpacing = -20;
 
+    // right - submit button
+
+    let submitBtn = this.add.text(0, 0, "submit", {
+      font: '30px Indie Flower',
+      fill: '#77BFA3',
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    });
+    submitBtn.setTextBounds(gameUiMap['5'].xLeft - 400, gameUiMap['5'].yTop - 300, gameUiMap['5'].xWidth, gameUiMap['5'].yHeight);
+
+    submitBtn.inputEnabled = true;
+    submitBtn.events.onInputOver.add(function() { submitBtn.fill = '#88CFB4'; submitBtn.setShadow(1.5,1.5,'rgb(0,0,0,0.15)', 3); }, this);
+    submitBtn.events.onInputOut.add(function() { submitBtn.fill = '#77BFA3'; submitBtn.setShadow(null);}, this);
+    submitBtn.events.onInputDown.add(this.submitSolution, this);
+
+
+  }
+
+  submitSolution() {
+    PS.submitSolution({ getSocket: function() { return socket; }})(connections)();
   }
 
   drawNode(t) {
