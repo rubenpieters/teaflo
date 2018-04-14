@@ -2,10 +2,15 @@ module Shared.Solution where
 
 import Prelude
 
+
 import Shared.MathUtils as MathUtils
 import Shared.Node
 import Shared.Board
 
+import Data.Foldable
+import Data.Newtype
+import Data.Monoid
+import Data.Monoid.Endo
 import Data.Foldable (elem)
 import Data.Either (Either(..))
 import Data.Map (Map(..))
@@ -21,7 +26,6 @@ import Data.Argonaut.Encode.Class (class EncodeJson)
 import Data.Argonaut.Encode.Generic.Rep (genericEncodeJson)
 import Data.Generic.Rep as Rep
 import Data.Generic.Rep.Show (genericShow)
-
 
 newtype Connection = Connection
   { to :: Node
@@ -149,3 +153,109 @@ verifyCost res (VictoryNode { vp, cost }) =
   where
   newResources = res `minus` cost
   checkResources = newResources # isValid
+
+--------------------------------------
+-- Traverse Solution
+--------------------------------------
+
+centerId :: Int
+centerId = 0
+
+traverseConnections = traverseConnections' centerId
+
+traverseConnections' :: forall a.
+  (Monoid a) =>
+  Int ->
+  (Connection -> a) ->
+  Solution ->
+  a
+traverseConnections' id f sol'@(Solution sol) =
+  case sol # Map.lookup id of
+    Just links ->
+      let
+        { result: result, nextIds: nextIds } = traverseLink f links
+      in
+        result <> (nextIds # foldMap (\i -> traverseConnections' i f sol'))
+    Nothing -> mempty
+
+traverseLink :: forall a.
+  (Monoid a) =>
+  (Connection -> a) ->
+  Array Connection ->
+  { result :: a, nextIds :: Array Int }
+traverseLink f links = case (Array.uncons links) of
+  Just { head: link'@(Connection link), tail: t } ->
+    let
+      { result: result, nextIds: nextIds } = traverseLink f t
+      (Node toNode) = link.to
+    in
+      { result: f link' <> result, nextIds: Array.cons toNode.id nextIds }
+  Nothing -> { result: mempty, nextIds: [] }
+
+--------------------------------------
+-- Calculate VP on Board
+--------------------------------------
+
+type ResourceResult =
+  { growth :: Number
+  , white :: Int
+  , blue :: Int
+  , red :: Int
+  , green :: Int
+  , yellow :: Int
+  }
+
+type VPResult =
+  { vp :: Int
+  }
+
+calculateVP :: ResourceResult -> Solution -> VPResult
+calculateVP totals cxns = un Endo (calculateVP' totals cxns) { vp: 0 }
+  where
+  calculateVP' :: ResourceResult -> Solution -> Endo VPResult
+  calculateVP' totals = traverseConnections f
+  f :: Connection -> Endo VPResult
+  f cxn = Endo (f' cxn)
+  f' :: Connection -> VPResult -> VPResult
+  f' (Connection { to, distance }) r@{ vp } =
+    let
+      (Node node) = to
+    in case node.nodeType of
+      VictoryNode { vp: gain } ->
+        { vp:  vp + ((gain `times` (Resources totals)) # sumColors) }
+      _ -> r
+
+--------------------------------------
+-- Calculate Resources on Board
+--------------------------------------
+
+initialResources :: ResourceResult
+initialResources =
+  { growth: 100.0
+  , white: 0
+  , blue: 0
+  , red: 0
+  , green: 0
+  , yellow: 0
+  }
+
+calculateResources :: Solution -> ResourceResult
+calculateResources cxns = un Endo (calculateResources' cxns) initialResources
+  where
+  calculateResources' :: Solution -> Endo ResourceResult
+  calculateResources' = traverseConnections f
+  f :: Connection -> Endo ResourceResult
+  f cxn = Endo (f' cxn)
+  f' :: Connection -> ResourceResult -> ResourceResult
+  f' (Connection { to, distance }) { growth, white, blue, red, green, yellow } =
+    let
+      (Node node) = to
+      gain = node.nodeType # nodeGain
+    in
+      { growth: growth - distance
+      , white: white + gain.white
+      , blue: blue + gain.blue
+      , red: red + gain.red
+      , green: green + gain.green
+      , yellow: yellow + gain.yellow
+      }

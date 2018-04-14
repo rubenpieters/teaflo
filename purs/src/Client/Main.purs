@@ -112,8 +112,6 @@ type Bulb =
   , id :: Int
   }
 
-centerId :: Int
-centerId = 0
 
 {-
 type Connection =
@@ -170,98 +168,10 @@ addLink { closest, furthest, distance } (Solution sol) =
     addLink' (Just l) = Just (Array.cons newCxn l)
     addLink' (Nothing) = Just [newCxn]
 
-traverseConnections = traverseConnections' centerId
 
-traverseConnections' :: forall a.
-  (Monoid a) =>
-  Int ->
-  (Connection -> a) ->
-  Solution ->
-  a
-traverseConnections' id f sol'@(Solution sol) =
-  case sol # Map.lookup id of
-    Just links ->
-      let
-        { result: result, nextIds: nextIds } = traverseLink f links
-      in
-        result <> (nextIds # foldMap (\i -> traverseConnections' i f sol'))
-    Nothing -> mempty
+calculateResourcesJS = calculateResources
 
-traverseLink :: forall a.
-  (Monoid a) =>
-  (Connection -> a) ->
-  Array Connection ->
-  { result :: a, nextIds :: Array Int }
-traverseLink f links = case (Array.uncons links) of
-  Just { head: link'@(Connection link), tail: t } ->
-    let
-      { result: result, nextIds: nextIds } = traverseLink f t
-      (Node toNode) = link.to
-    in
-      { result: f link' <> result, nextIds: Array.cons toNode.id nextIds }
-  Nothing -> { result: mempty, nextIds: [] }
-
-type ResourceResult =
-  { growth :: Number
-  , white :: Int
-  , blue :: Int
-  , red :: Int
-  , green :: Int
-  , yellow :: Int
-  }
-
-initialResources :: ResourceResult
-initialResources =
-  { growth: 100.0
-  , white: 0
-  , blue: 0
-  , red: 0
-  , green: 0
-  , yellow: 0
-  }
-
-calcResource :: Solution -> ResourceResult
-calcResource cxns = un Endo (calcResource' cxns) initialResources
-
-calcResource' :: Solution -> Endo ResourceResult
-calcResource' = traverseConnections f
-  where
-    f :: Connection -> Endo ResourceResult
-    f cxn = Endo (f' cxn)
-    f' :: Connection -> ResourceResult -> ResourceResult
-    f' (Connection { to, distance }) { growth, white, blue, red, green, yellow } =
-      let
-        (Node node) = to
-        gain = node.nodeType # nodeGain
-      in
-        { growth: growth - distance
-        , white: white + gain.white
-        , blue: blue + gain.blue
-        , red: red + gain.red
-        , green: green + gain.green
-        , yellow: yellow + gain.yellow
-        }
-
-type VPResult =
-  { vp :: Int
-  }
-
-calcVP :: ResourceResult -> Solution -> VPResult
-calcVP totals cxns = un Endo (calcVP' totals cxns) { vp: 0 }
-
-calcVP' :: ResourceResult -> Solution -> Endo VPResult
-calcVP' totals = traverseConnections f
-  where
-  f :: Connection -> Endo VPResult
-  f cxn = Endo (f' cxn)
-  f' :: Connection -> VPResult -> VPResult
-  f' (Connection { to, distance }) r@{ vp } =
-    let
-      (Node node) = to
-    in case node.nodeType of
-      VictoryNode { vp: gain } ->
-        { vp:  vp + ((gain `times` (Resources totals)) # sumColors) }
-      _ -> r
+calculateVPJS = calculateVP
 
 verifyCost ::
   Resources ->

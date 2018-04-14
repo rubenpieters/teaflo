@@ -300,12 +300,12 @@ export default class extends Phaser.State {
           connections = verify.newSolution;
 
           // calc totals
-          var result = PS.calcResource(connections);
+          var result = PS.calculateResourcesJS(connections);
           console.log("totals:");
           console.log(result);
           this.setTotals(result);
 
-          var vp = PS.calcVP(result)(connections);
+          var vp = PS.calculateVPJS(result)(connections);
           console.log("vp");
           console.log(vp);
 
