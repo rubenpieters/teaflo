@@ -251,8 +251,7 @@ submitSolution :: forall eff r.
 submitSolution k sol = do
   log "submitting..."
   socket <- k.getSocket
-  log ("test")
-  (spy socket) # emit (SubmitSolution { solution: sol })
+  socket # emit (SubmitSolution { solution: sol })
 
 main :: Eff _ Unit
 main = pure unit

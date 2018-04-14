@@ -155,10 +155,16 @@ submitSolution k sol client = do
   -- if not better, inform client
   k.getCurrentTop afterFetch
   where
+    solutionResources :: ResourceResult
+    solutionResources = sol # calculateResources
+    solutionVP :: VPResult
+    solutionVP = sol # calculateVP solutionResources
     afterFetch currentTop = do
       let mLowestTop = Array.last currentTop
+      k.log ("lowest VP: " <> (show $ mLowestTop <#> _.vp))
+      k.log ("submitted VP:  " <> (show solutionVP.vp))
       let addTop = case mLowestTop of
-            Just lowestTop -> 9999 > lowestTop.vp -- TODO: calc vp of sol
+            Just lowestTop -> solutionVP.vp > lowestTop.vp
             Nothing -> true
       if addTop
         then k.submitSolution sol

@@ -4,6 +4,9 @@ import PS from 'js/purs.bundle.js';
 
 const gameUiMap = PS.gameUiMap();
 
+var msgBox;
+var msgBoxText;
+
 var socket;
 
 var board;
@@ -178,6 +181,40 @@ export default class extends Phaser.State {
 
   submitSolution() {
     PS.submitSolution({ getSocket: function() { return socket; }})(connections)();
+    this.showMsgBox("submitting...");
+  }
+
+  showMsgBox(text) {
+    if (typeof msgBox === "undefined") {
+      msgBox = this.game.add.graphics(-100, -50);
+      msgBox.beginFill(0x708090);
+      msgBox.drawRect(0, 0, 200, 100);
+      msgBox.endFill();
+    }
+
+    if (typeof msgBoxText === "undefined") {
+      msgBoxText = this.add.text(0, 0, text, {
+        font: '30px Indie Flower',
+        fill: '#77BFA3',
+        boundsAlignH: "center",
+        boundsAlignV: "middle",
+      });
+
+      msgBoxText.setTextBounds(-100, -50, 200, 100);
+
+      msgBoxText.inputEnabled = true;
+      msgBoxText.events.onInputDown.add(this.hideMsgBox, this);
+
+    } else {
+      msgBoxText.setText(text);
+    }
+  }
+
+  hideMsgBox() {
+    msgBox.destroy();
+    msgBoxText.destroy();
+    msgBox = undefined;
+    msgBoxText = undefined;
   }
 
   drawNode(t) {
