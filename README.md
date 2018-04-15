@@ -1,1 +1,3 @@
-# teaflo
+# TeaFlo
+
+Collaboration Puzzle Game

@@ -1,1 +1,1 @@
-web: node purs/server.js
+web: npx ts-node src/server/main.ts
