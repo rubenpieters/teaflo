@@ -30,6 +30,7 @@
     "html-webpack-plugin": "^2.30.1",
     "ts-loader": "^3.5.0",
     "ts-node": "^5.0.1",
+    "tsconfig-paths-webpack-plugin": "^3.0.4",
     "tslint": "^5.9.1",
     "tslint-loader": "^3.5.3",
     "typescript": "^2.8.1",
