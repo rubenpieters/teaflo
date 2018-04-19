@@ -2,10 +2,10 @@ import "p2";
 import "pixi";
 import "phaser";
 
-import Boot from "./states/boot";
-import Load from "./states/load";
-import Menu from "./states/menu";
-import Game from "./states/game";
+import Boot from "src/app/states/boot";
+import Load from "src/app/states/load";
+import Menu from "src/app/states/menu";
+import Game from "src/app/states/game";
 
 class App extends Phaser.Game {
   constructor(config: Phaser.IGameConfig) {
