@@ -7,6 +7,7 @@ import Load from "src/app/states/load";
 import Menu from "src/app/states/menu";
 import Game from "src/app/states/game";
 
+
 class App extends Phaser.Game {
   constructor(config: Phaser.IGameConfig) {
     super(config);
