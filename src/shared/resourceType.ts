@@ -1,0 +1,1 @@
+export type ResourceType = "Basic" | "Red" | "Green" | "Blue" | "Yellow";

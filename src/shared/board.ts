@@ -1,36 +1,32 @@
-import { NodeType } from "src/shared/nodeType"
+import { NodeType } from "src/shared/nodeType";
+import { Node } from "src/shared/node";
 
-type Node =
-  { id: number,
-    x: number,
-    y: number,
-    nodeType: NodeType
-  };
+export type Board = Node[];
 
-type Board = Node[];
+export const emptyBoard: Board = [];
 
 function generateBoard(rng: Rng, boardData: BoardData): Board {
-  var result: Board = [];
-  const startNode = { id: 0, x: 0, y: 0, nodeType: { tag: "StartNode" } }
-  for (let level of boardData) {
+  const result: Board = [];
+  const startNode = { id: 0, x: 0, y: 0, nodeType: { tag: "StartNode" } };
+  for (const level of boardData) {
     const sectionData: SectionData[] = generateSectionData(level.ampMin, level.ampMax, level.quadrants, level.levels);
-    for (let sectionDatum of sectionData) {
+    for (const sectionDatum of sectionData) {
       const nodes: Node[] = generateSection(rng, sectionDatum, level.amount);
       result.concat(nodes);
     }
   }
   return result;
-};
+}
 
 type Quadrant = (rng: Rng) => NodeType;
 
-type LevelData =
-  { ampMin: number,
-    ampMax: number,
-    quadrants: Quadrant[],
-    levels: number,
-    amount: number
-  };
+type LevelData = {
+  ampMin: number,
+  ampMax: number,
+  quadrants: Quadrant[],
+  levels: number,
+  amount: number
+};
 
 type BoardData = LevelData[];
 
@@ -38,37 +34,66 @@ const boardData: BoardData = [
   {
     ampMin: 0,
     ampMax: 0,
-    quadrants: [(rng) => { return { tag: "StartNode" }}],
+    quadrants: [rng => { return { tag: "StartNode" }; }],
     levels: 1,
     amount: 1
-  }/*,
+  },
   {
     ampMin: 50,
     ampMax: 250,
     quadrants: [
-      
-    ]
-  }*/
-  ]
+      rng => { return { tag: "ResourceNode", cost: {}, gain: { basic: 1 }}; },
+      rng => { return { tag: "ResourceNode", cost: {}, gain: { basic: 1 }}; },
+      rng => { return { tag: "ResourceNode", cost: {}, gain: { basic: 1 }}; },
+      rng => { return { tag: "ResourceNode", cost: {}, gain: { basic: 1 }}; },
+    ],
+    levels: 1,
+    amount: 2,
+  },
+  {
+    ampMin: 200,
+    ampMax: 700,
+    quadrants: [
+      rng => { return { tag: "ResourceNode", cost: {}, gain: { blue: 1 }}; },
+      rng => { return { tag: "ResourceNode", cost: {}, gain: { red: 1 }}; },
+      rng => { return { tag: "ResourceNode", cost: {}, gain: { green: 1 }}; },
+      rng => { return { tag: "ResourceNode", cost: {}, gain: { yellow: 1 }}; },
+    ],
+    levels: 1,
+    amount: 2,
+  },
+  {
+    ampMin: 600,
+    ampMax: 800,
+    quadrants: [
+      rng => { return { tag: "VictoryNode", cost: {}}; },
+      rng => { return { tag: "VictoryNode", cost: {}}; },
+      rng => { return { tag: "VictoryNode", cost: {}}; },
+      rng => { return { tag: "VictoryNode", cost: {}}; },
+    ],
+    levels: 1,
+    amount: 2,
+  },
+  ];
 
-type SectionData =
-  { ampMin: number,
-    ampMax: number,
-    angleMin: number,
-    angleMax: number,
-    nodeTypes: Quadrant
-  }
+type SectionData = {
+  ampMin: number,
+  ampMax: number,
+  angleMin: number,
+  angleMax: number,
+  nodeTypes: Quadrant
+};
 
 function generateSectionData(
     ampMin: number, ampMax: number, quadrants: Quadrant[], levels: number
   ): SectionData[] {
-  var result: SectionData[] = [];
+  const result: SectionData[] = [];
   const quadrantSize: number = 360 / quadrants.length;
   for (let i = 0; i <= levels; i++) {
     const levelAmp: number = (ampMax - ampMin) / levels;
     const quadrantsWithIndex: { x: Quadrant, i: number}[] =
       quadrants.map((x, i) => { return { x: x, i: i }; });
-    for (let { x: quadrant, i: index } of quadrantsWithIndex) {
+    for (const { x: quadrant, i: index } of quadrantsWithIndex) {
       result.push({
         ampMin: ampMin + ((levels - 1) * levelAmp),
         ampMax: ampMin + (levels * levelAmp),
@@ -83,11 +108,11 @@ function generateSectionData(
 
 type Rng = {
   nextId: () => number,
-  integerInRange: (n1:number, n2:number) => () => number
-}
+  integerInRange: (n1: number, n2: number) => () => number
+};
 
 function generateSection(rng: Rng, sectionData: SectionData, amount: number): Node[] {
-  var result: Node[] = [];
+  const result: Node[] = [];
   for (let i = 1; i < amount; i++) {
     const r: number = rng.integerInRange(sectionData.ampMin, sectionData.ampMax)();
     const φ: number = rng.integerInRange(sectionData.angleMin, sectionData.angleMax)();
@@ -107,10 +132,10 @@ type Color = "red" | "green" | "yellow" | "blue";
 
 function oppositeColor(color: Color): Color[] {
   switch (color) {
-    case "red": return ["green", "yellow", "blue"]
-    case "green": return ["red", "yellow", "blue"]
-    case "yellow": return ["green", "red", "blue"]
-    case "blue": return ["green", "yellow", "red"]
+    case "red": return ["green", "yellow", "blue"];
+    case "green": return ["red", "yellow", "blue"];
+    case "yellow": return ["green", "red", "blue"];
+    case "blue": return ["green", "yellow", "red"];
   }
 }
 
