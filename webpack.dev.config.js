@@ -3,6 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
 module.exports = {
   entry: path.join(__dirname, "src/app/main.ts"),
@@ -31,6 +32,13 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "TeaFlo",
       template: path.join(__dirname, "templates/index.ejs")
+    }),
+    new BrowserSyncPlugin({
+      host: process.env.IP || 'localhost',
+      port: process.env.PORT || 3000,
+      server: {
+        baseDir: ['./', './dist']
+      }
     })
   ],
   module: {

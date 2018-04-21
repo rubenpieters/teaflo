@@ -2,6 +2,8 @@ import express from "express";
 import path from "path";
 import uws from "uws";
 
+import { ClientMessage } from "src/shared/network/clientMessage";
+
 main();
 
 function main(): void {
@@ -17,6 +19,8 @@ function main(): void {
 
   // initialize db connection
   // TODO
+
+  websocketServer.on("connection", onSocketConnection);
 }
 
 function mkServer(port: number): uws.Server {
@@ -35,4 +39,23 @@ function mkServer(port: number): uws.Server {
   const websocketServer: uws.Server = new uws.Server({ server: server });
 
   return websocketServer;
+}
+
+function onSocketConnection(client: uws) {
+  console.log("Player Connect");
+  client.on("message", onClientMessage(client));
+}
+
+function onClientMessage(client: uws) { 
+  return function(msg: string) {
+    console.log("received " + msg);
+    const clientMsg: ClientMessage = JSON.parse(msg);
+    switch (clientMsg.tag) {
+      case "GetCurrentBoard": {
+        console.log("sending");
+        client.send(JSON.stringify({ tag: "CurrentBoard", board: [] }));
+        break;
+      }
+    }
+  }
 }
