@@ -243,6 +243,10 @@ function nodeClick(game: Phaser.Game, node: Node) {
             console.log("invalid from node");
             break;
           }
+          case "InvalidAngle": {
+            console.log("invalid angle");
+            break;
+          }
           case "ValidConnection": {
             makeConnection(game, fromNode, toNode);
             solution = connectResult.newSolution;

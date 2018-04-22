@@ -13,10 +13,14 @@ type InvalidFromNode = {
   tag: "InvalidFromNode",
 }
 
+type InvalidAngle = {
+  tag: "InvalidAngle",
+}
+
 type ValidConnection = {
   tag: "ValidConnection",
   newValidFromNodes: number[],
   newSolution: Solution;
 }
 
-export type ConnectResult = InvalidFromNode | ValidConnection;
+export type ConnectResult = InvalidFromNode | InvalidAngle | ValidConnection;
