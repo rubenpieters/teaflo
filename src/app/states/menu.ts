@@ -2,9 +2,14 @@ import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, add
 import { connectToServer } from "src/app/network/network";
 import { Node } from "src/shared/node";
 import { Board } from "src/shared/board";
+import { ConnectResult, Solution } from "src/shared/connectResult";
+import { verifyAndAddConnection } from "src/shared/solution";
 
 let playBoardGroup: Phaser.Group;
 
+
+let validFromNodes: number[] = [];
+let solution: Solution = {};
 
 
 type ClickStateFrom = {
@@ -141,6 +146,7 @@ export default class Menu extends Phaser.State {
 
     addBoardCallback(board => {
       drawBoard(this.game, playBoardGroup, board);
+      validFromNodes = [board[0].id];
     });
 
     connectToServer();
@@ -218,16 +224,32 @@ function nodeClick(game: Phaser.Game, node: Node) {
   return function(nodeSprite: Phaser.Sprite) {
     switch (clickState.tag) {
       case "ClickStateFrom": {
-        clickState = { tag: "ClickStateTo", fromNode: node };
+        console.log("click0: " + node.id);
+        if (validFromNodes.filter(x => x === node.id).length < 1) {
+          console.log("not valid from node");
+        } else {
+          clickState = { tag: "ClickStateTo", fromNode: node };
+        }
         break;
       }
       case "ClickStateTo": {
+        console.log("click1: " + node.id);
         const fromNode: Node = clickState.fromNode;
         const toNode: Node = node;
 
-        // TODO: verify node connection
-
-        makeConnection(game, fromNode, toNode);
+        const connectResult: ConnectResult = verifyAndAddConnection(fromNode, toNode, validFromNodes, solution);
+        switch (connectResult.tag)  {
+          case "InvalidFromNode": {
+            console.log("invalid from node");
+            break;
+          }
+          case "ValidConnection": {
+            makeConnection(game, fromNode, toNode);
+            solution = connectResult.newSolution;
+            validFromNodes = connectResult.newValidFromNodes;
+            break;
+          }
+        }
 
         clickState = { tag: "ClickStateFrom" };
         break;
