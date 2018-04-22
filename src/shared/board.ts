@@ -7,9 +7,9 @@ export const emptyBoard: Board = [];
 
 export function generateBoard(rng: Rng, boardData: BoardData): Board {
   let result: Board = [];
-  var nodeId: number = 0;
+  let nodeId: number = 0;
   const gst: GenerateState = { nextId: () => { const id = nodeId; nodeId += 1; return id; } };
-  
+
   const startNode: Node = { id: 0, x: 0, y: 0, nodeType: { tag: "StartNode" } };
   result = [startNode];
 

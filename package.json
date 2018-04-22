@@ -13,7 +13,7 @@
     "tslint": "npx tslint -c tslint.json -p tsconfig.json",
     "webpack:dev": "npx webpack --watch --config webpack.dev.config.js",
     "dev:test": "npx ts-node -r tsconfig-paths/register test/main.ts",
-    "run:server": "npx ts-node src/server/main.ts",
+    "run:server": "npx ts-node -r tsconfig-paths/register src/server/main.ts",
     "heroku-prebuild": "npm run-script setup"
   },
   "dependencies": {

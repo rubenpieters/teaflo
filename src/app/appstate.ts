@@ -33,6 +33,10 @@ export function addSelectedScreenCallback(cb: ParamCallBack<SelectedScreen>) {
   selectedScreenCallbacks.push(cb);
 }
 
+export function getSelectedScreen(): SelectedScreen {
+  return appState.selectedScreen;
+}
+
 export function changeBoard(board: Board) {
   appState.board = board;
   boardCallbacks.forEach(cb => cb(board));

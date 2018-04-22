@@ -1,4 +1,5 @@
-import { changeConnected } from "src/app/appstate";
+import { changeConnected, changeBoard } from "src/app/appstate";
+import { ServerMessage } from "src/shared/network/serverMessage";
 
 export function connectToServer(): void {
   const host: string = location.origin.replace(/^http/, "ws").replace(/localhost:3000/, "localhost:8080");
@@ -12,5 +13,11 @@ export function connectToServer(): void {
 }
 
 function onServerMessage(event: MessageEvent): void {
-  console.log("received: " + event.data);
+  const serverMsg: ServerMessage = JSON.parse(event.data);
+  switch (serverMsg.tag) {
+    case "CurrentBoard": {
+      changeBoard(serverMsg.board);
+      break;
+    }
+  }
 }
