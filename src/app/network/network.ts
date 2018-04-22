@@ -8,7 +8,7 @@ export function connectToServer(): void {
     socket.onmessage = onServerMessage;
 
     socket.send(JSON.stringify({ tag: "GetCurrentBoard" }));
-  }
+  };
 }
 
 function onServerMessage(event: MessageEvent): void {

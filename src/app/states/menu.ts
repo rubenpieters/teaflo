@@ -1,5 +1,5 @@
 import { changeSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
-import { connectToServer } from "src/app/network/network"
+import { connectToServer } from "src/app/network/network";
 
 export default class Menu extends Phaser.State {
   public create(): void {

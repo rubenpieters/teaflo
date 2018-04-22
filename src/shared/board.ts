@@ -5,14 +5,19 @@ export type Board = Node[];
 
 export const emptyBoard: Board = [];
 
-function generateBoard(rng: Rng, boardData: BoardData): Board {
-  const result: Board = [];
-  const startNode = { id: 0, x: 0, y: 0, nodeType: { tag: "StartNode" } };
+export function generateBoard(rng: Rng, boardData: BoardData): Board {
+  let result: Board = [];
+  var nodeId: number = 0;
+  const gst: GenerateState = { nextId: () => { const id = nodeId; nodeId += 1; return id; } };
+  
+  const startNode: Node = { id: 0, x: 0, y: 0, nodeType: { tag: "StartNode" } };
+  result = [startNode];
+
   for (const level of boardData) {
     const sectionData: SectionData[] = generateSectionData(level.ampMin, level.ampMax, level.quadrants, level.levels);
     for (const sectionDatum of sectionData) {
-      const nodes: Node[] = generateSection(rng, sectionDatum, level.amount);
-      result.concat(nodes);
+      const nodes: Node[] = generateSection(rng, gst, sectionDatum, level.amount);
+      result = result.concat(nodes);
     }
   }
   return result;
@@ -30,7 +35,7 @@ type LevelData = {
 
 type BoardData = LevelData[];
 
-const boardData: BoardData = [
+export const boardData: BoardData = [
   {
     ampMin: 0,
     ampMax: 0,
@@ -107,16 +112,19 @@ function generateSectionData(
 }
 
 type Rng = {
-  nextId: () => number,
   integerInRange: (n1: number, n2: number) => () => number
 };
 
-function generateSection(rng: Rng, sectionData: SectionData, amount: number): Node[] {
+type GenerateState = {
+  nextId: () => number
+};
+
+function generateSection(rng: Rng, gst: GenerateState, sectionData: SectionData, amount: number): Node[] {
   const result: Node[] = [];
   for (let i = 1; i < amount; i++) {
     const r: number = rng.integerInRange(sectionData.ampMin, sectionData.ampMax)();
     const φ: number = rng.integerInRange(sectionData.angleMin, sectionData.angleMax)();
-    const id: number = rng.nextId();
+    const id: number = gst.nextId();
     const nodeType: NodeType = sectionData.nodeTypes(rng);
     result.push({
       id: id,
