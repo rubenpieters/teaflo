@@ -6,6 +6,23 @@ import { Board } from "src/shared/board";
 let playBoardGroup: Phaser.Group;
 
 
+
+type ClickStateFrom = {
+  tag: "ClickStateFrom",
+};
+
+type ClickStateTo = {
+  tag: "ClickStateTo",
+  fromNode: Node,
+};
+
+type ClickState = ClickStateFrom | ClickStateTo;
+
+let clickState: ClickState = { tag: "ClickStateFrom" };
+
+
+
+
 let zoom: number = 0;
 
 const gameX: number = 2500;
@@ -197,6 +214,36 @@ function onDown(game: Phaser.Game) {
   };
 }
 
+function nodeClick(game: Phaser.Game, node: Node) {
+  return function(nodeSprite: Phaser.Sprite) {
+    switch (clickState.tag) {
+      case "ClickStateFrom": {
+        clickState = { tag: "ClickStateTo", fromNode: node };
+        break;
+      }
+      case "ClickStateTo": {
+        const fromNode: Node = clickState.fromNode;
+        const toNode: Node = node;
+
+        // TODO: verify node connection
+
+        makeConnection(game, fromNode, toNode);
+
+        clickState = { tag: "ClickStateFrom" };
+        break;
+      }
+    }
+  };
+}
+
+function makeConnection(game: Phaser.Game, fromNode: Node, toNode: Node) {
+  const line = game.add.graphics(0, 0, playBoardGroup);
+  line.lineStyle(5, 0x000000);
+  line.moveTo(fromNode.x, fromNode.y);
+  line.lineTo(toNode.x, toNode.y);
+  line.endFill();
+}
+
 function drawBoard(game: Phaser.Game, group: Phaser.Group, board: Board): void {
   console.log("drawing board");
   for (const node of board) {
@@ -213,4 +260,5 @@ function drawNode(game: Phaser.Game, group: Phaser.Group, node: Node): void {
   nodeSprite.endFill();
   nodeSprite.inputEnabled = true;
   nodeSprite.events.onInputOver.add(() => { console.log("id: " + node.id); });
+  nodeSprite.events.onInputDown.add(nodeClick(game, node));
 }
