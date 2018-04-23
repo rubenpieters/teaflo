@@ -4,12 +4,18 @@ import { Node } from "src/shared/node";
 import { Board } from "src/shared/board";
 import { ConnectResult, Solution } from "src/shared/connectResult";
 import { verifyAndAddConnection } from "src/shared/solution";
+import { History, Action } from "src/app/history/history";
 
 let playBoardGroup: Phaser.Group;
 
 
+let undoList: History = [];
+let redoList: History = [];
+
+
 let validFromNodes: number[] = [];
 let solution: Solution = {};
+const connectionSprites: Phaser.Graphics[] = [];
 
 
 type ClickStateFrom = {
@@ -112,6 +118,30 @@ export default class Menu extends Phaser.State {
     this.game.camera.y = this.game.height * -0.5;
 
     this.game.input.onDown.add(onDown(this.game), this);
+
+    // undo button
+
+    const undoBtn: Phaser.Text = this.add.text(0, 0, "U", {
+      font: "22px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
+    }, playGroup);
+    undoBtn.setTextBounds(750 - 400, 575 - 300, 25, 25);
+    undoBtn.inputEnabled = true;
+    undoBtn.events.onInputDown.add(undoAction);
+
+    // redo button
+
+    const redoBtn: Phaser.Text = this.add.text(0, 0, "R", {
+      font: "22px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
+    }, playGroup);
+    redoBtn.setTextBounds(775 - 400, 575 - 300, 25, 25);
+    redoBtn.inputEnabled = true;
+    redoBtn.events.onInputDown.add(redoAction(this.game));
 
     // callbacks
 
@@ -251,6 +281,8 @@ function nodeClick(game: Phaser.Game, node: Node) {
             makeConnection(game, fromNode, toNode);
             solution = connectResult.newSolution;
             validFromNodes = connectResult.newValidFromNodes;
+            undoList.push({ tag: "AddConnectionAction", from: fromNode, to: toNode });
+            redoList = [];
             break;
           }
         }
@@ -263,15 +295,15 @@ function nodeClick(game: Phaser.Game, node: Node) {
 }
 
 function makeConnection(game: Phaser.Game, fromNode: Node, toNode: Node) {
-  const line = game.add.graphics(0, 0, playBoardGroup);
+  const line: Phaser.Graphics = game.add.graphics(0, 0, playBoardGroup);
   line.lineStyle(5, 0x000000);
   line.moveTo(fromNode.x, fromNode.y);
   line.lineTo(toNode.x, toNode.y);
   line.endFill();
+  connectionSprites.push(line);
 }
 
 function drawBoard(game: Phaser.Game, group: Phaser.Group, board: Board): void {
-  console.log("drawing board");
   for (const node of board) {
     drawNode(game, group, node);
   }
@@ -287,4 +319,63 @@ function drawNode(game: Phaser.Game, group: Phaser.Group, node: Node): void {
   nodeSprite.inputEnabled = true;
   nodeSprite.events.onInputOver.add(() => { console.log("id: " + node.id); });
   nodeSprite.events.onInputDown.add(nodeClick(game, node));
+}
+
+function undoAction() {
+  const [lastAction] = undoList.splice(-1, 1);
+  if (lastAction === undefined) {
+    // no undo action, do nothing
+  } else {
+    switch (lastAction.tag) {
+      case "AddConnectionAction": {
+        const index: number = validFromNodes.indexOf(lastAction.to.id);
+        if (index === -1) {
+          throw "Should not happen: to id " + lastAction.to.id + " was not added to valid from nodes";
+        } else {
+          validFromNodes.splice(index, 1);
+        }
+        solution[lastAction.from.id].splice(-1, 1);
+        const [connectionSprite] = connectionSprites.splice(-1, 1);
+        connectionSprite.destroy();
+        break;
+      }
+    }
+
+    // add action to redo list
+    redoList.push(lastAction);
+  }
+}
+
+function redoAction(game: Phaser.Game) {
+  return function() {
+    const [lastAction] = redoList.splice(-1, 1);
+    if (lastAction === undefined) {
+      // no redo action, do nothing
+    } else {
+      switch (lastAction.tag) {
+        case "AddConnectionAction": {
+          const connectResult: ConnectResult = verifyAndAddConnection(lastAction.from, lastAction.to, validFromNodes, solution);
+          switch (connectResult.tag)  {
+            case "InvalidFromNode": {
+              console.log("invalid from node");
+              break;
+            }
+            case "InvalidAngle": {
+              console.log("invalid angle");
+              break;
+            }
+            case "ValidConnection": {
+              makeConnection(game, lastAction.from, lastAction.to);
+              solution = connectResult.newSolution;
+              validFromNodes = connectResult.newValidFromNodes;
+              break;
+            }
+          }
+          break;
+        }
+      }
+
+      undoList.push(lastAction);
+    }
+  };
 }

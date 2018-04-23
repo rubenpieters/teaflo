@@ -1,7 +1,7 @@
 import { Board } from "src/shared/board";
 import { Node } from "src/shared/node";
 import { Connection, Solution, ConnectResult } from "src/shared/connectResult";
-import * as Phaser from "phaser-ce"
+import * as Phaser from "phaser-ce";
 
 export function verifyAndAddConnection(from: Node, to: Node, validFromNodes: number[], solution: Solution): ConnectResult {
   // TODO: use Array.contains ?
