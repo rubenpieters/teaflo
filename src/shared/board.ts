@@ -7,11 +7,10 @@ export const emptyBoard: Board = [];
 
 export function generateBoard(rng: Rng, boardData: BoardData): Board {
   let result: Board = [];
-  let nodeId: number = 0;
+  let nodeId: number = 1;
   const gst: GenerateState = { nextId: () => { const id = nodeId; nodeId += 1; return id; } };
 
-  const startNode: Node = { id: 0, x: 0, y: 0, nodeType: { tag: "StartNode" } };
-  result = [startNode];
+  result = [{ id: 0, x: 0, y: 0, nodeType: { tag: "StartNode", color: 0xFF00FF } }];
 
   for (const level of boardData) {
     const sectionData: SectionData[] = generateSectionData(level.ampMin, level.ampMax, level.quadrants, level.levels);
@@ -37,47 +36,40 @@ type BoardData = LevelData[];
 
 export const boardData: BoardData = [
   {
-    ampMin: 0,
-    ampMax: 0,
-    quadrants: [rng => { return { tag: "StartNode" }; }],
-    levels: 1,
-    amount: 1
-  },
-  {
     ampMin: 50,
     ampMax: 250,
     quadrants: [
-      rng => { return { tag: "ResourceNode", cost: {}, gain: { basic: 1 }}; },
-      rng => { return { tag: "ResourceNode", cost: {}, gain: { basic: 1 }}; },
-      rng => { return { tag: "ResourceNode", cost: {}, gain: { basic: 1 }}; },
-      rng => { return { tag: "ResourceNode", cost: {}, gain: { basic: 1 }}; },
+      rng => { return { tag: "ResourceNode", color: 0xFFFFFF, cost: {}, gain: { basic: 1 }}; },
+      rng => { return { tag: "ResourceNode", color: 0xFFFFFF, cost: {}, gain: { basic: 1 }}; },
+      rng => { return { tag: "ResourceNode", color: 0xFFFFFF, cost: {}, gain: { basic: 1 }}; },
+      rng => { return { tag: "ResourceNode", color: 0xFFFFFF, cost: {}, gain: { basic: 1 }}; },
     ],
-    levels: 1,
+    levels: 3,
     amount: 2,
   },
   {
     ampMin: 200,
     ampMax: 700,
     quadrants: [
-      rng => { return { tag: "ResourceNode", cost: {}, gain: { blue: 1 }}; },
-      rng => { return { tag: "ResourceNode", cost: {}, gain: { red: 1 }}; },
-      rng => { return { tag: "ResourceNode", cost: {}, gain: { green: 1 }}; },
-      rng => { return { tag: "ResourceNode", cost: {}, gain: { yellow: 1 }}; },
+      rng => { return { tag: "ResourceNode", color: 0x0000FF, cost: {}, gain: { blue: 1 }}; },
+      rng => { return { tag: "ResourceNode", color: 0xFF0000, cost: {}, gain: { red: 1 }}; },
+      rng => { return { tag: "ResourceNode", color: 0x00FF00, cost: {}, gain: { green: 1 }}; },
+      rng => { return { tag: "ResourceNode", color: 0xDDDD77, cost: {}, gain: { yellow: 1 }}; },
     ],
-    levels: 1,
+    levels: 4,
     amount: 2,
   },
   {
     ampMin: 600,
     ampMax: 800,
     quadrants: [
-      rng => { return { tag: "VictoryNode", cost: {}}; },
-      rng => { return { tag: "VictoryNode", cost: {}}; },
-      rng => { return { tag: "VictoryNode", cost: {}}; },
-      rng => { return { tag: "VictoryNode", cost: {}}; },
+      rng => { return { tag: "VictoryNode", color: 0x000000, cost: {}}; },
+      rng => { return { tag: "VictoryNode", color: 0x000000, cost: {}}; },
+      rng => { return { tag: "VictoryNode", color: 0x000000, cost: {}}; },
+      rng => { return { tag: "VictoryNode", color: 0x000000, cost: {}}; },
     ],
-    levels: 1,
-    amount: 2,
+    levels: 2,
+    amount: 3,
   },
   ];
 

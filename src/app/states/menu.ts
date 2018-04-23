@@ -281,7 +281,7 @@ function drawNode(game: Phaser.Game, group: Phaser.Group, node: Node): void {
   const size: number = 15;
 
   const nodeSprite: Phaser.Graphics = game.add.graphics(node.x, node.y, group);
-  nodeSprite.beginFill(0xFF0000);
+  nodeSprite.beginFill(node.nodeType.color);
   nodeSprite.drawRect(size * -0.5, size * -0.5, size, size);
   nodeSprite.endFill();
   nodeSprite.inputEnabled = true;
