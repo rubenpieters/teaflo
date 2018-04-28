@@ -1,4 +1,5 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback, addBoardCallback } from "src/app/appstate";
+import { changeSelectedNode, addNodeCallback } from "src/app/gamestate";
 import { connectToServer } from "src/app/network/network";
 import { Node } from "src/shared/node";
 import { Board } from "src/shared/board";
@@ -150,13 +151,21 @@ export default class Menu extends Phaser.State {
     bottomMenu.drawRect(0, 0, 800, 150);
     bottomMenu.endFill();
 
-    const branchResourceTitle: Phaser.Text = this.game.add.text(0, 0, "Branch Resources", {
+    const nodeTypeTitle: Phaser.Text = this.game.add.text(0, 0, "Node Type", {
       font: "20px Indie Flower",
       fill: "#77BFA3",
       boundsAlignH: "center",
       boundsAlignV: "middle"
     }, playGroup);
-    branchResourceTitle.setTextBounds(400 - 400, 425 - 300, 100, 25);
+    nodeTypeTitle.setTextBounds(10 - 400, 425 - 300, 100, 25);
+
+    const nodeTypeText: Phaser.Text = this.game.add.text(0, 0, "--", {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, playGroup);
+    nodeTypeText.setTextBounds(10 - 400, 450 - 300, 100, 25);
 
     // callbacks
 
@@ -190,9 +199,12 @@ export default class Menu extends Phaser.State {
     // callbacks - play
 
     addBoardCallback(board => {
-      console.log(board);
       drawBoard(this.game, playBoardGroup, board);
       validFromNodes = [board[0].id];
+    });
+
+    addNodeCallback(nodeType => {
+      nodeTypeText.setText(nodeType.meta.name);
     });
 
     connectToServer();
@@ -333,7 +345,7 @@ function drawNode(game: Phaser.Game, group: Phaser.Group, node: Node): void {
   nodeSprite.drawRect(size * -0.5, size * -0.5, size, size);
   nodeSprite.endFill();
   nodeSprite.inputEnabled = true;
-  nodeSprite.events.onInputOver.add(() => { console.log("id: " + node.id); });
+  nodeSprite.events.onInputOver.add(() => { changeSelectedNode(node.nodeType); });
   nodeSprite.events.onInputDown.add(nodeClick(game, node));
 }
 
