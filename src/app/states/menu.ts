@@ -190,6 +190,7 @@ export default class Menu extends Phaser.State {
     // callbacks - play
 
     addBoardCallback(board => {
+      console.log(board);
       drawBoard(this.game, playBoardGroup, board);
       validFromNodes = [board[0].id];
     });
@@ -328,7 +329,7 @@ function drawNode(game: Phaser.Game, group: Phaser.Group, node: Node): void {
   const size: number = 15;
 
   const nodeSprite: Phaser.Graphics = game.add.graphics(node.x, node.y, group);
-  nodeSprite.beginFill(node.nodeType.color);
+  nodeSprite.beginFill(node.nodeType.meta.color);
   nodeSprite.drawRect(size * -0.5, size * -0.5, size, size);
   nodeSprite.endFill();
   nodeSprite.inputEnabled = true;

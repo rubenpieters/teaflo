@@ -1,4 +1,4 @@
-import { NodeType } from "src/shared/nodeType";
+import { allNodes, NodeType } from "src/shared/nodeType";
 import { Node } from "src/shared/node";
 
 export type Board = Node[];
@@ -10,7 +10,7 @@ export function generateBoard(rng: Rng, boardData: BoardData): Board {
   let nodeId: number = 1;
   const gst: GenerateState = { nextId: () => { const id = nodeId; nodeId += 1; return id; } };
 
-  result = [{ id: 0, x: 0, y: 0, nodeType: { tag: "StartNode", color: 0xFF00FF } }];
+  result = [{ id: 0, x: 0, y: 0, nodeType: allNodes.startNode }];
 
   for (const level of boardData) {
     const sectionData: SectionData[] = generateSectionData(level.ampMin, level.ampMax, level.quadrants, level.levels);
@@ -34,8 +34,24 @@ type LevelData = {
 
 type BoardData = LevelData[];
 
+function chooseT1(rng: Rng): NodeType {
+  return chooseSet(rng, [allNodes.twoBasicBranch, allNodes.oneBasicFork]);
+}
+
 export const boardData: BoardData = [
   {
+    ampMin: 50,
+    ampMax: 150,
+    quadrants: [
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
+    ],
+    levels: 2,
+    amount: 1,
+  }
+  /*{
     ampMin: 50,
     ampMax: 250,
     quadrants: [
@@ -70,7 +86,7 @@ export const boardData: BoardData = [
     ],
     levels: 2,
     amount: 3,
-  },
+  },*/
   ];
 
 type SectionData = {
@@ -113,7 +129,7 @@ type GenerateState = {
 
 function generateSection(rng: Rng, gst: GenerateState, sectionData: SectionData, amount: number): Node[] {
   const result: Node[] = [];
-  for (let i = 1; i < amount; i++) {
+  for (let i = 0; i < amount; i++) {
     const r: number = rng.integerInRange(sectionData.ampMin, sectionData.ampMax)();
     const φ: number = rng.integerInRange(sectionData.angleMin, sectionData.angleMax)();
     const id: number = gst.nextId();
@@ -140,7 +156,7 @@ function oppositeColor(color: Color): Color[] {
 }
 
 function chooseSet<A>(rng: Rng, array: A[]): A {
-  const l: number = rng.integerInRange(0, array.length)();
+  const l: number = rng.integerInRange(0, array.length - 1)();
   return array[l];
 }
 

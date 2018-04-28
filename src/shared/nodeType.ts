@@ -1,21 +1,65 @@
-import { Resource } from "src/shared/resource"
+import { Resource } from "src/shared/resource";
+import { NodeEffect } from "src/shared/nodeEffect";
+
+type NodeTypeMeta = {
+  id: number,
+  name: string,
+  color: number,
+};
 
 type StartNode = {
   tag: "StartNode",
-  color: number,
+  meta: NodeTypeMeta,
 };
 
 type ResourceNode = {
   tag: "ResourceNode",
-  cost: Resource,
-  gain: Resource,
-  color: number,
+  linkEffect: NodeEffect,
+  finalEffect: NodeEffect,
+  meta: NodeTypeMeta,
 };
 
-type VictoryNode = {
-  tag: "VictoryNode",
-  cost: Resource,
-  color: number,
-};
+export type NodeType = StartNode | ResourceNode;
 
-export type NodeType = StartNode | ResourceNode | VictoryNode;
+// declaration of all node types
+
+export const allNodes: { [key: string]: NodeType } = {
+  startNode: {
+    tag: "StartNode",
+    meta: {
+      id: 0,
+      name: "Start Node",
+      color: 0xFFFFFF,
+    }
+  },
+  twoBasicBranch: {
+    tag: "ResourceNode",
+    linkEffect: {
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Branch", amount: 2 }],
+    },
+    finalEffect: {
+      tag: "NilEffect",
+    },
+    meta: {
+      id: 1,
+      name: "2 I (basic)",
+      color: 0xAAAAAA,
+    }
+  },
+  oneBasicFork: {
+    tag: "ResourceNode",
+    linkEffect: {
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Fork", amount: 1 }],
+    },
+    finalEffect: {
+      tag: "NilEffect",
+    },
+    meta: {
+      id: 2,
+      name: "1 Y (basic)",
+      color: 0xAAAAAA,
+    }
+  }
+};
