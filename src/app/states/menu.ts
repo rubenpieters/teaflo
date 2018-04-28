@@ -143,9 +143,24 @@ export default class Menu extends Phaser.State {
     redoBtn.inputEnabled = true;
     redoBtn.events.onInputDown.add(redoAction(this.game));
 
+    // bottom menu - background
+
+    const bottomMenu: Phaser.Graphics = this.game.add.graphics(0 - 400, 450 - 300, playGroup);
+    bottomMenu.beginFill(0x227744);
+    bottomMenu.drawRect(0, 0, 800, 150);
+    bottomMenu.endFill();
+
+    const branchResourceTitle: Phaser.Text = this.game.add.text(0, 0, "Branch Resources", {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, playGroup);
+    branchResourceTitle.setTextBounds(400 - 400, 425 - 300, 100, 25);
+
     // callbacks
 
-    // general - callbacks
+    // callbacks - general
 
     addSelectedScreenCallback(screen => { switch (screen) {
       case "Home": {
@@ -172,7 +187,7 @@ export default class Menu extends Phaser.State {
       }
     });
 
-    // play - callbacks
+    // callbacks - play
 
     addBoardCallback(board => {
       drawBoard(this.game, playBoardGroup, board);
