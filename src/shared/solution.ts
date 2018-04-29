@@ -3,6 +3,7 @@ import { Node } from "src/shared/node";
 import { allNodes } from "src/shared/nodeType";
 import { Connection, Solution, ConnectResult } from "src/shared/connectResult";
 import { NodeEffect } from "src/shared/nodeEffect";
+import { ResourceType, ResourceColor } from "src/shared/resourceType";
 import * as Phaser from "phaser-ce";
 
 export function verifyAndAddConnection(from: Node, to: Node, validFromNodes: number[], solution: Solution): ConnectResult {
@@ -41,13 +42,19 @@ type FailRunResult = {
 
 type RunResult = SuccessRunResult | FailRunResult;
 
+const emptyResource: Resource = {
+  "Fork": 0,
+  "Branch": 0,
+  "Total": 0,
+};
+
 const startResources: RunResources = {
-  "Basic": 0,
-  "Red": 0,
-  "Green": 0,
-  "Blue": 0,
-  "Yellow": 0,
-  "Victory": 0,
+  "Basic": emptyResource,
+  "Red": emptyResource,
+  "Green": emptyResource,
+  "Blue": emptyResource,
+  "Yellow": emptyResource,
+  "Victory": emptyResource,
 };
 
 export function runSolution(solution: Solution): RunResult {
@@ -59,13 +66,19 @@ export function runSolution(solution: Solution): RunResult {
   return { tag: "SuccessRunResult" };
 }
 
+type Resource = {
+  "Fork": number,
+  "Branch": number,
+  "Total": number,
+};
+
 type RunResources = {
-  "Basic": number,
-  "Red": number,
-  "Green": number,
-  "Blue": number,
-  "Yellow": number,
-  "Victory": number,
+  "Basic": Resource,
+  "Red": Resource,
+  "Green": Resource,
+  "Blue": Resource,
+  "Yellow": Resource,
+  "Victory": Resource,
 };
 
 type EffectFunction = (resources: RunResources) => RunResources;
@@ -81,13 +94,22 @@ function runStep(node: Node, solution: Solution, resources: RunResources): StepR
     // use final effect
     const func = effectFunction(node.nodeType.finalEffect);
     const newResources = func(resources);
+
+    // clear all branch/fork resources
+    clearResourceTypes(["Branch", "Fork"], newResources);
+
+    console.log("At Final: " + JSON.stringify(newResources));
     return { resources: newResources };
   } else {
     if (connections.length > 0) {
       // use link effect
       const nextNodes: Node[] = connections.map(conn => conn.to);
 
-      let currentResources = resources;
+      const func = effectFunction(node.nodeType.linkEffect);
+
+      console.log("TEST1: " + JSON.stringify(resources));
+      let currentResources = func(resources);
+      console.log("TEST2: " + JSON.stringify(currentResources));
 
       for (const nextNode of nextNodes) {
         const stepResult: StepResult = runStep(nextNode, solution, currentResources);
@@ -101,8 +123,6 @@ function runStep(node: Node, solution: Solution, resources: RunResources): StepR
   }
 }
 
-
-
 export function effectFunction(effect: NodeEffect): EffectFunction {
   switch (effect.tag) {
     case "NilEffect": {
@@ -112,10 +132,23 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
       return resources => {
         const newResources: RunResources = Object.assign({}, resources);
         for (const gain of effect.gains) {
-          newResources[gain.color] = newResources[gain.color] + gain.amount;
+          console.log("GAIN: " + JSON.stringify(gain));
+          console.log("x: " + gain.color);
+          console.log("x: " + gain.type);
+          newResources[gain.color][gain.type] = newResources[gain.color][gain.type] + gain.amount;
         }
         return newResources;
       };
+    }
+  }
+}
+
+const allColors: ResourceColor[] = ["Basic", "Red", "Green", "Blue", "Yellow", "Victory"];
+
+function clearResourceTypes(types: ResourceType[], resources: RunResources): void {
+  for (const resourceType of types) {
+    for (const resourceColor of allColors) {
+      resources[resourceColor][resourceType] = 0;
     }
   }
 }
