@@ -6,7 +6,7 @@ export type Connection = {
 };
 
 export type Solution = {
-  [id: string]: Connection[],
+  [id: number]: Connection[],
 };
 
 type InvalidFromNode = {

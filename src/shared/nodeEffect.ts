@@ -1,11 +1,11 @@
 import { Resource } from "src/shared/resourceType";
 
-type GainEffect = {
+export type GainEffect = {
   tag: "GainEffect",
   gains: Resource[],
 }
 
-type NilEffect = {
+export type NilEffect = {
   tag: "NilEffect",
 }
 

@@ -2,7 +2,7 @@ import { NodeType } from "src/shared/nodeType";
 
 export type GameState = {
   selectedNode: NodeType | undefined,
-}
+};
 
 type ParamCallBack<A> = (a: A) => void;
 
@@ -10,7 +10,7 @@ const selectedNodeCallbacks: ParamCallBack<NodeType>[] = [];
 
 const gameState: GameState = {
   selectedNode: undefined
-}
+};
 
 export function changeSelectedNode(nodeType: NodeType) {
   gameState.selectedNode = nodeType;

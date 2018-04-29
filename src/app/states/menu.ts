@@ -4,7 +4,7 @@ import { connectToServer } from "src/app/network/network";
 import { Node } from "src/shared/node";
 import { Board } from "src/shared/board";
 import { ConnectResult, Solution } from "src/shared/connectResult";
-import { verifyAndAddConnection } from "src/shared/solution";
+import { verifyAndAddConnection, runSolution } from "src/shared/solution";
 import { History, Action } from "src/app/history/history";
 
 let playBoardGroup: Phaser.Group;
@@ -120,6 +120,29 @@ export default class Menu extends Phaser.State {
 
     this.game.input.onDown.add(onDown(this.game), this);
 
+    // bottom menu - background
+
+    const bottomMenu: Phaser.Graphics = this.game.add.graphics(0 - 400, 450 - 300, playGroup);
+    bottomMenu.beginFill(0x227744);
+    bottomMenu.drawRect(0, 0, 800, 150);
+    bottomMenu.endFill();
+
+    const nodeTypeTitle: Phaser.Text = this.game.add.text(0, 0, "Node Type", {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, playGroup);
+    nodeTypeTitle.setTextBounds(10 - 400, 425 - 300, 100, 25);
+
+    const nodeTypeText: Phaser.Text = this.game.add.text(0, 0, "--", {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, playGroup);
+    nodeTypeText.setTextBounds(10 - 400, 450 - 300, 100, 25);
+
     // undo button
 
     const undoBtn: Phaser.Text = this.add.text(0, 0, "U", {
@@ -144,28 +167,17 @@ export default class Menu extends Phaser.State {
     redoBtn.inputEnabled = true;
     redoBtn.events.onInputDown.add(redoAction(this.game));
 
-    // bottom menu - background
+    // start run button
 
-    const bottomMenu: Phaser.Graphics = this.game.add.graphics(0 - 400, 450 - 300, playGroup);
-    bottomMenu.beginFill(0x227744);
-    bottomMenu.drawRect(0, 0, 800, 150);
-    bottomMenu.endFill();
-
-    const nodeTypeTitle: Phaser.Text = this.game.add.text(0, 0, "Node Type", {
-      font: "20px Indie Flower",
+    const startRunBtn: Phaser.Text = this.add.text(0, 0, "->", {
+      font: "22px Indie Flower",
       fill: "#77BFA3",
-      boundsAlignH: "center",
-      boundsAlignV: "middle"
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
     }, playGroup);
-    nodeTypeTitle.setTextBounds(10 - 400, 425 - 300, 100, 25);
-
-    const nodeTypeText: Phaser.Text = this.game.add.text(0, 0, "--", {
-      font: "20px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "center",
-      boundsAlignV: "middle"
-    }, playGroup);
-    nodeTypeText.setTextBounds(10 - 400, 450 - 300, 100, 25);
+    startRunBtn.setTextBounds(725 - 400, 575 - 300, 50, 25);
+    startRunBtn.inputEnabled = true;
+    startRunBtn.events.onInputDown.add(startRunAction);
 
     // callbacks
 
@@ -406,4 +418,8 @@ function redoAction(game: Phaser.Game) {
       undoList.push(lastAction);
     }
   };
+}
+
+function startRunAction() {
+  runSolution(solution);
 }
