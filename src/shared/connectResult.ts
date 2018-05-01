@@ -3,6 +3,7 @@ import { Node } from "src/shared/node";
 export type Connection = {
   to: Node,
   distance: number,
+  connectionId: number,
 };
 
 export type Solution = {

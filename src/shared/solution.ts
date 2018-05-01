@@ -6,7 +6,7 @@ import { NodeEffect } from "src/shared/nodeEffect";
 import { ResourceType, ResourceColor } from "src/shared/resourceType";
 import * as Phaser from "phaser-ce";
 
-export function verifyAndAddConnection(from: Node, to: Node, validFromNodes: number[], solution: Solution): ConnectResult {
+export function verifyAndAddConnection(from: Node, to: Node, connectionId: number, validFromNodes: number[], solution: Solution): ConnectResult {
   // TODO: use Array.contains ?
   if (validFromNodes.filter(x => x === from.id).length < 1) {
     return { tag: "InvalidFromNode" };
@@ -24,9 +24,9 @@ export function verifyAndAddConnection(from: Node, to: Node, validFromNodes: num
   validFromNodes.push(to.id);
   const currentConnections: Connection[] | undefined = solution[from.id];
   if (currentConnections !== undefined) {
-    currentConnections.push({ to: to, distance: 0.0 });
+    currentConnections.push({ to: to, distance: 0.0, connectionId: connectionId });
   } else {
-    solution[from.id] = [{ to: to, distance: 0.0 }];
+    solution[from.id] = [{ to: to, distance: 0.0, connectionId: connectionId }];
   }
 
   return { tag: "ValidConnection", newValidFromNodes: validFromNodes, newSolution: solution };
@@ -34,6 +34,7 @@ export function verifyAndAddConnection(from: Node, to: Node, validFromNodes: num
 
 type SuccessRunResult = {
   tag: "SuccessRunResult",
+  result: StepResult,
 };
 
 type FailRunResult = {
@@ -47,26 +48,19 @@ const emptyResource: () => Resource = function() {
     "Fork": 0,
     "Branch": 0,
     "Total": 0,
-  }
+  };
 };
 
-const startResources: RunResources = {
-  "Basic": emptyResource(),
-  "Red": emptyResource(),
-  "Green": emptyResource(),
-  "Blue": emptyResource(),
-  "Yellow": emptyResource(),
-  "Victory": emptyResource(),
+const startResources: () => RunResources = function() {
+  return {
+    "Basic": emptyResource(),
+    "Red": emptyResource(),
+    "Green": emptyResource(),
+    "Blue": emptyResource(),
+    "Yellow": emptyResource(),
+    "Victory": emptyResource(),
+  };
 };
-
-export function runSolution(solution: Solution): RunResult {
-  // TODO: get startNode from board?
-  const startResult: StepResult = runStep({ id: 0, x: 0, y: 0, nodeType: allNodes.startNode }, solution, startResources);
-
-  console.log("Run Result: " + JSON.stringify(startResult.resources));
-
-  return { tag: "SuccessRunResult" };
-}
 
 type Resource = {
   "Fork": number,
@@ -86,41 +80,62 @@ type RunResources = {
 type EffectFunction = (resources: RunResources) => RunResources;
 
 type StepResult = {
-  resources: RunResources
+  resources: RunResources,
+  nodeId: number,
+  count: number,
 };
 
-function runStep(node: Node, solution: Solution, resources: RunResources): StepResult {
-  console.log("Step: " + node.id);
+type StepResultX = {
+  resources: RunResources,
+  nodeId: number,
+};
+
+export function initVisit(solution: Solution, limit: number): StepResultX {
+  const startNode = { id: 0, x: 0, y: 0, nodeType: allNodes.startNode };
+  return visitStep(solution, startNode, startResources(), [], limit, 0);
+}
+
+function visitStep(solution: Solution, node: Node, resources: RunResources, nextNodes: Node[], limit: number, count: number): StepResultX {
+  const visitResult = visitNode(solution, node);
+
+  const newNextNodes = visitResult.next.map(conn => conn.to).concat(nextNodes);
+  let newResources = resources;
+
+  for (const effect of visitResult.effects) {
+    newResources = effectFunction(effect)(newResources);
+  }
+
+  if (count + 1 >= limit) {
+    return { resources: newResources, nodeId: node.id };
+  } else if (newNextNodes.length === 0) {
+    return { resources: newResources, nodeId: node.id };
+  } else {
+    const [nextNode] = newNextNodes.splice(0, 1);
+    return visitStep(solution, nextNode, newResources, newNextNodes, limit, count + 1);
+  }
+}
+
+function visitNode(solution: Solution, node: Node) {
   const connections: Connection[] | undefined = solution[node.id];
+
   if (connections === undefined) {
     // use final effect
-    const func = effectFunction(node.nodeType.finalEffect);
-    const newResources = func(resources);
+    const effect = node.nodeType.finalEffect;
 
-    // clear all branch/fork resources
-    clearResourceTypes(["Branch", "Fork"], newResources);
+    // clear temporary resources
 
-    console.log("At Final: " + JSON.stringify(newResources));
-    return { resources: newResources };
+    return { next: [], effects: [effect] };
   } else {
     if (connections.length > 0) {
       // use link effect
-      const nextNodes: Node[] = connections.map(conn => conn.to);
+      const effect = node.nodeType.linkEffect;
 
-      const func = effectFunction(node.nodeType.linkEffect);
-
-      let currentResources = func(resources);
-
-      for (const nextNode of nextNodes) {
-        const stepResult: StepResult = runStep(nextNode, solution, currentResources);
-        currentResources = stepResult.resources;
-      }
-
-      return { resources: currentResources };
+      return { next: connections, effects: [effect] };
     } else {
       throw "Should not happen: " + node.id + " has empty connections";
     }
   }
+
 }
 
 export function effectFunction(effect: NodeEffect): EffectFunction {
@@ -132,7 +147,6 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
       return resources => {
         const newResources: RunResources = Object.assign({}, resources);
         for (const gain of effect.gains) {
-          console.log("GAIN: " + JSON.stringify(gain));
           newResources[gain.color][gain.type] = newResources[gain.color][gain.type] + gain.amount;
         }
         return newResources;

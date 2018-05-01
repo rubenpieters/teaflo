@@ -1,14 +1,16 @@
-import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback, addBoardCallback } from "src/app/appstate";
-import { changeSelectedNode, addNodeCallback } from "src/app/gamestate";
+import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback, addBoardCallback, nodeLocation } from "src/app/appstate";
+import { changeSelectedNode, addNodeCallback, changeShownResources, addShownResourcesCallback } from "src/app/gamestate";
 import { connectToServer } from "src/app/network/network";
 import { Node } from "src/shared/node";
 import { Board } from "src/shared/board";
 import { ConnectResult, Solution } from "src/shared/connectResult";
-import { verifyAndAddConnection, runSolution } from "src/shared/solution";
+import { verifyAndAddConnection, initVisit } from "src/shared/solution";
 import { History, Action } from "src/app/history/history";
 
 let playBoardGroup: Phaser.Group;
 
+let currentLimit: number = 0;
+let circle: Phaser.Text | undefined = undefined;
 
 let undoList: History = [];
 let redoList: History = [];
@@ -17,6 +19,7 @@ let redoList: History = [];
 let validFromNodes: number[] = [];
 let solution: Solution = {};
 const connectionSprites: Phaser.Graphics[] = [];
+let nodeSprites: Phaser.Graphics[] = [];
 
 
 type ClickStateFrom = {
@@ -120,6 +123,16 @@ export default class Menu extends Phaser.State {
 
     this.game.input.onDown.add(onDown(this.game), this);
 
+    // circle
+
+    circle = this.add.text(0, 0, "O", {
+      font: "40px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
+    }, playBoardGroup);
+    circle.setTextBounds(-13, -13, 26, 26);
+
     // bottom menu - background
 
     const bottomMenu: Phaser.Graphics = this.game.add.graphics(0 - 400, 450 - 300, playGroup);
@@ -142,6 +155,22 @@ export default class Menu extends Phaser.State {
       boundsAlignV: "middle"
     }, playGroup);
     nodeTypeText.setTextBounds(10 - 400, 450 - 300, 100, 25);
+
+    const resourcesTitle: Phaser.Text = this.game.add.text(0, 0, "Resources", {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, playGroup);
+    resourcesTitle.setTextBounds(120 - 400, 425 - 300, 100, 25);
+
+    const resourcesText: Phaser.Text = this.game.add.text(0, 0, "--", {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    }, playGroup);
+    resourcesText.setTextBounds(120 - 400, 450 - 300, 100, 150);
 
     // undo button
 
@@ -167,15 +196,40 @@ export default class Menu extends Phaser.State {
     redoBtn.inputEnabled = true;
     redoBtn.events.onInputDown.add(redoAction(this.game));
 
-    // start run button
+    // step run -1 button
 
-    const startRunBtn: Phaser.Text = this.add.text(0, 0, "->", {
+    const stepRunMinBtn: Phaser.Text = this.add.text(0, 0, "-1>", {
       font: "22px Indie Flower",
       fill: "#77BFA3",
       boundsAlignH: "left",
       boundsAlignV: "middle",
     }, playGroup);
-    startRunBtn.setTextBounds(725 - 400, 575 - 300, 50, 25);
+    stepRunMinBtn.setTextBounds(630 - 400, 575 - 300, 40, 25);
+    stepRunMinBtn.inputEnabled = true;
+    const minus = (x: number) => { if (x - 1 > 0) {  return x - 1; } else { return x; } };
+    stepRunMinBtn.events.onInputDown.add(stepRunAction(minus));
+
+    // step run +1 button
+
+    const stepRunBtn: Phaser.Text = this.add.text(0, 0, "+1>", {
+      font: "22px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
+    }, playGroup);
+    stepRunBtn.setTextBounds(675 - 400, 575 - 300, 40, 25);
+    stepRunBtn.inputEnabled = true;
+    stepRunBtn.events.onInputDown.add(stepRunAction(x => x + 1));
+
+    // start run button
+
+    const startRunBtn: Phaser.Text = this.add.text(0, 0, ">>", {
+      font: "22px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
+    }, playGroup);
+    startRunBtn.setTextBounds(720 - 400, 575 - 300, 30, 25);
     startRunBtn.inputEnabled = true;
     startRunBtn.events.onInputDown.add(startRunAction);
 
@@ -196,6 +250,9 @@ export default class Menu extends Phaser.State {
         top2.fill = "#F08080";
         menuGroup.visible = false;
         playGroup.visible = true;
+        if (circle !== undefined) {
+          circle.visible = false;
+        }
         break;
       }
     }});
@@ -211,12 +268,21 @@ export default class Menu extends Phaser.State {
     // callbacks - play
 
     addBoardCallback(board => {
-      drawBoard(this.game, playBoardGroup, board);
+      nodeSprites = drawBoard(this.game, playBoardGroup, board);
       validFromNodes = [board[0].id];
     });
 
     addNodeCallback(nodeType => {
       nodeTypeText.setText(nodeType.meta.name);
+    });
+
+    addShownResourcesCallback(resources => {
+      resourcesText.setText(
+        "Basic Branch: " + resources.Basic.Branch + "\n" +
+        "Basic Fork: " + resources.Basic.Fork + "\n" +
+        "Basic Total: " + resources.Basic.Total + "\n" +
+        "Victory: " + resources.Victory.Total
+      );
     });
 
     connectToServer();
@@ -307,7 +373,7 @@ function nodeClick(game: Phaser.Game, node: Node) {
         const fromNode: Node = clickState.fromNode;
         const toNode: Node = node;
 
-        const connectResult: ConnectResult = verifyAndAddConnection(fromNode, toNode, validFromNodes, solution);
+        const connectResult: ConnectResult = verifyAndAddConnection(fromNode, toNode, connectionSprites.length, validFromNodes, solution);
         switch (connectResult.tag)  {
           case "InvalidFromNode": {
             console.log("invalid from node");
@@ -343,13 +409,15 @@ function makeConnection(game: Phaser.Game, fromNode: Node, toNode: Node) {
   connectionSprites.push(line);
 }
 
-function drawBoard(game: Phaser.Game, group: Phaser.Group, board: Board): void {
+function drawBoard(game: Phaser.Game, group: Phaser.Group, board: Board): Phaser.Graphics[] {
+  const result: Phaser.Graphics[] = [];
   for (const node of board) {
-    drawNode(game, group, node);
+    result.push(drawNode(game, group, node));
   }
+  return result;
 }
 
-function drawNode(game: Phaser.Game, group: Phaser.Group, node: Node): void {
+function drawNode(game: Phaser.Game, group: Phaser.Group, node: Node): Phaser.Graphics {
   const size: number = 15;
 
   const nodeSprite: Phaser.Graphics = game.add.graphics(node.x, node.y, group);
@@ -359,6 +427,7 @@ function drawNode(game: Phaser.Game, group: Phaser.Group, node: Node): void {
   nodeSprite.inputEnabled = true;
   nodeSprite.events.onInputOver.add(() => { changeSelectedNode(node.nodeType); });
   nodeSprite.events.onInputDown.add(nodeClick(game, node));
+  return nodeSprite;
 }
 
 function undoAction() {
@@ -394,7 +463,7 @@ function redoAction(game: Phaser.Game) {
     } else {
       switch (lastAction.tag) {
         case "AddConnectionAction": {
-          const connectResult: ConnectResult = verifyAndAddConnection(lastAction.from, lastAction.to, validFromNodes, solution);
+          const connectResult: ConnectResult = verifyAndAddConnection(lastAction.from, lastAction.to, connectionSprites.length, validFromNodes, solution);
           switch (connectResult.tag)  {
             case "InvalidFromNode": {
               console.log("invalid from node");
@@ -421,5 +490,39 @@ function redoAction(game: Phaser.Game) {
 }
 
 function startRunAction() {
-  runSolution(solution);
+  const stepResult = initVisit(solution, Number.POSITIVE_INFINITY);
+  const xy = nodeLocation(stepResult.nodeId);
+  if (circle !== undefined) {
+    circle.position.set(xy.x, xy.y);
+    circle.visible = true;
+  }
+  changeShownResources(stepResult.resources);
+}
+
+function stepRunAction(f: (n: number) => number) {
+  return function() {
+    currentLimit = f (currentLimit);
+    console.log("LIMIT: " + currentLimit);
+    const stepResult = initVisit(solution, currentLimit);
+    const xy = nodeLocation(stepResult.nodeId);
+    if (circle !== undefined) {
+      circle.position.set(xy.x, xy.y);
+      circle.visible = true;
+    }
+    changeShownResources(stepResult.resources);
+
+    /*switch (stepResult.tag) {
+      case "SuccessRunResult": {
+        const xy = nodeLocation(stepResult.result.nodeId);
+        if (circle !== undefined) {
+          circle.position.set(xy.x, xy.y);
+          circle.visible = true;
+        }
+        break;
+      }
+      case "FailRunResult": {
+        break;
+      }
+    }*/
+  };
 }

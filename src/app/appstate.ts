@@ -42,6 +42,10 @@ export function changeBoard(board: Board) {
   boardCallbacks.forEach(cb => cb(board));
 }
 
+export function nodeLocation(nodeId: number) {
+  return { x: appState.board[nodeId].x, y: appState.board[nodeId].y };
+}
+
 export function addBoardCallback(cb: ParamCallBack<Board>) {
   boardCallbacks.push(cb);
 }
