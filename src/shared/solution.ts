@@ -42,19 +42,21 @@ type FailRunResult = {
 
 type RunResult = SuccessRunResult | FailRunResult;
 
-const emptyResource: Resource = {
-  "Fork": 0,
-  "Branch": 0,
-  "Total": 0,
+const emptyResource: () => Resource = function() {
+  return {
+    "Fork": 0,
+    "Branch": 0,
+    "Total": 0,
+  }
 };
 
 const startResources: RunResources = {
-  "Basic": emptyResource,
-  "Red": emptyResource,
-  "Green": emptyResource,
-  "Blue": emptyResource,
-  "Yellow": emptyResource,
-  "Victory": emptyResource,
+  "Basic": emptyResource(),
+  "Red": emptyResource(),
+  "Green": emptyResource(),
+  "Blue": emptyResource(),
+  "Yellow": emptyResource(),
+  "Victory": emptyResource(),
 };
 
 export function runSolution(solution: Solution): RunResult {
@@ -107,9 +109,7 @@ function runStep(node: Node, solution: Solution, resources: RunResources): StepR
 
       const func = effectFunction(node.nodeType.linkEffect);
 
-      console.log("TEST1: " + JSON.stringify(resources));
       let currentResources = func(resources);
-      console.log("TEST2: " + JSON.stringify(currentResources));
 
       for (const nextNode of nextNodes) {
         const stepResult: StepResult = runStep(nextNode, solution, currentResources);
@@ -133,8 +133,6 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
         const newResources: RunResources = Object.assign({}, resources);
         for (const gain of effect.gains) {
           console.log("GAIN: " + JSON.stringify(gain));
-          console.log("x: " + gain.color);
-          console.log("x: " + gain.type);
           newResources[gain.color][gain.type] = newResources[gain.color][gain.type] + gain.amount;
         }
         return newResources;
