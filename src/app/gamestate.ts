@@ -6,8 +6,7 @@ export type GameState = {
 };
 
 type Resource = {
-  "Fork": number,
-  "Branch": number,
+  "Temp": number,
   "Total": number,
 };
 
@@ -22,8 +21,7 @@ type RunResources = {
 
 const emptyResource: () => Resource = function() {
   return {
-    "Fork": 0,
-    "Branch": 0,
+    "Temp": 0,
     "Total": 0,
   };
 };

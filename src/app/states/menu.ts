@@ -278,9 +278,8 @@ export default class Menu extends Phaser.State {
 
     addShownResourcesCallback(resources => {
       resourcesText.setText(
-        "Basic Branch: " + resources.Basic.Branch + "\n" +
-        "Basic Fork: " + resources.Basic.Fork + "\n" +
         "Basic Total: " + resources.Basic.Total + "\n" +
+        "Basic Temp: " + resources.Basic.Temp + "\n" +
         "Victory: " + resources.Victory.Total
       );
     });

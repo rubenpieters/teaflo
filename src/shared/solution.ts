@@ -45,8 +45,7 @@ type RunResult = SuccessRunResult | FailRunResult;
 
 const emptyResource: () => Resource = function() {
   return {
-    "Fork": 0,
-    "Branch": 0,
+    "Temp": 0,
     "Total": 0,
   };
 };
@@ -63,8 +62,7 @@ const startResources: () => RunResources = function() {
 };
 
 type Resource = {
-  "Fork": number,
-  "Branch": number,
+  "Temp": number,
   "Total": number,
 };
 
@@ -124,13 +122,13 @@ function visitNode(solution: Solution, node: Node) {
 
     // clear temporary resources
 
-    return { next: [], effects: [effect] };
+    return { next: [], effects: effect };
   } else {
     if (connections.length > 0) {
       // use link effect
       const effect = node.nodeType.linkEffect;
 
-      return { next: connections, effects: [effect] };
+      return { next: connections, effects: effect };
     } else {
       throw "Should not happen: " + node.id + " has empty connections";
     }
@@ -151,6 +149,15 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
         }
         return newResources;
       };
+    }
+    case "ClearTemp": {
+      return resources => {
+        const newResources: RunResources = Object.assign({}, resources);
+        for (const resourceColor of allColors) {
+          newResources[resourceColor]["Temp"] = 0;
+        }
+        return newResources;
+      }
     }
   }
 }

@@ -9,15 +9,15 @@ type NodeTypeMeta = {
 
 type StartNode = {
   tag: "StartNode",
-  linkEffect: NilEffect,
-  finalEffect: NilEffect,
+  linkEffect: NodeEffect[],
+  finalEffect: NodeEffect[],
   meta: NodeTypeMeta,
 };
 
 type ResourceNode = {
   tag: "ResourceNode",
-  linkEffect: NodeEffect,
-  finalEffect: NodeEffect,
+  linkEffect: NodeEffect[],
+  finalEffect: NodeEffect[],
   meta: NodeTypeMeta,
 };
 
@@ -28,8 +28,8 @@ export type NodeType = StartNode | ResourceNode;
 export const allNodes: { [key: string]: NodeType } = {
   startNode: {
     tag: "StartNode",
-    linkEffect: { tag: "NilEffect" },
-    finalEffect: { tag: "NilEffect" },
+    linkEffect: [],
+    finalEffect: [],
     meta: {
       id: 0,
       name: "Start Node",
@@ -38,14 +38,16 @@ export const allNodes: { [key: string]: NodeType } = {
   },
   twoBasicBranch: {
     tag: "ResourceNode",
-    linkEffect: {
+    linkEffect: [{
       tag: "GainEffect",
-      gains: [{ color: "Basic", type: "Branch", amount: 2 }],
-    },
-    finalEffect: {
+      gains: [{ color: "Basic", type: "Temp", amount: 2 }],
+    }],
+    finalEffect: [{
       tag: "GainEffect",
       gains: [{ color: "Victory", type: "Total", amount: 1 }],
     },
+    { tag: "ClearTemp" }
+    ],
     meta: {
       id: 1,
       name: "2 I (basic)",
@@ -54,14 +56,16 @@ export const allNodes: { [key: string]: NodeType } = {
   },
   oneBasicFork: {
     tag: "ResourceNode",
-    linkEffect: {
+    linkEffect: [{
       tag: "GainEffect",
-      gains: [{ color: "Basic", type: "Fork", amount: 1 }],
-    },
-    finalEffect: {
+      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+    }],
+    finalEffect: [{
       tag: "GainEffect",
       gains: [{ color: "Victory", type: "Total", amount: 1 }],
     },
+    { tag: "ClearTemp" }
+    ],
     meta: {
       id: 2,
       name: "1 Y (basic)",

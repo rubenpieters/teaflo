@@ -5,8 +5,12 @@ export type GainEffect = {
   gains: Resource[],
 }
 
+export type ClearTemp = {
+  tag: "ClearTemp",
+}
+
 export type NilEffect = {
   tag: "NilEffect",
 }
 
-export type NodeEffect = NilEffect | GainEffect;
+export type NodeEffect = NilEffect | GainEffect | ClearTemp;
