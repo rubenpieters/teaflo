@@ -13,7 +13,7 @@ export function generateBoard(rng: Rng, boardData: BoardData): Board {
   result = [{ id: 0, x: 0, y: 0, nodeType: allNodes.startNode }];
 
   for (const level of boardData) {
-    const sectionData: SectionData[] = generateSectionData(level.ampMin, level.ampMax, level.quadrants, level.levels);
+    const sectionData: SectionData[] = generateSectionData(level.ampMin, level.ampMax, level.quadrants);
     for (const sectionDatum of sectionData) {
       const nodes: Node[] = generateSection(rng, gst, sectionDatum, level.amount);
       result = result.concat(nodes);
@@ -28,8 +28,7 @@ type LevelData = {
   ampMin: number,
   ampMax: number,
   quadrants: Quadrant[],
-  levels: number,
-  amount: number
+  amount: number,
 };
 
 type BoardData = LevelData[];
@@ -41,52 +40,26 @@ function chooseT1(rng: Rng): NodeType {
 export const boardData: BoardData = [
   {
     ampMin: 50,
-    ampMax: 150,
+    ampMax: 100,
     quadrants: [
       rng => { return chooseT1(rng); },
       rng => { return chooseT1(rng); },
       rng => { return chooseT1(rng); },
       rng => { return chooseT1(rng); },
     ],
-    levels: 2,
-    amount: 1,
-  }
-  /*{
-    ampMin: 50,
-    ampMax: 250,
-    quadrants: [
-      rng => { return { tag: "ResourceNode", color: 0xFFFFFF, cost: {}, gain: { basic: 1 }}; },
-      rng => { return { tag: "ResourceNode", color: 0xFFFFFF, cost: {}, gain: { basic: 1 }}; },
-      rng => { return { tag: "ResourceNode", color: 0xFFFFFF, cost: {}, gain: { basic: 1 }}; },
-      rng => { return { tag: "ResourceNode", color: 0xFFFFFF, cost: {}, gain: { basic: 1 }}; },
-    ],
-    levels: 3,
     amount: 2,
   },
   {
-    ampMin: 200,
-    ampMax: 700,
+    ampMin: 150,
+    ampMax: 200,
     quadrants: [
-      rng => { return { tag: "ResourceNode", color: 0x0000FF, cost: {}, gain: { blue: 1 }}; },
-      rng => { return { tag: "ResourceNode", color: 0xFF0000, cost: {}, gain: { red: 1 }}; },
-      rng => { return { tag: "ResourceNode", color: 0x00FF00, cost: {}, gain: { green: 1 }}; },
-      rng => { return { tag: "ResourceNode", color: 0xDDDD77, cost: {}, gain: { yellow: 1 }}; },
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
     ],
-    levels: 4,
-    amount: 2,
-  },
-  {
-    ampMin: 600,
-    ampMax: 800,
-    quadrants: [
-      rng => { return { tag: "VictoryNode", color: 0x000000, cost: {}}; },
-      rng => { return { tag: "VictoryNode", color: 0x000000, cost: {}}; },
-      rng => { return { tag: "VictoryNode", color: 0x000000, cost: {}}; },
-      rng => { return { tag: "VictoryNode", color: 0x000000, cost: {}}; },
-    ],
-    levels: 2,
     amount: 3,
-  },*/
+  }
   ];
 
 type SectionData = {
@@ -98,24 +71,22 @@ type SectionData = {
 };
 
 function generateSectionData(
-    ampMin: number, ampMax: number, quadrants: Quadrant[], levels: number
+    ampMin: number, ampMax: number, quadrants: Quadrant[]
   ): SectionData[] {
   const result: SectionData[] = [];
   const quadrantSize: number = 360 / quadrants.length;
-  for (let i = 0; i <= levels; i++) {
-    const levelAmp: number = (ampMax - ampMin) / levels;
-    const quadrantsWithIndex: { x: Quadrant, i: number}[] =
-      quadrants.map((x, i) => { return { x: x, i: i }; });
-    for (const { x: quadrant, i: index } of quadrantsWithIndex) {
-      result.push({
-        ampMin: ampMin + ((levels - 1) * levelAmp),
-        ampMax: ampMin + (levels * levelAmp),
-        angleMin: index * quadrantSize,
-        angleMax: (index + 1) * quadrantSize,
-        nodeTypes: quadrant
-      });
-    }
+  const quadrantsWithIndex: { x: Quadrant, i: number}[] =
+    quadrants.map((x, i) => { return { x: x, i: i }; });
+  for (const { x: quadrant, i: index } of quadrantsWithIndex) {
+    result.push({
+      ampMin: ampMin,
+      ampMax: ampMax,
+      angleMin: index * quadrantSize,
+      angleMax: (index + 1) * quadrantSize,
+      nodeTypes: quadrant
+    });
   }
+
   return result;
 }
 
@@ -131,13 +102,14 @@ function generateSection(rng: Rng, gst: GenerateState, sectionData: SectionData,
   const result: Node[] = [];
   for (let i = 0; i < amount; i++) {
     const r: number = rng.integerInRange(sectionData.ampMin, sectionData.ampMax)();
-    const φ: number = rng.integerInRange(sectionData.angleMin, sectionData.angleMax)();
+    const phi: number = sectionData.angleMin + (sectionData.angleMax - sectionData.angleMin) * (i + 0.5) / amount;
+    const phiRadians: number = phi * Math.PI / 180;
     const id: number = gst.nextId();
     const nodeType: NodeType = sectionData.nodeTypes(rng);
     result.push({
       id: id,
-      x: r * Math.cos(φ),
-      y: r * Math.sin(φ),
+      x: r * Math.cos(phiRadians),
+      y: r * Math.sin(phiRadians),
       nodeType: nodeType
     });
   }
