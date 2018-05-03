@@ -91,7 +91,7 @@ export const allNodes: { [key: string]: NodeType } = {
     tag: "ResourceNode",
     linkEffect: [{
       tag: "ConsumeEffect",
-      consume: [{ color: "Red", type: "Temp", amount: 1 }],
+      consume: [{ color: "Red", type: "Both", amount: 1 }],
       afterConsume: [{
         tag: "GainEffect",
         gains: [{ color: "Red", type: "Temp", amount: 3 }],

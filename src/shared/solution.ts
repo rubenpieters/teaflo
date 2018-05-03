@@ -161,9 +161,9 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
     }
     case "ConsumeEffect": {
       return resources => {
-        // TODO: check and consume should fetch from temp/total pool together
         if (checkResources(resources, effect.consume)) {
           let newResources: RunResources = Object.assign({}, resources);
+          payResources(newResources, effect.consume);
           for (const consumeEff of effect.afterConsume) {
             newResources = effectFunction(consumeEff)(newResources)
           }
@@ -178,12 +178,44 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
 
 function checkResources(resources: RunResources, toCheck: {
   color: ResourceColor,
-  type: ResourceType,
+  type: "Temp" | "Total" | "Both",
   amount: number,
 }[]): boolean {
   for (const res of toCheck) {
-    if (resources[res.color][res.type] < res.amount) {
-      return false;
+    if (res.type === "Both") {
+      const amount: number = resources[res.color]["Temp"] + resources[res.color]["Total"];
+      if (amount < res.amount) {
+        return false;
+      }
+    } else {
+      if (resources[res.color][res.type] < res.amount) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function payResources(resources: RunResources, toPay: {
+  color: ResourceColor,
+  type: "Temp" | "Total" | "Both",
+  amount: number,
+}[]): boolean {
+  for (const res of toPay) {
+    if (res.type === "Both") {
+      if (resources[res.color]["Temp"] >= res.amount) {
+        resources[res.color]["Temp"] -= res.amount;
+      } else {
+        const toTakeFromTotal = res.amount - resources[res.color]["Total"];
+        resources[res.color]["Temp"] = 0;
+        resources[res.color]["Total"] -= toTakeFromTotal;
+      }
+      const amount: number = resources[res.color]["Temp"] + resources[res.color]["Total"];
+      if (amount < res.amount) {
+        return false;
+      }
+    } else {
+      resources[res.color][res.type] -= res.amount;
     }
   }
   return true;

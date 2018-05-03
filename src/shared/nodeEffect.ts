@@ -1,4 +1,4 @@
-import { Resource } from "src/shared/resourceType";
+import { Consume, Resource } from "src/shared/resourceType";
 
 export type GainEffect = {
   tag: "GainEffect",
@@ -15,7 +15,7 @@ export type NilEffect = {
 
 export type ConsumeEffect = {
   tag: "ConsumeEffect",
-  consume: Resource[],
+  consume: Consume[],
   afterConsume: NodeEffect[],
 }
 
