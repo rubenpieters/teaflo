@@ -13,4 +13,10 @@ export type NilEffect = {
   tag: "NilEffect",
 }
 
-export type NodeEffect = NilEffect | GainEffect | ClearTemp;
+export type ConsumeEffect = {
+  tag: "ConsumeEffect",
+  consume: Resource[],
+  afterConsume: NodeEffect[],
+}
+
+export type NodeEffect = NilEffect | GainEffect | ClearTemp | ConsumeEffect;

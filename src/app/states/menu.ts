@@ -278,6 +278,8 @@ export default class Menu extends Phaser.State {
 
     addShownResourcesCallback(resources => {
       resourcesText.setText(
+        "Red Total: " + resources.Red.Total + "\n" +
+        "Red Temp: " + resources.Red.Temp + "\n" +
         "Basic Total: " + resources.Basic.Total + "\n" +
         "Basic Temp: " + resources.Basic.Temp + "\n" +
         "Victory: " + resources.Victory.Total

@@ -50,7 +50,7 @@ export const allNodes: { [key: string]: NodeType } = {
     ],
     meta: {
       id: 1,
-      name: "2 I (basic)",
+      name: "2 x (temp)",
       color: 0xAAAAAA,
     }
   },
@@ -68,7 +68,41 @@ export const allNodes: { [key: string]: NodeType } = {
     ],
     meta: {
       id: 2,
-      name: "1 Y (basic)",
+      name: "1 x (temp)",
+      color: 0xAAAAAA,
+    }
+  },
+  twoRedTemp: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "GainEffect",
+      gains: [{ color: "Red", type: "Temp", amount: 2 }],
+    }],
+    finalEffect: [{
+      tag: "ClearTemp",
+    }],
+    meta: {
+      id: 3,
+      name: "1 R (temp)",
+      color: 0xAAAAAA,
+    }
+  },
+  consume1RTo3R: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Red", type: "Temp", amount: 1 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Red", type: "Temp", amount: 3 }],
+      }]
+    }],
+    finalEffect: [{
+      tag: "ClearTemp",
+    }],
+    meta: {
+      id: 3,
+      name: "consume 1 R to 3R",
       color: 0xAAAAAA,
     }
   }

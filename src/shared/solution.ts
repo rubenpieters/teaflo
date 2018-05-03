@@ -159,7 +159,34 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
         return newResources;
       }
     }
+    case "ConsumeEffect": {
+      return resources => {
+        // TODO: check and consume should fetch from temp/total pool together
+        if (checkResources(resources, effect.consume)) {
+          let newResources: RunResources = Object.assign({}, resources);
+          for (const consumeEff of effect.afterConsume) {
+            newResources = effectFunction(consumeEff)(newResources)
+          }
+          return newResources;
+        } else {
+          return resources;
+        }
+      }
+    }
   }
+}
+
+function checkResources(resources: RunResources, toCheck: {
+  color: ResourceColor,
+  type: ResourceType,
+  amount: number,
+}[]): boolean {
+  for (const res of toCheck) {
+    if (resources[res.color][res.type] < res.amount) {
+      return false;
+    }
+  }
+  return true;
 }
 
 const allColors: ResourceColor[] = ["Basic", "Red", "Green", "Blue", "Yellow", "Victory"];
