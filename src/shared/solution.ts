@@ -157,7 +157,7 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
           newResources[resourceColor]["Temp"] = 0;
         }
         return newResources;
-      }
+      };
     }
     case "ConsumeEffect": {
       return resources => {
@@ -165,13 +165,23 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
           let newResources: RunResources = Object.assign({}, resources);
           payResources(newResources, effect.consume);
           for (const consumeEff of effect.afterConsume) {
-            newResources = effectFunction(consumeEff)(newResources)
+            newResources = effectFunction(consumeEff)(newResources);
           }
           return newResources;
         } else {
           return resources;
         }
-      }
+      };
+    }
+    case "PersistEffect": {
+      return resources => {
+        let newResources: RunResources = Object.assign({}, resources);
+        for (const color of allColors) {
+          newResources[color]["Total"] += newResources[color]["Temp"];
+          newResources[color]["Temp"] = 0;
+        }
+        return newResources;
+      };
     }
   }
 }

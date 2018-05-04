@@ -84,7 +84,7 @@ export const allNodes: { [key: string]: NodeType } = {
     meta: {
       id: 3,
       name: "1 R (temp)",
-      color: 0xAAAAAA,
+      color: 0xFF0000,
     }
   },
   consume1RTo3R: {
@@ -101,9 +101,22 @@ export const allNodes: { [key: string]: NodeType } = {
       tag: "ClearTemp",
     }],
     meta: {
-      id: 3,
+      id: 4,
       name: "consume 1 R to 3R",
       color: 0xAAAAAA,
+    }
+  },
+  persistAll: {
+    tag: "ResourceNode",
+    linkEffect: [
+    ],
+    finalEffect: [{
+      tag: "PersistEffect",
+    }],
+    meta: {
+      id: 5,
+      name: "persist",
+      color: 0xAAFFFF,
     }
   }
 };

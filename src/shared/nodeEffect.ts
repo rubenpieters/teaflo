@@ -19,4 +19,8 @@ export type ConsumeEffect = {
   afterConsume: NodeEffect[],
 }
 
-export type NodeEffect = NilEffect | GainEffect | ClearTemp | ConsumeEffect;
+export type PersistEffect = {
+  tag: "PersistEffect",
+}
+
+export type NodeEffect = NilEffect | GainEffect | ClearTemp | ConsumeEffect | PersistEffect;
