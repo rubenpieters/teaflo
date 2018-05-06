@@ -10,14 +10,16 @@ export function generateBoard(rng: Rng, boardData: BoardData): Board {
   let nodeId: number = 1;
   const gst: GenerateState = { nextId: () => { const id = nodeId; nodeId += 1; return id; } };
 
-  result = [{ id: 0, x: 0, y: 0, nodeType: allNodes.startNode }];
+  result = [{ id: 0, x: 0, y: 0, nodeType: allNodes.startNode, tier: 0 }];
 
+  let tier: number = 1;
   for (const level of boardData) {
     const sectionData: SectionData[] = generateSectionData(level.ampMin, level.ampMax, level.quadrants);
     for (const sectionDatum of sectionData) {
-      const nodes: Node[] = generateSection(rng, gst, sectionDatum, level.amount);
+      const nodes: Node[] = generateSection(rng, gst, sectionDatum, level.amount, tier);
       result = result.concat(nodes);
     }
+    tier += 1;
   }
   return result;
 }
@@ -109,7 +111,7 @@ type GenerateState = {
   nextId: () => number
 };
 
-function generateSection(rng: Rng, gst: GenerateState, sectionData: SectionData, amount: number): Node[] {
+function generateSection(rng: Rng, gst: GenerateState, sectionData: SectionData, amount: number, tier: number): Node[] {
   const result: Node[] = [];
   for (let i = 0; i < amount; i++) {
     const r: number = rng.integerInRange(sectionData.ampMin, sectionData.ampMax)();
@@ -121,6 +123,7 @@ function generateSection(rng: Rng, gst: GenerateState, sectionData: SectionData,
       id: id,
       x: r * Math.cos(phiRadians),
       y: r * Math.sin(phiRadians),
+      tier: tier,
       nodeType: nodeType
     });
   }

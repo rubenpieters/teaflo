@@ -66,6 +66,7 @@ const startStepData: () => StepData = function() {
   return {
     resources: startResources(),
     modifiers: [],
+    growth: 15,
   };
 };
 
@@ -89,6 +90,7 @@ type ModifierFunction = (effects: NodeEffect) => NodeEffect[];
 type StepData = {
   resources: RunResources,
   modifiers: Modifier[],
+  growth: number,
 };
 
 type StepResult = {
@@ -97,15 +99,20 @@ type StepResult = {
 };
 
 export function initVisit(solution: Solution, limit: number): StepResult {
-  const startNode = { id: 0, x: 0, y: 0, nodeType: allNodes.startNode };
-  return visitStep(solution, startNode, startStepData(), [], limit, 0);
+  const startNode = { id: 0, x: 0, y: 0, nodeType: allNodes.startNode, tier: 0 };
+  return visitStep(solution, startNode, startStepData(), [], limit, 0, undefined);
 }
 
-function visitStep(solution: Solution, node: Node, stepData: StepData, nextNodes: Node[], limit: number, count: number): StepResult {
+function visitStep(solution: Solution, node: Node, stepData: StepData, nextNodes: Node[], limit: number, count: number, prevTier: number | undefined): StepResult {
   const visitResult = visitNode(solution, node, stepData.modifiers);
 
   const newNextNodes = visitResult.next.map(conn => conn.to).concat(nextNodes);
   let newStepData = stepData;
+
+  // update growth
+  if (prevTier !== undefined) {
+    newStepData.growth -= node.tier - prevTier;
+  }
 
   for (const effect of visitResult.effects) {
     newStepData = effectFunction(effect)(newStepData);
@@ -117,11 +124,15 @@ function visitStep(solution: Solution, node: Node, stepData: StepData, nextNodes
     return { stepData: newStepData, nodeId: node.id };
   } else {
     const [nextNode] = newNextNodes.splice(0, 1);
-    return visitStep(solution, nextNode, newStepData, newNextNodes, limit, count + 1);
+    return visitStep(solution, nextNode, newStepData, newNextNodes, limit, count + 1, visitResult.prevTier);
   }
 }
 
-function visitNode(solution: Solution, node: Node, modifiers: Modifier[]) {
+function visitNode(solution: Solution, node: Node, modifiers: Modifier[]): {
+  next: Connection[],
+  effects: NodeEffect[],
+  prevTier: number | undefined
+} {
   const connections: Connection[] | undefined = solution[node.id];
 
   if (connections === undefined) {
@@ -138,7 +149,7 @@ function visitNode(solution: Solution, node: Node, modifiers: Modifier[]) {
       effects = effectsTmp;
     }
 
-    return { next: [], effects: effects };
+    return { next: [], effects: effects, prevTier: undefined };
   } else {
     if (connections.length > 0) {
       // use link effect
@@ -154,7 +165,7 @@ function visitNode(solution: Solution, node: Node, modifiers: Modifier[]) {
         effects = effectsTmp;
       }
 
-      return { next: connections, effects: effects };
+      return { next: connections, effects: effects, prevTier: node.tier };
     } else {
       throw "Should not happen: " + node.id + " has empty connections";
     }
@@ -170,11 +181,10 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
     case "GainEffect": {
       return stepData => {
         const newResources: RunResources = Object.assign({}, stepData.resources);
-        console.log("GAIN: " + effect.gains);
         for (const gain of effect.gains) {
           newResources[gain.color][gain.type] = newResources[gain.color][gain.type] + gain.amount;
         }
-        return { resources: newResources, modifiers: stepData.modifiers };
+        return { resources: newResources, modifiers: stepData.modifiers, growth: stepData.growth };
       };
     }
     case "ClearTemp": {
@@ -183,7 +193,7 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
         for (const resourceColor of allColors) {
           newResources[resourceColor]["Temp"] = 0;
         }
-        return { resources: newResources, modifiers: stepData.modifiers };
+        return { resources: newResources, modifiers: stepData.modifiers, growth: stepData.growth };
       };
     }
     case "ConsumeEffect": {
@@ -191,13 +201,15 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
         if (checkResources(stepData.resources, effect.consume)) {
           let newResources: RunResources = Object.assign({}, stepData.resources);
           let newModifiers: Modifier[] = Object.assign({}, stepData.modifiers);
+          let newGrowth: number = stepData.growth;
           payResources(newResources, effect.consume);
           for (const consumeEff of effect.afterConsume) {
-            const newStepData = effectFunction(consumeEff)({ resources: newResources, modifiers: stepData.modifiers });
+            const newStepData = effectFunction(consumeEff)({ resources: newResources, modifiers: newModifiers, growth: newGrowth });
             newResources = newStepData.resources;
             newModifiers = newStepData.modifiers;
+            newGrowth = newStepData.growth;
           }
-          return { resources: newResources, modifiers: newModifiers };
+          return { resources: newResources, modifiers: newModifiers, growth: stepData.growth };
         } else {
           return stepData;
         }
@@ -210,13 +222,13 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
           newResources[color]["Total"] += newResources[color]["Temp"];
           newResources[color]["Temp"] = 0;
         }
-        return { resources: newResources, modifiers: stepData.modifiers };
+        return { resources: newResources, modifiers: stepData.modifiers, growth: stepData.growth };
       };
     }
     case "AddModifier": {
       return stepData => {
         const newModifiers: Modifier[] = stepData.modifiers.concat([effect.modifierType]);
-        return { resources: stepData.resources, modifiers: newModifiers };
+        return { resources: stepData.resources, modifiers: newModifiers, growth: stepData.growth };
       };
     }
   }
