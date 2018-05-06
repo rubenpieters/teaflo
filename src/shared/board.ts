@@ -54,7 +54,7 @@ export const boardData: BoardData = [
     ampMax: 200,
     quadrants: [
       rng => { return allNodes.consume1RTo3R; },
-      rng => { return chooseT1(rng); },
+      rng => { return allNodes.ignoreNextConsume; },
       rng => { return chooseT1(rng); },
       rng => { return chooseT1(rng); },
     ],

@@ -497,7 +497,7 @@ function startRunAction() {
     circle.position.set(xy.x, xy.y);
     circle.visible = true;
   }
-  changeShownResources(stepResult.resources);
+  changeShownResources(stepResult.stepData.resources);
 }
 
 function stepRunAction(f: (n: number) => number) {
@@ -510,7 +510,7 @@ function stepRunAction(f: (n: number) => number) {
       circle.position.set(xy.x, xy.y);
       circle.visible = true;
     }
-    changeShownResources(stepResult.resources);
+    changeShownResources(stepResult.stepData.resources);
 
     /*switch (stepResult.tag) {
       case "SuccessRunResult": {

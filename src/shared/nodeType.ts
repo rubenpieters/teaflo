@@ -118,5 +118,24 @@ export const allNodes: { [key: string]: NodeType } = {
       name: "persist",
       color: 0xAAFFFF,
     }
-  }
+  },
+  ignoreNextConsume: {
+    tag: "ResourceNode",
+    linkEffect: [
+    ],
+    finalEffect: [{
+      tag: "AddModifier",
+      modifierType: {
+        tag: "OneTimeModifier",
+        effect: {
+          tag: "IgnoreNextConsume",
+        }
+      }
+    }],
+    meta: {
+      id: 6,
+      name: "ignore next consume",
+      color: 0xAAFFAA,
+    }
+  },
 };

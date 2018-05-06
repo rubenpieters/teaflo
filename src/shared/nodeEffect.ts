@@ -1,4 +1,6 @@
 import { Consume, Resource } from "src/shared/resourceType";
+import { Modifier } from "src/shared/modifier";
+import { ModifierEffect } from "src/shared/modifierEffect";
 
 export type GainEffect = {
   tag: "GainEffect",
@@ -23,4 +25,16 @@ export type PersistEffect = {
   tag: "PersistEffect",
 }
 
-export type NodeEffect = NilEffect | GainEffect | ClearTemp | ConsumeEffect | PersistEffect;
+export type AddModifier = {
+  tag: "AddModifier",
+  modifierType: Modifier,
+}
+
+export type NodeEffect
+  = NilEffect
+  | GainEffect
+  | ClearTemp
+  | ConsumeEffect
+  | PersistEffect
+  | AddModifier
+  ;
