@@ -165,7 +165,7 @@ export default class Menu extends Phaser.State {
     resourcesTitle.setTextBounds(120 - 400, 425 - 300, 100, 25);
 
     const resourcesText: Phaser.Text = this.game.add.text(0, 0, "--", {
-      font: "20px Indie Flower",
+      font: "15px Indie Flower",
       fill: "#77BFA3",
       boundsAlignH: "center",
       boundsAlignV: "middle",
@@ -276,13 +276,15 @@ export default class Menu extends Phaser.State {
       nodeTypeText.setText(nodeType.meta.name);
     });
 
-    addShownResourcesCallback(resources => {
+    addShownResourcesCallback(stepData => {
       resourcesText.setText(
-        "Red Total: " + resources.Red.Total + "\n" +
-        "Red Temp: " + resources.Red.Temp + "\n" +
-        "Basic Total: " + resources.Basic.Total + "\n" +
-        "Basic Temp: " + resources.Basic.Temp + "\n" +
-        "Victory: " + resources.Victory.Total
+        "Red Total: " + stepData.resources.Red.Total + "\n" +
+        "Red Temp: " + stepData.resources.Red.Temp + "\n" +
+        "Basic Total: " + stepData.resources.Basic.Total + "\n" +
+        "Basic Temp: " + stepData.resources.Basic.Temp + "\n" +
+        "Growth: " + stepData.growth + "\n" +
+        "Modifiers: " + stepData.modifiers.length + "\n" +
+        "Victory: " + stepData.resources.Victory.Total
       );
     });
 
@@ -497,7 +499,7 @@ function startRunAction() {
     circle.position.set(xy.x, xy.y);
     circle.visible = true;
   }
-  changeShownResources(stepResult.stepData.resources);
+  changeShownResources(stepResult.stepData);
 }
 
 function stepRunAction(f: (n: number) => number) {
@@ -510,7 +512,7 @@ function stepRunAction(f: (n: number) => number) {
       circle.position.set(xy.x, xy.y);
       circle.visible = true;
     }
-    changeShownResources(stepResult.stepData.resources);
+    changeShownResources(stepResult.stepData);
 
     /*switch (stepResult.tag) {
       case "SuccessRunResult": {

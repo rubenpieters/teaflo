@@ -1,8 +1,9 @@
 import { NodeType } from "src/shared/nodeType";
+import { Modifier } from "src/shared/modifier";
 
 export type GameState = {
   selectedNode: NodeType | undefined,
-  shownResources: RunResources,
+  shownResources: StepData,
 };
 
 type Resource = {
@@ -17,6 +18,12 @@ type RunResources = {
   "Blue": Resource,
   "Yellow": Resource,
   "Victory": Resource,
+};
+
+type StepData = {
+  resources: RunResources,
+  modifiers: Modifier[],
+  growth: number,
 };
 
 const emptyResource: () => Resource = function() {
@@ -37,14 +44,22 @@ const startResources: () => RunResources = function() {
   };
 };
 
+const startStepData: () => StepData = function() {
+  return {
+    resources: startResources(),
+    modifiers: [],
+    growth: 15,
+  };
+};
+
 type ParamCallBack<A> = (a: A) => void;
 
 const selectedNodeCallbacks: ParamCallBack<NodeType>[] = [];
-const shownResourcesCallbacks: ParamCallBack<RunResources>[] = [];
+const shownResourcesCallbacks: ParamCallBack<StepData>[] = [];
 
 const gameState: GameState = {
   selectedNode: undefined,
-  shownResources: startResources(),
+  shownResources: startStepData(),
 };
 
 export function changeSelectedNode(nodeType: NodeType) {
@@ -56,11 +71,11 @@ export function addNodeCallback(cb: ParamCallBack<NodeType>) {
   selectedNodeCallbacks.push(cb);
 }
 
-export function changeShownResources(resources: RunResources) {
+export function changeShownResources(resources: StepData) {
   gameState.shownResources = resources;
   shownResourcesCallbacks.forEach(cb => cb(resources));
 }
 
-export function addShownResourcesCallback(cb: ParamCallBack<RunResources>) {
+export function addShownResourcesCallback(cb: ParamCallBack<StepData>) {
   shownResourcesCallbacks.push(cb);
 }
