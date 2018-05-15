@@ -144,12 +144,13 @@ export const allNodes: { [key: string]: NodeType } = {
       tag: "GainEffect",
       gains: [{ color: "Basic", type: "Temp", amount: 1 }],
     }],
-    finalEffect: [{
-      tag: "ClearTemp",
-    },
+    finalEffect: [
     {
       tag: "GainEffect",
       gains: [{ color: "Basic", type: "Total", amount: 1 }],
+    },
+    {
+      tag: "ClearTemp",
     }],
     meta: {
       id: 7,
@@ -167,9 +168,7 @@ export const allNodes: { [key: string]: NodeType } = {
         gains: [{ color: "Basic", type: "Temp", amount: 3 }],
       }]
     }],
-    finalEffect: [{
-      tag: "ClearTemp",
-    },
+    finalEffect: [
     {
       tag: "ConsumeEffect",
       consume: [{ color: "Basic", type: "Both", amount: 1 }],
@@ -177,6 +176,9 @@ export const allNodes: { [key: string]: NodeType } = {
         tag: "GainEffect",
         gains: [{ color: "Basic", type: "Total", amount: 3 }],
       }]
+    },
+    {
+      tag: "ClearTemp",
     }],
     meta: {
       id: 8,
@@ -194,9 +196,7 @@ export const allNodes: { [key: string]: NodeType } = {
         gains: [{ color: "Basic", type: "Temp", amount: 5 }],
       }]
     }],
-    finalEffect: [{
-      tag: "ClearTemp",
-    },
+    finalEffect: [
     {
       tag: "ConsumeEffect",
       consume: [{ color: "Basic", type: "Both", amount: 3 }],
@@ -204,6 +204,9 @@ export const allNodes: { [key: string]: NodeType } = {
         tag: "GainEffect",
         gains: [{ color: "Basic", type: "Total", amount: 5 }],
       }]
+    },
+    {
+      tag: "ClearTemp",
     }],
     meta: {
       id: 8,

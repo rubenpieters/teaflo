@@ -141,6 +141,7 @@ function visitNode(solution: Solution, node: Node, modifiers: Modifier[]): {
 
     // apply modifiers
     let effects: NodeEffect[] = effect;
+    console.log("modifiers: " + JSON.stringify(modifiers));
     for (const modifier of modifiers) {
       let effectsTmp: NodeEffect[] = [];
       for (const eff of effects) {
@@ -157,6 +158,7 @@ function visitNode(solution: Solution, node: Node, modifiers: Modifier[]): {
 
       // apply modifiers
       let effects: NodeEffect[] = effect;
+      console.log("modifiers: " + JSON.stringify(modifiers));
       for (const modifier of modifiers) {
         let effectsTmp: NodeEffect[] = [];
         for (const eff of effects) {
@@ -200,7 +202,7 @@ export function effectFunction(effect: NodeEffect): EffectFunction {
       return stepData => {
         if (checkResources(stepData.resources, effect.consume)) {
           let newResources: RunResources = Object.assign({}, stepData.resources);
-          let newModifiers: Modifier[] = Object.assign({}, stepData.modifiers);
+          let newModifiers: Modifier[] = stepData.modifiers.slice();
           let newGrowth: number = stepData.growth;
           payResources(newResources, effect.consume);
           for (const consumeEff of effect.afterConsume) {
