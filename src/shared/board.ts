@@ -46,7 +46,7 @@ export const boardData: BoardData = [
     quadrants: [
       rng => { return allNodes.twoRedTemp; },
       rng => { return allNodes.twoRedTemp; },
-      rng => { return allNodes.twoRedTemp; },
+      rng => { return allNodes.resource1; },
       rng => { return allNodes.twoRedTemp; },
     ],
     amount: 2,
@@ -56,22 +56,30 @@ export const boardData: BoardData = [
     ampMax: 200,
     quadrants: [
       rng => { return allNodes.consume1RTo3R; },
+      rng => { return allNodes.consume1RTo3R; },
       rng => { return allNodes.ignoreNextConsume; },
+      rng => { return allNodes.ignoreNextConsume; },
+      rng => { return allNodes.resource2_1; },
+      rng => { return chooseT1(rng); },
       rng => { return chooseT1(rng); },
       rng => { return chooseT1(rng); },
     ],
-    amount: 3,
+    amount: 1,
   },
   {
     ampMin: 225,
     ampMax: 250,
     quadrants: [
       rng => { return allNodes.persistAll; },
+      rng => { return allNodes.persistAll; },
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
+      rng => { return allNodes.resource3_1; },
       rng => { return chooseT1(rng); },
       rng => { return chooseT1(rng); },
       rng => { return chooseT1(rng); },
     ],
-    amount: 2,
+    amount: 1,
   }
   ];
 

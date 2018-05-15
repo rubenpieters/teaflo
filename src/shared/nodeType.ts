@@ -138,4 +138,77 @@ export const allNodes: { [key: string]: NodeType } = {
       color: 0xAAFFAA,
     }
   },
+  resource1: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+    }],
+    finalEffect: [{
+      tag: "ClearTemp",
+    },
+    {
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Total", amount: 1 }],
+    }],
+    meta: {
+      id: 7,
+      name: "1 Basic",
+      color: 0xAAAAAA,
+    }
+  },
+  resource2_1: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Temp", amount: 3 }],
+      }]
+    }],
+    finalEffect: [{
+      tag: "ClearTemp",
+    },
+    {
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Total", amount: 3 }],
+      }]
+    }],
+    meta: {
+      id: 8,
+      name: "Consume 1: Gain 3",
+      color: 0xAAAAAA,
+    }
+  },
+  resource3_1: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 3 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Temp", amount: 5 }],
+      }]
+    }],
+    finalEffect: [{
+      tag: "ClearTemp",
+    },
+    {
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 3 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Total", amount: 5 }],
+      }]
+    }],
+    meta: {
+      id: 8,
+      name: "Consume 3: Gain 5",
+      color: 0xAAAAAA,
+    }
+  },
 };
