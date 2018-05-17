@@ -278,8 +278,6 @@ export default class Menu extends Phaser.State {
 
     addShownResourcesCallback(stepData => {
       resourcesText.setText(
-        "Red Total: " + stepData.resources.Red.Total + "\n" +
-        "Red Temp: " + stepData.resources.Red.Temp + "\n" +
         "Basic Total: " + stepData.resources.Basic.Total + "\n" +
         "Basic Temp: " + stepData.resources.Basic.Temp + "\n" +
         "Growth: " + stepData.growth + "\n" +
@@ -499,7 +497,7 @@ function startRunAction() {
     circle.position.set(xy.x, xy.y);
     circle.visible = true;
   }
-  changeShownResources(stepResult.stepData);
+  changeShownResources(stepResult.stepValues);
 }
 
 function stepRunAction(f: (n: number) => number) {
@@ -512,7 +510,7 @@ function stepRunAction(f: (n: number) => number) {
       circle.position.set(xy.x, xy.y);
       circle.visible = true;
     }
-    changeShownResources(stepResult.stepData);
+    changeShownResources(stepResult.stepValues);
 
     /*switch (stepResult.tag) {
       case "SuccessRunResult": {

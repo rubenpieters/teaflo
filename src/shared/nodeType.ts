@@ -1,5 +1,5 @@
 import { Resource } from "src/shared/resource";
-import { NodeEffect, NilEffect } from "src/shared/nodeEffect";
+import { NodeEffect } from "src/shared/rules/effect";
 
 type NodeTypeMeta = {
   id: number,
@@ -25,6 +25,40 @@ export type NodeType = StartNode | ResourceNode;
 
 // declaration of all node types
 
+export const allNodes: { [key: string]: NodeType } = {
+  startNode: {
+    tag: "StartNode",
+    linkEffect: [],
+    finalEffect: [],
+    meta: {
+      id: 0,
+      name: "Start Node",
+      color: 0xFFFFFF,
+    }
+  },
+  resource1: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+    }],
+    finalEffect: [
+    {
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Total", amount: 1 }],
+    },
+    {
+      tag: "ClearTemp",
+    }],
+    meta: {
+      id: 7,
+      name: "1 Basic",
+      color: 0xAAAAAA,
+    }
+  },
+};
+
+/*
 export const allNodes: { [key: string]: NodeType } = {
   startNode: {
     tag: "StartNode",
@@ -215,3 +249,4 @@ export const allNodes: { [key: string]: NodeType } = {
     }
   },
 };
+*/
