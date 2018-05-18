@@ -77,6 +77,44 @@ export function effectFunction(effect: NodeEffect):
   };
 }
 
+function payResources(resources: ResourceValues, toPay: ConsumeUnit[]): ResourceValues | "NotEnough" {
+  let newResources: ResourceValues = resources;
+  for (const res of toPay) {
+    const payResult = payResource(newResources, res);
+    if (typeof payResult === "string") {
+      return "NotEnough";
+    } else {
+      newResources = payResult;
+    }
+  }
+  return newResources;
+}
+
+function payResource(resources: ResourceValues, res: ConsumeUnit): ResourceValues | "NotEnough" {
+  if (res.type === "Both") {
+    const amount: number = resources[res.color]["Temp"] + resources[res.color]["Total"];
+    if (amount < res.amount) {
+      return "NotEnough";
+    }
+    if (resources[res.color]["Temp"] >= res.amount) {
+      const newResources: ResourceValues = iassign(resources,
+        x => x[res.color]["Temp"], x => x - res.amount);
+      return newResources;
+    } else {
+      const toTakeFromTotal = res.amount - resources[res.color]["Total"];
+      const newResources: ResourceValues = iassign(resources,
+        x => x[res.color], x => { x["Temp"] = 0; x["Total"] -= toTakeFromTotal; return x });
+      return newResources;
+    }
+  } else {
+    const newResources: ResourceValues = iassign(resources,
+      // cast safe due to if statement
+      // TODO: no cast needed with switch?
+      x => x[res.color][<"Temp" | "Total">res.type], x => x - res.amount);
+    return newResources;
+  }
+}
+
 /*
 resource
 -consume x: gain x
