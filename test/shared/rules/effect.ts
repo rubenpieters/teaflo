@@ -48,4 +48,31 @@ function test2() {
   console.log(newValues.modifiers.map(x => JSON.stringify(x)));
 }
 
-test2();
+function test3() {
+  const consumeEffect: NodeEffect = {
+    tag: "ConsumeEffect",
+    consume: [
+      { color: "Basic", type: "Both", amount: 1 }
+    ],
+    afterConsume: [
+      {
+        tag: "GainEffect",
+        gains: [
+        { color: "Basic",
+          type: "Temp",
+          amount: 3,
+        }]
+      }
+    ]
+  }
+
+  
+  const stepValues: StepValues = iassign(emptyStepValues(),
+    x => x.resources["Basic"]["Temp"], x => 1);
+  
+  const newValues = triggerEffects([consumeEffect])(stepValues);
+  
+  console.log(newValues);
+}
+
+test3();

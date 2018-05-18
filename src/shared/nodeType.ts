@@ -51,8 +51,36 @@ export const allNodes: { [key: string]: NodeType } = {
       tag: "ClearTemp",
     }],
     meta: {
-      id: 7,
+      id: 1,
       name: "1 Basic",
+      color: 0xAAAAAA,
+    }
+  },
+  resource2_1: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Temp", amount: 3 }],
+      }]
+    }],
+    finalEffect: [
+    {
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Total", amount: 3 }],
+      }]
+    },
+    {
+      tag: "ClearTemp",
+    }],
+    meta: {
+      id: 2,
+      name: "Consume 1: Gain 3",
       color: 0xAAAAAA,
     }
   },

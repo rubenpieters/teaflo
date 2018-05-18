@@ -1,3 +1,4 @@
+import iassign from "immutable-assign";
 import { Board } from "src/shared/board";
 import { Node } from "src/shared/node";
 import { allNodes } from "src/shared/nodeType";
@@ -51,7 +52,8 @@ function visitStep(solution: Solution, node: Node, stepValues: StepValues, nextN
 
   // update growth
   if (prevTier !== undefined) {
-    newStepValues.growth -= node.tier - prevTier;
+    newStepValues = iassign(newStepValues,
+      x => x.growth, x => x - (node.tier - prevTier));
   }
 
   newStepValues = triggerEffects(visitResult.effects)(newStepValues);

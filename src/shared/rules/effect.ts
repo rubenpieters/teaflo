@@ -31,7 +31,7 @@ export function triggerEffects(nodeEffects: NodeEffect[]):
     while (effects.length > 0) {
       // cast is safe since length > 0, effects.pop() can not be undefined
       const effect: NodeEffect = (<NodeEffect>effects.pop());
-      const { newValues, newEffects } = triggerEffect(effect)(stepValues);
+      const { newValues, newEffects } = triggerEffect(effect)(returnValues);
       returnValues = newValues;
       effects = newEffects.concat(effects);
     }
@@ -68,7 +68,16 @@ export function effectFunction(effect: NodeEffect):
         return { newValues: newStepValues, newEffects: [] };
       }
       case "ConsumeEffect": {
-        return { newValues: stepValues, newEffects: [] };
+        let newStepValues: StepValues = stepValues;
+
+        const payResult = payResources(stepValues.resources, effect.consume);
+        if (typeof payResult === "string") {
+          // TODO: return Either
+          throw "can not pay consume";
+        } else {
+          newStepValues = iassign(newStepValues, v => v.resources, x => payResult);
+          return { newValues: newStepValues, newEffects: effect.afterConsume };
+        }
       }
       case "ClearTemp": {
         return { newValues: stepValues, newEffects: [] };
@@ -102,8 +111,9 @@ function payResource(resources: ResourceValues, res: ConsumeUnit): ResourceValue
       return newResources;
     } else {
       const toTakeFromTotal = res.amount - resources[res.color]["Total"];
-      const newResources: ResourceValues = iassign(resources,
-        x => x[res.color], x => { x["Temp"] = 0; x["Total"] -= toTakeFromTotal; return x });
+      const newResources: ResourceValues = iassign(iassign(resources,
+        x => x[res.color]["Temp"], x => 0),
+        x => x[res.color]["Total"], x => x - toTakeFromTotal);
       return newResources;
     }
   } else {
