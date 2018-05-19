@@ -82,7 +82,7 @@ function visitNode(solution: Solution, node: Node, modifiers: Modifier[]): {
     // use final effect
     const effects: NodeEffect[] = node.nodeType.finalEffect;
 
-    return { next: [], effects: node.nodeType.finalEffect, prevTier: undefined };
+    return { next: [], effects: node.nodeType.finalEffect, prevTier: 0 };
   } else {
     if (connections.length > 0) {
       // use link effect

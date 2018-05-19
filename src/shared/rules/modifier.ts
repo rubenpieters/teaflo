@@ -38,7 +38,7 @@ export function modifierFunction(modifier: Modifier):
           switch (nodeEffect.tag) {
             case "ConsumeEffect": {
               const modifiedEffect = nodeEffect.afterConsume;
-              return { newEffects: modifiedEffect, newModifiers: [modifier] };
+              return { newEffects: modifiedEffect, newModifiers: modifiersAfterUse };
             }
             default: {
               return { newEffects: [nodeEffect], newModifiers: [modifier] };
@@ -49,7 +49,7 @@ export function modifierFunction(modifier: Modifier):
           switch (nodeEffect.tag) {
             case "CheckEffect": {
               const modifiedEffect = nodeEffect.afterCheck;
-              return { newEffects: modifiedEffect, newModifiers: [modifier] };
+              return { newEffects: modifiedEffect, newModifiers: modifiersAfterUse };
             }
             default: {
               return { newEffects: [nodeEffect], newModifiers: [modifier] };
