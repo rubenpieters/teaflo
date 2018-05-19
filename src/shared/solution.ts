@@ -5,8 +5,11 @@ import { allNodes } from "src/shared/nodeType";
 import { Connection, Solution, ConnectResult } from "src/shared/connectResult";
 import { NodeEffect, triggerEffects } from "src/shared/rules/effect";
 import { Modifier } from "src/shared/rules/modifier";
-import * as Phaser from "phaser-ce";
 import { StepValues, emptyStepValues } from "src/shared/rules/resource";
+
+function clamp(v: number, min: number, max: number) {
+  return Math.min(Math.max(v, min), max);
+};
 
 export function verifyAndAddConnection(from: Node, to: Node, connectionId: number, validFromNodes: number[], solution: Solution): ConnectResult {
   // TODO: use Array.contains ?
@@ -15,9 +18,9 @@ export function verifyAndAddConnection(from: Node, to: Node, connectionId: numbe
   }
 
   if (from.nodeType.tag !== "StartNode") {
-    const angleCenter: number = Phaser.Math.radToDeg(Phaser.Math.angleBetween(0, 0, from.x, from.y));
-    const angleNewLine: number = Phaser.Math.radToDeg(Phaser.Math.angleBetween(from.x, from.y, to.x, to.y));
-    const verifyAngle = Phaser.Math.wrapAngle(angleCenter - angleNewLine);
+    const angleCenter: number = Math.atan2(from.y, from.x) * Math.PI / 180;
+    const angleNewLine: number = Math.atan2(to.y - from.y, to.x - from.x) * Math.PI / 180;
+    const verifyAngle = clamp(angleCenter - angleNewLine, -180, 180);
     if (verifyAngle > 90 || verifyAngle < -90) {
       return { tag: "InvalidAngle" };
     }
@@ -87,6 +90,7 @@ function visitNode(solution: Solution, node: Node, modifiers: Modifier[]): {
 
       return { next: connections, effects: effects, prevTier: node.tier };
     } else {
+      console.log("Should not happen: " + node.id + " has empty connections");
       throw "Should not happen: " + node.id + " has empty connections";
     }
   }

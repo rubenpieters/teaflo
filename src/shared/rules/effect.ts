@@ -26,7 +26,7 @@ export type NodeEffect
 export function triggerEffects(nodeEffects: NodeEffect[]):
   (sv: StepValues) => StepValues {
   return stepValues => {
-    let effects: NodeEffect[] = nodeEffects;
+    let effects: NodeEffect[] = nodeEffects.concat();
     let returnValues: StepValues = stepValues;
     while (effects.length > 0) {
       // cast is safe since length > 0, effects.pop() can not be undefined
@@ -73,6 +73,7 @@ export function effectFunction(effect: NodeEffect):
         const payResult = payResources(stepValues.resources, effect.consume);
         if (typeof payResult === "string") {
           // TODO: return Either
+          console.log("can not pay consume");
           throw "can not pay consume";
         } else {
           newStepValues = iassign(newStepValues, v => v.resources, x => payResult);
