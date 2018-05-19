@@ -5,6 +5,8 @@ export type ResourceColor
   | "Victory"
   ;
 
+export const allColors: ResourceColor[] = ["Basic", "Victory"];
+
 export type ResourceType
   = "Temp"
   | "Total"

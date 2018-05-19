@@ -27,28 +27,36 @@ export type ModifierEffect
   ;
 
 export function modifierFunction(modifier: Modifier):
-  (ne: NodeEffect) => { newEffect: NodeEffect, newModifiers: Modifier[] } {
+  (ne: NodeEffect) => { newEffects: NodeEffect[], newModifiers: Modifier[] } {
     return nodeEffect => {
       const modifierChargeReduced: Modifier = iassign(modifier,
         m => m.charges, c => c - modifier.chargePerUse);
-      const newModifiers: Modifier[] = modifierChargeReduced.charges > 0 ?
+      const modifiersAfterUse: Modifier[] = modifierChargeReduced.charges > 0 ?
         [modifierChargeReduced] : [];
       switch (modifier.modifierEffect.tag) {
         case "IgnoreNextConsume": {
-          return { newEffect: nodeEffect, newModifiers: newModifiers };
+          switch (nodeEffect.tag) {
+            case "ConsumeEffect": {
+              const modifiedEffect = nodeEffect.afterConsume;
+              return { newEffects: modifiedEffect, newModifiers: [modifier] };
+            }
+            default: {
+              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+            }
+          }
         }
         case "IgnoreNextCheck": {
-          return { newEffect: nodeEffect, newModifiers: newModifiers };
+          return { newEffects: [nodeEffect], newModifiers: [modifier] };
         }
         case "DoubleNextGain": {
           switch (nodeEffect.tag) {
             case "GainEffect": {
               const modifiedEffect: NodeEffect = iassign(nodeEffect,
                 x => x.gains, g => g.map(x => iassign(x, x => x.amount, x => x * 2)));
-              return { newEffect: nodeEffect, newModifiers: newModifiers };
+              return { newEffects: [nodeEffect], newModifiers: modifiersAfterUse };
             }
             default: {
-              return { newEffect: nodeEffect, newModifiers: newModifiers };
+              return { newEffects: [nodeEffect], newModifiers: [modifier] };
             }
           }
         }

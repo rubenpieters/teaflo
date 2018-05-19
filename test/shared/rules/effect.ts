@@ -39,7 +39,7 @@ function test2() {
   }
 
   const stepValues: StepValues = iassign(emptyStepValues(),
-  x => x.modifiers, m => [doubleGainMod]);
+    x => x.modifiers, m => [doubleGainMod]);
 
   
   const newValues = triggerEffects([gainEffect])(stepValues);
@@ -75,4 +75,23 @@ function test3() {
   console.log(newValues);
 }
 
-test3();
+function test4() {
+  const addModifierEffect: NodeEffect = {
+    tag: "AddModifier",
+    modifier: {
+      charges: 1,
+      chargePerUse: 1,
+      modifierEffect: {
+        tag: "DoubleNextGain"
+      },
+    }
+  }
+
+  const stepValues: StepValues = emptyStepValues();
+  
+  const newValues = triggerEffects([addModifierEffect])(stepValues);
+  
+  console.log(newValues);
+}
+
+test4();

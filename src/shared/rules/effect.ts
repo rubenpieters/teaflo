@@ -1,5 +1,5 @@
 import iassign from "immutable-assign";
-import { ResourceUnit, ConsumeUnit, ResourceValues, StepValues } from "src/shared/rules/resource";
+import { ResourceUnit, ConsumeUnit, ResourceValues, StepValues, allColors } from "src/shared/rules/resource";
 import { Modifier, modifierFunction } from "src/shared/rules/modifier";
 
 type GainEffect = {
@@ -17,10 +17,16 @@ type ClearTemp = {
   tag: "ClearTemp",
 };
 
+type AddModifier = {
+  tag: "AddModifier",
+  modifier: Modifier,
+};
+
 export type NodeEffect
   = GainEffect
   | ConsumeEffect
   | ClearTemp
+  | AddModifier
   ;
 
 export function triggerEffects(nodeEffects: NodeEffect[]):
@@ -42,16 +48,30 @@ export function triggerEffects(nodeEffects: NodeEffect[]):
 export function triggerEffect(nodeEffect: NodeEffect):
   (sv: StepValues) => { newValues: StepValues, newEffects: NodeEffect[] } {
   return stepValues => {
-    let effectAcc: NodeEffect = nodeEffect;
+    let effectAcc: NodeEffect | undefined = nodeEffect;
+    let restEffectAcc: NodeEffect[] = [];
     let modifierAcc: Modifier[] = [];
     for (const modifier of stepValues.modifiers) {
-      const { newEffect, newModifiers } = modifierFunction(modifier)(effectAcc);
-      effectAcc = newEffect;
-      modifierAcc = modifierAcc.concat(newModifiers);
+      if (effectAcc === undefined) {
+        return { newValues: stepValues, newEffects: restEffectAcc };
+      } else {
+        const { newEffects, newModifiers } = modifierFunction(modifier)(effectAcc);
+        if (newEffects.length > 0) {
+          effectAcc = newEffects[0];
+          restEffectAcc = restEffectAcc.concat(newEffects.slice(1));
+        } else {
+          effectAcc = undefined;
+        }
+        modifierAcc = modifierAcc.concat(newModifiers);
+      }
     }
     const valuesAfterModifier: StepValues  = iassign(stepValues,
       v => v.modifiers, m => modifierAcc);
-    return effectFunction(effectAcc)(valuesAfterModifier);
+    if (effectAcc === undefined) {
+      return { newValues: stepValues, newEffects: restEffectAcc };
+    } else {
+      return effectFunction(effectAcc)(valuesAfterModifier);
+    }
   };
 }
 
@@ -81,7 +101,16 @@ export function effectFunction(effect: NodeEffect):
         }
       }
       case "ClearTemp": {
+        let newStepValues: StepValues = stepValues;
+        for (const color of allColors) {
+          newStepValues = iassign(newStepValues, x => x.resources[color]["Temp"], x => 0);
+        }
         return { newValues: stepValues, newEffects: [] };
+      }
+      case "AddModifier": {
+        const newStepValues: StepValues = iassign(stepValues,
+          x => x.modifiers, x => x.concat([effect.modifier]));
+        return { newValues: newStepValues, newEffects: [] };
       }
     }
   };

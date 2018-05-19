@@ -9,7 +9,7 @@ import { StepValues, emptyStepValues } from "src/shared/rules/resource";
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max);
-};
+}
 
 export function verifyAndAddConnection(from: Node, to: Node, connectionId: number, validFromNodes: number[], solution: Solution): ConnectResult {
   // TODO: use Array.contains ?
