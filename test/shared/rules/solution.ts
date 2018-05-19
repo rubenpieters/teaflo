@@ -20,7 +20,7 @@ function test1() {
         id: 2,
         x: 0,
         y: 0,
-        tier: 0,
+        tier: 1,
         nodeType: allNodes.resource2_1
       },
       distance: 1,
@@ -32,4 +32,23 @@ function test1() {
   console.log(JSON.stringify(result));
 }
 
-test1();
+function test2() {
+  const sol: Solution = {
+    0: [{
+      to: {
+        id: 1,
+        x: 0,
+        y: 0,
+        tier: 1,
+        nodeType: allNodes.resource2_2
+      },
+      distance: 1,
+      connectionId: 0
+    }],
+  }
+
+  const result = initVisit(sol, 20);
+  console.log(JSON.stringify(result));
+}
+
+test2();

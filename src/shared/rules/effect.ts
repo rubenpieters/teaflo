@@ -1,5 +1,5 @@
 import iassign from "immutable-assign";
-import { ResourceUnit, ConsumeUnit, ResourceValues, StepValues, allColors } from "src/shared/rules/resource";
+import { ResourceUnit, ConsumeUnit, PersistUnit, ResourceValues, ResourceColor, StepValues, allColors, persist } from "src/shared/rules/resource";
 import { Modifier, modifierFunction } from "src/shared/rules/modifier";
 
 type GainEffect = {
@@ -13,6 +13,12 @@ type ConsumeEffect = {
   afterConsume: NodeEffect[],
 };
 
+type CheckEffect = {
+  tag: "CheckEffect",
+  consume: ConsumeUnit[],
+  afterCheck: NodeEffect[],
+};
+
 type ClearTemp = {
   tag: "ClearTemp",
 };
@@ -22,11 +28,18 @@ type AddModifier = {
   modifier: Modifier,
 };
 
+type PersistEffect = {
+  tag: "PersistEffect",
+  persists: PersistUnit[],
+};
+
 export type NodeEffect
   = GainEffect
   | ConsumeEffect
+  | CheckEffect
   | ClearTemp
   | AddModifier
+  | PersistEffect
   ;
 
 export function triggerEffects(nodeEffects: NodeEffect[]):
@@ -100,16 +113,41 @@ export function effectFunction(effect: NodeEffect):
           return { newValues: newStepValues, newEffects: effect.afterConsume };
         }
       }
+      case "CheckEffect": {
+        const payResult = payResources(stepValues.resources, effect.consume);
+        if (typeof payResult === "string") {
+          return { newValues: stepValues, newEffects: [] };
+        } else {
+          return { newValues: stepValues, newEffects: effect.afterCheck };
+        }
+      }
       case "ClearTemp": {
         let newStepValues: StepValues = stepValues;
         for (const color of allColors) {
           newStepValues = iassign(newStepValues, x => x.resources[color]["Temp"], x => 0);
         }
-        return { newValues: stepValues, newEffects: [] };
+        return { newValues: newStepValues, newEffects: [] };
       }
       case "AddModifier": {
         const newStepValues: StepValues = iassign(stepValues,
           x => x.modifiers, x => x.concat([effect.modifier]));
+        return { newValues: newStepValues, newEffects: [] };
+      }
+      case "PersistEffect": {
+        let newStepValues: StepValues = stepValues;
+        for (const persistUnit of effect.persists) {
+          if (persistUnit.color !== "All") {
+            // safe cast due to to if-stmt
+            const color = <ResourceColor>persistUnit.color;
+            newStepValues = iassign(newStepValues,
+              x => x.resources, x => persist(x, color, persistUnit.amount));
+          } else {
+            for (const color of allColors) {
+              newStepValues = iassign(newStepValues,
+                x => x.resources, x => persist(x, color, persistUnit.amount));
+            }
+          }
+        }
         return { newValues: newStepValues, newEffects: [] };
       }
     }

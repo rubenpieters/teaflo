@@ -36,7 +36,7 @@ export const allNodes: { [key: string]: NodeType } = {
       color: 0xFFFFFF,
     }
   },
-  resource1: {
+  resource1_1: {
     tag: "ResourceNode",
     linkEffect: [{
       tag: "GainEffect",
@@ -56,7 +56,7 @@ export const allNodes: { [key: string]: NodeType } = {
       color: 0xAAAAAA,
     }
   },
-  resource2_1: {
+  resource1_2: {
     tag: "ResourceNode",
     linkEffect: [{
       tag: "ConsumeEffect",
@@ -81,6 +81,58 @@ export const allNodes: { [key: string]: NodeType } = {
     meta: {
       id: 2,
       name: "Consume 1: Gain 3",
+      color: 0xAAAAAA,
+    }
+  },
+  resource2_1: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+    }],
+    finalEffect: [
+    {
+      tag: "AddModifier",
+      modifier: {
+        charges: 1,
+        chargePerUse: 1,
+        modifierEffect: {
+          tag: "IgnoreNextConsume",
+        }
+      },
+    },
+    {
+      tag: "ClearTemp",
+    }],
+    meta: {
+      id: 3,
+      name: "Ignore Next Consume",
+      color: 0xAAAAAA,
+    }
+  },
+  resource2_2: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+    }],
+    finalEffect: [
+    {
+      tag: "AddModifier",
+      modifier: {
+        charges: 1,
+        chargePerUse: 1,
+        modifierEffect: {
+          tag: "DoubleNextGain",
+        }
+      },
+    },
+    {
+      tag: "ClearTemp",
+    }],
+    meta: {
+      id: 4,
+      name: "Double Next Gain",
       color: 0xAAAAAA,
     }
   },

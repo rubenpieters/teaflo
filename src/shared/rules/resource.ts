@@ -1,3 +1,4 @@
+import iassign from "immutable-assign";
 import { Modifier } from "src/shared/rules/modifier";
 
 export type ResourceColor
@@ -23,6 +24,13 @@ export type ConsumeUnit = {
   type: ResourceType | "Both",
   amount: number,
 };
+
+export type PersistUnit = {
+  color: ResourceColor | "All",
+  type: ResourceType,
+  amount: number | "All",
+};
+
 
 export type ResourceValues = {
   [K in ResourceColor]: {
@@ -56,3 +64,18 @@ export const emptyStepValues: () => StepValues = () => {
     growth: 0,
   };
 };
+
+export function persist(values: ResourceValues, color: ResourceColor, amount: number | "All"): ResourceValues {
+  let toPersist: number = 0;
+  if (typeof amount === "string") {
+    toPersist = values[color]["Temp"];
+  } else {
+    toPersist = values[color]["Temp"] > amount ? amount : values[color]["Temp"];
+  }
+  values = iassign(iassign(values,
+    x => x[color]["Total"],
+    x => x + toPersist),
+    x => x[color]["Temp"],
+    x => x - toPersist);
+  return values;
+}

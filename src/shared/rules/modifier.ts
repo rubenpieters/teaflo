@@ -46,14 +46,22 @@ export function modifierFunction(modifier: Modifier):
           }
         }
         case "IgnoreNextCheck": {
-          return { newEffects: [nodeEffect], newModifiers: [modifier] };
+          switch (nodeEffect.tag) {
+            case "CheckEffect": {
+              const modifiedEffect = nodeEffect.afterCheck;
+              return { newEffects: modifiedEffect, newModifiers: [modifier] };
+            }
+            default: {
+              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+            }
+          }
         }
         case "DoubleNextGain": {
           switch (nodeEffect.tag) {
             case "GainEffect": {
               const modifiedEffect: NodeEffect = iassign(nodeEffect,
                 x => x.gains, g => g.map(x => iassign(x, x => x.amount, x => x * 2)));
-              return { newEffects: [nodeEffect], newModifiers: modifiersAfterUse };
+              return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
             }
             default: {
               return { newEffects: [nodeEffect], newModifiers: [modifier] };

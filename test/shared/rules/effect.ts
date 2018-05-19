@@ -12,7 +12,7 @@ function test1() {
       amount: 1,
     }]
   }
-  
+
   const stepValues: StepValues = emptyStepValues();
   
   const newValues = triggerEffects([gainEffect])(stepValues);
@@ -82,7 +82,7 @@ function test4() {
       charges: 1,
       chargePerUse: 1,
       modifierEffect: {
-        tag: "DoubleNextGain"
+        tag: "DoubleNextGain",
       },
     }
   }
