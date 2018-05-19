@@ -49,7 +49,7 @@ export function triggerEffects(nodeEffects: NodeEffect[]):
     let returnValues: StepValues = stepValues;
     while (effects.length > 0) {
       // cast is safe since length > 0, effects.pop() can not be undefined
-      const effect: NodeEffect = (<NodeEffect>effects.pop());
+      const effect: NodeEffect = (<NodeEffect>effects.shift());
       const { newValues, newEffects } = triggerEffect(effect)(returnValues);
       returnValues = newValues;
       effects = newEffects.concat(effects);

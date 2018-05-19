@@ -70,8 +70,8 @@ export const boardData: BoardData = [
     ampMin: 225,
     ampMax: 250,
     quadrants: [
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
+      rng => { return allNodes.resource1_3; },
+      rng => { return allNodes.resource1_3; },
       rng => { return allNodes.resource1_1; },
       rng => { return allNodes.resource1_1; },
       rng => { return allNodes.resource1_1; },
