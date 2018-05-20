@@ -4,7 +4,7 @@ import uws from "uws";
 
 import { ClientMessage } from "src/shared/network/clientMessage";
 import { Board, generateBoard, boardData } from "src/shared/board";
-import { rng, newRng, rngHandler } from "src/shared/handler/rng/randomSeedRng";
+import { newRng, rngHandler } from "src/shared/handler/rng/randomSeedRng";
 
 main();
 
@@ -12,8 +12,11 @@ function main(): void {
   console.log("Server started");
 
   // parse port from env or default
-  // TODO: get port from Env
-  const parsedPort: number = 8080;
+  let parsedPort: number = 8080;
+  const envPort: string | undefined = process.env.port;
+  if (envPort !== undefined) {
+    parsedPort = Number(envPort);
+  }
 
   // initialize websocket server
   console.log("binding to port: " + parsedPort);
@@ -26,7 +29,7 @@ function main(): void {
 }
 
 function mkServer(port: number): uws.Server {
-  const distFolder: string = path.join(__dirname, "dist");
+  const distFolder: string = path.join(__dirname, "..", "..", "dist");
   const indexFile: string = path.join(distFolder, "index.html");
 
   const app = express();
