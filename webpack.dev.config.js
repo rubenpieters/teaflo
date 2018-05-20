@@ -9,7 +9,7 @@ module.exports = {
   entry: path.join(__dirname, "src/app/main.ts"),
   output: {
     path: path.join(__dirname, "dist"),
-    filename: "bundle.js"
+    filename: "js/bundle.js"
   },
   resolve: {
     plugins: [

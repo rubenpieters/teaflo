@@ -30,6 +30,7 @@ function main(): void {
 
 function mkServer(port: number): uws.Server {
   const distFolder: string = path.join(__dirname, "..", "..", "dist");
+  const jsFolder: string = path.join(distFolder, "js");
   const indexFile: string = path.join(distFolder, "index.html");
 
   const app = express();
@@ -37,7 +38,7 @@ function mkServer(port: number): uws.Server {
   console.log("dist folder: " + distFolder);
 
   app.get("/", (req, res) => { res.sendFile(indexFile); });
-  app.use("/js", express.static(distFolder));
+  app.use("/js", express.static(jsFolder));
 
   const server = app.listen(port, () => { console.log("listening on " + port); });
 
