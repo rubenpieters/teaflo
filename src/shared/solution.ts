@@ -49,7 +49,7 @@ export function initVisit(solution: Solution, limit: number): StepResult {
 
 function visitStep(solution: Solution, node: Node, stepValues: StepValues, nextNodes: Node[], limit: number, count: number, prevTier: number | undefined): StepResult {
   const visitResult = visitNode(solution, node, stepValues.modifiers);
-  
+
   const newNextNodes = visitResult.next.map(conn => conn.to).concat(nextNodes);
   let newStepValues: StepValues = stepValues;
 

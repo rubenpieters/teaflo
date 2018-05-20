@@ -93,5 +93,29 @@ function test4() {
   
   console.log(newValues);
 }
+function test5() {
+  const convertEffect: NodeEffect = {
+    tag: "ConvertEffect",
+    converts: [{
+      tag: "ConvertBothUnit",
+      from: {
+        color: "Basic",
+      },
+      to: {
+        color: "Victory",
+        type: "Total",
+      },
+      amount: "All",
+    }]
+  }
 
-test4();
+  const stepValues: StepValues = iassign(iassign(emptyStepValues(),
+  x => x.resources["Basic"]["Temp"], x => 1),
+  x => x.resources["Basic"]["Total"], x => 1);
+  
+  const newValues = triggerEffects([convertEffect])(stepValues);
+  
+  console.log(newValues);
+}
+
+test5();
