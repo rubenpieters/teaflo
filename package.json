@@ -12,10 +12,11 @@
     "setup": "npm install -g npx@9.7.1 && npm install",
     "tslint": "npx tslint -c tslint.json -p tsconfig.json",
     "webpack:dev": "npx webpack --watch --config webpack.dev.config.js",
+    "webpack:prod": "npx webpack --config webpack.production.config.js",
     "dev:test": "npx ts-node -r tsconfig-paths/register test/main.ts",
     "run:server": "npx ts-node -r tsconfig-paths/register src/server/main.ts",
     "heroku-prebuild": "npm run-script setup",
-    "heroku-postbuild": "npm run-script webpack:dev"
+    "heroku-postbuild": "npm run-script webpack:prod"
   },
   "dependencies": {
     "express": "^4.16.3",
@@ -43,6 +44,7 @@
     "tslint": "^5.9.1",
     "tslint-loader": "^3.5.3",
     "typescript": "^2.8.1",
-    "webpack": "^3.11.0"
+    "webpack": "^3.11.0",
+    "webpack-bundle-analyzer": "^2.12.0"
   }
 }

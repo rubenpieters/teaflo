@@ -4,7 +4,6 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   entry: path.join(__dirname, "src/app/main.ts"),
@@ -30,18 +29,17 @@ module.exports = {
     new CleanWebpackPlugin([
       path.join(__dirname, "dist")
     ]),
+    new webpack.optimize.UglifyJsPlugin({
+      drop_console: true,
+      minimize: true,
+      output: {
+        comments: false
+      }
+    }),
     new HtmlWebpackPlugin({
       title: "TeaFlo",
       template: path.join(__dirname, "templates/index.ejs")
     }),
-    new BrowserSyncPlugin({
-      host: process.env.IP || 'localhost',
-      port: process.env.PORT || 3000,
-      server: {
-        baseDir: ['./', './dist']
-      }
-    })
-    // , new BundleAnalyzerPlugin()
   ],
   module: {
     rules: [
@@ -52,6 +50,5 @@ module.exports = {
       { test: /p2\.js$/, loader: "expose-loader?p2" },
       { test: /\.ts$/, loader: "ts-loader", exclude: "/node_modules/" }
     ]
-  },
-  devtool: "source-map"
+  }
 };
