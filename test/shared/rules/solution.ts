@@ -12,6 +12,13 @@ function test1() {
         tier: 0,
         nodeType: allNodes.resource1
       },
+      from: {
+        id: 1,
+        x: 0,
+        y: 0,
+        tier: 0,
+        nodeType: allNodes.resource2_2
+      },
       distance: 1,
       connectionId: 0
     }],
@@ -22,6 +29,13 @@ function test1() {
         y: 0,
         tier: 1,
         nodeType: allNodes.resource2_1
+      },
+      from: {
+        id: 1,
+        x: 0,
+        y: 0,
+        tier: 0,
+        nodeType: allNodes.resource2_2
       },
       distance: 1,
       connectionId: 0
@@ -40,6 +54,13 @@ function test2() {
         x: 0,
         y: 0,
         tier: 1,
+        nodeType: allNodes.resource2_2
+      },
+      from: {
+        id: 1,
+        x: 0,
+        y: 0,
+        tier: 0,
         nodeType: allNodes.resource2_2
       },
       distance: 1,

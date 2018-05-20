@@ -17,21 +17,21 @@ export function verifyAndAddConnection(from: Node, to: Node, connectionId: numbe
     return { tag: "InvalidFromNode" };
   }
 
-  if (from.nodeType.tag !== "StartNode") {
+  /*if (from.nodeType.tag !== "StartNode") {
     const angleCenter: number = Math.atan2(from.y, from.x) * Math.PI / 180;
     const angleNewLine: number = Math.atan2(to.y - from.y, to.x - from.x) * Math.PI / 180;
     const verifyAngle = clamp(angleCenter - angleNewLine, -180, 180);
     if (verifyAngle > 90 || verifyAngle < -90) {
       return { tag: "InvalidAngle" };
     }
-  }
+  }*/
 
   validFromNodes.push(to.id);
   const currentConnections: Connection[] | undefined = solution[from.id];
   if (currentConnections !== undefined) {
-    currentConnections.push({ to: to, distance: 0.0, connectionId: connectionId });
+    currentConnections.push({ from: from, to: to, distance: 0.0, connectionId: connectionId });
   } else {
-    solution[from.id] = [{ to: to, distance: 0.0, connectionId: connectionId }];
+    solution[from.id] = [{ from: from, to: to, distance: 0.0, connectionId: connectionId }];
   }
 
   return { tag: "ValidConnection", newValidFromNodes: validFromNodes, newSolution: solution };
@@ -44,37 +44,45 @@ type StepResult = {
 
 export function initVisit(solution: Solution, limit: number): StepResult {
   const startNode = { id: 0, x: 0, y: 0, nodeType: allNodes.startNode, tier: 0 };
-  return visitStep(solution, startNode, emptyStepValues(), [], limit, 0, undefined);
+  return visitStep(solution, startNode, undefined, emptyStepValues(), [], limit, 0);
 }
 
-function visitStep(solution: Solution, node: Node, stepValues: StepValues, nextNodes: Node[], limit: number, count: number, prevTier: number | undefined): StepResult {
-  const visitResult = visitNode(solution, node, stepValues.modifiers);
+function visitStep(solution: Solution, node: Node, from: Node | undefined, stepValues: StepValues, nextConnections: Connection[], limit: number, count: number): StepResult {
+  const visitResult = visitNode(solution, node, from, stepValues.modifiers);
 
-  const newNextNodes = visitResult.next.map(conn => conn.to).concat(nextNodes);
+  const newNextConnections: Connection[] = visitResult.next.concat(nextConnections);
   let newStepValues: StepValues = stepValues;
 
   // update growth
-  if (prevTier !== undefined) {
-    newStepValues = iassign(newStepValues,
-      x => x.growth, x => x - (node.tier - prevTier));
+  if (from !== undefined) {
+    if (from.tier < node.tier ) {
+      newStepValues = iassign(newStepValues,
+        x => x.growth, x => x - (node.tier - from.tier));
+    } else if (from.tier === node.tier) {
+      newStepValues = iassign(newStepValues,
+        x => x.growth, x => x - 1);
+    }
   }
 
   newStepValues = triggerEffects(visitResult.effects)(newStepValues);
 
   if (count + 1 >= limit) {
     return { stepValues: newStepValues, nodeId: node.id };
-  } else if (newNextNodes.length === 0) {
+  } else if (newNextConnections.length === 0) {
     return { stepValues: newStepValues, nodeId: node.id };
   } else {
-    const [nextNode] = newNextNodes.splice(0, 1);
-    return visitStep(solution, nextNode, newStepValues, newNextNodes, limit, count + 1, visitResult.prevTier);
+    const [nextConnection] = newNextConnections.splice(0, 1);
+    return visitStep(solution, nextConnection.to, nextConnection.from, newStepValues, newNextConnections, limit, count + 1);
   }
 }
 
-function visitNode(solution: Solution, node: Node, modifiers: Modifier[]): {
+const clearTemp: NodeEffect = {
+  tag: "ClearTemp",
+};
+
+function visitNode(solution: Solution, node: Node, from: Node | undefined, modifiers: Modifier[]): {
   next: Connection[],
-  effects: NodeEffect[],
-  prevTier: number | undefined
+  effects: NodeEffect[]
 } {
   const connections: Connection[] | undefined = solution[node.id];
 
@@ -82,13 +90,18 @@ function visitNode(solution: Solution, node: Node, modifiers: Modifier[]): {
     // use final effect
     const effects: NodeEffect[] = node.nodeType.finalEffect;
 
-    return { next: [], effects: node.nodeType.finalEffect, prevTier: 0 };
+    if (from !== undefined && from.tier === 0) {
+      // add clear temp when startin from start node
+      return { next: [], effects: [clearTemp].concat(effects) };
+    } else {
+      return { next: [], effects: effects };
+    }
   } else {
     if (connections.length > 0) {
       // use link effect
       const effects: NodeEffect[] = node.nodeType.linkEffect;
 
-      return { next: connections, effects: effects, prevTier: node.tier };
+      return { next: connections, effects: effects };
     } else {
       console.log("Should not happen: " + node.id + " has empty connections");
       throw "Should not happen: " + node.id + " has empty connections";

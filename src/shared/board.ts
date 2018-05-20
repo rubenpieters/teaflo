@@ -40,7 +40,7 @@ function chooseT1(rng: Rng): NodeType {
 }
 
 function chooseT2(rng: Rng): NodeType {
-  return chooseSet(rng, [allNodes.resource_t2_1, allNodes.resource_t2_2, allNodes.resource_t2_3]);
+  return chooseSet(rng, [allNodes.resource_t2_1, allNodes.resource_t2_2, allNodes.resource_t2_3, allNodes.resource_t2_4]);
 }
 
 function chooseT3(rng: Rng): NodeType {

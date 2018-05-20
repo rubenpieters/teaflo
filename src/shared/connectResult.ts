@@ -1,6 +1,7 @@
 import { Node } from "src/shared/node";
 
 export type Connection = {
+  from: Node,
   to: Node,
   distance: number,
   connectionId: number,

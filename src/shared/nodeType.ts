@@ -25,7 +25,7 @@ type ResourceNode = {
 export type NodeType = StartNode | ResourceNode;
 
 function addClear(nodeType: ResourceNode): NodeType {
-  const addedClear: NodeEffect[] = nodeType.linkEffect.concat([{ tag: "ClearTemp" }]);
+  const addedClear: NodeEffect[] = nodeType.finalEffect.concat([{ tag: "ClearTemp" }]);
   return iassign(nodeType,
     x => x.linkEffect,
     x => addedClear);
@@ -72,12 +72,9 @@ export const allNodes: { [key: string]: NodeType } = {
     {
       tag: "GainEffect",
       gains: [{ color: "Basic", type: "Total", amount: 1 }],
-    },
-    {
-      tag: "ClearTemp",
     }],
     meta: {
-      id: 1,
+      id: 101,
       name: "1 Basic",
       color: 0xAAAAAA,
     }
@@ -100,12 +97,9 @@ export const allNodes: { [key: string]: NodeType } = {
         tag: "GainEffect",
         gains: [{ color: "Basic", type: "Total", amount: 3 }],
       }]
-    },
-    {
-      tag: "ClearTemp",
     }],
     meta: {
-      id: 2,
+      id: 201,
       name: "Consume 1: Gain 3",
       color: 0xAAAAAA,
     }
@@ -134,12 +128,9 @@ export const allNodes: { [key: string]: NodeType } = {
             }
           },
         }]
-    },
-    {
-      tag: "ClearTemp",
     }],
     meta: {
-      id: 3,
+      id: 202,
       name: "Ignore Next Consume",
       color: 0xAAAAAA,
     }
@@ -168,13 +159,34 @@ export const allNodes: { [key: string]: NodeType } = {
           }
         },
       }]
-    },
-    {
-      tag: "ClearTemp",
     }],
     meta: {
-      id: 4,
+      id: 203,
       name: "Double Next Gain",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t2_4: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Temp", amount: 3 }],
+      }]
+    }],
+    finalEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Temp", amount: 5 }],
+      }]
+    }],
+    meta: {
+      id: 204,
+      name: "Consume 1: Gain 5",
       color: 0xAAAAAA,
     }
   },
@@ -196,12 +208,9 @@ export const allNodes: { [key: string]: NodeType } = {
         tag: "GainEffect",
         gains: [{ color: "Basic", type: "Total", amount: 4 }],
       }]
-    },
-    {
-      tag: "ClearTemp",
     }],
     meta: {
-      id: 2,
+      id: 301,
       name: "Consume 2: Gain 4",
       color: 0xAAAAAA,
     }
@@ -234,12 +243,9 @@ export const allNodes: { [key: string]: NodeType } = {
             amount: "All",
           }]
         }]
-    },
-    {
-      tag: "ClearTemp",
     }],
     meta: {
-      id: 4,
+      id: 302,
       name: "Convert Basic to Victory",
       color: 0xAAAAAA,
     }
