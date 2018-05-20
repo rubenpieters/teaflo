@@ -107,6 +107,7 @@ export function effectFunction(effect: NodeEffect):
         return { newValues: newStepValues, newEffects: [] };
       }
       case "ConsumeEffect": {
+        console.log("CONSUME!");
         let newStepValues: StepValues = stepValues;
 
         const payResult = payResources(stepValues.resources, effect.consume);
@@ -179,6 +180,7 @@ export function effectFunction(effect: NodeEffect):
 }
 
 function payResources(resources: ResourceValues, toPay: ConsumeUnit[]): ResourceValues | "NotEnough" {
+  console.log(JSON.stringify(resources));
   let newResources: ResourceValues = resources;
   for (const res of toPay) {
     const payResult = payResource(newResources, res);
@@ -188,11 +190,17 @@ function payResources(resources: ResourceValues, toPay: ConsumeUnit[]): Resource
       newResources = payResult;
     }
   }
+  console.log(JSON.stringify(newResources));
   return newResources;
 }
 
 function payResource(resources: ResourceValues, res: ConsumeUnit): ResourceValues | "NotEnough" {
   if (res.type !== "Both") {
+    const newResources: ResourceValues = iassign(resources,
+      // cast safe due to if statement
+      x => x[res.color][<"Temp" | "Total">res.type], x => x - res.amount);
+    return newResources;
+  } else {
     const amount: number = resources[res.color]["Temp"] + resources[res.color]["Total"];
     if (amount < res.amount) {
       return "NotEnough";
@@ -202,17 +210,11 @@ function payResource(resources: ResourceValues, res: ConsumeUnit): ResourceValue
         x => x[res.color]["Temp"], x => x - res.amount);
       return newResources;
     } else {
-      const toTakeFromTotal = res.amount - resources[res.color]["Total"];
+      const toTakeFromTotal = res.amount - resources[res.color]["Temp"];
       const newResources: ResourceValues = iassign(iassign(resources,
         x => x[res.color]["Temp"], x => 0),
         x => x[res.color]["Total"], x => x - toTakeFromTotal);
       return newResources;
     }
-  } else {
-    const newResources: ResourceValues = iassign(resources,
-      // cast safe due to if statement
-      // TODO: no cast needed with switch?
-      x => x[res.color][<"Temp" | "Total">res.type], x => x - res.amount);
-    return newResources;
   }
 }

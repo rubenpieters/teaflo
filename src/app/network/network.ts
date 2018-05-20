@@ -11,7 +11,7 @@ export function connectToServer(): void {
     const getBoardMessage: ClientMessage = {
       tag: "GetCurrentBoard",
       seed: "ABCD-EFGH",
-    }
+    };
 
     socket.send(JSON.stringify(getBoardMessage));
   };
