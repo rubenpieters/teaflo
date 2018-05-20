@@ -62,7 +62,7 @@ export const allNodes: { [key: string]: NodeType } = {
       color: 0xFFFFFF,
     }
   },
-  resource1_1: {
+  resource_t1_1: {
     tag: "ResourceNode",
     linkEffect: [{
       tag: "GainEffect",
@@ -82,7 +82,7 @@ export const allNodes: { [key: string]: NodeType } = {
       color: 0xAAAAAA,
     }
   },
-  resource1_2: {
+  resource_t2_1: {
     tag: "ResourceNode",
     linkEffect: [{
       tag: "ConsumeEffect",
@@ -110,7 +110,75 @@ export const allNodes: { [key: string]: NodeType } = {
       color: 0xAAAAAA,
     }
   },
-  resource1_3: {
+  resource_t2_2: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Temp", amount: 3 }],
+      }]
+    }],
+    finalEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [
+        {
+          tag: "AddModifier",
+          modifier: {
+            charges: 1,
+            chargePerUse: 1,
+            modifierEffect: {
+              tag: "IgnoreNextConsume",
+            }
+          },
+        }]
+    },
+    {
+      tag: "ClearTemp",
+    }],
+    meta: {
+      id: 3,
+      name: "Ignore Next Consume",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t2_3: {
+    tag: "ResourceNode",
+    linkEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Temp", amount: 3 }],
+      }]
+    }],
+    finalEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 1 }],
+      afterConsume: [
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 1,
+          chargePerUse: 1,
+          modifierEffect: {
+            tag: "DoubleNextGain",
+          }
+        },
+      }]
+    },
+    {
+      tag: "ClearTemp",
+    }],
+    meta: {
+      id: 4,
+      name: "Double Next Gain",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t3_1: {
     tag: "ResourceNode",
     linkEffect: [{
       tag: "ConsumeEffect",
@@ -138,78 +206,34 @@ export const allNodes: { [key: string]: NodeType } = {
       color: 0xAAAAAA,
     }
   },
-  resource2_1: {
+  resource_t3_2: {
     tag: "ResourceNode",
     linkEffect: [{
-      tag: "GainEffect",
-      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
-    }],
-    finalEffect: [
-    {
-      tag: "AddModifier",
-      modifier: {
-        charges: 1,
-        chargePerUse: 1,
-        modifierEffect: {
-          tag: "IgnoreNextConsume",
-        }
-      },
-    },
-    {
-      tag: "ClearTemp",
-    }],
-    meta: {
-      id: 3,
-      name: "Ignore Next Consume",
-      color: 0xAAAAAA,
-    }
-  },
-  resource2_2: {
-    tag: "ResourceNode",
-    linkEffect: [{
-      tag: "GainEffect",
-      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
-    }],
-    finalEffect: [
-    {
-      tag: "AddModifier",
-      modifier: {
-        charges: 1,
-        chargePerUse: 1,
-        modifierEffect: {
-          tag: "DoubleNextGain",
-        }
-      },
-    },
-    {
-      tag: "ClearTemp",
-    }],
-    meta: {
-      id: 4,
-      name: "Double Next Gain",
-      color: 0xAAAAAA,
-    }
-  },
-  resource_t3: {
-    tag: "ResourceNode",
-    linkEffect: [{
-      tag: "GainEffect",
-      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
-    }],
-    finalEffect: [
-    {
-      tag: "ConvertEffect",
-      converts: [{
-        tag: "ConvertBothUnit",
-        from: {
-          color: "Basic",
-        },
-        to: {
-          color: "Victory",
-          type: "Total",
-        },
-        amount: "All",
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 2 }],
+      afterConsume: [{
+        tag: "GainEffect",
+        gains: [{ color: "Basic", type: "Temp", amount: 4 }],
       }]
+    }],
+    finalEffect: [{
+      tag: "ConsumeEffect",
+      consume: [{ color: "Basic", type: "Both", amount: 2 }],
+      afterConsume: [
+        {
+          tag: "ConvertEffect",
+          converts: [{
+            tag: "ConvertBothUnit",
+            from: {
+              color: "Basic",
+            },
+            to: {
+              color: "Victory",
+              type: "Total",
+            },
+            amount: "All",
+          }]
+        }]
     },
     {
       tag: "ClearTemp",

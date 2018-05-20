@@ -36,7 +36,15 @@ type LevelData = {
 type BoardData = LevelData[];
 
 function chooseT1(rng: Rng): NodeType {
-  return chooseSet(rng, [allNodes.twoBasicBranch, allNodes.oneBasicFork]);
+  return chooseSet(rng, [allNodes.resource_t1_1]);
+}
+
+function chooseT2(rng: Rng): NodeType {
+  return chooseSet(rng, [allNodes.resource_t2_1, allNodes.resource_t2_2, allNodes.resource_t2_3]);
+}
+
+function chooseT3(rng: Rng): NodeType {
+  return chooseSet(rng, [allNodes.resource_t3_1, allNodes.resource_t3_2]);
 }
 
 export const boardData: BoardData = [
@@ -44,10 +52,10 @@ export const boardData: BoardData = [
     ampMin: 50,
     ampMax: 100,
     quadrants: [
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource2_1; },
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
+      rng => { return chooseT1(rng); },
     ],
     amount: 2,
   },
@@ -55,14 +63,14 @@ export const boardData: BoardData = [
     ampMin: 150,
     ampMax: 200,
     quadrants: [
-      rng => { return allNodes.resource1_2; },
-      rng => { return allNodes.resource1_2; },
-      rng => { return allNodes.resource2_2; },
-      rng => { return allNodes.resource2_2; },
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
+      rng => { return chooseT2(rng); },
+      rng => { return chooseT2(rng); },
+      rng => { return chooseT2(rng); },
+      rng => { return chooseT2(rng); },
+      rng => { return chooseT2(rng); },
+      rng => { return chooseT2(rng); },
+      rng => { return chooseT2(rng); },
+      rng => { return chooseT2(rng); },
     ],
     amount: 1,
   },
@@ -70,14 +78,14 @@ export const boardData: BoardData = [
     ampMin: 225,
     ampMax: 250,
     quadrants: [
-      rng => { return allNodes.resource1_3; },
-      rng => { return allNodes.resource1_3; },
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
-      rng => { return allNodes.resource1_1; },
+      rng => { return chooseT3(rng); },
+      rng => { return chooseT3(rng); },
+      rng => { return chooseT3(rng); },
+      rng => { return chooseT3(rng); },
+      rng => { return chooseT3(rng); },
+      rng => { return chooseT3(rng); },
+      rng => { return chooseT3(rng); },
+      rng => { return chooseT3(rng); },
     ],
     amount: 1,
   }
