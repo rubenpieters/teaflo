@@ -14,7 +14,8 @@
     "webpack:dev": "npx webpack --watch --config webpack.dev.config.js",
     "dev:test": "npx ts-node -r tsconfig-paths/register test/main.ts",
     "run:server": "npx ts-node -r tsconfig-paths/register src/server/main.ts",
-    "heroku-prebuild": "npm run-script setup"
+    "heroku-prebuild": "npm run-script setup",
+    "heroku-postbuild": "npm run-script webpack:dev"
   },
   "dependencies": {
     "express": "^4.16.3",
