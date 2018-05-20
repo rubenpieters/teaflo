@@ -13,7 +13,7 @@ function main(): void {
 
   // parse port from env or default
   let parsedPort: number = 8080;
-  const envPort: string | undefined = process.env.port;
+  const envPort: string | undefined = process.env["PORT"];
   if (envPort !== undefined) {
     parsedPort = Number(envPort);
   }
