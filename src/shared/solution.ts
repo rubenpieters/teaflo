@@ -17,14 +17,15 @@ export function verifyAndAddConnection(from: Node, to: Node, connectionId: numbe
     return { tag: "InvalidFromNode" };
   }
 
-  /*if (from.nodeType.tag !== "StartNode") {
-    const angleCenter: number = Math.atan2(from.y, from.x) * Math.PI / 180;
-    const angleNewLine: number = Math.atan2(to.y - from.y, to.x - from.x) * Math.PI / 180;
+  if (from.nodeType.tag !== "StartNode") {
+    const angleCenter: number = Math.atan2(from.y, from.x) * 180 / Math.PI;
+    const angleNewLine: number = Math.atan2(to.y - from.y, to.x - from.x) * 180 / Math.PI;
     const verifyAngle = clamp(angleCenter - angleNewLine, -180, 180);
+    console.log("ANGLE: " + verifyAngle);
     if (verifyAngle > 90 || verifyAngle < -90) {
       return { tag: "InvalidAngle" };
     }
-  }*/
+  }
 
   validFromNodes.push(to.id);
   const currentConnections: Connection[] | undefined = solution[from.id];
