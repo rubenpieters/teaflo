@@ -36,15 +36,15 @@ type LevelData = {
 type BoardData = LevelData[];
 
 function chooseT1(rng: Rng): NodeType {
-  return chooseSet(rng, [allNodes.resource_t1_1]);
+  return chooseSet(rng, [allNodes.resource_t1_1, allNodes.resource_t1_2]);
 }
 
 function chooseT2(rng: Rng): NodeType {
-  return chooseSet(rng, [allNodes.resource_t2_1, allNodes.resource_t2_2, allNodes.resource_t2_3, allNodes.resource_t2_4]);
+  return chooseSet(rng, [allNodes.resource_t2_1]);
 }
 
 function chooseT3(rng: Rng): NodeType {
-  return chooseSet(rng, [allNodes.resource_t3_1, allNodes.resource_t3_2]);
+  return chooseSet(rng, [allNodes.resource_t3_1]);
 }
 
 export const boardData: BoardData = [

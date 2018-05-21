@@ -4,9 +4,10 @@ import { Modifier } from "src/shared/rules/modifier";
 export type ResourceColor
   = "Basic"
   | "Victory"
+  | "Stack"
   ;
 
-export const allColors: ResourceColor[] = ["Basic", "Victory"];
+export const allColors: ResourceColor[] = ["Basic", "Victory", "Stack"];
 
 export type ResourceType
   = "Temp"
@@ -73,6 +74,10 @@ export const emptyResourceValues: () => ResourceValues = () => {
       Temp: 0,
       Total: 0,
     },
+    Stack: {
+      Temp: 0,
+      Total: 0,
+    }
   };
 };
 

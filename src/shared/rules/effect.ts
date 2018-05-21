@@ -107,7 +107,6 @@ export function effectFunction(effect: NodeEffect):
         return { newValues: newStepValues, newEffects: [] };
       }
       case "ConsumeEffect": {
-        console.log("CONSUME!");
         let newStepValues: StepValues = stepValues;
 
         const payResult = payResources(stepValues.resources, effect.consume);

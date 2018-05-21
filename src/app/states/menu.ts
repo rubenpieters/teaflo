@@ -280,6 +280,8 @@ export default class Menu extends Phaser.State {
       resourcesText.setText(
         "Basic Total: " + stepData.resources.Basic.Total + "\n" +
         "Basic Temp: " + stepData.resources.Basic.Temp + "\n" +
+        "Stack Total: " + stepData.resources.Stack.Total + "\n" +
+        "Stack Temp: " + stepData.resources.Stack.Temp + "\n" +
         "Growth: " + stepData.growth + "\n" +
         "Modifiers: " + stepData.modifiers.length + "\n" +
         "Victory: " + stepData.resources.Victory.Total

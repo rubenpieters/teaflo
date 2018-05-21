@@ -10,52 +10,24 @@ type NodeTypeMeta = {
 
 type StartNode = {
   tag: "StartNode",
-  linkEffect: NodeEffect[],
-  finalEffect: NodeEffect[],
+  effects: NodeEffect[],
   meta: NodeTypeMeta,
 };
 
 type ResourceNode = {
   tag: "ResourceNode",
-  linkEffect: NodeEffect[],
-  finalEffect: NodeEffect[],
+  effects: NodeEffect[],
   meta: NodeTypeMeta,
 };
 
 export type NodeType = StartNode | ResourceNode;
-
-function addClear(nodeType: ResourceNode): NodeType {
-  const addedClear: NodeEffect[] = nodeType.finalEffect.concat([{ tag: "ClearTemp" }]);
-  return iassign(nodeType,
-    x => x.linkEffect,
-    x => addedClear);
-}
-
-function addConsumeX(nodeType: ResourceNode, consumeAmt: number): NodeType {
-  const addedConsumeLink: NodeEffect[] = [{
-    tag: "ConsumeEffect",
-    consume: [{ color: "Basic", type: "Both", amount: consumeAmt }],
-    afterConsume: nodeType.linkEffect,
-  }];
-  const addedConsumeFinal: NodeEffect[] = [{
-    tag: "ConsumeEffect",
-    consume: [{ color: "Basic", type: "Both", amount: consumeAmt }],
-    afterConsume: nodeType.finalEffect,
-  }];
-  return iassign(iassign(nodeType,
-    x => x.linkEffect,
-    x => addedConsumeLink),
-    x => x.finalEffect,
-    x => addedConsumeFinal);
-}
 
 // declaration of all node types
 
 export const allNodes: { [key: string]: NodeType } = {
   startNode: {
     tag: "StartNode",
-    linkEffect: [],
-    finalEffect: [],
+    effects: [],
     meta: {
       id: 0,
       name: "Start Node",
@@ -64,7 +36,79 @@ export const allNodes: { [key: string]: NodeType } = {
   },
   resource_t1_1: {
     tag: "ResourceNode",
-    linkEffect: [{
+    effects: [
+    {
+      tag: "ClearTemp",
+    },
+    {
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+    }],
+    meta: {
+      id: 101,
+      name: "1 Basic",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t1_2: {
+    tag: "ResourceNode",
+    effects: [
+    {
+      tag: "ClearTemp",
+    },
+    {
+      tag: "GainEffect",
+      gains: [{ color: "Stack", type: "Temp", amount: 1 }],
+    }],
+    meta: {
+      id: 102,
+      name: "1 Stack",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t2_1: {
+    tag: "ResourceNode",
+    effects: [
+    {
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+    }
+    ],
+    meta: {
+      id: 201,
+      name: "TODO",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t3_1: {
+    tag: "ResourceNode",
+    effects: [
+    {
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+    }
+    ],
+    meta: {
+      id: 301,
+      name: "TODO",
+      color: 0xAAAAAA,
+    }
+  },
+};
+/*
+export const allNodes: { [key: string]: NodeType } = {
+  startNode: {
+    tag: "StartNode",
+    effects: [],
+    meta: {
+      id: 0,
+      name: "Start Node",
+      color: 0xFFFFFF,
+    }
+  },
+  resource_t1_1: {
+    tag: "ResourceNode",
+    effects: [{
       tag: "GainEffect",
       gains: [{ color: "Basic", type: "Temp", amount: 1 }],
     }],
@@ -81,7 +125,7 @@ export const allNodes: { [key: string]: NodeType } = {
   },
   resource_t2_1: {
     tag: "ResourceNode",
-    linkEffect: [{
+    effects: [{
       tag: "ConsumeEffect",
       consume: [{ color: "Basic", type: "Both", amount: 1 }],
       afterConsume: [{
@@ -106,7 +150,7 @@ export const allNodes: { [key: string]: NodeType } = {
   },
   resource_t2_2: {
     tag: "ResourceNode",
-    linkEffect: [{
+    effects: [{
       tag: "ConsumeEffect",
       consume: [{ color: "Basic", type: "Both", amount: 1 }],
       afterConsume: [{
@@ -137,7 +181,7 @@ export const allNodes: { [key: string]: NodeType } = {
   },
   resource_t2_3: {
     tag: "ResourceNode",
-    linkEffect: [{
+    effects: [{
       tag: "ConsumeEffect",
       consume: [{ color: "Basic", type: "Both", amount: 1 }],
       afterConsume: [{
@@ -168,7 +212,7 @@ export const allNodes: { [key: string]: NodeType } = {
   },
   resource_t2_4: {
     tag: "ResourceNode",
-    linkEffect: [{
+    effects: [{
       tag: "ConsumeEffect",
       consume: [{ color: "Basic", type: "Both", amount: 1 }],
       afterConsume: [{
@@ -192,7 +236,7 @@ export const allNodes: { [key: string]: NodeType } = {
   },
   resource_t3_1: {
     tag: "ResourceNode",
-    linkEffect: [{
+    effects: [{
       tag: "ConsumeEffect",
       consume: [{ color: "Basic", type: "Both", amount: 2 }],
       afterConsume: [{
@@ -217,7 +261,7 @@ export const allNodes: { [key: string]: NodeType } = {
   },
   resource_t3_2: {
     tag: "ResourceNode",
-    linkEffect: [{
+    effects: [{
       tag: "ConsumeEffect",
       consume: [{ color: "Basic", type: "Both", amount: 2 }],
       afterConsume: [{
@@ -251,3 +295,4 @@ export const allNodes: { [key: string]: NodeType } = {
     }
   },
 };
+*/

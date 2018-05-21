@@ -88,19 +88,12 @@ function visitNode(solution: Solution, node: Node, from: Node | undefined, modif
   const connections: Connection[] | undefined = solution[node.id];
 
   if (connections === undefined) {
-    // use final effect
-    const effects: NodeEffect[] = node.nodeType.finalEffect;
+    const effects: NodeEffect[] = node.nodeType.effects;
 
-    if (from !== undefined && from.tier === 0) {
-      // add clear temp when startin from start node
-      return { next: [], effects: [clearTemp].concat(effects) };
-    } else {
-      return { next: [], effects: effects };
-    }
+    return { next: [], effects: effects };
   } else {
     if (connections.length > 0) {
-      // use link effect
-      const effects: NodeEffect[] = node.nodeType.linkEffect;
+      const effects: NodeEffect[] = node.nodeType.effects;
 
       return { next: connections, effects: effects };
     } else {
