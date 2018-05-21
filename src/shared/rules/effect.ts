@@ -7,6 +7,11 @@ type GainEffect = {
   gains: ResourceUnit[],
 };
 
+type LoseEffect = {
+  tag: "LoseEffect",
+  losses: ResourceUnit[],
+};
+
 type ConsumeEffect = {
   tag: "ConsumeEffect",
   consume: ConsumeUnit[],
@@ -40,6 +45,7 @@ type ConvertEffect = {
 
 export type NodeEffect
   = GainEffect
+  | LoseEffect
   | ConsumeEffect
   | CheckEffect
   | ClearTemp
@@ -106,6 +112,14 @@ export function effectFunction(effect: NodeEffect):
         }
         return { newValues: newStepValues, newEffects: [] };
       }
+      case "LoseEffect": {
+        let newStepValues: StepValues = stepValues;
+        for (const loss of effect.losses) {
+          newStepValues = iassign(newStepValues,
+            v => v.resources[loss.color][loss.type], x => x - loss.amount);
+        }
+        return { newValues: newStepValues, newEffects: [] };
+      }
       case "ConsumeEffect": {
         let newStepValues: StepValues = stepValues;
 
@@ -135,9 +149,14 @@ export function effectFunction(effect: NodeEffect):
         return { newValues: newStepValues, newEffects: [] };
       }
       case "AddModifier": {
-        const newStepValues: StepValues = iassign(stepValues,
-          x => x.modifiers, x => x.concat([effect.modifier]));
-        return { newValues: newStepValues, newEffects: [] };
+        if (stepValues.resources.Stack.Temp + stepValues.resources.Stack.Total > stepValues.modifiers.length) {
+          const newStepValues: StepValues = iassign(stepValues,
+            x => x.modifiers, x => x.concat([effect.modifier]));
+          return { newValues: newStepValues, newEffects: [] };
+        } else {
+          console.log("Stack FULL!");
+          return { newValues: stepValues, newEffects: [] };
+        }
       }
       case "PersistEffect": {
         let newStepValues: StepValues = stepValues;
