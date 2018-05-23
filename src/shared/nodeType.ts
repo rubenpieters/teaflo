@@ -1,6 +1,6 @@
 import iassign from "immutable-assign";
 import { Resource } from "src/shared/resource";
-import { NodeEffect } from "src/shared/rules/effect";
+import { NodeEffect, showEffect } from "src/shared/rules/effect";
 
 type NodeTypeMeta = {
   id: number,
@@ -21,6 +21,17 @@ type ResourceNode = {
 };
 
 export type NodeType = StartNode | ResourceNode;
+
+function showNodeType(nodeType: NodeType): string {
+  switch (nodeType.tag) {
+    case "StartNode": {
+      return "StartNode";
+    }
+    case "ResourceNode": {
+      return "Resource: " + nodeType.effects.map(showEffect).join(";");
+    }
+  }
+}
 
 // declaration of all node types
 

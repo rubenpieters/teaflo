@@ -20,7 +20,7 @@ type ConsumeEffect = {
 
 type CheckEffect = {
   tag: "CheckEffect",
-  consume: ConsumeUnit[],
+  check: ConsumeUnit[],
   afterCheck: NodeEffect[],
 };
 
@@ -53,6 +53,37 @@ export type NodeEffect
   | PersistEffect
   | ConvertEffect
   ;
+
+export function showEffect(nodeEffect: NodeEffect): string {
+  switch (nodeEffect.tag) {
+    case "GainEffect": {
+      return "Gain " + JSON.stringify(nodeEffect.gains);
+    }
+    case "LoseEffect": {
+      return "Lose " + JSON.stringify(nodeEffect.losses);
+    }
+    case "ConsumeEffect": {
+      return "Consume " + JSON.stringify(nodeEffect.consume) + ": " +
+        nodeEffect.afterConsume.map(showEffect).join(";");
+    }
+    case "CheckEffect": {
+      return "Consume " + JSON.stringify(nodeEffect.check) + ": " +
+        nodeEffect.afterCheck.map(showEffect).join(";");
+    }
+    case "ClearTemp": {
+      return "ClearTemp";
+    }
+    case "AddModifier": {
+      return "AddMod " + JSON.stringify(nodeEffect.modifier);
+    }
+    case "PersistEffect": {
+      return "Persist " + JSON.stringify(nodeEffect.persists);
+    }
+    case "ConvertEffect": {
+      return "Convert " + JSON.stringify(nodeEffect.converts);
+    }
+  }
+}
 
 export function triggerEffects(nodeEffects: NodeEffect[]):
   (sv: StepValues) => StepValues {
@@ -134,7 +165,7 @@ export function effectFunction(effect: NodeEffect):
         }
       }
       case "CheckEffect": {
-        const payResult = payResources(stepValues.resources, effect.consume);
+        const payResult = payResources(stepValues.resources, effect.check);
         if (typeof payResult === "string") {
           return { newValues: stepValues, newEffects: [] };
         } else {

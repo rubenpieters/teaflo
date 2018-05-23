@@ -172,6 +172,22 @@ export default class Menu extends Phaser.State {
     }, playGroup);
     resourcesText.setTextBounds(120 - 400, 450 - 300, 100, 150);
 
+    const selectedNodeTitle: Phaser.Text = this.game.add.text(0, 0, "Node", {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, playGroup);
+    selectedNodeTitle.setTextBounds(230 - 400, 425 - 300, 100, 25);
+
+    const selectedNodeText: Phaser.Text = this.game.add.text(0, 0, "--", {
+      font: "15px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    }, playGroup);
+    selectedNodeText.setTextBounds(230 - 400, 450 - 300, 100, 150);
+
     // undo button
 
     const undoBtn: Phaser.Text = this.add.text(0, 0, "U", {
@@ -286,6 +302,10 @@ export default class Menu extends Phaser.State {
         "Modifiers: " + stepData.modifiers.length + "\n" +
         "Victory: " + stepData.resources.Victory.Total
       );
+    });
+
+    addNodeCallback(node => {
+      selectedNodeText.setText("" + node.meta.id);
     });
 
     connectToServer();
