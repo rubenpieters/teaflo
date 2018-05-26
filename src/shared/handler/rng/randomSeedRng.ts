@@ -1,4 +1,4 @@
-import * as Random from "random-seed"
+import * as Random from "random-seed";
 
 export type Rng = {
   integerInRange: (n1: number, n2: number) => () => number
@@ -10,7 +10,7 @@ export function chooseSet<A>(rng: Rng, array: A[]): A {
 }
 
 export function newRng(seed: string): Random.RandomSeed {
-  return Random.create(seed)
+  return Random.create(seed);
 }
 
 export function rngHandler(rng: Random.RandomSeed) {
@@ -18,7 +18,7 @@ export function rngHandler(rng: Random.RandomSeed) {
     integerInRange: (n1: number, n2: number) => {
       return () => {
         return rng.intBetween(n1, n2);
-      }
+      };
     }
-  }
+  };
 }

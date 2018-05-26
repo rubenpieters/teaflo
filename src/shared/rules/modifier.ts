@@ -23,7 +23,7 @@ type DoubleNextGain = {
 type Buffer = {
   tag: "Buffer",
   value: number,
-}
+};
 
 export type ModifierEffect
   = IgnoreNextConsume

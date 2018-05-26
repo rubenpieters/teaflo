@@ -11,6 +11,17 @@ function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max);
 }
 
+function standardizeAngle(angle: number): number {
+  let result: number = angle;
+  while (result > 180) {
+    result = result - 360; 
+  }
+  while (result < -180) {
+    result = result + 360
+  }
+  return result;
+}
+
 export function verifyAndAddConnection(from: Node, to: Node, connectionId: number, validFromNodes: number[], solution: Solution): ConnectResult {
   // TODO: use Array.contains ?
   if (validFromNodes.filter(x => x === from.id).length < 1) {
@@ -20,7 +31,7 @@ export function verifyAndAddConnection(from: Node, to: Node, connectionId: numbe
   if (from.nodeType.tag !== "StartNode") {
     const angleCenter: number = Math.atan2(from.y, from.x) * 180 / Math.PI;
     const angleNewLine: number = Math.atan2(to.y - from.y, to.x - from.x) * 180 / Math.PI;
-    const verifyAngle = clamp(angleCenter - angleNewLine, -180, 180);
+    const verifyAngle = standardizeAngle(angleNewLine - angleCenter);
     console.log("ANGLE: " + verifyAngle);
     if (verifyAngle > 90 || verifyAngle < -90) {
       return { tag: "InvalidAngle" };
@@ -76,10 +87,6 @@ function visitStep(solution: Solution, node: Node, from: Node | undefined, stepV
     return visitStep(solution, nextConnection.to, nextConnection.from, newStepValues, newNextConnections, limit, count + 1);
   }
 }
-
-const clearTemp: NodeEffect = {
-  tag: "ClearTemp",
-};
 
 function visitNode(solution: Solution, node: Node, from: Node | undefined, modifiers: Modifier[]): {
   next: Connection[],

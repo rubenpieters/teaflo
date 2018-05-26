@@ -1,7 +1,7 @@
 import { allNodes, NodeType, addNegative } from "src/shared/nodeType";
 import { Node } from "src/shared/node";
 import { NodeEffect } from "src/shared/rules/effect";
-import { Rng, chooseSet } from "src/shared/handler/rng/randomSeedRng"
+import { Rng, chooseSet } from "src/shared/handler/rng/randomSeedRng";
 
 export type Board = Node[];
 
@@ -43,14 +43,14 @@ function chooseT1(rng: Rng): NodeType {
 
 const negativeEffectsT2: NodeEffect[] = [
   { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } }
-]
+];
 
 const negativeEffectsT3: NodeEffect[] = [
-  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 2 } }
-]
+  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 5 } }
+];
 
 function chooseT2(rng: Rng): NodeType {
-  return addNegative(chooseSet(rng, [allNodes.resource_t2_1]), negativeEffectsT2, rng);
+  return addNegative(chooseSet(rng, [allNodes.resource_t2_1, allNodes.resource_t2_2, allNodes.resource_t2_3]), negativeEffectsT2, rng);
 }
 
 function chooseT3(rng: Rng): NodeType {

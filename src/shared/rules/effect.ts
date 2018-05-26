@@ -45,11 +45,11 @@ type ConvertEffect = {
 
 type LoseChargeEffect = {
   tag: "LoseChargeEffect",
-}
+};
 
 type RefreshChargeEffect = {
   tag: "RefreshChargeEffect",
-}
+};
 
 export type NodeEffect
   = GainEffect
@@ -110,7 +110,14 @@ export function triggerEffects(nodeEffects: NodeEffect[]):
       // cast is safe since length > 0, effects.pop() can not be undefined
       const effect: NodeEffect = (<NodeEffect>effects.shift());
       const { newValues, newEffects } = triggerEffect(effect)(returnValues);
-      returnValues = newValues;
+
+      const stackValue: number = newValues.resources.Stack.Temp + newValues.resources.Stack.Total;
+      if (stackValue < newValues.modifiers.length) {
+        // remove modifiers, if stack resource is too low
+        returnValues = iassign(newValues, x => x.modifiers, x => x.slice(0, stackValue));
+      } else {
+        returnValues = newValues;
+      }
       effects = newEffects.concat(effects);
     }
     return returnValues;

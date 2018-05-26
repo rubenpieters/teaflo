@@ -1,7 +1,7 @@
 import iassign from "immutable-assign";
 import { Resource } from "src/shared/resource";
 import { NodeEffect, showEffect } from "src/shared/rules/effect";
-import { Rng, chooseSet } from "src/shared/handler/rng/randomSeedRng"
+import { Rng, chooseSet } from "src/shared/handler/rng/randomSeedRng";
 
 type NodeTypeMeta = {
   id: number,
@@ -61,10 +61,14 @@ export const allNodes: { [key: string]: NodeType } = {
     {
       tag: "GainEffect",
       gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+    },
+    {
+      tag: "GainEffect",
+      gains: [{ color: "Stack", type: "Temp", amount: 2 }],
     }],
     meta: {
       id: 101,
-      name: "1 Basic",
+      name: "1 Basic 1 Stack",
       color: 0xAAAAAA,
     }
   },
@@ -76,11 +80,23 @@ export const allNodes: { [key: string]: NodeType } = {
     },
     {
       tag: "GainEffect",
-      gains: [{ color: "Stack", type: "Temp", amount: 1 }],
+      gains: [{ color: "Stack", type: "Temp", amount: 3 }],
+    },
+    {
+      tag: "AddModifier",
+      modifier: {
+        charges: 1,
+        chargePerUse: 1,
+        maxCharges: 1,
+        modifierEffect: {
+          tag: "Buffer",
+          value: 4,
+        },
+      }
     }],
     meta: {
       id: 102,
-      name: "1 Stack",
+      name: "Buffer 1 - 4",
       color: 0xAAAAAA,
     }
   },
@@ -95,14 +111,50 @@ export const allNodes: { [key: string]: NodeType } = {
         maxCharges: 1,
         modifierEffect: {
           tag: "Buffer",
-          value: 4,
+          value: 8,
         },
       }
     }
     ],
     meta: {
       id: 201,
-      name: "TODO",
+      name: "Buffer 1 - 8",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t2_2: {
+    tag: "ResourceNode",
+    effects: [
+    {
+      tag: "AddModifier",
+      modifier: {
+        charges: 4,
+        chargePerUse: 1,
+        maxCharges: 1,
+        modifierEffect: {
+          tag: "Buffer",
+          value: 2,
+        },
+      }
+    }
+    ],
+    meta: {
+      id: 202,
+      name: "Buffer 4 - 2",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t2_3: {
+    tag: "ResourceNode",
+    effects: [
+    {
+      tag: "GainEffect",
+      gains: [{ color: "Basic", type: "Temp", amount: 3 }],
+    }
+    ],
+    meta: {
+      id: 203,
+      name: "Basic 3",
       color: 0xAAAAAA,
     }
   },

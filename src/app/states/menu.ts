@@ -6,7 +6,7 @@ import { Board } from "src/shared/board";
 import { ConnectResult, Solution } from "src/shared/connectResult";
 import { verifyAndAddConnection, initVisit } from "src/shared/solution";
 import { History, Action } from "src/app/history/history";
-import { showNodeType } from "src/shared/nodeType"
+import { showNodeType } from "src/shared/nodeType";
 
 let playBoardGroup: Phaser.Group;
 
