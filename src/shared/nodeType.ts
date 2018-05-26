@@ -1,6 +1,7 @@
 import iassign from "immutable-assign";
 import { Resource } from "src/shared/resource";
 import { NodeEffect, showEffect } from "src/shared/rules/effect";
+import { Rng, chooseSet } from "src/shared/handler/rng/randomSeedRng"
 
 type NodeTypeMeta = {
   id: number,
@@ -22,15 +23,21 @@ type ResourceNode = {
 
 export type NodeType = StartNode | ResourceNode;
 
-function showNodeType(nodeType: NodeType): string {
+export function showNodeType(nodeType: NodeType): string {
   switch (nodeType.tag) {
     case "StartNode": {
       return "StartNode";
     }
     case "ResourceNode": {
-      return "Resource: " + nodeType.effects.map(showEffect).join(";");
+      return "Resource: " + nodeType.effects.length + "\n" +
+        nodeType.effects.map(showEffect).join("\n");
     }
   }
+}
+
+export function addNegative(nodeType: NodeType, negativeEffects: NodeEffect[], rng: Rng): NodeType {
+  const randomEffect: NodeEffect = chooseSet(rng, negativeEffects);
+  return iassign(nodeType, x => x.effects, x => [randomEffect].concat(x));
 }
 
 // declaration of all node types
@@ -81,8 +88,16 @@ export const allNodes: { [key: string]: NodeType } = {
     tag: "ResourceNode",
     effects: [
     {
-      tag: "GainEffect",
-      gains: [{ color: "Basic", type: "Temp", amount: 1 }],
+      tag: "AddModifier",
+      modifier: {
+        charges: 1,
+        chargePerUse: 1,
+        maxCharges: 1,
+        modifierEffect: {
+          tag: "Buffer",
+          value: 4,
+        },
+      }
     }
     ],
     meta: {

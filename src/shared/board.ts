@@ -1,5 +1,7 @@
-import { allNodes, NodeType } from "src/shared/nodeType";
+import { allNodes, NodeType, addNegative } from "src/shared/nodeType";
 import { Node } from "src/shared/node";
+import { NodeEffect } from "src/shared/rules/effect";
+import { Rng, chooseSet } from "src/shared/handler/rng/randomSeedRng"
 
 export type Board = Node[];
 
@@ -39,12 +41,20 @@ function chooseT1(rng: Rng): NodeType {
   return chooseSet(rng, [allNodes.resource_t1_1, allNodes.resource_t1_2]);
 }
 
+const negativeEffectsT2: NodeEffect[] = [
+  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } }
+]
+
+const negativeEffectsT3: NodeEffect[] = [
+  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 2 } }
+]
+
 function chooseT2(rng: Rng): NodeType {
-  return chooseSet(rng, [allNodes.resource_t2_1]);
+  return addNegative(chooseSet(rng, [allNodes.resource_t2_1]), negativeEffectsT2, rng);
 }
 
 function chooseT3(rng: Rng): NodeType {
-  return chooseSet(rng, [allNodes.resource_t3_1]);
+  return addNegative(chooseSet(rng, [allNodes.resource_t3_1]), negativeEffectsT3, rng);
 }
 
 export const boardData: BoardData = [
@@ -119,10 +129,6 @@ function generateSectionData(
   return result;
 }
 
-type Rng = {
-  integerInRange: (n1: number, n2: number) => () => number
-};
-
 type GenerateState = {
   nextId: () => number
 };
@@ -155,11 +161,6 @@ function oppositeColor(color: Color): Color[] {
     case "yellow": return ["green", "red", "blue"];
     case "blue": return ["green", "yellow", "red"];
   }
-}
-
-function chooseSet<A>(rng: Rng, array: A[]): A {
-  const l: number = rng.integerInRange(0, array.length - 1)();
-  return array[l];
 }
 
 

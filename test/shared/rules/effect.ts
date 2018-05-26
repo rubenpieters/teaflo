@@ -33,6 +33,7 @@ function test2() {
   const doubleGainMod: Modifier = {
     charges: 1,
     chargePerUse: 1,
+    maxCharges: 1,
     modifierEffect: {
       tag: "DoubleNextGain",
     }
@@ -81,6 +82,7 @@ function test4() {
     modifier: {
       charges: 1,
       chargePerUse: 1,
+      maxCharges: 1,
       modifierEffect: {
         tag: "DoubleNextGain",
       },
@@ -93,6 +95,7 @@ function test4() {
   
   console.log(newValues);
 }
+
 function test5() {
   const convertEffect: NodeEffect = {
     tag: "ConvertEffect",
@@ -118,4 +121,57 @@ function test5() {
   console.log(newValues);
 }
 
-test5();
+// loss takes temp first
+
+function test6() {
+  const lossEffect: NodeEffect = {
+    tag: "LoseEffect",
+    loss: {
+      color: "Basic",
+      type: "Both",
+      amount: 1,
+    }
+  }
+
+  const stepValues: StepValues = iassign(iassign(emptyStepValues(),
+  x => x.resources["Basic"]["Temp"], x => 1),
+  x => x.resources["Basic"]["Total"], x => 1);
+  
+  const newValues = triggerEffects([lossEffect])(stepValues);
+  
+  console.log(newValues);
+}
+
+// loss with buffer
+
+function test7() {
+  const lossEffect: NodeEffect = {
+    tag: "LoseEffect",
+    loss: {
+      color: "Basic",
+      type: "Both",
+      amount: 1,
+    }
+  }
+
+  const buffer: Modifier = {
+    charges: 1,
+    chargePerUse: 1,
+    maxCharges: 1,
+    modifierEffect: {
+      tag: "Buffer",
+      value: 10,
+    },
+  }
+
+  const stepValues: StepValues = iassign(iassign(iassign(emptyStepValues(),
+  x => x.resources["Basic"]["Temp"], x => 1),
+  x => x.resources["Basic"]["Total"], x => 1),
+  x => x.modifiers, x => [buffer]);
+  
+  const newValues = triggerEffects([lossEffect])(stepValues);
+  
+  console.log(JSON.stringify(newValues));
+}
+
+test7();

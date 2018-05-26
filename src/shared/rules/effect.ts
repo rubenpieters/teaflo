@@ -1,6 +1,6 @@
 import iassign from "immutable-assign";
 import { ResourceUnit, ConsumeUnit, PersistUnit, ConvertUnit, ConvertBothUnit, ResourceValues, ResourceColor, StepValues, allColors, persist, convert, convertFromBoth } from "src/shared/rules/resource";
-import { Modifier, modifierFunction } from "src/shared/rules/modifier";
+import { Modifier, modifierFunction, loseCharge, refreshCharge } from "src/shared/rules/modifier";
 
 type GainEffect = {
   tag: "GainEffect",
@@ -9,7 +9,7 @@ type GainEffect = {
 
 type LoseEffect = {
   tag: "LoseEffect",
-  losses: ResourceUnit[],
+  loss: ConsumeUnit,
 };
 
 type ConsumeEffect = {
@@ -43,6 +43,14 @@ type ConvertEffect = {
   converts: (ConvertUnit | ConvertBothUnit)[],
 };
 
+type LoseChargeEffect = {
+  tag: "LoseChargeEffect",
+}
+
+type RefreshChargeEffect = {
+  tag: "RefreshChargeEffect",
+}
+
 export type NodeEffect
   = GainEffect
   | LoseEffect
@@ -52,35 +60,43 @@ export type NodeEffect
   | AddModifier
   | PersistEffect
   | ConvertEffect
+  | LoseChargeEffect
+  | RefreshChargeEffect
   ;
 
 export function showEffect(nodeEffect: NodeEffect): string {
   switch (nodeEffect.tag) {
     case "GainEffect": {
-      return "Gain " + JSON.stringify(nodeEffect.gains);
+      return "Gain";
     }
     case "LoseEffect": {
-      return "Lose " + JSON.stringify(nodeEffect.losses);
+      return "Lose";
     }
     case "ConsumeEffect": {
-      return "Consume " + JSON.stringify(nodeEffect.consume) + ": " +
-        nodeEffect.afterConsume.map(showEffect).join(";");
+      return "Consume" + "\n  " +
+        nodeEffect.afterConsume.map(showEffect).join("  \n");
     }
     case "CheckEffect": {
-      return "Consume " + JSON.stringify(nodeEffect.check) + ": " +
-        nodeEffect.afterCheck.map(showEffect).join(";");
+      return "Consume " + "  \n" +
+        nodeEffect.afterCheck.map(showEffect).join("  \n");
     }
     case "ClearTemp": {
       return "ClearTemp";
     }
     case "AddModifier": {
-      return "AddMod " + JSON.stringify(nodeEffect.modifier);
+      return "AddMod";
     }
     case "PersistEffect": {
-      return "Persist " + JSON.stringify(nodeEffect.persists);
+      return "Persist";
     }
     case "ConvertEffect": {
-      return "Convert " + JSON.stringify(nodeEffect.converts);
+      return "Convert";
+    }
+    case "LoseChargeEffect": {
+      return "LoseChargeEffect";
+    }
+    case "RefreshChargeEffect": {
+      return "RefreshChargeEffect";
     }
   }
 }
@@ -144,11 +160,9 @@ export function effectFunction(effect: NodeEffect):
         return { newValues: newStepValues, newEffects: [] };
       }
       case "LoseEffect": {
-        let newStepValues: StepValues = stepValues;
-        for (const loss of effect.losses) {
-          newStepValues = iassign(newStepValues,
-            v => v.resources[loss.color][loss.type], x => x - loss.amount);
-        }
+        const newStepValues: StepValues = iassign(stepValues,
+          // not sure why this typechecks, paying can fail with "NotEnough"
+          v => v.resources, x => payResource(x, effect.loss));
         return { newValues: newStepValues, newEffects: [] };
       }
       case "ConsumeEffect": {
@@ -193,8 +207,7 @@ export function effectFunction(effect: NodeEffect):
         let newStepValues: StepValues = stepValues;
         for (const persistUnit of effect.persists) {
           if (persistUnit.color !== "All") {
-            // safe cast due to to if-stmt
-            const color = <ResourceColor>persistUnit.color;
+            const color: ResourceColor = persistUnit.color;
             newStepValues = iassign(newStepValues,
               x => x.resources, x => persist(x, color, persistUnit.amount));
           } else {
@@ -222,6 +235,20 @@ export function effectFunction(effect: NodeEffect):
             }
           }
         }
+        return { newValues: newStepValues, newEffects: [] };
+      }
+      case "LoseChargeEffect": {
+        // TODO: find a typesafe way to filter?
+        const newModifiers = <Modifier[]>stepValues.modifiers.map(m => loseCharge(m)).filter(x => x !== undefined);
+        const newStepValues: StepValues = iassign(stepValues,
+          x => x.modifiers, x => newModifiers);
+        return { newValues: newStepValues, newEffects: [] };
+      }
+      case "RefreshChargeEffect": {
+        // TODO: find a typesafe way to filter?
+        const newModifiers = stepValues.modifiers.map(m => refreshCharge(m));
+        const newStepValues: StepValues = iassign(stepValues,
+          x => x.modifiers, x => newModifiers);
         return { newValues: newStepValues, newEffects: [] };
       }
     }
