@@ -191,7 +191,7 @@ export const allNodes: { [key: string]: NodeType } = {
     {
       tag: "AddModifier",
       modifier: {
-        charges: 2,
+        charges: 1,
         chargePerUse: 1,
         maxCharges: 1,
         modifierEffect: {
@@ -204,6 +204,54 @@ export const allNodes: { [key: string]: NodeType } = {
     meta: {
       id: 205,
       name: "Persister 5",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t2_6: {
+    tag: "ResourceNode",
+    effects: [
+    {
+      tag: "AddModifier",
+      modifier: {
+        charges: 4,
+        chargePerUse: 1,
+        maxCharges: 4,
+        modifierEffect: {
+          tag: "IncreaseLoss",
+          value: 1,
+        },
+      }
+    },
+    {
+      tag: "AddModifier",
+      modifier: {
+        charges: 4,
+        chargePerUse: 1,
+        maxCharges: 4,
+        modifierEffect: {
+          tag: "IncreaseGain",
+          value: 1,
+        },
+      }
+    },
+    ],
+    meta: {
+      id: 206,
+      name: "Inc Gain/Inc Loss Mod",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t2_7: {
+    tag: "ResourceNode",
+    effects: [
+    {
+      tag: "GainChargeEffect",
+      value: 1,
+    },
+    ],
+    meta: {
+      id: 207,
+      name: "Gain Charge 1",
       color: 0xAAAAAA,
     }
   },

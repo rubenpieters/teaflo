@@ -1,6 +1,6 @@
 import iassign from "immutable-assign";
 import { ResourceUnit, ConsumeUnit, PersistUnit, ConvertUnit, ConvertBothUnit, ResourceValues, ResourceColor, StepValues, allColors, persist, convert, convertFromBoth } from "src/shared/rules/resource";
-import { Modifier, modifierFunction, loseCharge, refreshCharge } from "src/shared/rules/modifier";
+import { Modifier, showModifier, modifierFunction, loseCharge, refreshCharge } from "src/shared/rules/modifier";
 
 type GainEffect = {
   tag: "GainEffect",
@@ -47,6 +47,11 @@ type LoseChargeEffect = {
   tag: "LoseChargeEffect",
 };
 
+type GainChargeEffect = {
+  tag: "GainChargeEffect",
+  value: 1,
+};
+
 type RefreshChargeEffect = {
   tag: "RefreshChargeEffect",
 };
@@ -61,16 +66,17 @@ export type NodeEffect
   | PersistEffect
   | ConvertEffect
   | LoseChargeEffect
+  | GainChargeEffect
   | RefreshChargeEffect
   ;
 
 export function showEffect(nodeEffect: NodeEffect): string {
   switch (nodeEffect.tag) {
     case "GainEffect": {
-      return "Gain";
+      return "Gain " + nodeEffect.gain.amount + " " + nodeEffect.gain.color + " " + nodeEffect.gain.type;
     }
     case "LoseEffect": {
-      return "Lose";
+      return "Lose " + nodeEffect.loss.amount + " " + nodeEffect.loss.color + " " + nodeEffect.loss.type;
     }
     case "ConsumeEffect": {
       return "Consume" + "\n  " +
@@ -84,7 +90,7 @@ export function showEffect(nodeEffect: NodeEffect): string {
       return "ClearTemp";
     }
     case "AddModifier": {
-      return "AddMod";
+      return "AddMod: " + showModifier(nodeEffect.modifier);
     }
     case "PersistEffect": {
       return "Persist";
@@ -94,6 +100,9 @@ export function showEffect(nodeEffect: NodeEffect): string {
     }
     case "LoseChargeEffect": {
       return "LoseChargeEffect";
+    }
+    case "GainChargeEffect": {
+      return "Each Mod Gain " + nodeEffect.value + " Charges";
     }
     case "RefreshChargeEffect": {
       return "RefreshChargeEffect";
@@ -159,7 +168,7 @@ export function effectFunction(effect: NodeEffect):
   return stepValues => {
     switch (effect.tag) {
       case "GainEffect": {
-        let newStepValues: StepValues = iassign(stepValues,
+        const newStepValues: StepValues = iassign(stepValues,
           v => v.resources[effect.gain.color][effect.gain.type], x => x + effect.gain.amount);
         return { newValues: newStepValues, newEffects: [] };
       }
@@ -244,6 +253,15 @@ export function effectFunction(effect: NodeEffect):
       case "LoseChargeEffect": {
         // TODO: find a typesafe way to filter?
         const newModifiers = <Modifier[]>stepValues.modifiers.map(m => loseCharge(m)).filter(x => x !== undefined);
+        const newStepValues: StepValues = iassign(stepValues,
+          x => x.modifiers, x => newModifiers);
+        return { newValues: newStepValues, newEffects: [] };
+      }
+      case "GainChargeEffect": {
+        const newModifiers = stepValues.modifiers.map(m => iassign(iassign(m,
+          x => x.charges, x => x + effect.value),
+          x => x.maxCharges, x => x + effect.value)
+        );
         const newStepValues: StepValues = iassign(stepValues,
           x => x.modifiers, x => newModifiers);
         return { newValues: newStepValues, newEffects: [] };

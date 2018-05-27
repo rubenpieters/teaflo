@@ -30,13 +30,52 @@ type Persister = {
   cap: number,
 };
 
+type IncreaseLoss = {
+  tag: "IncreaseLoss",
+  value: number,
+};
+
+type IncreaseGain = {
+  tag: "IncreaseGain",
+  value: number,
+};
+
 export type ModifierEffect
   = IgnoreNextConsume
   | IgnoreNextCheck
   | DoubleNextGain
   | Buffer
   | Persister
+  | IncreaseGain
+  | IncreaseLoss
   ;
+
+export function showModifier(modifier: Modifier): string {
+  const showCharges: string = "[" + modifier.charges + "/" + modifier.maxCharges + " (" + modifier.chargePerUse + ")]";
+  switch (modifier.modifierEffect.tag) {
+    case "IgnoreNextConsume": {
+      return "TODO";
+    }
+    case "IgnoreNextCheck": {
+      return "TODO";
+    }
+    case "DoubleNextGain": {
+      return "TODO";
+    }
+    case "Buffer": {
+      return "Buffer " + modifier.modifierEffect.value + " " + showCharges;
+    }
+    case "Persister": {
+      return "Persister " + modifier.modifierEffect.cap + " " + showCharges;
+    }
+    case "IncreaseGain": {
+      return "IncreaseGain " + modifier.modifierEffect.value + " " + showCharges;
+    }
+    case "IncreaseLoss": {
+      return "IncreaseLoss " + modifier.modifierEffect.value + " " + showCharges;
+    }
+  }
+}
 
 export function modifierFunction(modifier: Modifier):
   (ne: NodeEffect) => { newEffects: NodeEffect[], newModifiers: Modifier[] } {
@@ -110,6 +149,32 @@ export function modifierFunction(modifier: Modifier):
                   x => x.gain.type, x => "Total");
                   return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
               }
+            }
+            default: {
+              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+            }
+          }
+        }
+        case "IncreaseLoss": {
+          const incValue: number = modifier.modifierEffect.value;
+          switch (nodeEffect.tag) {
+            case "LoseEffect": {
+              const modifiedEffect: NodeEffect = iassign(nodeEffect,
+                x => x.loss.amount, x => x + incValue);
+              return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
+            }
+            default: {
+              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+            }
+          }
+        }
+        case "IncreaseGain": {
+          const incValue: number = modifier.modifierEffect.value;
+          switch (nodeEffect.tag) {
+            case "GainEffect": {
+              const modifiedEffect: NodeEffect = iassign(nodeEffect,
+                x => x.gain.amount, x => x + incValue);
+              return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
             }
             default: {
               return { newEffects: [nodeEffect], newModifiers: [modifier] };

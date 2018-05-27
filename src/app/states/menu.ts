@@ -7,6 +7,7 @@ import { ConnectResult, Solution } from "src/shared/connectResult";
 import { verifyAndAddConnection, initVisit } from "src/shared/solution";
 import { History, Action } from "src/app/history/history";
 import { showNodeType } from "src/shared/nodeType";
+import { showModifier } from "../../shared/rules/modifier";
 
 let playBoardGroup: Phaser.Group;
 
@@ -134,6 +135,23 @@ export default class Menu extends Phaser.State {
     }, playBoardGroup);
     circle.setTextBounds(-13, -13, 26, 26);
 
+    // right menu - background
+
+    const rightMenu: Phaser.Graphics = this.game.add.graphics(550 - 400, 75 - 300, playGroup);
+    rightMenu.beginFill(0x227744);
+    rightMenu.drawRect(0, 0, 250, 285);
+    rightMenu.endFill();
+
+    // right menu
+
+    const nodeTypeDetail: Phaser.Text = this.game.add.text(0, 0, "--", {
+      font: "14px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, playGroup);
+    nodeTypeDetail.setTextBounds(570 - 400, 90 - 300, 210, 245);
+
     // bottom menu - background
 
     const bottomMenu: Phaser.Graphics = this.game.add.graphics(0 - 400, 450 - 300, playGroup);
@@ -141,7 +159,9 @@ export default class Menu extends Phaser.State {
     bottomMenu.drawRect(0, 0, 800, 150);
     bottomMenu.endFill();
 
-    const nodeTypeTitle: Phaser.Text = this.game.add.text(0, 0, "Node Type", {
+    // bottom menu
+
+    /*const nodeTypeTitle: Phaser.Text = this.game.add.text(0, 0, "Node Type", {
       font: "20px Indie Flower",
       fill: "#77BFA3",
       boundsAlignH: "center",
@@ -155,7 +175,7 @@ export default class Menu extends Phaser.State {
       boundsAlignH: "center",
       boundsAlignV: "middle"
     }, playGroup);
-    nodeTypeText.setTextBounds(10 - 400, 450 - 300, 100, 25);
+    nodeTypeText.setTextBounds(10 - 400, 450 - 300, 100, 25);*/
 
     const resourcesTitle: Phaser.Text = this.game.add.text(0, 0, "Resources", {
       font: "20px Indie Flower",
@@ -163,31 +183,31 @@ export default class Menu extends Phaser.State {
       boundsAlignH: "center",
       boundsAlignV: "middle"
     }, playGroup);
-    resourcesTitle.setTextBounds(120 - 400, 425 - 300, 100, 25);
+    resourcesTitle.setTextBounds(100 - 400, 425 - 300, 100, 25);
 
     const resourcesText: Phaser.Text = this.game.add.text(0, 0, "--", {
-      font: "15px Indie Flower",
+      font: "14px Indie Flower",
       fill: "#77BFA3",
       boundsAlignH: "center",
       boundsAlignV: "middle",
     }, playGroup);
-    resourcesText.setTextBounds(120 - 400, 450 - 300, 100, 150);
+    resourcesText.setTextBounds(100 - 400, 450 - 300, 100, 150);
 
-    const selectedNodeTitle: Phaser.Text = this.game.add.text(0, 0, "Node", {
+    const modsTitle: Phaser.Text = this.game.add.text(0, 0, "Mods", {
       font: "20px Indie Flower",
       fill: "#77BFA3",
       boundsAlignH: "center",
       boundsAlignV: "middle"
     }, playGroup);
-    selectedNodeTitle.setTextBounds(230 - 400, 425 - 300, 100, 25);
+    modsTitle.setTextBounds(260 - 400, 425 - 300, 100, 25);
 
-    const selectedNodeText: Phaser.Text = this.game.add.text(0, 0, "--", {
-      font: "15px Indie Flower",
+    const modsText: Phaser.Text = this.game.add.text(0, 0, "--", {
+      font: "14px Indie Flower",
       fill: "#77BFA3",
       boundsAlignH: "center",
       boundsAlignV: "middle",
     }, playGroup);
-    selectedNodeText.setTextBounds(230 - 400, 450 - 300, 100, 150);
+    modsText.setTextBounds(260 - 400, 450 - 300, 100, 150);
 
     // undo button
 
@@ -289,24 +309,20 @@ export default class Menu extends Phaser.State {
       validFromNodes = [board[0].id];
     });
 
-    addNodeCallback(nodeType => {
-      nodeTypeText.setText(nodeType.meta.name);
-    });
-
     addShownResourcesCallback(stepData => {
+      modsText.setText(stepData.modifiers.map(showModifier).join("\n"));
       resourcesText.setText(
         "Basic Total: " + stepData.resources.Basic.Total + "\n" +
         "Basic Temp: " + stepData.resources.Basic.Temp + "\n" +
         "Stack Total: " + stepData.resources.Stack.Total + "\n" +
         "Stack Temp: " + stepData.resources.Stack.Temp + "\n" +
-        "Growth: " + stepData.growth + "\n" +
-        "Modifiers: " + stepData.modifiers.length + "\n" +
-        "Victory: " + stepData.resources.Victory.Total
+        "Growth: " + stepData.growth
       );
     });
 
     addNodeCallback(node => {
-      selectedNodeText.setText(showNodeType(node));
+      // nodeTypeText.setText(nodeType.meta.name);
+      nodeTypeDetail.setText(showNodeType(node));
     });
 
     connectToServer();

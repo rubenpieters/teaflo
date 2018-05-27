@@ -55,7 +55,9 @@ function chooseT2(rng: Rng): NodeType {
     allNodes.resource_t2_2,
     allNodes.resource_t2_3,
     allNodes.resource_t2_4,
-    allNodes.resource_t2_5
+    allNodes.resource_t2_5,
+    allNodes.resource_t2_6,
+    allNodes.resource_t2_7
   ]), negativeEffectsT2, rng);
 }
 function chooseT3(rng: Rng): NodeType {
@@ -64,7 +66,9 @@ function chooseT3(rng: Rng): NodeType {
     allNodes.resource_t2_2,
     allNodes.resource_t2_3,
     allNodes.resource_t2_4,
-    allNodes.resource_t2_5
+    allNodes.resource_t2_5,
+    allNodes.resource_t2_6,
+    allNodes.resource_t2_7
   ]), negativeEffectsT3, rng);
 }
 
