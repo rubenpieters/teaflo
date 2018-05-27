@@ -50,17 +50,35 @@ const negativeEffectsT3: NodeEffect[] = [
 ];
 
 function chooseT2(rng: Rng): NodeType {
-  return addNegative(chooseSet(rng, [allNodes.resource_t2_1, allNodes.resource_t2_2, allNodes.resource_t2_3]), negativeEffectsT2, rng);
+  return addNegative(chooseSet(rng, [
+    allNodes.resource_t2_1,
+    allNodes.resource_t2_2,
+    allNodes.resource_t2_3,
+    allNodes.resource_t2_4,
+    allNodes.resource_t2_5
+  ]), negativeEffectsT2, rng);
+}
+function chooseT3(rng: Rng): NodeType {
+  return addNegative(chooseSet(rng, [
+    allNodes.resource_t2_1,
+    allNodes.resource_t2_2,
+    allNodes.resource_t2_3,
+    allNodes.resource_t2_4,
+    allNodes.resource_t2_5
+  ]), negativeEffectsT3, rng);
 }
 
-function chooseT3(rng: Rng): NodeType {
-  return addNegative(chooseSet(rng, [allNodes.resource_t3_1]), negativeEffectsT3, rng);
+function chooseT4(rng: Rng): NodeType {
+  return addNegative(chooseSet(rng, [
+    allNodes.resource_t3_1,
+    allNodes.resource_t3_2
+  ]), negativeEffectsT3, rng);
 }
 
 export const boardData: BoardData = [
   {
     ampMin: 50,
-    ampMax: 100,
+    ampMax: 125,
     quadrants: [
       rng => { return chooseT1(rng); },
       rng => { return chooseT1(rng); },
@@ -96,6 +114,21 @@ export const boardData: BoardData = [
       rng => { return chooseT3(rng); },
       rng => { return chooseT3(rng); },
       rng => { return chooseT3(rng); },
+    ],
+    amount: 2,
+  },
+  {
+    ampMin: 275,
+    ampMax: 325,
+    quadrants: [
+      rng => { return chooseT4(rng); },
+      rng => { return chooseT4(rng); },
+      rng => { return chooseT4(rng); },
+      rng => { return chooseT4(rng); },
+      rng => { return chooseT4(rng); },
+      rng => { return chooseT4(rng); },
+      rng => { return chooseT4(rng); },
+      rng => { return chooseT4(rng); },
     ],
     amount: 1,
   }

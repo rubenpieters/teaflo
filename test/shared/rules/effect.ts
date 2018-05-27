@@ -6,11 +6,11 @@ import { Modifier } from "src/shared/rules/modifier";
 function test1() {
   const gainEffect: NodeEffect = {
     tag: "GainEffect",
-    gains: [
-    { color: "Basic",
-      type: "Temp",
-      amount: 1,
-    }]
+    gain: 
+      { color: "Basic",
+        type: "Temp",
+        amount: 1,
+      }
   }
 
   const stepValues: StepValues = emptyStepValues();
@@ -23,11 +23,11 @@ function test1() {
 function test2() {
   const gainEffect: NodeEffect = {
     tag: "GainEffect",
-    gains: [
-    { color: "Basic",
-      type: "Temp",
-      amount: 1,
-    }]
+    gain: 
+      { color: "Basic",
+        type: "Temp",
+        amount: 1,
+      }
   }
 
   const doubleGainMod: Modifier = {
@@ -58,11 +58,11 @@ function test3() {
     afterConsume: [
       {
         tag: "GainEffect",
-        gains: [
-        { color: "Basic",
-          type: "Temp",
-          amount: 3,
-        }]
+        gain: 
+          { color: "Basic",
+            type: "Temp",
+            amount: 3,
+          }
       }
     ]
   }

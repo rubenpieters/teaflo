@@ -4,7 +4,7 @@ import { Modifier, modifierFunction, loseCharge, refreshCharge } from "src/share
 
 type GainEffect = {
   tag: "GainEffect",
-  gains: ResourceUnit[],
+  gain: ResourceUnit,
 };
 
 type LoseEffect = {
@@ -159,11 +159,8 @@ export function effectFunction(effect: NodeEffect):
   return stepValues => {
     switch (effect.tag) {
       case "GainEffect": {
-        let newStepValues: StepValues = stepValues;
-        for (const gain of effect.gains) {
-          newStepValues = iassign(newStepValues,
-            v => v.resources[gain.color][gain.type], x => x + gain.amount);
-        }
+        let newStepValues: StepValues = iassign(stepValues,
+          v => v.resources[effect.gain.color][effect.gain.type], x => x + effect.gain.amount);
         return { newValues: newStepValues, newEffects: [] };
       }
       case "LoseEffect": {
@@ -252,7 +249,6 @@ export function effectFunction(effect: NodeEffect):
         return { newValues: newStepValues, newEffects: [] };
       }
       case "RefreshChargeEffect": {
-        // TODO: find a typesafe way to filter?
         const newModifiers = stepValues.modifiers.map(m => refreshCharge(m));
         const newStepValues: StepValues = iassign(stepValues,
           x => x.modifiers, x => newModifiers);

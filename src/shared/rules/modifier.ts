@@ -25,11 +25,17 @@ type Buffer = {
   value: number,
 };
 
+type Persister = {
+  tag: "Persister",
+  cap: number,
+};
+
 export type ModifierEffect
   = IgnoreNextConsume
   | IgnoreNextCheck
   | DoubleNextGain
   | Buffer
+  | Persister
   ;
 
 export function modifierFunction(modifier: Modifier):
@@ -66,7 +72,7 @@ export function modifierFunction(modifier: Modifier):
           switch (nodeEffect.tag) {
             case "GainEffect": {
               const modifiedEffect: NodeEffect = iassign(nodeEffect,
-                x => x.gains, g => g.map(x => iassign(x, x => x.amount, x => x * 2)));
+                x => x.gain.amount, x => x * 2);
               return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
             }
             default: {
@@ -88,6 +94,23 @@ export function modifierFunction(modifier: Modifier):
                 const modifiedEffect = iassign(nodeEffect,
                   x => x.loss.amount, x => x - (<Buffer>modifier.modifierEffect).value);
                 return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
+              }
+            }
+            default: {
+              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+            }
+          }
+        }
+        case "Persister": {
+          switch (nodeEffect.tag) {
+            case "GainEffect": {
+              const gainAmount: number = nodeEffect.gain.amount;
+              if (gainAmount > modifier.modifierEffect.cap || nodeEffect.gain.type === "Total") {
+                return { newEffects: [nodeEffect], newModifiers: [modifier] };
+              } else {
+                const modifiedEffect = iassign(nodeEffect,
+                  x => x.gain.type, x => "Total");
+                  return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
               }
             }
             default: {

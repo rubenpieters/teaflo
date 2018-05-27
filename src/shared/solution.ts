@@ -14,10 +14,10 @@ function clamp(v: number, min: number, max: number) {
 function standardizeAngle(angle: number): number {
   let result: number = angle;
   while (result > 180) {
-    result = result - 360; 
+    result = result - 360;
   }
   while (result < -180) {
-    result = result + 360
+    result = result + 360;
   }
   return result;
 }
