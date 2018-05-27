@@ -87,9 +87,7 @@ export function modifierFunction(modifier: Modifier):
               if (modifier.modifierEffect.value > loseAmount) {
                 const modifiedEffect = iassign(nodeEffect,
                   x => x.loss.amount, x => 0);
-                const newModifier: Modifier = iassign(modifier,
-                  x => (<Buffer>x.modifierEffect).value, x => x - nodeEffect.loss.amount);
-                return { newEffects: [modifiedEffect], newModifiers: [newModifier] };
+                return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
               } else {
                 const modifiedEffect = iassign(nodeEffect,
                   x => x.loss.amount, x => x - (<Buffer>modifier.modifierEffect).value);
