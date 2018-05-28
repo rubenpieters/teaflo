@@ -7,6 +7,8 @@ import Load from "src/app/states/load";
 import Menu from "src/app/states/menu";
 import Game from "src/app/states/game";
 
+import { config } from "src/app/config";
+
 
 class App extends Phaser.Game {
   constructor(config: Phaser.IGameConfig) {
@@ -23,8 +25,8 @@ class App extends Phaser.Game {
 
 function startApp(): void {
   const gameConfig: Phaser.IGameConfig = {
-    width: 800,
-    height: 600,
+    width: config.gameWidth,
+    height: config.gameHeight,
     renderer: Phaser.AUTO,
     parent: "",
     resolution: 1
@@ -33,6 +35,6 @@ function startApp(): void {
   const app: Phaser.Game = new App(gameConfig);
 }
 
-window.onload = () => {
+window.addEventListener("load", () => {
   startApp();
-};
+});

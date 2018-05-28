@@ -7,7 +7,9 @@ import { ConnectResult, Solution } from "src/shared/connectResult";
 import { verifyAndAddConnection, initVisit } from "src/shared/solution";
 import { History, Action } from "src/app/history/history";
 import { showNodeType } from "src/shared/nodeType";
-import { showModifier } from "../../shared/rules/modifier";
+import { showModifier } from "src/shared/rules/modifier";
+
+import { config } from "src/app/config";
 
 let playBoardGroup: Phaser.Group;
 
@@ -53,6 +55,14 @@ let oldCamY: number | undefined;
 let viewRect: Phaser.Rectangle;
 
 export default class Menu extends Phaser.State {
+  public init(): void {
+    this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.scale.maxWidth = config.gameWidth;
+    this.scale.maxHeight = config.gameHeight;
+    this.scale.pageAlignHorizontally = true;
+    this.scale.pageAlignVertically = true;
+  }
+
   public create(): void {
     this.stage.backgroundColor = 0xDCDCDC;
 
