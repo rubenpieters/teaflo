@@ -42,11 +42,23 @@ function chooseT1(rng: Rng): NodeType {
 }
 
 const negativeEffectsT2: NodeEffect[] = [
-  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } }
+  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
+  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
+  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
+  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
+  { tag: "AddModifier", modifier: {
+    charges: 4,
+    chargePerUse: 1,
+    maxCharges: 4,
+    modifierEffect: {
+      tag: "IncreaseLoss",
+      value: 1,
+    },
+  }},
 ];
 
 const negativeEffectsT3: NodeEffect[] = [
-  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 5 } }
+  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 5 } },
 ];
 
 function chooseT2(rng: Rng): NodeType {

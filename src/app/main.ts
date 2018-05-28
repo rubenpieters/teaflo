@@ -29,7 +29,8 @@ function startApp(): void {
     height: config.gameHeight,
     renderer: Phaser.AUTO,
     parent: "",
-    resolution: 1
+    resolution: 1,
+    scaleMode: Phaser.ScaleManager.SHOW_ALL,
   };
 
   const app: Phaser.Game = new App(gameConfig);

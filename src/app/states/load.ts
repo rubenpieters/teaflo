@@ -1,4 +1,14 @@
+import { config } from "src/app/config";
+
 export default class Load extends Phaser.State {
+  public init(): void {
+    this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.scale.maxWidth = config.gameWidth;
+    this.scale.maxHeight = config.gameHeight;
+    this.scale.pageAlignHorizontally = true;
+    this.scale.pageAlignVertically = true;
+  }
+
   public create(): void {
     const loadingText: Phaser.Text = this.game.add.text(0, 0, "loading...", {
       fill: "#D3D3D3",
