@@ -163,20 +163,19 @@ export const allNodes: { [key: string]: NodeType } = {
     effects: [
     {
       tag: "ConvertEffect",
-      converts: [
-      {
-        tag: "ConvertUnit",
-        from: {
-          color: "Stack",
-          type: "Temp",
-        },
-        to: {
-          color: "Stack",
-          type: "Total",
-        },
-        amount: 1,
-      }
-      ]
+      converts:
+        {
+          tag: "ConvertUnit",
+          from: {
+            color: "Stack",
+            type: "Temp",
+          },
+          to: {
+            color: "Stack",
+            type: "Total",
+          },
+          amount: 1,
+        }
     }
     ],
     meta: {
@@ -260,20 +259,19 @@ export const allNodes: { [key: string]: NodeType } = {
     effects: [
     {
       tag: "ConvertEffect",
-      converts: [
-      {
-        tag: "ConvertUnit",
-        from: {
-          color: "Stack",
-          type: "Temp",
-        },
-        to: {
-          color: "Stack",
-          type: "Total",
-        },
-        amount: 3,
-      }
-      ]
+      converts:
+        {
+          tag: "ConvertUnit",
+          from: {
+            color: "Stack",
+            type: "Temp",
+          },
+          to: {
+            color: "Stack",
+            type: "Total",
+          },
+          amount: 3,
+        }
     }
     ],
     meta: {

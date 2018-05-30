@@ -99,17 +99,18 @@ function test4() {
 function test5() {
   const convertEffect: NodeEffect = {
     tag: "ConvertEffect",
-    converts: [{
+    converts: {
       tag: "ConvertBothUnit",
       from: {
         color: "Basic",
+        type: "Both",
       },
       to: {
         color: "Victory",
         type: "Total",
       },
       amount: "All",
-    }]
+    }
   }
 
   const stepValues: StepValues = iassign(iassign(emptyStepValues(),

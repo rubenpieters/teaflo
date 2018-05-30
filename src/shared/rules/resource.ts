@@ -43,6 +43,7 @@ export type ConvertBothUnit = {
   tag: "ConvertBothUnit",
   from: {
     color: ResourceColor,
+    type: "Both",
   },
   to: {
     color: ResourceColor,

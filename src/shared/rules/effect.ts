@@ -40,7 +40,7 @@ type PersistEffect = {
 
 type ConvertEffect = {
   tag: "ConvertEffect",
-  converts: (ConvertUnit | ConvertBothUnit)[],
+  converts: ConvertUnit | ConvertBothUnit,
 };
 
 type LoseChargeEffect = {
@@ -96,7 +96,9 @@ export function showEffect(nodeEffect: NodeEffect): string {
       return "Persist";
     }
     case "ConvertEffect": {
-      return "Convert";
+      return "Convert " + nodeEffect.converts.from.color + " " + nodeEffect.converts.from.type +
+        " to " + nodeEffect.converts.to.color + " " + nodeEffect.converts.to.type +
+        "(" + nodeEffect.converts.amount + ")";
     }
     case "LoseChargeEffect": {
       return "LoseChargeEffect";
@@ -234,18 +236,18 @@ export function effectFunction(effect: NodeEffect):
       }
       case "ConvertEffect": {
         let newStepValues: StepValues = stepValues;
-        for (const convertUnit of effect.converts) {
-          switch (convertUnit.tag) {
-            case "ConvertUnit": {
-              newStepValues = iassign(newStepValues,
-                x => x.resources, x => convert(x, convertUnit));
+        switch (effect.converts.tag) {
+          case "ConvertUnit": {
+            const convertUnit: ConvertUnit = effect.converts;
+            newStepValues = iassign(newStepValues,
+              x => x.resources, x => convert(x, convertUnit));
+            break;
+          }
+          case "ConvertBothUnit": {
+            const convertUnit: ConvertBothUnit = effect.converts;
+            newStepValues = iassign(newStepValues,
+              x => x.resources, x => convertFromBoth(x, convertUnit));
               break;
-            }
-            case "ConvertBothUnit": {
-              newStepValues = iassign(newStepValues,
-                x => x.resources, x => convertFromBoth(x, convertUnit));
-                break;
-            }
           }
         }
         return { newValues: newStepValues, newEffects: [] };
