@@ -113,30 +113,35 @@ export function showEffect(nodeEffect: NodeEffect): string {
 }
 
 export function triggerEffects(nodeEffects: NodeEffect[]):
-  (sv: StepValues) => StepValues {
+  (sv: StepValues) => StepValues | "Invalid" {
   return stepValues => {
     let effects: NodeEffect[] = nodeEffects.concat();
     let returnValues: StepValues = stepValues;
     while (effects.length > 0) {
       // cast is safe since length > 0, effects.pop() can not be undefined
       const effect: NodeEffect = (<NodeEffect>effects.shift());
-      const { newValues, newEffects } = triggerEffect(effect)(returnValues);
-
-      const stackValue: number = newValues.resources.Stack.Temp + newValues.resources.Stack.Total;
-      if (stackValue < newValues.modifiers.length) {
-        // remove modifiers, if stack resource is too low
-        returnValues = iassign(newValues, x => x.modifiers, x => x.slice(0, stackValue));
+      const triggerResult = triggerEffect(effect)(returnValues);
+      if (triggerResult === "Invalid") {
+        return "Invalid";
       } else {
-        returnValues = newValues;
+        const { newValues, newEffects } = triggerResult;
+
+        const stackValue: number = newValues.resources.Stack.Temp + newValues.resources.Stack.Total;
+        if (stackValue < newValues.modifiers.length) {
+          // remove modifiers, if stack resource is too low
+          returnValues = iassign(newValues, x => x.modifiers, x => x.slice(0, stackValue));
+        } else {
+          returnValues = newValues;
+        }
+        effects = newEffects.concat(effects);
       }
-      effects = newEffects.concat(effects);
     }
     return returnValues;
   };
 }
 
 export function triggerEffect(nodeEffect: NodeEffect):
-  (sv: StepValues) => { newValues: StepValues, newEffects: NodeEffect[] } {
+  (sv: StepValues) => { newValues: StepValues, newEffects: NodeEffect[] } | "Invalid" {
   return stepValues => {
     let effectAcc: NodeEffect | undefined = nodeEffect;
     let restEffectAcc: NodeEffect[] = [];
@@ -160,13 +165,18 @@ export function triggerEffect(nodeEffect: NodeEffect):
     if (effectAcc === undefined) {
       return { newValues: stepValues, newEffects: restEffectAcc };
     } else {
-      return effectFunction(effectAcc)(valuesAfterModifier);
+      const effectResult = effectFunction(effectAcc)(valuesAfterModifier);
+      if (effectResult === "Invalid") {
+        return "Invalid";
+      } else {
+        return effectResult;
+      }
     }
   };
 }
 
 export function effectFunction(effect: NodeEffect):
-  (sv: StepValues) => { newValues: StepValues, newEffects: NodeEffect[] } {
+  (sv: StepValues) => { newValues: StepValues, newEffects: NodeEffect[] } | "Invalid" {
   return stepValues => {
     switch (effect.tag) {
       case "GainEffect": {
@@ -175,10 +185,14 @@ export function effectFunction(effect: NodeEffect):
         return { newValues: newStepValues, newEffects: [] };
       }
       case "LoseEffect": {
-        const newStepValues: StepValues = iassign(stepValues,
-          // not sure why this typechecks, paying can fail with "NotEnough"
-          v => v.resources, x => payResource(x, effect.loss));
-        return { newValues: newStepValues, newEffects: [] };
+        const newResourceValues = payResource(stepValues.resources, effect.loss);
+        if (newResourceValues !== "NotEnough") {
+          const newStepValues: StepValues = iassign(stepValues,
+            v => v.resources, x => newResourceValues);
+          return { newValues: newStepValues, newEffects: [] };
+        } else {
+          return "Invalid";
+        }
       }
       case "ConsumeEffect": {
         let newStepValues: StepValues = stepValues;

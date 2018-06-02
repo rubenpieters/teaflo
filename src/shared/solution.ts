@@ -51,7 +51,8 @@ export function verifyAndAddConnection(from: Node, to: Node, connectionId: numbe
 
 type StepResult = {
   stepValues: StepValues,
-  nodeId: number,
+  lastVisitedNodeId: number,
+  validSolution: boolean,
 };
 
 export function initVisit(solution: Solution, limit: number): StepResult {
@@ -63,28 +64,31 @@ function visitStep(solution: Solution, node: Node, from: Node | undefined, stepV
   const visitResult = visitNode(solution, node, from, stepValues.modifiers);
 
   const newNextConnections: Connection[] = visitResult.next.concat(nextConnections);
-  let newStepValues: StepValues = stepValues;
+  let stepValuesAfterGrowth: StepValues = stepValues;
 
   // update growth
   if (from !== undefined) {
     if (from.tier < node.tier ) {
-      newStepValues = iassign(newStepValues,
+      stepValuesAfterGrowth = iassign(stepValuesAfterGrowth,
         x => x.growth, x => x - (node.tier - from.tier));
     } else if (from.tier === node.tier) {
-      newStepValues = iassign(newStepValues,
+      stepValuesAfterGrowth = iassign(stepValuesAfterGrowth,
         x => x.growth, x => x - 1);
     }
   }
 
-  newStepValues = triggerEffects(visitResult.effects)(newStepValues);
-
-  if (count + 1 >= limit) {
-    return { stepValues: newStepValues, nodeId: node.id };
-  } else if (newNextConnections.length === 0) {
-    return { stepValues: newStepValues, nodeId: node.id };
+  const stepValuesAfterTrigger = triggerEffects(visitResult.effects)(stepValuesAfterGrowth);
+  if (stepValuesAfterTrigger === "Invalid") {
+    return { stepValues: stepValues, lastVisitedNodeId: node.id, validSolution: false };
   } else {
-    const [nextConnection] = newNextConnections.splice(0, 1);
-    return visitStep(solution, nextConnection.to, nextConnection.from, newStepValues, newNextConnections, limit, count + 1);
+    if (count + 1 >= limit) {
+      return { stepValues: stepValuesAfterGrowth, lastVisitedNodeId: node.id, validSolution: true };
+    } else if (newNextConnections.length === 0) {
+      return { stepValues: stepValuesAfterGrowth, lastVisitedNodeId: node.id, validSolution: true };
+    } else {
+      const [nextConnection] = newNextConnections.splice(0, 1);
+      return visitStep(solution, nextConnection.to, nextConnection.from, stepValuesAfterGrowth, newNextConnections, limit, count + 1);
+    }
   }
 }
 

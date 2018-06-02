@@ -16,7 +16,7 @@ let playBoardGroup: Phaser.Group;
 let currentLimit: number = 0;
 let circle: Phaser.Text | undefined = undefined;
 
-let undoList: History = [];
+const undoList: History = [];
 let redoList: History = [];
 
 
@@ -319,15 +319,21 @@ export default class Menu extends Phaser.State {
       validFromNodes = [board[0].id];
     });
 
-    addShownResourcesCallback(stepData => {
+    addShownResourcesCallback(result => {
+      const stepData = result.values;
       modsText.setText(stepData.modifiers.map(showModifier).join("\n"));
-      resourcesText.setText(
-        "Basic Total: " + stepData.resources.Basic.Total + "\n" +
-        "Basic Temp: " + stepData.resources.Basic.Temp + "\n" +
-        "Stack Total: " + stepData.resources.Stack.Total + "\n" +
-        "Stack Temp: " + stepData.resources.Stack.Temp + "\n" +
-        "Growth: " + stepData.growth
-      );
+      let resourcesString: string = "";
+      if (! result.valid) {
+        resourcesString = "INVALID\n";
+      } else {
+        resourcesString = resourcesString +
+          "Basic Total: " + stepData.resources.Basic.Total + "\n" +
+          "Basic Temp: " + stepData.resources.Basic.Temp + "\n" +
+          "Stack Total: " + stepData.resources.Stack.Total + "\n" +
+          "Stack Temp: " + stepData.resources.Stack.Temp + "\n" +
+          "Growth: " + stepData.growth;
+      }
+      resourcesText.setText(resourcesString);
     });
 
     addNodeCallback(node => {
@@ -541,12 +547,12 @@ function redoAction(game: Phaser.Game) {
 
 function startRunAction() {
   const stepResult = initVisit(solution, Number.POSITIVE_INFINITY);
-  const xy = nodeLocation(stepResult.nodeId);
+  const xy = nodeLocation(stepResult.lastVisitedNodeId);
   if (circle !== undefined) {
     circle.position.set(xy.x, xy.y);
     circle.visible = true;
   }
-  changeShownResources(stepResult.stepValues);
+  changeShownResources({ values: stepResult.stepValues, valid: stepResult.validSolution });
 }
 
 function stepRunAction(f: (n: number) => number) {
@@ -554,12 +560,12 @@ function stepRunAction(f: (n: number) => number) {
     currentLimit = f (currentLimit);
     console.log("LIMIT: " + currentLimit);
     const stepResult = initVisit(solution, currentLimit);
-    const xy = nodeLocation(stepResult.nodeId);
+    const xy = nodeLocation(stepResult.lastVisitedNodeId);
     if (circle !== undefined) {
       circle.position.set(xy.x, xy.y);
       circle.visible = true;
     }
-    changeShownResources(stepResult.stepValues);
+    changeShownResources({ values: stepResult.stepValues, valid: stepResult.validSolution });
 
     /*switch (stepResult.tag) {
       case "SuccessRunResult": {

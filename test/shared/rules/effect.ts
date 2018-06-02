@@ -45,8 +45,7 @@ function test2() {
   
   const newValues = triggerEffects([gainEffect])(stepValues);
   
-  console.log(newValues);
-  console.log(newValues.modifiers.map(x => JSON.stringify(x)));
+  console.log(JSON.stringify(newValues));
 }
 
 function test3() {
