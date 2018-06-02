@@ -82,12 +82,12 @@ function visitStep(solution: Solution, node: Node, from: Node | undefined, stepV
     return { stepValues: stepValues, lastVisitedNodeId: node.id, validSolution: false };
   } else {
     if (count + 1 >= limit) {
-      return { stepValues: stepValuesAfterGrowth, lastVisitedNodeId: node.id, validSolution: true };
+      return { stepValues: stepValuesAfterTrigger, lastVisitedNodeId: node.id, validSolution: true };
     } else if (newNextConnections.length === 0) {
-      return { stepValues: stepValuesAfterGrowth, lastVisitedNodeId: node.id, validSolution: true };
+      return { stepValues: stepValuesAfterTrigger, lastVisitedNodeId: node.id, validSolution: true };
     } else {
       const [nextConnection] = newNextConnections.splice(0, 1);
-      return visitStep(solution, nextConnection.to, nextConnection.from, stepValuesAfterGrowth, newNextConnections, limit, count + 1);
+      return visitStep(solution, nextConnection.to, nextConnection.from, stepValuesAfterTrigger, newNextConnections, limit, count + 1);
     }
   }
 }
