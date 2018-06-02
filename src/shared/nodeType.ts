@@ -130,7 +130,7 @@ export const allNodes: { [key: string]: NodeType } = {
       modifier: {
         charges: 4,
         chargePerUse: 1,
-        maxCharges: 1,
+        maxCharges: 4,
         modifierEffect: {
           tag: "Buffer",
           value: 2,
@@ -251,6 +251,27 @@ export const allNodes: { [key: string]: NodeType } = {
     meta: {
       id: 207,
       name: "Gain Charge 1",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t2_8: {
+    tag: "ResourceNode",
+    effects: [
+    {
+      tag: "AddModifier",
+      modifier: {
+        charges: 1,
+        chargePerUse: 1,
+        maxCharges: 1,
+        modifierEffect: {
+          tag: "DuplicateAddMod",
+        },
+      }
+    },
+    ],
+    meta: {
+      id: 208,
+      name: "DuplicateAddMod",
       color: 0xAAAAAA,
     }
   },

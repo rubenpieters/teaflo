@@ -45,7 +45,6 @@ const negativeEffectsT2: NodeEffect[] = [
   { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
   { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
   { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
-  { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
   { tag: "AddModifier", modifier: {
     charges: 4,
     chargePerUse: 1,
@@ -55,6 +54,7 @@ const negativeEffectsT2: NodeEffect[] = [
       value: 1,
     },
   }},
+  { tag: "LoseChargeEffect" },
 ];
 
 const negativeEffectsT3: NodeEffect[] = [
@@ -69,7 +69,8 @@ function chooseT2(rng: Rng): NodeType {
     allNodes.resource_t2_4,
     allNodes.resource_t2_5,
     allNodes.resource_t2_6,
-    allNodes.resource_t2_7
+    allNodes.resource_t2_7,
+    allNodes.resource_t2_8
   ]), negativeEffectsT2, rng);
 }
 function chooseT3(rng: Rng): NodeType {
@@ -80,7 +81,8 @@ function chooseT3(rng: Rng): NodeType {
     allNodes.resource_t2_4,
     allNodes.resource_t2_5,
     allNodes.resource_t2_6,
-    allNodes.resource_t2_7
+    allNodes.resource_t2_7,
+    allNodes.resource_t2_8
   ]), negativeEffectsT3, rng);
 }
 

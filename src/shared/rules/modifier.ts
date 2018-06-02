@@ -40,6 +40,10 @@ type IncreaseGain = {
   value: number,
 };
 
+type DuplicateAddMod = {
+  tag: "DuplicateAddMod",
+};
+
 export type ModifierEffect
   = IgnoreNextConsume
   | IgnoreNextCheck
@@ -48,6 +52,7 @@ export type ModifierEffect
   | Persister
   | IncreaseGain
   | IncreaseLoss
+  | DuplicateAddMod
   ;
 
 export function showModifier(modifier: Modifier): string {
@@ -73,6 +78,9 @@ export function showModifier(modifier: Modifier): string {
     }
     case "IncreaseLoss": {
       return "IncreaseLoss " + modifier.modifierEffect.value + " " + showCharges;
+    }
+    case "DuplicateAddMod": {
+      return "DuplicateAddMod " + showCharges;
     }
   }
 }
@@ -175,6 +183,16 @@ export function modifierFunction(modifier: Modifier):
               const modifiedEffect: NodeEffect = iassign(nodeEffect,
                 x => x.gain.amount, x => x + incValue);
               return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
+            }
+            default: {
+              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+            }
+          }
+        }
+        case "DuplicateAddMod": {
+          switch (nodeEffect.tag) {
+            case "AddModifier": {
+                return { newEffects: [nodeEffect, nodeEffect], newModifiers: modifiersAfterUse };
             }
             default: {
               return { newEffects: [nodeEffect], newModifiers: [modifier] };
