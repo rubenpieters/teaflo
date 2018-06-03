@@ -1,9 +1,13 @@
 import { allNodes, NodeType, addNegative } from "src/shared/nodeType";
-import { Node } from "src/shared/node";
+import { Node, satisfiesFilter } from "src/shared/node";
 import { NodeEffect } from "src/shared/rules/effect";
 import { Rng, chooseSet } from "src/shared/handler/rng/randomSeedRng";
 
 export type Board = Node[];
+
+export function filterBoard(filter: string, board: Board): Node[] {
+  return board.filter(node => satisfiesFilter(filter, node));
+}
 
 export const emptyBoard: Board = [];
 

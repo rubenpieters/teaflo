@@ -1,8 +1,8 @@
-import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback, addBoardCallback, nodeLocation } from "src/app/appstate";
+import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback, addBoardCallback, nodeLocation, changeCurrentFilter, addCurrentFilterCallback } from "src/app/appstate";
 import { changeSelectedNode, addNodeCallback, changeShownResources, addShownResourcesCallback } from "src/app/gamestate";
 import { connectToServer } from "src/app/network/network";
 import { Node } from "src/shared/node";
-import { Board } from "src/shared/board";
+import { Board, filterBoard } from "src/shared/board";
 import { ConnectResult, Solution } from "src/shared/connectResult";
 import { verifyAndAddConnection, initVisit } from "src/shared/solution";
 import { History, Action } from "src/app/history/history";
@@ -12,6 +12,11 @@ import { showModifier } from "src/shared/rules/modifier";
 import { config } from "src/app/config";
 
 let playBoardGroup: Phaser.Group;
+
+type BoardNode = {
+  sprite: Phaser.Graphics,
+};
+let nodes: { [nodeId: number]: BoardNode } = {};
 
 let currentLimit: number = 0;
 let circle: Phaser.Text | undefined = undefined;
@@ -243,6 +248,18 @@ export default class Menu extends Phaser.State {
     redoBtn.inputEnabled = true;
     redoBtn.events.onInputDown.add(redoAction(this.game));
 
+    // filter button
+
+    const filterBtn: Phaser.Text = this.add.text(0, 0, "F", {
+      font: "22px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
+    }, playGroup);
+    filterBtn.setTextBounds(605 - 400, 575 - 300, 25, 25);
+    filterBtn.inputEnabled = true;
+    filterBtn.events.onInputDown.add(() => { changeCurrentFilter("LoseEffect"); });
+
     // step run -1 button
 
     const stepRunMinBtn: Phaser.Text = this.add.text(0, 0, "-1>", {
@@ -341,6 +358,21 @@ export default class Menu extends Phaser.State {
       nodeTypeDetail.setText(showNodeType(node));
     });
 
+    addCurrentFilterCallback((input: {board: Node[], filter: string | undefined }) => {
+      if (input.filter === undefined) {
+        // filter is cleared, make all nodes visible
+      } else {
+        const nodeIds: number[] = filterBoard(input.filter, input.board).map(x => x.id);
+        console.log(nodeIds);
+        playBoardGroup.forEachExists((node: Phaser.Sprite) => {
+          node.data.visibleOverride = true;
+        });
+        for (const nodeId in nodeIds) {
+          nodes[nodeId].sprite.data.visibleOverride = false;
+        }
+      }
+    });
+
     connectToServer();
   }
 
@@ -387,7 +419,7 @@ function gameUpdate(game: Phaser.Game) {
       ((node.y - playBoardGroup.pivot.y) * playBoardGroup.scale.y) + (game.height * 0.5)
     );
 
-    if (Phaser.Rectangle.containsPoint(viewRect, boundsPoint)) {
+    if (Phaser.Rectangle.containsPoint(viewRect, boundsPoint) && ! node.data.visibleOverride) {
       node.visible = true;
     } else {
       node.visible = false;
@@ -467,8 +499,11 @@ function makeConnection(game: Phaser.Game, fromNode: Node, toNode: Node) {
 
 function drawBoard(game: Phaser.Game, group: Phaser.Group, board: Board): Phaser.Graphics[] {
   const result: Phaser.Graphics[] = [];
+  nodes = {};
   for (const node of board) {
-    result.push(drawNode(game, group, node));
+    const sprite = drawNode(game, group, node);
+    result.push(sprite);
+    nodes[node.id] = { sprite: sprite };
   }
   return result;
 }
@@ -566,19 +601,5 @@ function stepRunAction(f: (n: number) => number) {
       circle.visible = true;
     }
     changeShownResources({ values: stepResult.stepValues, valid: stepResult.validSolution });
-
-    /*switch (stepResult.tag) {
-      case "SuccessRunResult": {
-        const xy = nodeLocation(stepResult.result.nodeId);
-        if (circle !== undefined) {
-          circle.position.set(xy.x, xy.y);
-          circle.visible = true;
-        }
-        break;
-      }
-      case "FailRunResult": {
-        break;
-      }
-    }*/
   };
 }

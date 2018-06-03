@@ -7,13 +7,15 @@ export type AppState = {
   selectedScreen: SelectedScreen,
   board: Board,
   branchedFrom?: Board,
-  connectionStatus: ConnectionStatus
+  connectionStatus: ConnectionStatus,
+  currentFilter: string | undefined,
 };
 
 const appState: AppState = {
   selectedScreen: "Home",
   board: emptyBoard,
-  connectionStatus: "notConnected"
+  connectionStatus: "notConnected",
+  currentFilter: undefined,
 };
 
 type ParamCallBack<A> = (a: A) => void;
@@ -21,6 +23,7 @@ type ParamCallBack<A> = (a: A) => void;
 const selectedScreenCallbacks: ParamCallBack<SelectedScreen>[] = [];
 const boardCallbacks: ParamCallBack<Board>[] = [];
 const connectedCallbacks: ParamCallBack<ConnectionStatus>[] = [];
+const currentFilterCallbacks: ParamCallBack<{ board: Board, filter: string | undefined }>[] = [];
 
 export function changeSelectedScreen(newScreen: SelectedScreen) {
   if (appState.selectedScreen !== newScreen) {
@@ -57,4 +60,13 @@ export function changeConnected(connectionStatus: ConnectionStatus) {
 
 export function addConnectedCallback(cb: ParamCallBack<ConnectionStatus>) {
   connectedCallbacks.push(cb);
+}
+
+export function changeCurrentFilter(filter: string | undefined) {
+  appState.currentFilter = filter;
+  currentFilterCallbacks.forEach(cb => cb({ board: appState.board, filter: filter }));
+}
+
+export function addCurrentFilterCallback(cb: ParamCallBack<{ board: Board, filter: string | undefined }>) {
+  currentFilterCallbacks.push(cb);
 }
