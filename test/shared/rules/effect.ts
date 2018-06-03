@@ -174,4 +174,32 @@ function test7() {
   console.log(JSON.stringify(newValues));
 }
 
-test7();
+// destroy mod
+
+function test8() {
+  const destroyModEffect: NodeEffect = {
+    tag: "DestroyModEffect",
+    position: 0,
+  }
+
+  const buffer: Modifier = {
+    charges: 1,
+    chargePerUse: 1,
+    maxCharges: 1,
+    modifierEffect: {
+      tag: "Buffer",
+      value: 10,
+    },
+  }
+
+  const stepValues: StepValues = iassign(iassign(iassign(emptyStepValues(),
+  x => x.resources["Stack"]["Temp"], x => 1),
+  x => x.resources["Stack"]["Total"], x => 1),
+  x => x.modifiers, x => [buffer, buffer]);
+
+  const newValues = triggerEffects([destroyModEffect])(stepValues);
+  
+  console.log(JSON.stringify(newValues));
+}
+
+test8();

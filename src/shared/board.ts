@@ -55,6 +55,7 @@ const negativeEffectsT2: NodeEffect[] = [
     },
   }},
   { tag: "LoseChargeEffect" },
+  { tag: "DestroyModEffect", position: 0 },
 ];
 
 const negativeEffectsT3: NodeEffect[] = [

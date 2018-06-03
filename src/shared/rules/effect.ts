@@ -56,6 +56,11 @@ type RefreshChargeEffect = {
   tag: "RefreshChargeEffect",
 };
 
+type DestroyModEffect = {
+  tag: "DestroyModEffect",
+  position: number,
+};
+
 export type NodeEffect
   = GainEffect
   | LoseEffect
@@ -68,6 +73,7 @@ export type NodeEffect
   | LoseChargeEffect
   | GainChargeEffect
   | RefreshChargeEffect
+  | DestroyModEffect
   ;
 
 export function showEffect(nodeEffect: NodeEffect): string {
@@ -108,6 +114,9 @@ export function showEffect(nodeEffect: NodeEffect): string {
     }
     case "RefreshChargeEffect": {
       return "RefreshChargeEffect";
+    }
+    case "DestroyModEffect": {
+      return "DestroyModEffect " + nodeEffect.position;
     }
   }
 }
@@ -287,6 +296,21 @@ export function effectFunction(effect: NodeEffect):
         const newStepValues: StepValues = iassign(stepValues,
           x => x.modifiers, x => newModifiers);
         return { newValues: newStepValues, newEffects: [] };
+      }
+      case "DestroyModEffect": {
+        if (stepValues.modifiers.length == 0) {
+          return "Invalid";
+        } else {
+          let pos = effect.position;
+          if (pos >= stepValues.modifiers.length) {
+            pos = effect.position % stepValues.modifiers.length;
+          }
+          const newModifiers = stepValues.modifiers.slice(0, pos)
+            .concat(stepValues.modifiers.slice(pos + 1, stepValues.modifiers.length));
+          const newStepValues: StepValues = iassign(stepValues,
+            x => x.modifiers, x => newModifiers);
+          return { newValues: newStepValues, newEffects: [] };
+        }
       }
     }
   };
