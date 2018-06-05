@@ -7,14 +7,14 @@ type GenerateRow = {
 
 const loseBasic: GenerateRow = {
   generate: rng => {
-    const loseAmount: number = rng.integerInRange(1, 8)();
-    const cost: number = loseAmount;
+    const amount: number = rng.integerInRange(1, 8)();
+    const cost: number = amount;
     const effect: NodeEffect = {
       tag: "LoseEffect",
       loss: {
         color: "Basic",
         type: "Both",
-        amount: loseAmount,
+        amount: amount,
       }
     }
     return { effect: effect, cost: cost };
@@ -29,6 +29,140 @@ const destroyMod: GenerateRow = {
     return { effect: effect, cost: cost }
   }
 }
+
+const gainBasic: GenerateRow = {
+  generate: rng => {
+    const amount: number = rng.integerInRange(1, 8)();
+    const cost: number = amount;
+    const effect: NodeEffect = {
+      tag: "LoseEffect",
+      loss: {
+        color: "Basic",
+        type: "Both",
+        amount: amount,
+      }
+    }
+    return { effect: effect, cost: cost };
+  }
+}
+
+const addBuffer: GenerateRow = {
+  generate: rng => {
+    const bufferValue: number = rng.integerInRange(1, 8)();
+    const maxCharges: number = rng.integerInRange(1, 3)();
+    const cost: number = bufferValue + (maxCharges * 2);
+    const effect: NodeEffect = {
+      tag: "AddModifier",
+      modifier: {
+        charges: maxCharges,
+        chargePerUse: 1,
+        maxCharges: maxCharges,
+        modifierEffect: {
+          tag: "Buffer",
+          value: bufferValue,
+        },
+      }
+    }
+    return { effect: effect, cost: cost };
+  }
+}
+
+const convertStackTempToTotal: GenerateRow = {
+  generate: rng => {
+    const amount: number = rng.integerInRange(1, 8)();
+    const cost: number = amount;
+    const effect: NodeEffect = {
+      tag: "ConvertEffect",
+      converts:
+        {
+          tag: "ConvertUnit",
+          from: {
+            color: "Stack",
+            type: "Temp",
+          },
+          to: {
+            color: "Stack",
+            type: "Total",
+          },
+          amount: amount,
+        }
+    }
+    return { effect: effect, cost: cost };
+  }
+}
+
+const addPersister: GenerateRow = {
+  generate: rng => {
+    const persisterValue: number = rng.integerInRange(1, 8)();
+    const maxCharges: number = rng.integerInRange(1, 3)();
+    const cost: number = persisterValue + (maxCharges * 2);
+    const effect: NodeEffect = {
+      tag: "AddModifier",
+      modifier: {
+        charges: maxCharges,
+        chargePerUse: 1,
+        maxCharges: maxCharges,
+        modifierEffect: {
+          tag: "Persister",
+          cap: persisterValue,
+        },
+      }
+    }
+    return { effect: effect, cost: cost };
+  }
+}
+
+const addIncreaseGain: GenerateRow = {
+  generate: rng => {
+    const increaseAmount: number = rng.integerInRange(1, 8)();
+    const maxCharges: number = rng.integerInRange(1, 3)();
+    const cost: number = increaseAmount * maxCharges;
+    const effect: NodeEffect = {
+      tag: "AddModifier",
+      modifier: {
+        charges: maxCharges,
+        chargePerUse: 1,
+        maxCharges: maxCharges,
+        modifierEffect: {
+          tag: "IncreaseGain",
+          value: increaseAmount,
+        },
+      }
+    }
+    return { effect: effect, cost: cost };
+  }
+}
+
+const gainCharge: GenerateRow = {
+  generate: rng => {
+    const cost: number = 5;
+    const effect: NodeEffect = {
+      tag: "GainChargeEffect",
+      value: 1,
+    }
+    return { effect: effect, cost: cost }
+  }
+}
+
+const addDuplicater: GenerateRow = {
+  generate: rng => {
+    const maxCharges: number = rng.integerInRange(1, 3)();
+    const cost: number = maxCharges * 5;
+    const effect: NodeEffect = {
+      tag: "AddModifier",
+      modifier: {
+        charges: 1,
+        chargePerUse: 1,
+        maxCharges: 1,
+        modifierEffect: {
+          tag: "DuplicateAddMod",
+        },
+      }
+    }
+    return { effect: effect, cost: cost };
+  }
+}
+
 
 export const negEffects: GenerateRow[] = [
   loseBasic,
