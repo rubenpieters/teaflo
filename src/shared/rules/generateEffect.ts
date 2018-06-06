@@ -3,7 +3,7 @@ import { NodeEffect } from "src/shared/rules/effect";
 
 type GenerateRow = {
   generate: (rng: Rng) => { effect: NodeEffect, cost: number }
-}
+};
 
 const loseBasic: GenerateRow = {
   generate: rng => {
@@ -16,35 +16,35 @@ const loseBasic: GenerateRow = {
         type: "Both",
         amount: amount,
       }
-    }
+    };
     return { effect: effect, cost: cost };
   }
-}
+};
 
 const destroyMod: GenerateRow = {
   generate: rng => {
     const pos: number = rng.integerInRange(1, 10)();
     const cost: number = 5;
     const effect: NodeEffect = { tag: "DestroyModEffect", position: pos };
-    return { effect: effect, cost: cost }
+    return { effect: effect, cost: cost };
   }
-}
+};
 
-const gainBasic: GenerateRow = {
+const gainBasicTemp: GenerateRow = {
   generate: rng => {
     const amount: number = rng.integerInRange(1, 8)();
     const cost: number = amount;
     const effect: NodeEffect = {
-      tag: "LoseEffect",
-      loss: {
+      tag: "GainEffect",
+      gain: {
         color: "Basic",
-        type: "Both",
+        type: "Temp",
         amount: amount,
       }
-    }
+    };
     return { effect: effect, cost: cost };
   }
-}
+};
 
 const addBuffer: GenerateRow = {
   generate: rng => {
@@ -62,10 +62,10 @@ const addBuffer: GenerateRow = {
           value: bufferValue,
         },
       }
-    }
+    };
     return { effect: effect, cost: cost };
   }
-}
+};
 
 const convertStackTempToTotal: GenerateRow = {
   generate: rng => {
@@ -86,10 +86,10 @@ const convertStackTempToTotal: GenerateRow = {
           },
           amount: amount,
         }
-    }
+    };
     return { effect: effect, cost: cost };
   }
-}
+};
 
 const addPersister: GenerateRow = {
   generate: rng => {
@@ -107,10 +107,10 @@ const addPersister: GenerateRow = {
           cap: persisterValue,
         },
       }
-    }
+    };
     return { effect: effect, cost: cost };
   }
-}
+};
 
 const addIncreaseGain: GenerateRow = {
   generate: rng => {
@@ -128,10 +128,10 @@ const addIncreaseGain: GenerateRow = {
           value: increaseAmount,
         },
       }
-    }
+    };
     return { effect: effect, cost: cost };
   }
-}
+};
 
 const gainCharge: GenerateRow = {
   generate: rng => {
@@ -139,10 +139,10 @@ const gainCharge: GenerateRow = {
     const effect: NodeEffect = {
       tag: "GainChargeEffect",
       value: 1,
-    }
-    return { effect: effect, cost: cost }
+    };
+    return { effect: effect, cost: cost };
   }
-}
+};
 
 const addDuplicater: GenerateRow = {
   generate: rng => {
@@ -158,16 +158,25 @@ const addDuplicater: GenerateRow = {
           tag: "DuplicateAddMod",
         },
       }
-    }
+    };
     return { effect: effect, cost: cost };
   }
-}
+};
 
+export const posEffects: GenerateRow[] = [
+  gainBasicTemp,
+  addBuffer,
+  convertStackTempToTotal,
+  addPersister,
+  addIncreaseGain,
+  gainCharge,
+  addDuplicater,
+];
 
 export const negEffects: GenerateRow[] = [
   loseBasic,
   destroyMod,
-]
+];
 
 // genPoints is the amount of points we can spend to generate the effect
 export function generateEffects(genPoints: number, rng: Rng, genRows: GenerateRow[]): NodeEffect[] {

@@ -2,6 +2,7 @@ import { allNodes, NodeType, addNegative } from "src/shared/nodeType";
 import { Node, satisfiesFilter } from "src/shared/node";
 import { NodeEffect } from "src/shared/rules/effect";
 import { Rng, chooseSet } from "src/shared/handler/rng/randomSeedRng";
+import { generateEffects, negEffects, posEffects } from "src/shared/rules/generateEffect";
 
 export type Board = Node[];
 
@@ -67,7 +68,16 @@ const negativeEffectsT3: NodeEffect[] = [
 ];
 
 function chooseT2(rng: Rng): NodeType {
-  return addNegative(chooseSet(rng, [
+  return addNegative({
+    tag: "ResourceNode", effects: generateEffects(4, rng, posEffects),
+    meta: {
+      id: 1,
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
+  negativeEffectsT2, rng);
+  /*return addNegative(chooseSet(rng, [
     allNodes.resource_t2_1,
     allNodes.resource_t2_2,
     allNodes.resource_t2_3,
@@ -76,10 +86,19 @@ function chooseT2(rng: Rng): NodeType {
     allNodes.resource_t2_6,
     allNodes.resource_t2_7,
     allNodes.resource_t2_8
-  ]), negativeEffectsT2, rng);
+  ]), negativeEffectsT2, rng);*/
 }
 function chooseT3(rng: Rng): NodeType {
-  return addNegative(chooseSet(rng, [
+  return addNegative({
+    tag: "ResourceNode", effects: generateEffects(7, rng, posEffects),
+    meta: {
+      id: 1,
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
+  negativeEffectsT2, rng);
+  /*return addNegative(chooseSet(rng, [
     allNodes.resource_t2_1,
     allNodes.resource_t2_2,
     allNodes.resource_t2_3,
@@ -88,14 +107,23 @@ function chooseT3(rng: Rng): NodeType {
     allNodes.resource_t2_6,
     allNodes.resource_t2_7,
     allNodes.resource_t2_8
-  ]), negativeEffectsT3, rng);
+  ]), negativeEffectsT3, rng);*/
 }
 
 function chooseT4(rng: Rng): NodeType {
-  return addNegative(chooseSet(rng, [
+  return addNegative({
+    tag: "ResourceNode", effects: generateEffects(10, rng, posEffects),
+    meta: {
+      id: 1,
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
+  negativeEffectsT3, rng);
+  /*return addNegative(chooseSet(rng, [
     allNodes.resource_t3_1,
     allNodes.resource_t3_2
-  ]), negativeEffectsT3, rng);
+  ]), negativeEffectsT3, rng);*/
 }
 
 export const boardData: BoardData = [
