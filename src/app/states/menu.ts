@@ -258,7 +258,7 @@ export default class Menu extends Phaser.State {
     }, playGroup);
     filterBtn.setTextBounds(605 - 400, 575 - 300, 25, 25);
     filterBtn.inputEnabled = true;
-    filterBtn.events.onInputDown.add(() => { changeCurrentFilter("LoseEffect"); });
+    filterBtn.events.onInputDown.add(filterAction);
 
     // step run -1 button
 
@@ -360,7 +360,10 @@ export default class Menu extends Phaser.State {
 
     addCurrentFilterCallback((input: {board: Node[], filter: string | undefined }) => {
       if (input.filter === undefined) {
-        // filter is cleared, make all nodes visible
+        console.log("CLEAR");
+        playBoardGroup.forEachExists((node: Phaser.Sprite) => {
+          node.data.visibleOverride = false;
+        });
       } else {
         const nodeIds: number[] = filterBoard(input.filter, input.board).map(x => x.id);
         console.log(nodeIds);
@@ -602,4 +605,15 @@ function stepRunAction(f: (n: number) => number) {
     }
     changeShownResources({ values: stepResult.stepValues, valid: stepResult.validSolution });
   };
+}
+
+function filterAction() {
+  const input = prompt("change filter to ('clear' to clear):");
+  if (input === null || input === "") {
+    // do nothing
+  } else if (input === "clear") {
+    changeCurrentFilter(undefined);
+  } else {
+    changeCurrentFilter(input);
+  }
 }
