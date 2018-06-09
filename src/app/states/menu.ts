@@ -1,6 +1,6 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback, addBoardCallback, nodeLocation, changeCurrentFilter, addCurrentFilterCallback } from "src/app/appstate";
 import { changeSelectedNode, addNodeCallback, changeShownResources, addShownResourcesCallback } from "src/app/gamestate";
-import { connectToServer } from "src/app/network/network";
+import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
 import { Node } from "src/shared/node";
 import { Board, filterBoard } from "src/shared/board";
 import { ConnectResult, Solution } from "src/shared/connectResult";
@@ -10,6 +10,8 @@ import { showNodeType } from "src/shared/nodeType";
 import { showModifier } from "src/shared/rules/modifier";
 
 import { config } from "src/app/config";
+
+let serverConn: ServerConnection | undefined = undefined;
 
 let playBoardGroup: Phaser.Group;
 
@@ -109,6 +111,26 @@ export default class Menu extends Phaser.State {
       boundsAlignV: "middle",
     }, menuGroup);
     home1.setTextBounds(50 - 400, 100 - 300, 150, 75);
+
+    const board1Btn: Phaser.Text = this.add.text(0, 0, "board1", {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
+    }, menuGroup);
+    board1Btn.setTextBounds(75 - 400, 165 - 300, 75, 50);
+    board1Btn.inputEnabled = true;
+    board1Btn.events.onInputDown.add(() => { if (serverConn !== undefined) { getBoard(serverConn, "ABCD-EFGH"); } });
+
+    const board2Btn: Phaser.Text = this.add.text(0, 0, "board2", {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
+    }, menuGroup);
+    board2Btn.setTextBounds(175 - 400, 165 - 300, 75, 50);
+    board2Btn.inputEnabled = true;
+    board2Btn.events.onInputDown.add(() => { if (serverConn !== undefined) { getBoard(serverConn, "IJKL-MNOP"); } });
 
     const home2: Phaser.Text = this.add.text(0, 0, "Top Solutions", {
       font: "35px Indie Flower",
@@ -376,7 +398,7 @@ export default class Menu extends Phaser.State {
       }
     });
 
-    connectToServer();
+    serverConn = connectToServer((serverConn) => { getBoard(serverConn, "ABCD-EFGH"); });
   }
 
   public update() {

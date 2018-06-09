@@ -41,6 +41,7 @@ export function getSelectedScreen(): SelectedScreen {
 }
 
 export function changeBoard(board: Board) {
+  // TODO clear old state from old board
   appState.board = board;
   boardCallbacks.forEach(cb => cb(board));
 }
