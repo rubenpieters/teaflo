@@ -43,7 +43,10 @@ type LevelData = {
 type BoardData = LevelData[];
 
 function chooseT1(rng: Rng): NodeType {
-  return chooseSet(rng, [allNodes.resource_t1_1, allNodes.resource_t1_2]);
+  return chooseSet(rng, [
+    allNodes.resource_t1_1,
+    allNodes.resource_t1_2,
+  ]);
 }
 
 const negativeEffectsT2: NodeEffect[] = [
@@ -68,62 +71,23 @@ const negativeEffectsT3: NodeEffect[] = [
 ];
 
 function chooseT2(rng: Rng): NodeType {
-  return addNegative({
-    tag: "ResourceNode", effects: generateEffects(4, rng, posEffects),
-    meta: {
-      id: 1,
-      name: "",
-      color: 0xAAAAAA,
-    }
-  },
-  negativeEffectsT2, rng);
-  /*return addNegative(chooseSet(rng, [
+  return chooseSet(rng, [
     allNodes.resource_t2_1,
     allNodes.resource_t2_2,
-    allNodes.resource_t2_3,
-    allNodes.resource_t2_4,
-    allNodes.resource_t2_5,
-    allNodes.resource_t2_6,
-    allNodes.resource_t2_7,
-    allNodes.resource_t2_8
-  ]), negativeEffectsT2, rng);*/
+  ]);
 }
 function chooseT3(rng: Rng): NodeType {
-  return addNegative({
-    tag: "ResourceNode", effects: generateEffects(7, rng, posEffects),
-    meta: {
-      id: 1,
-      name: "",
-      color: 0xAAAAAA,
-    }
-  },
-  negativeEffectsT2, rng);
-  /*return addNegative(chooseSet(rng, [
-    allNodes.resource_t2_1,
-    allNodes.resource_t2_2,
-    allNodes.resource_t2_3,
-    allNodes.resource_t2_4,
-    allNodes.resource_t2_5,
-    allNodes.resource_t2_6,
-    allNodes.resource_t2_7,
-    allNodes.resource_t2_8
-  ]), negativeEffectsT3, rng);*/
+  return chooseSet(rng, [
+    allNodes.resource_t3_1,
+    allNodes.resource_t3_2,
+  ]);
 }
 
 function chooseT4(rng: Rng): NodeType {
-  return addNegative({
-    tag: "ResourceNode", effects: generateEffects(10, rng, posEffects),
-    meta: {
-      id: 1,
-      name: "",
-      color: 0xAAAAAA,
-    }
-  },
-  negativeEffectsT3, rng);
-  /*return addNegative(chooseSet(rng, [
-    allNodes.resource_t3_1,
-    allNodes.resource_t3_2
-  ]), negativeEffectsT3, rng);*/
+  return chooseSet(rng, [
+    allNodes.resource_t4_1,
+    allNodes.resource_t4_2,
+  ]);
 }
 
 export const boardData: BoardData = [

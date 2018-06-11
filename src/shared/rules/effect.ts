@@ -178,7 +178,8 @@ export function triggerEffect(nodeEffect: NodeEffect):
       if (effectResult === "Invalid") {
         return "Invalid";
       } else {
-        return effectResult;
+        const { newValues, newEffects } = effectResult;
+        return { newValues: newValues, newEffects: newEffects.concat(restEffectAcc) };
       }
     }
   };

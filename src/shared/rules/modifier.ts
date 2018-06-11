@@ -42,6 +42,7 @@ type IncreaseGain = {
 
 type DuplicateAddMod = {
   tag: "DuplicateAddMod",
+  value: number,
 };
 
 export type ModifierEffect
@@ -80,7 +81,7 @@ export function showModifier(modifier: Modifier): string {
       return "IncreaseLoss " + modifier.modifierEffect.value + " " + showCharges;
     }
     case "DuplicateAddMod": {
-      return "DuplicateAddMod " + showCharges;
+      return "DuplicateAddMod " + modifier.modifierEffect.value + " " + showCharges;
     }
   }
 }
@@ -192,7 +193,8 @@ export function modifierFunction(modifier: Modifier):
         case "DuplicateAddMod": {
           switch (nodeEffect.tag) {
             case "AddModifier": {
-                return { newEffects: [nodeEffect, nodeEffect], newModifiers: modifiersAfterUse };
+              const value = modifier.modifierEffect.value;
+              return { newEffects: fillArray(nodeEffect, value + 1), newModifiers: modifiersAfterUse };
             }
             default: {
               return { newEffects: [nodeEffect], newModifiers: [modifier] };
@@ -217,4 +219,12 @@ export function modifierFunction(modifier: Modifier):
     const newModifier = iassign(modifier,
       x => x.charges, x => modifier.maxCharges);
       return newModifier;
+  }
+
+  function fillArray<A>(value: A, len: number): A[] {
+    const arr = new Array(len);
+    for (let i = 0; i < len; i++) {
+      arr[i] = value;
+    }
+    return arr;
   }

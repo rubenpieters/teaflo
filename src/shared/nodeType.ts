@@ -55,66 +55,86 @@ export const allNodes: { [key: string]: NodeType } = {
   resource_t1_1: {
     tag: "ResourceNode",
     effects: [
-    {
-      tag: "ClearTemp",
-    },
-    {
-      tag: "GainEffect",
-      gain: { color: "Basic", type: "Temp", amount: 1 },
-    },
-    {
-      tag: "GainEffect",
-      gain: { color: "Stack", type: "Temp", amount: 2 },
-    }],
+      {
+        tag: "GainEffect",
+        gain: { color: "Basic", type: "Temp", amount: 3 },
+      },
+      {
+        tag: "GainEffect",
+        gain: { color: "Stack", type: "Temp", amount: 3 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 3,
+          chargePerUse: 1,
+          maxCharges: 3,
+          modifierEffect: {
+            tag: "IncreaseGain",
+            value: 1,
+          },
+        }
+      }
+    ],
     meta: {
       id: 101,
-      name: "1 Basic 1 Stack",
+      name: "",
       color: 0xAAAAAA,
     }
   },
   resource_t1_2: {
     tag: "ResourceNode",
     effects: [
-    {
-      tag: "ClearTemp",
-    },
-    {
-      tag: "GainEffect",
-      gain: { color: "Stack", type: "Temp", amount: 3 },
-    },
-    {
-      tag: "AddModifier",
-      modifier: {
-        charges: 1,
-        chargePerUse: 1,
-        maxCharges: 1,
-        modifierEffect: {
-          tag: "Buffer",
-          value: 4,
-        },
+      {
+        tag: "GainEffect",
+        gain: { color: "Basic", type: "Temp", amount: 3 },
+      },
+      {
+        tag: "GainEffect",
+        gain: { color: "Stack", type: "Temp", amount: 3 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 1,
+          chargePerUse: 1,
+          maxCharges: 1,
+          modifierEffect: {
+            tag: "DuplicateAddMod",
+            value: 1,
+          },
+        }
       }
-    }],
+    ],
     meta: {
       id: 102,
-      name: "Buffer 1 - 4",
+      name: "",
       color: 0xAAAAAA,
     }
   },
   resource_t2_1: {
     tag: "ResourceNode",
     effects: [
-    {
-      tag: "AddModifier",
-      modifier: {
-        charges: 1,
-        chargePerUse: 1,
-        maxCharges: 1,
-        modifierEffect: {
-          tag: "Buffer",
-          value: 8,
-        },
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 3 },
+      },
+      {
+        tag: "GainEffect",
+        gain: { color: "Basic", type: "Temp", amount: 5 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 3,
+          chargePerUse: 1,
+          maxCharges: 3,
+          modifierEffect: {
+            tag: "IncreaseGain",
+            value: 2,
+          },
+        }
       }
-    }
     ],
     meta: {
       id: 201,
@@ -125,22 +145,30 @@ export const allNodes: { [key: string]: NodeType } = {
   resource_t2_2: {
     tag: "ResourceNode",
     effects: [
-    {
-      tag: "AddModifier",
-      modifier: {
-        charges: 4,
-        chargePerUse: 1,
-        maxCharges: 4,
-        modifierEffect: {
-          tag: "Buffer",
-          value: 2,
-        },
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 3 },
+      },
+      {
+        tag: "GainEffect",
+        gain: { color: "Basic", type: "Temp", amount: 5 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 1,
+          chargePerUse: 1,
+          maxCharges: 1,
+          modifierEffect: {
+            tag: "DuplicateAddMod",
+            value: 2,
+          },
+        }
       }
-    }
     ],
     meta: {
       id: 202,
-      name: "Buffer 4 - 2",
+      name: "",
       color: 0xAAAAAA,
     }
   },
@@ -265,6 +293,7 @@ export const allNodes: { [key: string]: NodeType } = {
         maxCharges: 1,
         modifierEffect: {
           tag: "DuplicateAddMod",
+          value: 1,
         },
       }
     },
@@ -278,22 +307,26 @@ export const allNodes: { [key: string]: NodeType } = {
   resource_t3_1: {
     tag: "ResourceNode",
     effects: [
-    {
-      tag: "ConvertEffect",
-      converts:
-        {
-          tag: "ConvertUnit",
-          from: {
-            color: "Stack",
-            type: "Temp",
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 5 },
+      },
+      {
+        tag: "GainEffect",
+        gain: { color: "Basic", type: "Temp", amount: 7 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 3,
+          chargePerUse: 1,
+          maxCharges: 3,
+          modifierEffect: {
+            tag: "IncreaseGain",
+            value: 3,
           },
-          to: {
-            color: "Stack",
-            type: "Total",
-          },
-          amount: 3,
         }
-    }
+      }
     ],
     meta: {
       id: 301,
@@ -304,14 +337,82 @@ export const allNodes: { [key: string]: NodeType } = {
   resource_t3_2: {
     tag: "ResourceNode",
     effects: [
-    {
-      tag: "GainEffect",
-      gain: { color: "Basic", type: "Temp", amount: 5 },
-    }
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 5 },
+      },
+      {
+        tag: "GainEffect",
+        gain: { color: "Basic", type: "Temp", amount: 7 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 1,
+          chargePerUse: 1,
+          maxCharges: 1,
+          modifierEffect: {
+            tag: "DuplicateAddMod",
+            value: 3,
+          },
+        }
+      }
     ],
     meta: {
       id: 302,
-      name: "Basic 5",
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t4_1: {
+    tag: "ResourceNode",
+    effects: [
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 7 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 3,
+          chargePerUse: 1,
+          maxCharges: 3,
+          modifierEffect: {
+            tag: "IncreaseGain",
+            value: 4,
+          },
+        }
+      }
+    ],
+    meta: {
+      id: 401,
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t4_2: {
+    tag: "ResourceNode",
+    effects: [
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 7 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 1,
+          chargePerUse: 1,
+          maxCharges: 1,
+          modifierEffect: {
+            tag: "DuplicateAddMod",
+            value: 4,
+          },
+        }
+      }
+    ],
+    meta: {
+      id: 402,
+      name: "",
       color: 0xAAAAAA,
     }
   },

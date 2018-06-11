@@ -147,7 +147,8 @@ const gainCharge: GenerateRow = {
 const addDuplicater: GenerateRow = {
   generate: rng => {
     const maxCharges: number = rng.integerInRange(1, 3)();
-    const cost: number = maxCharges * 5;
+    const value: number = rng.integerInRange(1, 3)();
+    const cost: number = maxCharges * 3 + value * 3;
     const effect: NodeEffect = {
       tag: "AddModifier",
       modifier: {
@@ -156,6 +157,7 @@ const addDuplicater: GenerateRow = {
         maxCharges: 1,
         modifierEffect: {
           tag: "DuplicateAddMod",
+          value: value,
         },
       }
     };
