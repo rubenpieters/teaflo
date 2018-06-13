@@ -61,6 +61,10 @@ type DestroyModEffect = {
   position: number,
 };
 
+type ConvertModsToVictory = {
+  tag: "ConvertModsToVictory",
+};
+
 export type NodeEffect
   = GainEffect
   | LoseEffect
@@ -74,6 +78,7 @@ export type NodeEffect
   | GainChargeEffect
   | RefreshChargeEffect
   | DestroyModEffect
+  | ConvertModsToVictory
   ;
 
 export function showEffect(nodeEffect: NodeEffect): string {
@@ -117,6 +122,9 @@ export function showEffect(nodeEffect: NodeEffect): string {
     }
     case "DestroyModEffect": {
       return "DestroyModEffect " + nodeEffect.position;
+    }
+    case "ConvertModsToVictory": {
+      return "ConvertModsToVictory";
     }
   }
 }
@@ -312,6 +320,13 @@ export function effectFunction(effect: NodeEffect):
             x => x.modifiers, x => newModifiers);
           return { newValues: newStepValues, newEffects: [] };
         }
+      }
+      case "ConvertModsToVictory": {
+        const modifierAmount = stepValues.modifiers.length;
+        const newStepValues: StepValues = iassign(iassign(stepValues,
+          x => x.modifiers, x => []),
+          x => x.resources.Victory.Total, x => modifierAmount);
+          return { newValues: newStepValues, newEffects: [] };
       }
     }
   };

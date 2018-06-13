@@ -112,6 +112,24 @@ export const allNodes: { [key: string]: NodeType } = {
       color: 0xAAAAAA,
     }
   },
+  resource_t1_5_1: {
+    tag: "ResourceNode",
+    effects: [
+      {
+        tag: "GainEffect",
+        gain: { color: "Basic", type: "Temp", amount: 1 },
+      },
+      {
+        tag: "GainEffect",
+        gain: { color: "Stack", type: "Temp", amount: 1 },
+      }
+    ],
+    meta: {
+      id: 1501,
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
   resource_t2_1: {
     tag: "ResourceNode",
     effects: [
@@ -372,16 +390,7 @@ export const allNodes: { [key: string]: NodeType } = {
         loss: { color: "Basic", type: "Both", amount: 7 },
       },
       {
-        tag: "AddModifier",
-        modifier: {
-          charges: 3,
-          chargePerUse: 1,
-          maxCharges: 3,
-          modifierEffect: {
-            tag: "IncreaseGain",
-            value: 4,
-          },
-        }
+        tag: "ConvertModsToVictory",
       }
     ],
     meta: {

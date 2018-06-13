@@ -42,13 +42,6 @@ type LevelData = {
 
 type BoardData = LevelData[];
 
-function chooseT1(rng: Rng): NodeType {
-  return chooseSet(rng, [
-    allNodes.resource_t1_1,
-    allNodes.resource_t1_2,
-  ]);
-}
-
 const negativeEffectsT2: NodeEffect[] = [
   { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
   { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 1 } },
@@ -70,6 +63,19 @@ const negativeEffectsT3: NodeEffect[] = [
   { tag: "LoseEffect", loss: { color: "Basic", type: "Both", amount: 5 } },
 ];
 
+function chooseT1(rng: Rng): NodeType {
+  return chooseSet(rng, [
+    allNodes.resource_t1_1,
+    allNodes.resource_t1_2,
+  ]);
+}
+
+function chooseT1_5(rng: Rng): NodeType {
+  return chooseSet(rng, [
+    allNodes.resource_t1_5_1,
+  ]);
+}
+
 function chooseT2(rng: Rng): NodeType {
   return chooseSet(rng, [
     allNodes.resource_t2_1,
@@ -86,7 +92,6 @@ function chooseT3(rng: Rng): NodeType {
 function chooseT4(rng: Rng): NodeType {
   return chooseSet(rng, [
     allNodes.resource_t4_1,
-    allNodes.resource_t4_2,
   ]);
 }
 
@@ -104,7 +109,18 @@ export const boardData: BoardData = [
   },
   {
     ampMin: 150,
-    ampMax: 200,
+    ampMax: 175,
+    quadrants: [
+      rng => { return chooseT1_5(rng); },
+      rng => { return chooseT1_5(rng); },
+      rng => { return chooseT1_5(rng); },
+      rng => { return chooseT1_5(rng); },
+    ],
+    amount: 2,
+  },
+  {
+    ampMin: 200,
+    ampMax: 250,
     quadrants: [
       rng => { return chooseT2(rng); },
       rng => { return chooseT2(rng); },
@@ -118,8 +134,8 @@ export const boardData: BoardData = [
     amount: 1,
   },
   {
-    ampMin: 225,
-    ampMax: 250,
+    ampMin: 275,
+    ampMax: 300,
     quadrants: [
       rng => { return chooseT3(rng); },
       rng => { return chooseT3(rng); },
@@ -133,8 +149,8 @@ export const boardData: BoardData = [
     amount: 2,
   },
   {
-    ampMin: 275,
-    ampMax: 325,
+    ampMin: 325,
+    ampMax: 375,
     quadrants: [
       rng => { return chooseT4(rng); },
       rng => { return chooseT4(rng); },

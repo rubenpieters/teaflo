@@ -370,6 +370,8 @@ export default class Menu extends Phaser.State {
           "Basic Temp: " + stepData.resources.Basic.Temp + "\n" +
           "Stack Total: " + stepData.resources.Stack.Total + "\n" +
           "Stack Temp: " + stepData.resources.Stack.Temp + "\n" +
+          "Victory Temp: " + stepData.resources.Victory.Temp + "\n" +
+          "Victory Total: " + stepData.resources.Victory.Total + "\n" +
           "Growth: " + stepData.growth;
       }
       resourcesText.setText(resourcesString);
