@@ -77,7 +77,13 @@ function visitStep(solution: Solution, node: Node, from: Node | undefined, stepV
     }
   }
 
-  const stepValuesAfterTrigger = triggerEffects(visitResult.effects)(stepValuesAfterGrowth);
+  let toTriggerEffects = visitResult.effects;
+  if (from !== undefined && from.id === 0) {
+    const clearTemp: NodeEffect[] = [{ tag: "ClearTemp" }];
+    toTriggerEffects = clearTemp.concat(visitResult.effects);
+  }
+
+  const stepValuesAfterTrigger = triggerEffects(toTriggerEffects)(stepValuesAfterGrowth);
   if (stepValuesAfterTrigger === "Invalid") {
     return { stepValues: stepValues, lastVisitedNodeId: node.id, validSolution: false };
   } else {
