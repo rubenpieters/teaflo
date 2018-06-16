@@ -34,6 +34,7 @@ function test2() {
     charges: 1,
     chargePerUse: 1,
     maxCharges: 1,
+    fragile: false,
     modifierEffect: {
       tag: "DoubleNextGain",
     }
@@ -82,6 +83,7 @@ function test4() {
       charges: 1,
       chargePerUse: 1,
       maxCharges: 1,
+      fragile: false,
       modifierEffect: {
         tag: "DoubleNextGain",
       },
@@ -158,6 +160,7 @@ function test7() {
     charges: 1,
     chargePerUse: 1,
     maxCharges: 1,
+    fragile: false,
     modifierEffect: {
       tag: "Buffer",
       value: 10,
@@ -186,6 +189,7 @@ function test8() {
     charges: 1,
     chargePerUse: 1,
     maxCharges: 1,
+    fragile: false,
     modifierEffect: {
       tag: "Buffer",
       value: 10,

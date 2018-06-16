@@ -207,8 +207,9 @@ export function effectFunction(effect: NodeEffect):
   return stepValues => {
     switch (effect.tag) {
       case "GainEffect": {
+        const gainColor = effect.gain.color === "Affinity" ? stepValues.affinity : effect.gain.color;
         const newStepValues: StepValues = iassign(stepValues,
-          v => v.resources[effect.gain.color][effect.gain.type], x => x + effect.gain.amount);
+          v => v.resources[gainColor][effect.gain.type], x => x + effect.gain.amount);
         return { newValues: newStepValues, newEffects: [] };
       }
       case "LoseEffect": {

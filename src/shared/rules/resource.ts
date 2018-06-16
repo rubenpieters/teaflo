@@ -15,7 +15,7 @@ export type ResourceType
   ;
 
 export type ResourceUnit = {
-  color: ResourceColor
+  color: ResourceColor | "Affinity"
   type: ResourceType
   amount: number
 };

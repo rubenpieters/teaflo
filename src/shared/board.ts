@@ -50,6 +50,7 @@ const negativeEffectsT2: NodeEffect[] = [
     charges: 4,
     chargePerUse: 1,
     maxCharges: 4,
+    fragile: false,
     modifierEffect: {
       tag: "IncreaseLoss",
       value: 1,
@@ -92,6 +93,9 @@ function chooseT3(rng: Rng): NodeType {
 function chooseT4(rng: Rng): NodeType {
   return chooseSet(rng, [
     allNodes.resource_t4_1,
+    allNodes.resource_t4_2,
+    allNodes.resource_t4_4,
+    allNodes.resource_t4_3,
   ]);
 }
 
@@ -107,7 +111,7 @@ export const boardData: BoardData = [
     ],
     amount: 2,
   },
-  {
+  /*{
     ampMin: 150,
     ampMax: 175,
     quadrants: [
@@ -117,7 +121,7 @@ export const boardData: BoardData = [
       rng => { return chooseT1_5(rng); },
     ],
     amount: 2,
-  },
+  },*/
   {
     ampMin: 200,
     ampMax: 250,
@@ -152,14 +156,14 @@ export const boardData: BoardData = [
     ampMin: 325,
     ampMax: 375,
     quadrants: [
-      rng => { return chooseT4(rng); },
-      rng => { return chooseT4(rng); },
-      rng => { return chooseT4(rng); },
-      rng => { return chooseT4(rng); },
-      rng => { return chooseT4(rng); },
-      rng => { return chooseT4(rng); },
-      rng => { return chooseT4(rng); },
-      rng => { return chooseT4(rng); },
+      rng => { return allNodes.resource_t4_1; },
+      rng => { return allNodes.resource_t4_2; },
+      rng => { return allNodes.resource_t4_3; },
+      rng => { return allNodes.resource_t4_4; },
+      rng => { return allNodes.resource_t4_1; },
+      rng => { return allNodes.resource_t4_2; },
+      rng => { return allNodes.resource_t4_3; },
+      rng => { return allNodes.resource_t4_4; },
     ],
     amount: 1,
   }

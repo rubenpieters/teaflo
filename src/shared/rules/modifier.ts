@@ -1,4 +1,5 @@
 import { NodeEffect } from "src/shared/rules/effect";
+import { ResourceColor } from "src/shared/rules/resource";
 import iassign from "immutable-assign";
 
 export type Modifier = {
@@ -6,6 +7,7 @@ export type Modifier = {
   chargePerUse: number,
   maxCharges: number,
   modifierEffect: ModifierEffect,
+  fragile: boolean,
 };
 
 type IgnoreNextConsume = {
@@ -45,6 +47,16 @@ type DuplicateAddMod = {
   value: number,
 };
 
+type LossToGain = {
+  tag: "LossToGain",
+};
+
+type GainXToVictory = {
+  tag: "GainXToVictory",
+  minimum: number,
+  type: ResourceColor,
+};
+
 export type ModifierEffect
   = IgnoreNextConsume
   | IgnoreNextCheck
@@ -54,10 +66,16 @@ export type ModifierEffect
   | IncreaseGain
   | IncreaseLoss
   | DuplicateAddMod
+  | LossToGain
+  | GainXToVictory
   ;
 
 export function showModifier(modifier: Modifier): string {
-  const showCharges: string = "[" + modifier.charges + "/" + modifier.maxCharges + " (" + modifier.chargePerUse + ")]";
+  const showCharges: string = "[" +
+      modifier.charges + "/" +
+      modifier.maxCharges + " (" +
+      modifier.chargePerUse + ")]" +
+      (modifier.fragile ? " F" : "");
   switch (modifier.modifierEffect.tag) {
     case "IgnoreNextConsume": {
       return "TODO";
@@ -83,6 +101,12 @@ export function showModifier(modifier: Modifier): string {
     case "DuplicateAddMod": {
       return "DuplicateAddMod " + modifier.modifierEffect.value + " " + showCharges;
     }
+    case "LossToGain": {
+      return "LossToGain " + showCharges;
+    }
+    case "GainXToVictory": {
+      return "Gain " + modifier.modifierEffect.minimum + " " + modifier.modifierEffect.type + " To Victory " + showCharges;
+    }
   }
 }
 
@@ -93,6 +117,10 @@ export function modifierFunction(modifier: Modifier):
         m => m.charges, c => c - modifier.chargePerUse);
       const modifiersAfterUse: Modifier[] = modifierChargeReduced.charges > 0 ?
         [modifierChargeReduced] : [];
+
+      const unmodifiedResult = { newEffects: [nodeEffect], newModifiers: [modifier] };
+      const modifiedResult = { newEffects: [nodeEffect], newModifiers: [modifierChargeReduced] };
+      const afterNoTrigger = modifier.fragile ? modifiedResult : unmodifiedResult;
       switch (modifier.modifierEffect.tag) {
         case "IgnoreNextConsume": {
           switch (nodeEffect.tag) {
@@ -101,7 +129,7 @@ export function modifierFunction(modifier: Modifier):
               return { newEffects: modifiedEffect, newModifiers: modifiersAfterUse };
             }
             default: {
-              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+              return afterNoTrigger;
             }
           }
         }
@@ -112,7 +140,7 @@ export function modifierFunction(modifier: Modifier):
               return { newEffects: modifiedEffect, newModifiers: modifiersAfterUse };
             }
             default: {
-              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+              return afterNoTrigger;
             }
           }
         }
@@ -124,7 +152,7 @@ export function modifierFunction(modifier: Modifier):
               return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
             }
             default: {
-              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+              return afterNoTrigger;
             }
           }
         }
@@ -143,7 +171,7 @@ export function modifierFunction(modifier: Modifier):
               }
             }
             default: {
-              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+              return afterNoTrigger;
             }
           }
         }
@@ -160,7 +188,7 @@ export function modifierFunction(modifier: Modifier):
               }
             }
             default: {
-              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+              return afterNoTrigger;
             }
           }
         }
@@ -173,7 +201,7 @@ export function modifierFunction(modifier: Modifier):
               return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
             }
             default: {
-              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+              return afterNoTrigger;
             }
           }
         }
@@ -186,7 +214,7 @@ export function modifierFunction(modifier: Modifier):
               return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
             }
             default: {
-              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+              return afterNoTrigger;
             }
           }
         }
@@ -197,7 +225,43 @@ export function modifierFunction(modifier: Modifier):
               return { newEffects: fillArray(nodeEffect, value + 1), newModifiers: modifiersAfterUse };
             }
             default: {
-              return { newEffects: [nodeEffect], newModifiers: [modifier] };
+              return afterNoTrigger;
+            }
+          }
+        }
+        case "LossToGain": {
+          switch (nodeEffect.tag) {
+            case "LoseEffect": {
+              const modifiedEffect: NodeEffect = {
+                tag: "GainEffect",
+                gain: {
+                  color: nodeEffect.loss.color,
+                  type: "Temp",
+                  amount: nodeEffect.loss.amount,
+                },
+              };
+              return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
+            }
+            default: {
+              return afterNoTrigger;
+            }
+          }
+        }
+        case "GainXToVictory": {
+          switch (nodeEffect.tag) {
+            case "GainEffect": {
+              const modifiedEffect: NodeEffect = {
+                tag: "GainEffect",
+                gain: {
+                  color: "Victory",
+                  type: "Total",
+                  amount: 1,
+                },
+              };
+              return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
+            }
+            default: {
+              return afterNoTrigger;
             }
           }
         }

@@ -69,6 +69,7 @@ export const allNodes: { [key: string]: NodeType } = {
           charges: 3,
           chargePerUse: 1,
           maxCharges: 3,
+          fragile: false,
           modifierEffect: {
             tag: "IncreaseGain",
             value: 1,
@@ -99,6 +100,7 @@ export const allNodes: { [key: string]: NodeType } = {
           charges: 1,
           chargePerUse: 1,
           maxCharges: 1,
+          fragile: false,
           modifierEffect: {
             tag: "DuplicateAddMod",
             value: 1,
@@ -147,6 +149,7 @@ export const allNodes: { [key: string]: NodeType } = {
           charges: 3,
           chargePerUse: 1,
           maxCharges: 3,
+          fragile: false,
           modifierEffect: {
             tag: "IncreaseGain",
             value: 2,
@@ -177,6 +180,7 @@ export const allNodes: { [key: string]: NodeType } = {
           charges: 1,
           chargePerUse: 1,
           maxCharges: 1,
+          fragile: false,
           modifierEffect: {
             tag: "DuplicateAddMod",
             value: 2,
@@ -239,6 +243,7 @@ export const allNodes: { [key: string]: NodeType } = {
         charges: 1,
         chargePerUse: 1,
         maxCharges: 1,
+        fragile: false,
         modifierEffect: {
           tag: "Persister",
           cap: 5,
@@ -261,6 +266,7 @@ export const allNodes: { [key: string]: NodeType } = {
         charges: 4,
         chargePerUse: 1,
         maxCharges: 4,
+        fragile: false,
         modifierEffect: {
           tag: "IncreaseLoss",
           value: 1,
@@ -273,6 +279,7 @@ export const allNodes: { [key: string]: NodeType } = {
         charges: 4,
         chargePerUse: 1,
         maxCharges: 4,
+        fragile: false,
         modifierEffect: {
           tag: "IncreaseGain",
           value: 1,
@@ -309,6 +316,7 @@ export const allNodes: { [key: string]: NodeType } = {
         charges: 1,
         chargePerUse: 1,
         maxCharges: 1,
+        fragile: false,
         modifierEffect: {
           tag: "DuplicateAddMod",
           value: 1,
@@ -339,6 +347,7 @@ export const allNodes: { [key: string]: NodeType } = {
           charges: 3,
           chargePerUse: 1,
           maxCharges: 3,
+          fragile: false,
           modifierEffect: {
             tag: "IncreaseGain",
             value: 3,
@@ -369,6 +378,7 @@ export const allNodes: { [key: string]: NodeType } = {
           charges: 1,
           chargePerUse: 1,
           maxCharges: 1,
+          fragile: false,
           modifierEffect: {
             tag: "DuplicateAddMod",
             value: 3,
@@ -412,6 +422,7 @@ export const allNodes: { [key: string]: NodeType } = {
           charges: 1,
           chargePerUse: 1,
           maxCharges: 1,
+          fragile: false,
           modifierEffect: {
             tag: "DuplicateAddMod",
             value: 4,
@@ -421,6 +432,78 @@ export const allNodes: { [key: string]: NodeType } = {
     ],
     meta: {
       id: 402,
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t4_3: {
+    tag: "ResourceNode",
+    effects: [
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 7 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 1,
+          chargePerUse: 1,
+          maxCharges: 1,
+          fragile: false,
+          modifierEffect: {
+            tag: "GainXToVictory",
+            minimum: 5,
+            type: "Basic",
+          },
+        }
+      }
+    ],
+    meta: {
+      id: 403,
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t4_4: {
+    tag: "ResourceNode",
+    effects: [
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 7 },
+      },
+      {
+        tag: "ConvertEffect",
+        converts: {
+          tag: "ConvertUnit",
+          from: {
+            color: "Stack",
+            type: "Temp",
+          },
+          to: {
+            color: "Stack",
+            type: "Total",
+          },
+          amount: "All",
+        }
+      },
+      {
+        tag: "ConvertEffect",
+        converts: {
+          tag: "ConvertUnit",
+          from: {
+            color: "Basic",
+            type: "Temp",
+          },
+          to: {
+            color: "Basic",
+            type: "Total",
+          },
+          amount: "All",
+        }
+      },
+    ],
+    meta: {
+      id: 403,
       name: "",
       color: 0xAAAAAA,
     }

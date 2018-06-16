@@ -57,6 +57,7 @@ const addBuffer: GenerateRow = {
         charges: maxCharges,
         chargePerUse: 1,
         maxCharges: maxCharges,
+        fragile: false,
         modifierEffect: {
           tag: "Buffer",
           value: bufferValue,
@@ -102,6 +103,7 @@ const addPersister: GenerateRow = {
         charges: maxCharges,
         chargePerUse: 1,
         maxCharges: maxCharges,
+        fragile: false,
         modifierEffect: {
           tag: "Persister",
           cap: persisterValue,
@@ -123,6 +125,7 @@ const addIncreaseGain: GenerateRow = {
         charges: maxCharges,
         chargePerUse: 1,
         maxCharges: maxCharges,
+        fragile: false,
         modifierEffect: {
           tag: "IncreaseGain",
           value: increaseAmount,
@@ -155,6 +158,7 @@ const addDuplicater: GenerateRow = {
         charges: 1,
         chargePerUse: 1,
         maxCharges: 1,
+        fragile: false,
         modifierEffect: {
           tag: "DuplicateAddMod",
           value: value,
