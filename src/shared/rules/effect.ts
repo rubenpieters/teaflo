@@ -65,6 +65,11 @@ type ConvertModsToVictory = {
   tag: "ConvertModsToVictory",
 };
 
+type SetAffinity = {
+  tag: "SetAffinity",
+  value: ResourceColor,
+};
+
 export type NodeEffect
   = GainEffect
   | LoseEffect
@@ -79,6 +84,7 @@ export type NodeEffect
   | RefreshChargeEffect
   | DestroyModEffect
   | ConvertModsToVictory
+  | SetAffinity
   ;
 
 export function showEffect(nodeEffect: NodeEffect): string {
@@ -125,6 +131,9 @@ export function showEffect(nodeEffect: NodeEffect): string {
     }
     case "ConvertModsToVictory": {
       return "ConvertModsToVictory";
+    }
+    case "SetAffinity": {
+      return "SetAffinity " + nodeEffect.value;
     }
   }
 }
@@ -327,6 +336,12 @@ export function effectFunction(effect: NodeEffect):
           x => x.modifiers, x => []),
           x => x.resources.Victory.Total, x => modifierAmount);
           return { newValues: newStepValues, newEffects: [] };
+      }
+      case "SetAffinity": {
+        const newStepValues: StepValues = iassign(stepValues,
+          x => x.affinity, x => effect.value
+        );
+        return { newValues: newStepValues, newEffects: [] };
       }
     }
   };

@@ -86,6 +86,7 @@ export type StepValues = {
   resources: ResourceValues,
   modifiers: Modifier[],
   growth: number,
+  affinity: ResourceColor,
 };
 
 export const emptyStepValues: () => StepValues = () => {
@@ -93,6 +94,7 @@ export const emptyStepValues: () => StepValues = () => {
     resources: emptyResourceValues(),
     modifiers: [],
     growth: 0,
+    affinity: "Basic",
   };
 };
 
