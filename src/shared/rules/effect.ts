@@ -31,6 +31,7 @@ type ClearTemp = {
 type AddModifier = {
   tag: "AddModifier",
   modifier: Modifier,
+  amount: number,
 };
 
 type PersistEffect = {
@@ -107,7 +108,7 @@ export function showEffect(nodeEffect: NodeEffect): string {
       return "ClearTemp";
     }
     case "AddModifier": {
-      return "AddMod: " + showModifier(nodeEffect.modifier);
+      return "AddMod: " + "(" + nodeEffect.amount + ")" + showModifier(nodeEffect.modifier);
     }
     case "PersistEffect": {
       return "Persist";
@@ -251,14 +252,21 @@ export function effectFunction(effect: NodeEffect):
         return { newValues: newStepValues, newEffects: [] };
       }
       case "AddModifier": {
-        if (stepValues.resources.Stack.Temp + stepValues.resources.Stack.Total > stepValues.modifiers.length) {
-          const newStepValues: StepValues = iassign(stepValues,
-            x => x.modifiers, x => x.concat([effect.modifier]));
-          return { newValues: newStepValues, newEffects: [] };
-        } else {
-          console.log("Stack FULL!");
-          return { newValues: stepValues, newEffects: [] };
+        let newStepValues: StepValues = stepValues;
+        const toAdd = effect.amount;
+        console.log("ADDING: " + toAdd);
+        for (let i = 0; i < toAdd; i++) {
+          console.log("-- ADDING: " + i);
+          const maxMods = newStepValues.resources.Stack.Temp + newStepValues.resources.Stack.Total;
+          if (maxMods > newStepValues.modifiers.length) {
+            newStepValues = iassign(newStepValues,
+              x => x.modifiers, x => x.concat([effect.modifier]));
+          } else {
+            console.log("Stack FULL!");
+            return { newValues: newStepValues, newEffects: [] };
+          }
         }
+        return { newValues: newStepValues, newEffects: [] };
       }
       case "PersistEffect": {
         let newStepValues: StepValues = stepValues;

@@ -87,7 +87,8 @@ function test4() {
       modifierEffect: {
         tag: "DoubleNextGain",
       },
-    }
+    },
+    amount: 1,
   }
 
   const stepValues: StepValues = emptyStepValues();
@@ -206,4 +207,40 @@ function test8() {
   console.log(JSON.stringify(newValues));
 }
 
-test8();
+function test9() {
+  const dupModEff: NodeEffect = {
+    tag: "AddModifier",
+    modifier: {
+      charges: 1,
+      chargePerUse: 1,
+      maxCharges: 1,
+      modifierEffect: {
+        tag: "DuplicateAddMod",
+        value: 2,
+      },
+      fragile: false,
+    },
+    amount: 1,
+  }
+
+  const dupMod1: Modifier = {
+    charges: 1,
+    chargePerUse: 1,
+    maxCharges: 1,
+    modifierEffect: {
+      tag: "DuplicateAddMod",
+      value: 1,
+    },
+    fragile: false,
+  }
+
+  const stepValues: StepValues = iassign(iassign(emptyStepValues(),
+  x => x.modifiers, x => [dupMod1]),
+  x => x.resources["Stack"]["Temp"], x => 3);
+  
+  const newValues = triggerEffects([dupModEff])(stepValues);
+  
+  console.log(JSON.stringify(newValues));
+}
+
+test9();

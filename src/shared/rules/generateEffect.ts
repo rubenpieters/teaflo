@@ -62,7 +62,8 @@ const addBuffer: GenerateRow = {
           tag: "Buffer",
           value: bufferValue,
         },
-      }
+      },
+      amount: 1,
     };
     return { effect: effect, cost: cost };
   }
@@ -108,7 +109,8 @@ const addPersister: GenerateRow = {
           tag: "Persister",
           cap: persisterValue,
         },
-      }
+      },
+      amount: 1,
     };
     return { effect: effect, cost: cost };
   }
@@ -130,7 +132,8 @@ const addIncreaseGain: GenerateRow = {
           tag: "IncreaseGain",
           value: increaseAmount,
         },
-      }
+      },
+      amount: 1,
     };
     return { effect: effect, cost: cost };
   }
@@ -163,7 +166,8 @@ const addDuplicater: GenerateRow = {
           tag: "DuplicateAddMod",
           value: value,
         },
-      }
+      },
+      amount: 1,
     };
     return { effect: effect, cost: cost };
   }

@@ -74,7 +74,8 @@ export const allNodes: { [key: string]: NodeType } = {
             tag: "IncreaseGain",
             value: 1,
           },
-        }
+        },
+        amount: 1,
       }
     ],
     meta: {
@@ -105,7 +106,8 @@ export const allNodes: { [key: string]: NodeType } = {
             tag: "DuplicateAddMod",
             value: 1,
           },
-        }
+        },
+        amount: 1,
       }
     ],
     meta: {
@@ -154,7 +156,8 @@ export const allNodes: { [key: string]: NodeType } = {
             tag: "IncreaseGain",
             value: 2,
           },
-        }
+        },
+        amount: 1,
       }
     ],
     meta: {
@@ -185,7 +188,8 @@ export const allNodes: { [key: string]: NodeType } = {
             tag: "DuplicateAddMod",
             value: 2,
           },
-        }
+        },
+        amount: 1,
       }
     ],
     meta: {
@@ -248,7 +252,8 @@ export const allNodes: { [key: string]: NodeType } = {
           tag: "Persister",
           cap: 5,
         },
-      }
+      },
+      amount: 1,
     }
     ],
     meta: {
@@ -271,7 +276,8 @@ export const allNodes: { [key: string]: NodeType } = {
           tag: "IncreaseLoss",
           value: 1,
         },
-      }
+      },
+      amount: 1,
     },
     {
       tag: "AddModifier",
@@ -284,7 +290,8 @@ export const allNodes: { [key: string]: NodeType } = {
           tag: "IncreaseGain",
           value: 1,
         },
-      }
+      },
+      amount: 1,
     },
     ],
     meta: {
@@ -321,7 +328,8 @@ export const allNodes: { [key: string]: NodeType } = {
           tag: "DuplicateAddMod",
           value: 1,
         },
-      }
+      },
+      amount: 1,
     },
     ],
     meta: {
@@ -352,7 +360,8 @@ export const allNodes: { [key: string]: NodeType } = {
             tag: "IncreaseGain",
             value: 3,
           },
-        }
+        },
+        amount: 1,
       }
     ],
     meta: {
@@ -383,7 +392,8 @@ export const allNodes: { [key: string]: NodeType } = {
             tag: "DuplicateAddMod",
             value: 3,
           },
-        }
+        },
+        amount: 1,
       }
     ],
     meta: {
@@ -427,7 +437,8 @@ export const allNodes: { [key: string]: NodeType } = {
             tag: "DuplicateAddMod",
             value: 4,
           },
-        }
+        },
+        amount: 1,
       }
     ],
     meta: {
@@ -455,7 +466,8 @@ export const allNodes: { [key: string]: NodeType } = {
             minimum: 5,
             type: "Basic",
           },
-        }
+        },
+        amount: 1,
       }
     ],
     meta: {

@@ -55,7 +55,9 @@ const negativeEffectsT2: NodeEffect[] = [
       tag: "IncreaseLoss",
       value: 1,
     },
-  }},
+  },
+  amount: 1,
+  },
   { tag: "LoseChargeEffect" },
   { tag: "DestroyModEffect", position: 0 },
 ];
@@ -101,7 +103,7 @@ function chooseT4(rng: Rng): NodeType {
 
 export const boardData: BoardData = [
   {
-    ampMin: 50,
+    ampMin: 100,
     ampMax: 125,
     quadrants: [
       rng => { return chooseT1(rng); },

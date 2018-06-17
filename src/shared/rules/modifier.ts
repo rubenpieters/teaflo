@@ -221,8 +221,10 @@ export function modifierFunction(modifier: Modifier):
         case "DuplicateAddMod": {
           switch (nodeEffect.tag) {
             case "AddModifier": {
-              const value = modifier.modifierEffect.value;
-              return { newEffects: fillArray(nodeEffect, value + 1), newModifiers: modifiersAfterUse };
+              const duplicationAmount = modifier.modifierEffect.value;
+              const modifiedEffect: NodeEffect = iassign(nodeEffect,
+                x => x.amount, x => duplicationAmount + 1);
+              return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
             }
             default: {
               return afterNoTrigger;
