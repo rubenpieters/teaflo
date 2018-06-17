@@ -64,6 +64,7 @@ const addBuffer: GenerateRow = {
         },
       },
       amount: 1,
+      location: "Back",
     };
     return { effect: effect, cost: cost };
   }
@@ -111,6 +112,7 @@ const addPersister: GenerateRow = {
         },
       },
       amount: 1,
+      location: "Back",
     };
     return { effect: effect, cost: cost };
   }
@@ -134,6 +136,7 @@ const addIncreaseGain: GenerateRow = {
         },
       },
       amount: 1,
+      location: "Back",
     };
     return { effect: effect, cost: cost };
   }
@@ -168,6 +171,7 @@ const addDuplicater: GenerateRow = {
         },
       },
       amount: 1,
+      location: "Back",
     };
     return { effect: effect, cost: cost };
   }

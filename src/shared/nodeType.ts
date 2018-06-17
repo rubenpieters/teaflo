@@ -76,6 +76,7 @@ export const allNodes: { [key: string]: NodeType } = {
           },
         },
         amount: 1,
+        location: "Back",
       }
     ],
     meta: {
@@ -108,6 +109,7 @@ export const allNodes: { [key: string]: NodeType } = {
           },
         },
         amount: 1,
+        location: "Back",
       }
     ],
     meta: {
@@ -158,6 +160,7 @@ export const allNodes: { [key: string]: NodeType } = {
           },
         },
         amount: 1,
+        location: "Back",
       }
     ],
     meta: {
@@ -190,6 +193,7 @@ export const allNodes: { [key: string]: NodeType } = {
           },
         },
         amount: 1,
+        location: "Back",
       }
     ],
     meta: {
@@ -254,6 +258,7 @@ export const allNodes: { [key: string]: NodeType } = {
         },
       },
       amount: 1,
+      location: "Back",
     }
     ],
     meta: {
@@ -278,6 +283,7 @@ export const allNodes: { [key: string]: NodeType } = {
         },
       },
       amount: 1,
+      location: "Back",
     },
     {
       tag: "AddModifier",
@@ -292,6 +298,7 @@ export const allNodes: { [key: string]: NodeType } = {
         },
       },
       amount: 1,
+      location: "Back",
     },
     ],
     meta: {
@@ -330,6 +337,7 @@ export const allNodes: { [key: string]: NodeType } = {
         },
       },
       amount: 1,
+      location: "Back",
     },
     ],
     meta: {
@@ -362,6 +370,7 @@ export const allNodes: { [key: string]: NodeType } = {
           },
         },
         amount: 1,
+        location: "Back",
       }
     ],
     meta: {
@@ -394,6 +403,7 @@ export const allNodes: { [key: string]: NodeType } = {
           },
         },
         amount: 1,
+        location: "Back",
       }
     ],
     meta: {
@@ -439,6 +449,7 @@ export const allNodes: { [key: string]: NodeType } = {
           },
         },
         amount: 1,
+        location: "Back",
       }
     ],
     meta: {
@@ -468,6 +479,7 @@ export const allNodes: { [key: string]: NodeType } = {
           },
         },
         amount: 1,
+        location: "Back",
       }
     ],
     meta: {
@@ -515,7 +527,39 @@ export const allNodes: { [key: string]: NodeType } = {
       },
     ],
     meta: {
-      id: 403,
+      id: 404,
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t4_5: {
+    tag: "ResourceNode",
+    effects: [
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 7 },
+      },
+      {
+        tag: "AllModsFragile",
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 99,
+          chargePerUse: 0,
+          maxCharges: 99,
+          fragile: false,
+          modifierEffect: {
+            tag: "DuplicateAddMod",
+            value: 1,
+          },
+        },
+        amount: 1,
+        location: "Back",
+      },
+    ],
+    meta: {
+      id: 405,
       name: "",
       color: 0xAAAAAA,
     }

@@ -32,6 +32,7 @@ type AddModifier = {
   tag: "AddModifier",
   modifier: Modifier,
   amount: number,
+  location: "Front" | "Back",
 };
 
 type PersistEffect = {
@@ -71,6 +72,10 @@ type SetAffinity = {
   value: ResourceColor,
 };
 
+type AllModsFragile = {
+  tag: "AllModsFragile",
+};
+
 export type NodeEffect
   = GainEffect
   | LoseEffect
@@ -86,6 +91,7 @@ export type NodeEffect
   | DestroyModEffect
   | ConvertModsToVictory
   | SetAffinity
+  | AllModsFragile
   ;
 
 export function showEffect(nodeEffect: NodeEffect): string {
@@ -135,6 +141,9 @@ export function showEffect(nodeEffect: NodeEffect): string {
     }
     case "SetAffinity": {
       return "SetAffinity " + nodeEffect.value;
+    }
+    case "AllModsFragile": {
+      return "AllModsFragile";
     }
   }
 }
@@ -254,13 +263,16 @@ export function effectFunction(effect: NodeEffect):
       case "AddModifier": {
         let newStepValues: StepValues = stepValues;
         const toAdd = effect.amount;
-        console.log("ADDING: " + toAdd);
         for (let i = 0; i < toAdd; i++) {
-          console.log("-- ADDING: " + i);
           const maxMods = newStepValues.resources.Stack.Temp + newStepValues.resources.Stack.Total;
           if (maxMods > newStepValues.modifiers.length) {
-            newStepValues = iassign(newStepValues,
-              x => x.modifiers, x => x.concat([effect.modifier]));
+            if (effect.location === "Front") {
+              newStepValues = iassign(newStepValues,
+                x => x.modifiers, x => [effect.modifier].concat(x));
+            } else if (effect.location === "Back") {
+              newStepValues = iassign(newStepValues,
+                x => x.modifiers, x => x.concat([effect.modifier]));
+            }
           } else {
             console.log("Stack FULL!");
             return { newValues: newStepValues, newEffects: [] };
@@ -349,6 +361,15 @@ export function effectFunction(effect: NodeEffect):
       case "SetAffinity": {
         const newStepValues: StepValues = iassign(stepValues,
           x => x.affinity, x => effect.value
+        );
+        return { newValues: newStepValues, newEffects: [] };
+      }
+      case "AllModsFragile": {
+        const newModifiers = stepValues.modifiers.map(m => iassign(m,
+          x => x.fragile, x => true)
+        );
+        const newStepValues: StepValues = iassign(stepValues,
+          x => x.modifiers, x => newModifiers
         );
         return { newValues: newStepValues, newEffects: [] };
       }

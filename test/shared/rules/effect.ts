@@ -89,6 +89,7 @@ function test4() {
       },
     },
     amount: 1,
+    location: "Back",
   }
 
   const stepValues: StepValues = emptyStepValues();
@@ -221,6 +222,7 @@ function test9() {
       fragile: false,
     },
     amount: 1,
+    location: "Back",
   }
 
   const dupMod1: Modifier = {

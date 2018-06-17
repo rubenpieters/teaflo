@@ -57,6 +57,7 @@ const negativeEffectsT2: NodeEffect[] = [
     },
   },
   amount: 1,
+  location: "Back",
   },
   { tag: "LoseChargeEffect" },
   { tag: "DestroyModEffect", position: 0 },
@@ -96,8 +97,9 @@ function chooseT4(rng: Rng): NodeType {
   return chooseSet(rng, [
     allNodes.resource_t4_1,
     allNodes.resource_t4_2,
-    allNodes.resource_t4_4,
     allNodes.resource_t4_3,
+    allNodes.resource_t4_4,
+    allNodes.resource_t4_5,
   ]);
 }
 
