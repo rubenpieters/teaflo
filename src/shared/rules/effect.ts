@@ -51,7 +51,7 @@ type LoseChargeEffect = {
 
 type GainChargeEffect = {
   tag: "GainChargeEffect",
-  value: 1,
+  value: number,
 };
 
 type RefreshChargeEffect = {
@@ -114,7 +114,15 @@ export function showEffect(nodeEffect: NodeEffect): string {
       return "ClearTemp";
     }
     case "AddModifier": {
-      return "AddMod: " + "(" + nodeEffect.amount + ")" + showModifier(nodeEffect.modifier);
+      let locationAbbrev = "";
+      if (nodeEffect.location === "Front") {
+        locationAbbrev = "->";
+      } else if (nodeEffect.location === "Back") {
+        locationAbbrev = "<-";
+      } else {
+        locationAbbrev = "?";
+      }
+      return "AddMod: " + "(" + nodeEffect.amount + "|" + locationAbbrev + ")" + showModifier(nodeEffect.modifier);
     }
     case "PersistEffect": {
       return "Persist";

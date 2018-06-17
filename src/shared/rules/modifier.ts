@@ -10,6 +10,10 @@ export type Modifier = {
   fragile: boolean,
 };
 
+type NoopMod = {
+  tag: "NoopMod",
+};
+
 type IgnoreNextConsume = {
   tag: "IgnoreNextConsume",
 };
@@ -58,7 +62,8 @@ type GainXToVictory = {
 };
 
 export type ModifierEffect
-  = IgnoreNextConsume
+  = NoopMod
+  | IgnoreNextConsume
   | IgnoreNextCheck
   | DoubleNextGain
   | Buffer
@@ -77,6 +82,9 @@ export function showModifier(modifier: Modifier): string {
       modifier.chargePerUse + ")]" +
       (modifier.fragile ? " F" : "");
   switch (modifier.modifierEffect.tag) {
+    case "NoopMod": {
+      return "TODO";
+    }
     case "IgnoreNextConsume": {
       return "TODO";
     }
@@ -122,6 +130,9 @@ export function modifierFunction(modifier: Modifier):
       const modifiedResult = { newEffects: [nodeEffect], newModifiers: [modifierChargeReduced] };
       const afterNoTrigger = modifier.fragile ? modifiedResult : unmodifiedResult;
       switch (modifier.modifierEffect.tag) {
+        case "NoopMod": {
+          return afterNoTrigger;
+        }
         case "IgnoreNextConsume": {
           switch (nodeEffect.tag) {
             case "ConsumeEffect": {

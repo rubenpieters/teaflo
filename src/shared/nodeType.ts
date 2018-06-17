@@ -205,14 +205,32 @@ export const allNodes: { [key: string]: NodeType } = {
   resource_t2_3: {
     tag: "ResourceNode",
     effects: [
-    {
-      tag: "GainEffect",
-      gain: { color: "Basic", type: "Temp", amount: 3 },
-    }
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 3 },
+      },
+      {
+        tag: "GainEffect",
+        gain: { color: "Basic", type: "Temp", amount: 5 },
+      },
+      {
+        tag: "AddModifier",
+        modifier: {
+          charges: 10,
+          chargePerUse: 1,
+          maxCharges: 10,
+          fragile: true,
+          modifierEffect: {
+            tag: "NoopMod",
+          },
+        },
+        amount: 1,
+        location: "Front",
+      }
     ],
     meta: {
       id: 203,
-      name: "Basic 3",
+      name: "",
       color: 0xAAAAAA,
     }
   },
@@ -404,6 +422,32 @@ export const allNodes: { [key: string]: NodeType } = {
         },
         amount: 1,
         location: "Back",
+      }
+    ],
+    meta: {
+      id: 302,
+      name: "",
+      color: 0xAAAAAA,
+    }
+  },
+  resource_t3_3: {
+    tag: "ResourceNode",
+    effects: [
+      {
+        tag: "LoseEffect",
+        loss: { color: "Basic", type: "Both", amount: 5 },
+      },
+      {
+        tag: "GainEffect",
+        gain: { color: "Basic", type: "Temp", amount: 7 },
+      },
+      {
+        tag: "DestroyModEffect",
+        position: 0,
+      },
+      {
+        tag: "GainChargeEffect",
+        value: 5,
       }
     ],
     meta: {
