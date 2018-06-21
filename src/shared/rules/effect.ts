@@ -76,6 +76,10 @@ type AllModsFragile = {
   tag: "AllModsFragile",
 };
 
+type ConnectEffect = {
+  tag: "ConnectEffect",
+};
+
 export type NodeEffect
   = GainEffect
   | LoseEffect
@@ -92,6 +96,7 @@ export type NodeEffect
   | ConvertModsToVictory
   | SetAffinity
   | AllModsFragile
+  | ConnectEffect
   ;
 
 export function showEffect(nodeEffect: NodeEffect): string {
@@ -152,6 +157,9 @@ export function showEffect(nodeEffect: NodeEffect): string {
     }
     case "AllModsFragile": {
       return "AllModsFragile";
+    }
+    case "ConnectEffect": {
+      return "ConnectEffect";
     }
   }
 }
@@ -380,6 +388,9 @@ export function effectFunction(effect: NodeEffect):
           x => x.modifiers, x => newModifiers
         );
         return { newValues: newStepValues, newEffects: [] };
+      }
+      case "ConnectEffect": {
+        return { newValues: stepValues, newEffects: [] };
       }
     }
   };

@@ -40,6 +40,11 @@ export function addNegative(nodeType: NodeType, negativeEffects: NodeEffect[], r
   return iassign(nodeType, x => x.effects, x => [randomEffect].concat(x));
 }
 
+export function addConnect(nodeType: NodeType): NodeType {
+  const connectEffect: NodeEffect[] = [{ tag: "ConnectEffect" }];
+  return iassign(nodeType, x => x.effects, x => connectEffect.concat(x));
+}
+
 // declaration of all node types
 
 export const allNodes: { [key: string]: NodeType } = {

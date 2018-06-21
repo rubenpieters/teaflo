@@ -1,4 +1,4 @@
-import { allNodes, NodeType, addNegative } from "src/shared/nodeType";
+import { allNodes, NodeType, addConnect } from "src/shared/nodeType";
 import { Node, satisfiesFilter } from "src/shared/node";
 import { NodeEffect } from "src/shared/rules/effect";
 import { Rng, chooseSet } from "src/shared/handler/rng/randomSeedRng";
@@ -68,41 +68,41 @@ const negativeEffectsT3: NodeEffect[] = [
 ];
 
 function chooseT1(rng: Rng): NodeType {
-  return chooseSet(rng, [
+  return addConnect(chooseSet(rng, [
     allNodes.resource_t1_1,
     allNodes.resource_t1_2,
-  ]);
+  ]));
 }
 
 function chooseT1_5(rng: Rng): NodeType {
-  return chooseSet(rng, [
+  return addConnect(chooseSet(rng, [
     allNodes.resource_t1_5_1,
-  ]);
+  ]));
 }
 
 function chooseT2(rng: Rng): NodeType {
-  return chooseSet(rng, [
+  return addConnect(chooseSet(rng, [
     allNodes.resource_t2_1,
     allNodes.resource_t2_2,
     allNodes.resource_t2_3,
-  ]);
+  ]));
 }
 function chooseT3(rng: Rng): NodeType {
-  return chooseSet(rng, [
+  return addConnect(chooseSet(rng, [
     allNodes.resource_t3_1,
     allNodes.resource_t3_2,
     allNodes.resource_t3_3,
-  ]);
+  ]));
 }
 
 function chooseT4(rng: Rng): NodeType {
-  return chooseSet(rng, [
+  return addConnect(chooseSet(rng, [
     allNodes.resource_t4_1,
     allNodes.resource_t4_2,
     allNodes.resource_t4_3,
     allNodes.resource_t4_4,
     allNodes.resource_t4_5,
-  ]);
+  ]));
 }
 
 export const boardData: BoardData = [
@@ -162,14 +162,14 @@ export const boardData: BoardData = [
     ampMin: 325,
     ampMax: 375,
     quadrants: [
-      rng => { return allNodes.resource_t4_1; },
-      rng => { return allNodes.resource_t4_2; },
-      rng => { return allNodes.resource_t4_3; },
-      rng => { return allNodes.resource_t4_4; },
-      rng => { return allNodes.resource_t4_1; },
-      rng => { return allNodes.resource_t4_2; },
-      rng => { return allNodes.resource_t4_3; },
-      rng => { return allNodes.resource_t4_4; },
+      rng => { return addConnect(allNodes.resource_t4_1); },
+      rng => { return addConnect(allNodes.resource_t4_2); },
+      rng => { return addConnect(allNodes.resource_t4_3); },
+      rng => { return addConnect(allNodes.resource_t4_4); },
+      rng => { return addConnect(allNodes.resource_t4_1); },
+      rng => { return addConnect(allNodes.resource_t4_2); },
+      rng => { return addConnect(allNodes.resource_t4_3); },
+      rng => { return addConnect(allNodes.resource_t4_4); },
     ],
     amount: 1,
   }
