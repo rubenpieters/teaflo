@@ -65,19 +65,18 @@ export const allNodes: { [key: string]: NodeType } = {
         gain: { color: "Basic", type: "Temp", amount: 3 },
       },
       {
-        tag: "GainEffect",
-        gain: { color: "Stack", type: "Temp", amount: 3 },
-      },
-      {
         tag: "AddModifier",
         modifier: {
-          charges: 3,
-          chargePerUse: 1,
-          maxCharges: 3,
+          charges: 99,
+          chargePerUse: 0,
+          maxCharges: 99,
           fragile: false,
           modifierEffect: {
-            tag: "IncreaseGain",
-            value: 1,
+            tag: "EffectOnConnect",
+            effect: {
+              tag: "GainEffect",
+              gain: { color: "Stack", type: "Temp", amount: 2 },
+            },
           },
         },
         amount: 1,

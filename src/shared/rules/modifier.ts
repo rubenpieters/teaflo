@@ -1,4 +1,4 @@
-import { NodeEffect } from "src/shared/rules/effect";
+import { NodeEffect, showEffect } from "src/shared/rules/effect";
 import { ResourceColor } from "src/shared/rules/resource";
 import iassign from "immutable-assign";
 
@@ -61,6 +61,11 @@ type GainXToVictory = {
   type: ResourceColor,
 };
 
+type EffectOnConnect = {
+  tag: "EffectOnConnect",
+  effect: NodeEffect,
+};
+
 export type ModifierEffect
   = NoopMod
   | IgnoreNextConsume
@@ -73,6 +78,7 @@ export type ModifierEffect
   | DuplicateAddMod
   | LossToGain
   | GainXToVictory
+  | EffectOnConnect
   ;
 
 export function showModifier(modifier: Modifier): string {
@@ -114,6 +120,9 @@ export function showModifier(modifier: Modifier): string {
     }
     case "GainXToVictory": {
       return "Gain " + modifier.modifierEffect.minimum + " " + modifier.modifierEffect.type + " To Victory " + showCharges;
+    }
+    case "EffectOnConnect": {
+      return "EffectOnConnect" + showEffect(modifier.modifierEffect.effect) + " " + showCharges;
     }
   }
 }
@@ -272,6 +281,16 @@ export function modifierFunction(modifier: Modifier):
                 },
               };
               return { newEffects: [modifiedEffect], newModifiers: modifiersAfterUse };
+            }
+            default: {
+              return afterNoTrigger;
+            }
+          }
+        }
+        case "EffectOnConnect": {
+          switch (nodeEffect.tag) {
+            case "ConnectEffect": {
+              return { newEffects: [modifier.modifierEffect.effect], newModifiers: modifiersAfterUse };
             }
             default: {
               return afterNoTrigger;

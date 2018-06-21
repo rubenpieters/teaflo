@@ -28,7 +28,7 @@ export function verifyAndAddConnection(from: Node, to: Node, connectionId: numbe
     return { tag: "InvalidFromNode" };
   }
 
-  if (from.nodeType.tag !== "StartNode") {
+  /*if (from.nodeType.tag !== "StartNode") {
     const angleCenter: number = Math.atan2(from.y, from.x) * 180 / Math.PI;
     const angleNewLine: number = Math.atan2(to.y - from.y, to.x - from.x) * 180 / Math.PI;
     const verifyAngle = standardizeAngle(angleNewLine - angleCenter);
@@ -36,7 +36,7 @@ export function verifyAndAddConnection(from: Node, to: Node, connectionId: numbe
     if (verifyAngle > 90 || verifyAngle < -90) {
       return { tag: "InvalidAngle" };
     }
-  }
+  }*/
 
   validFromNodes.push(to.id);
   const currentConnections: Connection[] | undefined = solution[from.id];
