@@ -65,6 +65,10 @@ export const allNodes: { [key: string]: NodeType } = {
         gain: { color: "Basic", type: "Temp", amount: 3 },
       },
       {
+        tag: "GainEffect",
+        gain: { color: "Stack", type: "Temp", amount: 1 },
+      },
+      {
         tag: "AddModifier",
         modifier: {
           charges: 99,
@@ -516,9 +520,9 @@ export const allNodes: { [key: string]: NodeType } = {
       {
         tag: "AddModifier",
         modifier: {
-          charges: 1,
+          charges: 10,
           chargePerUse: 1,
-          maxCharges: 1,
+          maxCharges: 10,
           fragile: false,
           modifierEffect: {
             tag: "GainXToVictory",

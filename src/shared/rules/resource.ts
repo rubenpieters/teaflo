@@ -12,6 +12,7 @@ export const allColors: ResourceColor[] = ["Basic", "Victory", "Stack"];
 export type ResourceType
   = "Temp"
   | "Total"
+  | "Corrupted"
   ;
 
 export type ResourceUnit = {
@@ -70,14 +71,17 @@ export const emptyResourceValues: () => ResourceValues = () => {
     Basic: {
       Temp: 0,
       Total: 0,
+      Corrupted: 0,
     },
     Victory: {
       Temp: 0,
       Total: 0,
+      Corrupted: 0,
     },
     Stack: {
       Temp: 0,
       Total: 0,
+      Corrupted: 0,
     }
   };
 };

@@ -390,6 +390,15 @@ export function effectFunction(effect: NodeEffect):
         return { newValues: newStepValues, newEffects: [] };
       }
       case "ConnectEffect": {
+        let newStepValues = stepValues;
+        for (const color of allColors) {
+          let newValue = newStepValues.resources[color].Corrupted;
+          if (newValue < 0) {
+            newValue = 0;
+          }
+          newStepValues = iassign(newStepValues,
+            x => x.resources[color].Corrupted, x => newValue);
+        }
         return { newValues: stepValues, newEffects: [] };
       }
     }

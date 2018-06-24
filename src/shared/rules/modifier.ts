@@ -89,7 +89,7 @@ export function showModifier(modifier: Modifier): string {
       (modifier.fragile ? " F" : "");
   switch (modifier.modifierEffect.tag) {
     case "NoopMod": {
-      return "TODO";
+      return "Noop " + showCharges;
     }
     case "IgnoreNextConsume": {
       return "TODO";
