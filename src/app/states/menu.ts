@@ -4,7 +4,6 @@ import { ServerConnection, connectToServer, getBoard } from "src/app/network/net
 import { Node } from "src/shared/node";
 import { Board, filterBoard } from "src/shared/board";
 import { ConnectResult, Solution } from "src/shared/connectResult";
-import { verifyAndAddConnection, initVisit } from "src/shared/solution";
 import { History, Action } from "src/app/history/history";
 import { showNodeType } from "src/shared/nodeType";
 import { showModifier } from "src/shared/rules/modifier";
@@ -293,7 +292,7 @@ export default class Menu extends Phaser.State {
     stepRunMinBtn.setTextBounds(630 - 400, 575 - 300, 40, 25);
     stepRunMinBtn.inputEnabled = true;
     const minus = (x: number) => { if (x - 1 > 0) {  return x - 1; } else { return x; } };
-    stepRunMinBtn.events.onInputDown.add(stepRunAction(minus));
+    //stepRunMinBtn.events.onInputDown.add(stepRunAction(minus));
 
     // step run +1 button
 
@@ -305,7 +304,7 @@ export default class Menu extends Phaser.State {
     }, playGroup);
     stepRunBtn.setTextBounds(675 - 400, 575 - 300, 40, 25);
     stepRunBtn.inputEnabled = true;
-    stepRunBtn.events.onInputDown.add(stepRunAction(x => x + 1));
+    //stepRunBtn.events.onInputDown.add(stepRunAction(x => x + 1));
 
     // start run button
 
@@ -488,7 +487,7 @@ function nodeClick(game: Phaser.Game, node: Node) {
         const fromNode: Node = clickState.fromNode;
         const toNode: Node = node;
 
-        const connectResult: ConnectResult = verifyAndAddConnection(fromNode, toNode, connectionSprites.length, validFromNodes, solution);
+        /*const connectResult: ConnectResult = verifyAndAddConnection(fromNode, toNode, connectionSprites.length, validFromNodes, solution);
         switch (connectResult.tag)  {
           case "InvalidFromNode": {
             console.log("invalid from node");
@@ -508,7 +507,7 @@ function nodeClick(game: Phaser.Game, node: Node) {
           }
         }
 
-        clickState = { tag: "ClickStateFrom" };
+        clickState = { tag: "ClickStateFrom" };*/
         break;
       }
     }
@@ -575,7 +574,7 @@ function undoAction() {
 
 function redoAction(game: Phaser.Game) {
   return function() {
-    const [lastAction] = redoList.splice(-1, 1);
+    /*const [lastAction] = redoList.splice(-1, 1);
     if (lastAction === undefined) {
       // no redo action, do nothing
     } else {
@@ -603,22 +602,22 @@ function redoAction(game: Phaser.Game) {
       }
 
       undoList.push(lastAction);
-    }
+    }*/
   };
 }
 
 function startRunAction() {
-  const stepResult = initVisit(solution, Number.POSITIVE_INFINITY);
+  /*const stepResult = initVisit(solution, Number.POSITIVE_INFINITY);
   const xy = nodeLocation(stepResult.lastVisitedNodeId);
   if (circle !== undefined) {
     circle.position.set(xy.x, xy.y);
     circle.visible = true;
   }
-  changeShownResources({ values: stepResult.stepValues, valid: stepResult.validSolution });
+  changeShownResources({ values: stepResult.stepValues, valid: stepResult.validSolution });*/
 }
 
 function stepRunAction(f: (n: number) => number) {
-  return function() {
+  /*return function() {
     currentLimit = f (currentLimit);
     console.log("LIMIT: " + currentLimit);
     const stepResult = initVisit(solution, currentLimit);
@@ -628,7 +627,7 @@ function stepRunAction(f: (n: number) => number) {
       circle.visible = true;
     }
     changeShownResources({ values: stepResult.stepValues, valid: stepResult.validSolution });
-  };
+  };*/
 }
 
 function filterAction() {
