@@ -79,6 +79,9 @@ function solutionStep(
   const action = nextAction(index, solution);
 
   const newState = doAction(action, state);
+  if (newState === "invalid") {
+    return "invalid";
+  }
   const newIndex = nextIndex(index, solution);
 
   return { newIndex, newState };
@@ -86,7 +89,7 @@ function solutionStep(
 
 export function runSolution(
   solution: Solution,
-): GameState {
+): GameState | "invalid" {
   return _runSolution(solution, initialIndex, initialState);
 }
 
@@ -94,11 +97,15 @@ function _runSolution(
   solution: Solution,
   index: SolutionIndex | "done",
   state: GameState,
-): GameState {
+): GameState | "invalid" {
   if (index === "done") {
     return state;
   }
 
-  const { newIndex, newState } = solutionStep(index, state, solution);
+  const stepResult = solutionStep(index, state, solution);
+  if (stepResult === "invalid") {
+    return "invalid";
+  }
+  const { newIndex, newState } = stepResult;
   return _runSolution(solution, newIndex, newState);
 }

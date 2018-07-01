@@ -1,6 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import { GameState } from "src/shared/game/state";
+import { Enemy, runBattle } from "src/shared/game/enemy";
 
 export type Recruit = {
   tag: "Recruit",
@@ -9,6 +10,7 @@ export type Recruit = {
 
 export type Battle = {
   tag: "Battle",
+  enemy: Enemy,
 }
 
 export type Rest = {
@@ -28,7 +30,11 @@ export function doAction(
       return state;
     }
     case "Battle": {
-      return state;
+      const battleResult = runBattle(state.crew, action.enemy);
+      if (battleResult === "invalid") {
+        return "invalid"
+      }
+      return focus(state, set(x => x.crew, battleResult));
     }
     case "Recruit": {
       return focus(state,

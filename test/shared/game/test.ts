@@ -13,4 +13,23 @@ function basicCrewTest() {
   console.log(JSON.stringify(runSolution(solution)));
 }
 
-basicCrewTest();
+function basicBattleTest() {
+  const path1: Path = {
+    restAction: { tag: "Rest" },
+    actions: [
+      { tag: "Recruit", crew: allCrew.stFighter },
+      { tag: "Battle", enemy: { rank: 2, actions: [{
+        tag: "MeleeAttack",
+        multiplier: 1,
+        positions: [0], }] } },
+    ]
+  }
+  const solution: Solution = {
+    paths: [path1]
+  }
+
+  console.log(JSON.stringify(runSolution(solution)));
+}
+
+//basicCrewTest();
+basicBattleTest();
