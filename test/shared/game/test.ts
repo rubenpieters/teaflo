@@ -1,5 +1,6 @@
 import { Solution, Path, runSolution } from "src/shared/game/solution";
 import { allCrew } from "src/shared/game/crew";
+import { showSolutionLog } from "src/shared/game/log";
 
 function basicCrewTest() {
   const path1: Path = {
@@ -10,7 +11,14 @@ function basicCrewTest() {
     paths: [path1]
   }
 
-  console.log(JSON.stringify(runSolution(solution)));
+  const sol = runSolution(solution);
+  if (sol === "invalid") {
+    console.log("invalid");
+  } else {
+    const { state, log } = sol;
+    console.log(JSON.stringify(state));
+    console.log(showSolutionLog(log));
+  }
 }
 
 function basicBattleTest() {
@@ -28,7 +36,14 @@ function basicBattleTest() {
     paths: [path1]
   }
 
-  console.log(JSON.stringify(runSolution(solution)));
+  const sol = runSolution(solution);
+  if (sol === "invalid") {
+    console.log("invalid");
+  } else {
+    const { state, log } = sol;
+    console.log(JSON.stringify(state));
+    console.log(showSolutionLog(log));
+  }
 }
 
 //basicCrewTest();

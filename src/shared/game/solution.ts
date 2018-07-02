@@ -1,6 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Action, Recruit, Battle, Rest, doAction } from "src/shared/game/action";
 import { GameState, initialState } from "src/shared/game/state";
+import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 
 export type Path = {
   restAction: Rest,
@@ -75,37 +76,43 @@ function solutionStep(
   index: SolutionIndex,
   state: GameState,
   solution: Solution,
-) {
+): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
   const action = nextAction(index, solution);
+  const actionLog: ActionLog = {
+    action: action,
+  }
 
   const newState = doAction(action, state);
   if (newState === "invalid") {
-    return "invalid";
+    return { result: "invalid", log: actionLog };
   }
   const newIndex = nextIndex(index, solution);
 
-  return { newIndex, newState };
+  return { result: { newIndex, newState }, log: actionLog };
 }
 
 export function runSolution(
   solution: Solution,
-): GameState | "invalid" {
-  return _runSolution(solution, initialIndex, initialState);
+): { state: GameState, log: SolutionLog } | "invalid" {
+  return _runSolution(solution, initialIndex, initialState, emptySolutionLog);
 }
 
 function _runSolution(
   solution: Solution,
   index: SolutionIndex | "done",
   state: GameState,
-): GameState | "invalid" {
+  log: SolutionLog,
+): { state: GameState, log: SolutionLog } | "invalid" {
   if (index === "done") {
-    return state;
+    return { state, log };
   }
 
-  const stepResult = solutionStep(index, state, solution);
+  const solStep = solutionStep(index, state, solution);
+  const stepResult = solStep.result;
   if (stepResult === "invalid") {
     return "invalid";
   }
   const { newIndex, newState } = stepResult;
-  return _runSolution(solution, newIndex, newState);
+  const newSolutionLog = focus(log, over(x => x.actionLog, x => x.concat([solStep.log])));
+  return _runSolution(solution, newIndex, newState, newSolutionLog);
 }
