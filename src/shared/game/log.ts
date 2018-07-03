@@ -15,19 +15,42 @@ export function showSolutionLog(solutionLog: SolutionLog): string {
 }
 
 export type ActionLog = {
-  action: Action | Rest,
+  action: (Action | Rest),
+  loggedEffects: (Action | Rest)[],
 }
 
 function showActionLog(actionLog: ActionLog): string {
-  switch (actionLog.action.tag) {
+  return showAction(actionLog.action) + "\n" + actionLog.loggedEffects.map(a => " - " + showAction(a)).join("\n");
+}
+
+function showAction(action: Action | Rest): string {
+  switch (action.tag) {
     case "Battle": {
-      return "-- Battle"
+      return "Battle";
     }
     case "Recruit": {
-      return "-- Recruit"
+      return "Recruit";
     }
     case "Rest": {
-      return "-- Rest"
+      return "Rest";
+    }
+    case "Damage": {
+      return "Damage";
+    }
+    case "BattleTurn": {
+      return "BattleTurn - " + action.turn;
     }
   }
 }
+
+type EnemyDamage = {
+  tag: "EnemyDamage",
+}
+
+type AllyDamage = {
+  tag: "AllyDamage",
+}
+
+export type LoggedEffect
+  = EnemyDamage
+  | AllyDamage

@@ -1,6 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
-import { Effect, applyEffect } from "src/shared/game/effect";
+import { GameState } from "src/shared/game/state";
+import { Action, Rest, BattleTurn, doAction } from "src/shared/game/action";
 
 export type Enemy = {
   rank: number,
@@ -22,11 +23,20 @@ export type EnemyAttack
   | Heal
 
 function battleStep(
-  crew: Crew[],
+  state: GameState,
   enemy: Enemy,
   turn: number,
-) {
-  const fighter: Crew | undefined = crew[0];
+): { result: { newState: GameState, newEnemy: Enemy } | "invalid", log: (Action | Rest)[] } {
+  // do BattleTurn action
+  const battleTurn: BattleTurn = { tag: "BattleTurn", turn };
+  const afterTurnResult = doAction(battleTurn, state);
+  if (afterTurnResult.newState === "invalid") {
+    return { result: "invalid", log: [battleTurn] };
+  }
+
+  state = afterTurnResult.newState;
+
+  const fighter: Crew | undefined = state.crew[0];
   const fighterAtk = fighter === undefined ? 0 : fighter.ap;
   const newEnemy: Enemy = focus(enemy, over(x => x.rank, x => x - fighterAtk));
 
@@ -40,44 +50,44 @@ function battleStep(
   switch (enemyAction.tag) {
     case "MeleeAttack": {
       const atkValue: number = enemy.rank * enemyAction.multiplier;
-      const effect: Effect = {
+      const action: Action = {
         tag: "Damage",
         positions: enemyAction.positions,
         value: atkValue,
       }
-      const effectResult = applyEffect(effect, crew);
-      if (effectResult === "invalid") {
-        return "invalid";
+      const effectResult = doAction(action, state);
+      if (effectResult.newState === "invalid") {
+        return { result: "invalid", log: [battleTurn, action] };
       } else {
-        return { newCrew: effectResult, newEnemy };
+        return { result: { newState: effectResult.newState, newEnemy }, log: [battleTurn, action] };
       }
     }
     case "Heal": {
-      return { newCrew: crew, newEnemy };
+      return { result: { newState: state, newEnemy }, log: [] };
     }
   }
 }
 
 export function runBattle(
-  crew: Crew[],
+  state: GameState,
   enemy: Enemy,
 ) {
-  return _runBattle(crew, enemy, 0);
+  return _runBattle(state, enemy, 0);
 }
 
 export function _runBattle(
-  crew: Crew[],
+  state: GameState,
   enemy: Enemy,
   turn: number,
-): Crew[] | "invalid" {
-  const battleResult = battleStep(crew, enemy, turn);
-  if (battleResult === "invalid") {
-    return "invalid"
-  } else if (battleResult.newEnemy.rank < 0) {
-    return battleResult.newCrew;
+): { newState: GameState | "invalid", log: (Action | Rest)[] } {
+  const { result, log } = battleStep(state, enemy, turn);
+  if (result === "invalid") {
+    return { newState: "invalid", log }
+  } else if (result.newEnemy.rank < 0) {
+    return { newState: result.newState, log };
   } else {
-    const { newCrew, newEnemy } = battleResult
+    const { newState, newEnemy } = result
 
-    return _runBattle(newCrew, newEnemy, turn + 1);
+    return _runBattle(newState, newEnemy, turn + 1);
   }
 }

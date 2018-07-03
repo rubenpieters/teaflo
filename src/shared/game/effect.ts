@@ -11,19 +11,24 @@ type Gain = {
   tag: "Gain",
 }
 
+type Recruit = {
+  tag: "Recruit",
+  crew: Crew,
+}
+
 export type Effect
   = Damage
   | Gain
+  | Recruit
 
+/*
 export function applyEffect(
   effect: Effect,
   crew: Crew[],
 ): Crew[] | "invalid" {
-  /* crew interactions with effects
-  for (const ally of crew) {
-
-  }
-  */
+  // for (const ally of crew) {
+  // 
+  // }
 
   switch (effect.tag) {
     case "Gain": {
@@ -42,5 +47,11 @@ export function applyEffect(
       }
       return resultCrew;
     }
+    case "Recruit": {
+      const newState = focus(state,
+        over(x => x.crew, x => [action.crew].concat(x))
+      );
+      return { newState, log: [] };
+    }
   }
-}
+}*/

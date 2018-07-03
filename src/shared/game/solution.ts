@@ -78,17 +78,18 @@ function solutionStep(
   solution: Solution,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
   const action = nextAction(index, solution);
+  const actionResult = doAction(action, state);
   const actionLog: ActionLog = {
     action: action,
+    loggedEffects: actionResult.log,
   }
 
-  const newState = doAction(action, state);
-  if (newState === "invalid") {
+  if (actionResult.newState === "invalid") {
     return { result: "invalid", log: actionLog };
   }
   const newIndex = nextIndex(index, solution);
 
-  return { result: { newIndex, newState }, log: actionLog };
+  return { result: { newIndex, newState: actionResult.newState }, log: actionLog };
 }
 
 export function runSolution(
