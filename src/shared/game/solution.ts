@@ -78,7 +78,7 @@ function solutionStep(
   solution: Solution,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
   const action = nextAction(index, solution);
-  const actionResult = doAction(action, state, []);
+  const actionResult = doAction(action, state, [], 0);
   const actionLog: ActionLog = {
     action: action,
     loggedEffects: actionResult.newLog,

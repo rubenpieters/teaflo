@@ -23,6 +23,18 @@ export type Damage = {
   value: number,
 }
 
+export type GainHP = {
+  tag: "GainHP",
+  target: "self",
+  value: number,
+}
+
+export type GainAP = {
+  tag: "GainAP",
+  target: "self",
+  value: number,
+}
+
 export type BattleTurn = {
   tag: "BattleTurn",
   turn: number,
@@ -33,26 +45,41 @@ export type Action
   | Battle
   | Damage
   | BattleTurn
+  | GainHP
+  | GainAP
 
 export function doAction(
   action: Action | Rest,
   state: GameState,
   log: (Action | Rest)[],
+  from: number,
 ): { newState: GameState | "invalid", newLog: (Action | Rest)[] } {
-  /* crew interactions with effects
-  for (const ally of crew) {
+  let newState: GameState = state;
+  let newLog: (Action | Rest)[] = log;
 
+  // crew interactions with effects
+  for (const ally of state.crew.slice(from)) {
+    for (const trigger of ally.triggers) {
+      if (trigger.onTag === action.tag && trigger.type === "before") {
+        const afterTrigger = doAction(trigger.action, newState, newLog, from + 1);
+        if (afterTrigger.newState === "invalid") {
+          return { newState: "invalid", newLog };
+        }
+        newState = afterTrigger.newState;
+        newLog = afterTrigger.newLog;
+      }
+    }
   }
-  */
-  const afterEffectLog = log.concat([action])
+  
+  const afterEffectLog = newLog.concat([action])
   switch (action.tag) {
     case "Rest": {
-      return { newState: state, newLog: afterEffectLog };
+      return { newState, newLog: afterEffectLog };
     }
     case "Damage": {
-      let resultCrew: Crew[] = state.crew;
+      let resultCrew: Crew[] = newState.crew;
       for (const position in action.positions) {
-        const allyAtPos: Crew | undefined = state.crew[position];
+        const allyAtPos: Crew | undefined = newState.crew[position];
         if (allyAtPos === undefined) {
           return { newState: "invalid", newLog: afterEffectLog }
         }
@@ -60,24 +87,30 @@ export function doAction(
           over(x => x[position].hp, x => x - action.value)
         )
       }
-      const newState = focus(state, set(x => x.crew, resultCrew));
+      newState = focus(newState, set(x => x.crew, resultCrew));
       return { newState, newLog: afterEffectLog };
     }
     case "Battle": {
-      const { newState, newLog } = runBattle(state, action.enemy, afterEffectLog);
-      if (newState === "invalid") {
-        return { newState: "invalid", newLog }
+      const afterBattle = runBattle(newState, action.enemy, afterEffectLog);
+      if (afterBattle.newState === "invalid") {
+        return { newState: "invalid", newLog: afterBattle.newLog };
       }
-      return { newState, newLog: newLog.concat(log) }
+      return { newState: afterBattle.newState, newLog: afterBattle.newLog };
     }
     case "Recruit": {
-      const newState = focus(state,
+      newState = focus(newState,
         over(x => x.crew, x => [action.crew].concat(x))
       );
       return { newState, newLog: afterEffectLog };
     }
     case "BattleTurn": {
-      return { newState: state, newLog: afterEffectLog };
+      return { newState, newLog: afterEffectLog };
+    }
+    case "GainHP": {
+      return { newState, newLog: afterEffectLog };
+    }
+    case "GainAP": {
+      return { newState, newLog: afterEffectLog };
     }
   }
 }
