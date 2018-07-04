@@ -78,10 +78,10 @@ function solutionStep(
   solution: Solution,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
   const action = nextAction(index, solution);
-  const actionResult = doAction(action, state);
+  const actionResult = doAction(action, state, []);
   const actionLog: ActionLog = {
     action: action,
-    loggedEffects: actionResult.log,
+    loggedEffects: actionResult.newLog,
   }
 
   if (actionResult.newState === "invalid") {

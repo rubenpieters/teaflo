@@ -26,12 +26,13 @@ function battleStep(
   state: GameState,
   enemy: Enemy,
   turn: number,
-): { result: { newState: GameState, newEnemy: Enemy } | "invalid", log: (Action | Rest)[] } {
+  log: (Action | Rest)[],
+): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: (Action | Rest)[] } {
   // do BattleTurn action
   const battleTurn: BattleTurn = { tag: "BattleTurn", turn };
-  const afterTurnResult = doAction(battleTurn, state);
+  const afterTurnResult = doAction(battleTurn, state, log);
   if (afterTurnResult.newState === "invalid") {
-    return { result: "invalid", log: [battleTurn] };
+    return { result: "invalid", newLog: afterTurnResult.newLog };
   }
 
   state = afterTurnResult.newState;
@@ -55,15 +56,15 @@ function battleStep(
         positions: enemyAction.positions,
         value: atkValue,
       }
-      const effectResult = doAction(action, state);
+      const effectResult = doAction(action, state, afterTurnResult.newLog);
       if (effectResult.newState === "invalid") {
-        return { result: "invalid", log: [battleTurn, action] };
+        return { result: "invalid", newLog: effectResult.newLog };
       } else {
-        return { result: { newState: effectResult.newState, newEnemy }, log: [battleTurn, action] };
+        return { result: { newState: effectResult.newState, newEnemy }, newLog: effectResult.newLog };
       }
     }
     case "Heal": {
-      return { result: { newState: state, newEnemy }, log: [] };
+      return { result: { newState: state, newEnemy }, newLog: log };
     }
   }
 }
@@ -71,23 +72,25 @@ function battleStep(
 export function runBattle(
   state: GameState,
   enemy: Enemy,
+  log: (Action | Rest)[],
 ) {
-  return _runBattle(state, enemy, 0);
+  return _runBattle(state, enemy, 0, log);
 }
 
 export function _runBattle(
   state: GameState,
   enemy: Enemy,
   turn: number,
-): { newState: GameState | "invalid", log: (Action | Rest)[] } {
-  const { result, log } = battleStep(state, enemy, turn);
+  log: (Action | Rest)[],
+): { newState: GameState | "invalid", newLog: (Action | Rest)[] } {
+  const { result, newLog } = battleStep(state, enemy, turn, log);
   if (result === "invalid") {
-    return { newState: "invalid", log }
+    return { newState: "invalid", newLog }
   } else if (result.newEnemy.rank < 0) {
-    return { newState: result.newState, log };
+    return { newState: result.newState, newLog };
   } else {
     const { newState, newEnemy } = result
 
-    return _runBattle(newState, newEnemy, turn + 1);
+    return _runBattle(newState, newEnemy, turn + 1, newLog);
   }
 }

@@ -2,7 +2,6 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import { GameState } from "src/shared/game/state";
 import { Enemy, runBattle } from "src/shared/game/enemy";
-import { LoggedEffect } from "./log";
 
 export type Recruit = {
   tag: "Recruit",
@@ -38,47 +37,47 @@ export type Action
 export function doAction(
   action: Action | Rest,
   state: GameState,
-): { newState: GameState | "invalid", log: (Action | Rest)[] } {
+  log: (Action | Rest)[],
+): { newState: GameState | "invalid", newLog: (Action | Rest)[] } {
   /* crew interactions with effects
   for (const ally of crew) {
 
   }
   */
-
+  const afterEffectLog = log.concat([action])
   switch (action.tag) {
     case "Rest": {
-      return { newState: state, log: [action] };
+      return { newState: state, newLog: afterEffectLog };
     }
     case "Damage": {
       let resultCrew: Crew[] = state.crew;
       for (const position in action.positions) {
         const allyAtPos: Crew | undefined = state.crew[position];
         if (allyAtPos === undefined) {
-          return { newState: "invalid", log: [action] }
+          return { newState: "invalid", newLog: afterEffectLog }
         }
         resultCrew = focus(resultCrew,
           over(x => x[position].hp, x => x - action.value)
         )
       }
       const newState = focus(state, set(x => x.crew, resultCrew));
-      return { newState: state, log: [action] };
+      return { newState, newLog: afterEffectLog };
     }
     case "Battle": {
-      const { newState, log } = runBattle(state, action.enemy);
-      const l: (Action | Rest)[] = [action];
+      const { newState, newLog } = runBattle(state, action.enemy, afterEffectLog);
       if (newState === "invalid") {
-        return { newState: "invalid", log: l.concat(log) }
+        return { newState: "invalid", newLog }
       }
-      return { newState , log: l.concat(log) };
+      return { newState, newLog: newLog.concat(log) }
     }
     case "Recruit": {
       const newState = focus(state,
         over(x => x.crew, x => [action.crew].concat(x))
       );
-      return { newState, log: [action] };
+      return { newState, newLog: afterEffectLog };
     }
     case "BattleTurn": {
-      return { newState: state, log: [action] };
+      return { newState: state, newLog: afterEffectLog };
     }
   }
 }
