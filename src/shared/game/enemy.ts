@@ -1,7 +1,8 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import { GameState } from "src/shared/game/state";
-import { Action, Rest, BattleTurn, doAction } from "src/shared/game/action";
+import { ActionRest, Action, BattleTurn, doAction } from "src/shared/game/action";
+import { Target } from "src/shared/game/target";
 
 export type Enemy = {
   rank: number,
@@ -26,8 +27,8 @@ function battleStep(
   state: GameState,
   enemy: Enemy,
   turn: number,
-  log: (Action | Rest)[],
-): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: (Action | Rest)[] } {
+  log: ActionRest[],
+): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionRest[] } {
   // do BattleTurn action
   const battleTurn: BattleTurn = { tag: "BattleTurn", turn };
   const afterTurnResult = doAction(battleTurn, state, log, 0);
@@ -51,7 +52,7 @@ function battleStep(
   switch (enemyAction.tag) {
     case "MeleeAttack": {
       const atkValue: number = enemy.rank * enemyAction.multiplier;
-      const action: Action = {
+      const action: Action<Target> = {
         tag: "Damage",
         positions: enemyAction.positions,
         value: atkValue,
@@ -72,7 +73,7 @@ function battleStep(
 export function runBattle(
   state: GameState,
   enemy: Enemy,
-  log: (Action | Rest)[],
+  log: ActionRest[],
 ) {
   return _runBattle(state, enemy, 0, log);
 }
@@ -81,8 +82,8 @@ export function _runBattle(
   state: GameState,
   enemy: Enemy,
   turn: number,
-  log: (Action | Rest)[],
-): { newState: GameState | "invalid", newLog: (Action | Rest)[] } {
+  log: ActionRest[],
+): { newState: GameState | "invalid", newLog: ActionRest[] } {
   const { result, newLog } = battleStep(state, enemy, turn, log);
   if (result === "invalid") {
     return { newState: "invalid", newLog }

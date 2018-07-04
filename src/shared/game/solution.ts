@@ -1,11 +1,12 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Action, Recruit, Battle, Rest, doAction } from "src/shared/game/action";
+import { Action, ActionRest, Recruit, Battle, Rest, doAction } from "src/shared/game/action";
 import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
+import { Target } from "src/shared/game/target";
 
 export type Path = {
   restAction: Rest,
-  actions: Action[]
+  actions: Action<Target>[]
 }
 export type Solution = {
   paths: Path[]
@@ -25,7 +26,7 @@ const initialIndex: SolutionIndex = {
 function nextAction(
   index: SolutionIndex,
   solution: Solution
-): Action | Rest {
+): ActionRest {
   const path: Path | undefined = solution.paths[index.path];
   if (path === undefined) {
     throw ("invalid index: " + index)
@@ -33,7 +34,7 @@ function nextAction(
     if (index.action === "rest") {
       return path.restAction;
     } else {
-      const action: Action | undefined = path.actions[index.action];
+      const action: Action<Target> | undefined = path.actions[index.action];
       if (action === undefined) {
         throw ("invalid index: " + index)
       } else {

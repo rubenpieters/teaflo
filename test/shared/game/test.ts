@@ -5,7 +5,10 @@ import { showSolutionLog } from "src/shared/game/log";
 function basicCrewTest() {
   const path1: Path = {
     restAction: { tag: "Rest" },
-    actions: [{ tag: "Recruit", crew: allCrew.stFighter }]
+    actions: [
+      { tag: "Recruit", crew: allCrew.recruitGrow1 },
+      { tag: "Recruit", crew: allCrew.stFighter },
+    ]
   }
   const solution: Solution = {
     paths: [path1]
@@ -46,5 +49,5 @@ function basicBattleTest() {
   }
 }
 
-//basicCrewTest();
-basicBattleTest();
+basicCrewTest();
+//basicBattleTest();
