@@ -1,8 +1,8 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
-import { GameState } from "src/shared/game/state";
+import { GameState, IdCrew } from "src/shared/game/state";
 import { Enemy, runBattle } from "src/shared/game/enemy";
-import { Target, findTarget } from "src/shared/game/target";
+import { Target, findTarget, onTargets } from "src/shared/game/target";
 
 export type Recruit = {
   tag: "Recruit",
@@ -59,18 +59,10 @@ function fmap<A,B>(
     case "Damage": return action
     case "BattleTurn": return action
     case "GainHP": {
-      return {
-        tag: "GainHP",
-        target: f(action.target),
-        value: action.value,
-      }
+      return {...action, ...{ target: f(action.target)}};
     }
     case "GainAP": {
-      return {
-        tag: "GainAP",
-        target: f(action.target),
-        value: action.value,
-      }
+      return {...action, ...{ target: f(action.target)}};
     }
   }
 }
@@ -90,7 +82,7 @@ export function doAction(
   for (const ally of state.crew.slice(from)) {
     for (const trigger of ally.triggers) {
       if (trigger.onTag === action.tag && trigger.type === "before") {
-        const action = fmap(findTarget, trigger.action);
+        const action = fmap(x => findTarget(x, ally.id), trigger.action);
         const afterTrigger = doAction(action, newState, newLog, from + 1);
         if (afterTrigger.newState === "invalid") {
           return { newState: "invalid", newLog };
@@ -107,9 +99,9 @@ export function doAction(
       return { newState, newLog: afterEffectLog };
     }
     case "Damage": {
-      let resultCrew: Crew[] = newState.crew;
+      let resultCrew: IdCrew[] = newState.crew;
       for (const position in action.positions) {
-        const allyAtPos: Crew | undefined = newState.crew[position];
+        const allyAtPos: IdCrew | undefined = newState.crew[position];
         if (allyAtPos === undefined) {
           return { newState: "invalid", newLog: afterEffectLog }
         }
@@ -128,8 +120,10 @@ export function doAction(
       return { newState: afterBattle.newState, newLog: afterBattle.newLog };
     }
     case "Recruit": {
+      const id = 1; // TODO: generate new id
+      const idCrew = {...action.crew, ...{ id }}
       newState = focus(newState,
-        over(x => x.crew, x => [action.crew].concat(x))
+        over(x => x.crew, x => [idCrew].concat(x))
       );
       return { newState, newLog: afterEffectLog };
     }
@@ -137,15 +131,13 @@ export function doAction(
       return { newState, newLog: afterEffectLog };
     }
     case "GainHP": {
-      newState = focus(newState,
-        over(x => x.crew, x => x.map(v => focus(v, over(v => v.hp, v => v + action.value))))
-      );
+      const addHP = (c: IdCrew) => focus(c, over(x => x.hp, x => x + action.value));
+      newState = onTargets(action.target, addHP, newState);
       return { newState, newLog: afterEffectLog };
     }
     case "GainAP": {
-      newState = focus(newState,
-        over(x => x.crew, x => x.map(v => focus(v, over(v => v.ap, v => v + action.value))))
-      );
+      const addAP = (c: IdCrew) => focus(c, over(x => x.hp, x => x + action.value));
+      newState = onTargets(action.target, addAP, newState);
       return { newState, newLog: afterEffectLog };
     }
   }

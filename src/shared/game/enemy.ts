@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
-import { GameState } from "src/shared/game/state";
+import { GameState, IdCrew } from "src/shared/game/state";
 import { ActionRest, Action, BattleTurn, doAction } from "src/shared/game/action";
 import { Target } from "src/shared/game/target";
 
@@ -38,7 +38,7 @@ function battleStep(
 
   state = afterTurnResult.newState;
 
-  const fighter: Crew | undefined = state.crew[0];
+  const fighter: IdCrew | undefined = state.crew[0];
   const fighterAtk = fighter === undefined ? 0 : fighter.ap;
   const newEnemy: Enemy = focus(enemy, over(x => x.rank, x => x - fighterAtk));
 
