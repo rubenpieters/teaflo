@@ -2,6 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { Enemy, runBattle } from "src/shared/game/enemy";
+import { Generator } from "src/shared/handler/id/generator";
 import { Target, findTarget, onTargets } from "src/shared/game/target";
 
 export type Recruit = {
@@ -74,6 +75,7 @@ export function doAction(
   state: GameState,
   log: ActionRest[],
   from: number,
+  idGen: Generator,
 ): { newState: GameState | "invalid", newLog: ActionRest[] } {
   let newState: GameState = state;
   let newLog: ActionRest[] = log;
@@ -83,7 +85,7 @@ export function doAction(
     for (const trigger of ally.triggers) {
       if (trigger.onTag === action.tag && trigger.type === "before") {
         const action = fmap(x => findTarget(x, ally.id), trigger.action);
-        const afterTrigger = doAction(action, newState, newLog, from + 1);
+        const afterTrigger = doAction(action, newState, newLog, from + 1, idGen);
         if (afterTrigger.newState === "invalid") {
           return { newState: "invalid", newLog };
         }
@@ -120,7 +122,7 @@ export function doAction(
       return { newState: afterBattle.newState, newLog: afterBattle.newLog };
     }
     case "Recruit": {
-      const id = 1; // TODO: generate new id
+      const id = idGen.newId();
       const idCrew = {...action.crew, ...{ id }}
       newState = focus(newState,
         over(x => x.crew, x => [idCrew].concat(x))
@@ -136,7 +138,7 @@ export function doAction(
       return { newState, newLog: afterEffectLog };
     }
     case "GainAP": {
-      const addAP = (c: IdCrew) => focus(c, over(x => x.hp, x => x + action.value));
+      const addAP = (c: IdCrew) => focus(c, over(x => x.ap, x => x + action.value));
       newState = onTargets(action.target, addAP, newState);
       return { newState, newLog: afterEffectLog };
     }

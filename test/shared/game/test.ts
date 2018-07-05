@@ -8,6 +8,7 @@ function basicCrewTest() {
     actions: [
       { tag: "Recruit", crew: allCrew.recruitGrow1 },
       { tag: "Recruit", crew: allCrew.stFighter },
+      { tag: "Recruit", crew: allCrew.stFighter },
     ]
   }
   const solution: Solution = {

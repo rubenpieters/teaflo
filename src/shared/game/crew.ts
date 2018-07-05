@@ -22,7 +22,17 @@ const recruitGrow1: Crew = {
       type: "before",
       action: {
         tag: "GainHP",
-        target: { tag: "AllCrew" },
+        target: { tag: "Self" },
+        value: 1,
+      },
+    },
+    
+    {
+      onTag: "Recruit",
+      type: "before",
+      action: {
+        tag: "GainAP",
+        target: { tag: "Self" },
         value: 1,
       },
     }

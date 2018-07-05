@@ -50,8 +50,39 @@ export function onTargets(
   f: (crew: IdCrew) => IdCrew,
   state: GameState,
 ): GameState {
-  const newState: GameState = focus(state,
-    over(x => x.crew, x => x.map(f))
-  );
-  return newState;
+  switch (target.tag) {
+    case "TargetId": {
+      const targetIndex = indexOfId(target.id, state.crew);
+      if (targetIndex === "notFound") {
+        return state;
+      } else {
+        return focus(state,
+          over(x => x.crew[targetIndex], f)
+        );
+      }
+    }
+    case "AllCrew": {
+      const newState: GameState = focus(state,
+        over(x => x.crew, x => x.map(f))
+      );
+      return newState;
+    }
+    case "Positions": {
+      return state;
+    }
+  }
+}
+
+function indexOfId(
+  id: number,
+  crew: IdCrew[],
+) {
+  let index: number = 0;
+  for (const ally of crew) {
+    if (ally.id === id) {
+      return index;
+    }
+    index += 1;
+  }
+  return "notFound"
 }

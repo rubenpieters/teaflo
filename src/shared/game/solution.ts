@@ -3,6 +3,7 @@ import { Action, ActionRest, Recruit, Battle, Rest, doAction } from "src/shared/
 import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Target } from "src/shared/game/target";
+import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
 
 export type Path = {
   restAction: Rest,
@@ -77,9 +78,10 @@ function solutionStep(
   index: SolutionIndex,
   state: GameState,
   solution: Solution,
+  idGen: Generator,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
   const action = nextAction(index, solution);
-  const actionResult = doAction(action, state, [], 0);
+  const actionResult = doAction(action, state, [], 0, idGen);
   const actionLog: ActionLog = {
     action: action,
     loggedEffects: actionResult.newLog,
@@ -96,7 +98,7 @@ function solutionStep(
 export function runSolution(
   solution: Solution,
 ): { state: GameState, log: SolutionLog } | "invalid" {
-  return _runSolution(solution, initialIndex, initialState, emptySolutionLog);
+  return _runSolution(solution, initialIndex, initialState, emptySolutionLog, plusOneGenerator());
 }
 
 function _runSolution(
@@ -104,17 +106,18 @@ function _runSolution(
   index: SolutionIndex | "done",
   state: GameState,
   log: SolutionLog,
+  idGen: Generator,
 ): { state: GameState, log: SolutionLog } | "invalid" {
   if (index === "done") {
     return { state, log };
   }
 
-  const solStep = solutionStep(index, state, solution);
+  const solStep = solutionStep(index, state, solution, idGen);
   const stepResult = solStep.result;
   if (stepResult === "invalid") {
     return "invalid";
   }
   const { newIndex, newState } = stepResult;
   const newSolutionLog = focus(log, over(x => x.actionLog, x => x.concat([solStep.log])));
-  return _runSolution(solution, newIndex, newState, newSolutionLog);
+  return _runSolution(solution, newIndex, newState, newSolutionLog, idGen);
 }
