@@ -125,7 +125,7 @@ export function doAction(
       const id = idGen.newId();
       const idCrew = {...action.crew, ...{ id }}
       newState = focus(newState,
-        over(x => x.crew, x => [idCrew].concat(x))
+        over(x => x.crew, x => x.concat([idCrew]))
       );
       return { newState, newLog: afterEffectLog };
     }

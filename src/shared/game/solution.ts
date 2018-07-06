@@ -5,23 +5,26 @@ import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Target } from "src/shared/game/target";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
 
+export type Card = Action<Target>[];
+
 export type Path = {
   restAction: Rest,
-  actions: Action<Target>[]
+  cards: Card[]
 }
 export type Solution = {
   paths: Path[]
 }
 
-
-type SolutionIndex = {
+export type SolutionIndex = {
   path: number,
-  action: "rest" | number,
+  card: "rest" | number,
+  action: number,
 }
 
-const initialIndex: SolutionIndex = {
+export const initialIndex: SolutionIndex = {
   path: 0,
-  action: "rest",
+  card: "rest",
+  action: 0,
 }
 
 function nextAction(
@@ -31,46 +34,58 @@ function nextAction(
   const path: Path | undefined = solution.paths[index.path];
   if (path === undefined) {
     throw ("invalid index: " + index)
-  } else {
-    if (index.action === "rest") {
-      return path.restAction;
-    } else {
-      const action: Action<Target> | undefined = path.actions[index.action];
-      if (action === undefined) {
-        throw ("invalid index: " + index)
-      } else {
-        return action;
-      }
-    }
   }
+  if (index.card === "rest") {
+    return path.restAction;
+  }
+  const card: Card | undefined = path.cards[index.card];
+  if (card === undefined) {
+    throw ("invalid index: " + index)
+  }
+  const action: Action<Target> | undefined = card[index.card];
+  if (action === undefined) {
+    throw ("invalid index " + index);
+  }
+  return action;
 }
 
-function nextIndex(
+export function nextIndex(
   index: SolutionIndex,
   solution: Solution,
 ): SolutionIndex | "done" {
-  let newAction: "rest" | number;
-  if (index.action === "rest") {
+  let newPath: number = index.path;
+  let newCard: "rest" | number = index.card;
+  let newAction: number = index.action;
+
+  if (newCard === "rest") {
+    newCard = 0;
     newAction = 0;
   } else {
-    newAction = index.action + 1;
+    newAction += 1;
   }
-  const path: Path | undefined = solution.paths[index.path];
-  if (path === undefined) {
-    throw ("invalid index: " + index)
+
+  if (newAction < solution.paths[newPath].cards[newCard].length) {
+    return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
+  }
+
+  newCard += 1;
+  newAction = 0;
+
+  if (
+    newCard < solution.paths[newPath].cards.length &&
+    newAction < solution.paths[newPath].cards[newCard].length
+  ) {
+    return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
+  }
+
+  newPath += 1;
+  newCard = "rest"
+  newAction = 0;
+
+  if (newPath < solution.paths.length) {
+    return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
   } else {
-    if (newAction < path.actions.length) {
-      return focus(index, set(x => x.action, newAction));
-    } else {
-      if (index.path === solution.paths.length - 1) {
-        return "done";
-      } else {
-        return focus(index,
-          set(x => x.action, "rest"),
-          over(x => x.path, x => x + 1),
-        );
-      }
-    }
+    return "done";
   }
 }
 
