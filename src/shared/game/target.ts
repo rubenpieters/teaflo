@@ -73,7 +73,7 @@ export function onTargets(
   }
 }
 
-function indexOfId(
+export function indexOfId(
   id: number,
   crew: IdCrew[],
 ) {

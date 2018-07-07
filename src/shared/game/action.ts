@@ -3,7 +3,7 @@ import { Crew } from "src/shared/game/crew";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { Enemy, runBattle } from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, findTarget, onTargets } from "src/shared/game/target";
+import { Target, findTarget, onTargets, indexOfId } from "src/shared/game/target";
 
 export type Recruit = {
   tag: "Recruit",
@@ -47,6 +47,11 @@ export type GainGold = {
   gain: number,
 }
 
+export type Death<T> = {
+  tag: "Death",
+  targetId: number,
+}
+
 export type Action<T>
   = Recruit
   | Battle
@@ -55,6 +60,7 @@ export type Action<T>
   | GainHP<T>
   | GainAP<T>
   | GainGold
+  | Death<T>
 
 function fmap<A,B>(
   f: (a: A) => B,
@@ -68,6 +74,7 @@ function fmap<A,B>(
     case "GainHP": return {...action, ...{ target: f(action.target)}};
     case "GainAP":return {...action, ...{ target: f(action.target)}};
     case "GainGold": return action;
+    case "Death": return {...action, ...{ target: f(action.target)}};
   }
 }
 
@@ -148,6 +155,15 @@ export function doAction(
     case "GainGold": {
       newState = focus(newState, over(x => x.gold, x => x + action.gain));
       return { newState, newLog: afterEffectLog };
+    }
+    case "Death": {
+      const index = indexOfId(action.targetId, newState.crew);
+      if (index === "notFound") {
+        throw ("index " + index + " not found");
+      } else {
+        newState = focus(newState, set(x => x.crew, newState.crew.slice(0,index).concat(newState.crew.slice(index + 1))));
+        return { newState, newLog: afterEffectLog };
+      }
     }
   }
 }

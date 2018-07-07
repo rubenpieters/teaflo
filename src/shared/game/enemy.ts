@@ -43,7 +43,6 @@ function battleStep(
 
 
   const meleeCrew: IdCrew | undefined = state.crew[0];
-  console.log(JSON.stringify(meleeCrew));
   let newEnemy: Enemy = meleeCrew === undefined ? enemy : doAttack(meleeCrew, enemy);
 
   newEnemy = state.crew.slice(1).reduce((acc, crew) => {
@@ -53,7 +52,6 @@ function battleStep(
       return acc
     }
   }, newEnemy);
-  console.log(JSON.stringify(newEnemy));
 
   const actionIndex = turn % enemy.actions.length;
   const enemyAction: EnemyAttack | undefined = enemy.actions[actionIndex]
@@ -62,6 +60,8 @@ function battleStep(
     throw ("invalid actionIndex " + actionIndex);
   }
 
+  let battleResult: { result: { newState: GameState, newEnemy: Enemy }, newLog: ActionRest[] }
+    = undefined;
   switch (enemyAction.tag) {
     case "MeleeAttack": {
       const atkValue: number = enemy.rank * enemyAction.multiplier;
@@ -74,13 +74,34 @@ function battleStep(
       if (effectResult.newState === "invalid") {
         return { result: "invalid", newLog: effectResult.newLog };
       } else {
-        return { result: { newState: effectResult.newState, newEnemy }, newLog: effectResult.newLog };
+        battleResult = { result: { newState: effectResult.newState, newEnemy }, newLog: effectResult.newLog };
       }
+      break;
     }
     case "Heal": {
-      return { result: { newState: state, newEnemy }, newLog: log };
+      battleResult = { result: { newState: state, newEnemy }, newLog: log };
+      break;
     }
   }
+
+  // handle dead crew
+  // TODO: move this to after doAction?
+  for (const ally of battleResult.result.newState.crew) {
+    if (ally.hp <= 0) {
+      const afterDeath = doAction({ tag: "Death", targetId: ally.id },
+        battleResult.result.newState,
+        battleResult.newLog,
+        0,
+        idGen
+      )
+      battleResult = focus(battleResult,
+        set(x => x.result.newState, afterDeath.newState),
+        set(x => x.newLog, afterDeath.newLog)
+      );
+    }
+  }
+
+  return battleResult;
 }
 
 export function runBattle(

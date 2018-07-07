@@ -49,6 +49,9 @@ function showAction(action: ActionRest): string {
     case "GainGold": {
       return "GainGold " + action.gain;
     }
+    case "Death": {
+      return "Death "  + action.targetId;
+    }
   }
 }
 
