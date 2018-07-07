@@ -9,8 +9,10 @@ export type IdCrew = Crew & Id;
 
 export type GameState = {
   crew: IdCrew[],
+  gold: number,
 };
 
 export const initialState: GameState = {
   crew: [],
+  gold: 0,
 };

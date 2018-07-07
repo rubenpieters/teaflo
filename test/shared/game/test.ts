@@ -33,10 +33,13 @@ function basicBattleTest() {
     restAction: { tag: "Rest" },
     cards: [
       [{ tag: "Recruit", crew: allCrew.stFighter }],
+      [{ tag: "Recruit", crew: allCrew.stRanged }],
       [{ tag: "Battle", enemy: { rank: 2, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
-        positions: [0], }] } }],
+        positions: [0], }] } },
+        { tag: "GainGold", gain: 5 },
+      ],
     ]
   }
   const solution: Solution = {
@@ -53,5 +56,5 @@ function basicBattleTest() {
   }
 }
 
-basicCrewTest();
-//basicBattleTest();
+//basicCrewTest();
+basicBattleTest();

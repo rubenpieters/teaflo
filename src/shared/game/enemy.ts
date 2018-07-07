@@ -2,7 +2,9 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { ActionRest, Action, BattleTurn, doAction } from "src/shared/game/action";
+import { Generator } from "src/shared/handler/id/generator";
 import { Target } from "src/shared/game/target";
+import { doAttack } from "src/shared/game/attack";
 
 export type Enemy = {
   rank: number,
@@ -28,19 +30,30 @@ function battleStep(
   enemy: Enemy,
   turn: number,
   log: ActionRest[],
+  idGen: Generator,
 ): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionRest[] } {
   // do BattleTurn action
   const battleTurn: BattleTurn = { tag: "BattleTurn", turn };
-  const afterTurnResult = doAction(battleTurn, state, log, 0);
+  const afterTurnResult = doAction(battleTurn, state, log, 0, idGen);
   if (afterTurnResult.newState === "invalid") {
     return { result: "invalid", newLog: afterTurnResult.newLog };
   }
 
   state = afterTurnResult.newState;
 
-  const fighter: IdCrew | undefined = state.crew[0];
-  const fighterAtk = fighter === undefined ? 0 : fighter.ap;
-  const newEnemy: Enemy = focus(enemy, over(x => x.rank, x => x - fighterAtk));
+
+  const meleeCrew: IdCrew | undefined = state.crew[0];
+  console.log(JSON.stringify(meleeCrew));
+  let newEnemy: Enemy = meleeCrew === undefined ? enemy : doAttack(meleeCrew, enemy);
+
+  newEnemy = state.crew.slice(1).reduce((acc, crew) => {
+    if (crew.ranged) {
+      return doAttack(crew, acc)
+    } else {
+      return acc
+    }
+  }, newEnemy);
+  console.log(JSON.stringify(newEnemy));
 
   const actionIndex = turn % enemy.actions.length;
   const enemyAction: EnemyAttack | undefined = enemy.actions[actionIndex]
@@ -57,7 +70,7 @@ function battleStep(
         positions: enemyAction.positions,
         value: atkValue,
       }
-      const effectResult = doAction(action, state, afterTurnResult.newLog, 0);
+      const effectResult = doAction(action, state, afterTurnResult.newLog, 0, idGen);
       if (effectResult.newState === "invalid") {
         return { result: "invalid", newLog: effectResult.newLog };
       } else {
@@ -74,8 +87,9 @@ export function runBattle(
   state: GameState,
   enemy: Enemy,
   log: ActionRest[],
+  idGen: Generator,
 ) {
-  return _runBattle(state, enemy, 0, log);
+  return _runBattle(state, enemy, 0, log, idGen);
 }
 
 export function _runBattle(
@@ -83,8 +97,9 @@ export function _runBattle(
   enemy: Enemy,
   turn: number,
   log: ActionRest[],
+  idGen: Generator,
 ): { newState: GameState | "invalid", newLog: ActionRest[] } {
-  const { result, newLog } = battleStep(state, enemy, turn, log);
+  const { result, newLog } = battleStep(state, enemy, turn, log, idGen);
   if (result === "invalid") {
     return { newState: "invalid", newLog }
   } else if (result.newEnemy.rank < 0) {
@@ -92,6 +107,6 @@ export function _runBattle(
   } else {
     const { newState, newEnemy } = result
 
-    return _runBattle(newState, newEnemy, turn + 1, newLog);
+    return _runBattle(newState, newEnemy, turn + 1, newLog, idGen);
   }
 }

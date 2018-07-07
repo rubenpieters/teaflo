@@ -46,6 +46,9 @@ function showAction(action: ActionRest): string {
     case "GainAP": {
       return "Gain " + action.value + " AP (" + JSON.stringify(action.target) + ")";
     }
+    case "GainGold": {
+      return "GainGold " + action.gain;
+    }
   }
 }
 

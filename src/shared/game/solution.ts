@@ -42,7 +42,7 @@ function nextAction(
   if (card === undefined) {
     throw ("invalid index: " + index)
   }
-  const action: Action<Target> | undefined = card[index.card];
+  const action: Action<Target> | undefined = card[index.action];
   if (action === undefined) {
     throw ("invalid index " + index);
   }

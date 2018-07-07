@@ -42,6 +42,11 @@ export type BattleTurn = {
   turn: number,
 }
 
+export type GainGold = {
+  tag: "GainGold",
+  gain: number,
+}
+
 export type Action<T>
   = Recruit
   | Battle
@@ -49,22 +54,20 @@ export type Action<T>
   | BattleTurn
   | GainHP<T>
   | GainAP<T>
+  | GainGold
 
 function fmap<A,B>(
   f: (a: A) => B,
   action: Action<A>,
 ): Action<B> {
   switch (action.tag) {
-    case "Recruit": return action
-    case "Battle": return action
-    case "Damage": return action
-    case "BattleTurn": return action
-    case "GainHP": {
-      return {...action, ...{ target: f(action.target)}};
-    }
-    case "GainAP": {
-      return {...action, ...{ target: f(action.target)}};
-    }
+    case "Recruit": return action;
+    case "Battle": return action;
+    case "Damage": return action;
+    case "BattleTurn": return action;
+    case "GainHP": return {...action, ...{ target: f(action.target)}};
+    case "GainAP":return {...action, ...{ target: f(action.target)}};
+    case "GainGold": return action;
   }
 }
 
@@ -140,6 +143,10 @@ export function doAction(
     case "GainAP": {
       const addAP = (c: IdCrew) => focus(c, over(x => x.ap, x => x + action.value));
       newState = onTargets(action.target, addAP, newState);
+      return { newState, newLog: afterEffectLog };
+    }
+    case "GainGold": {
+      newState = focus(newState, over(x => x.gold, x => x + action.gain));
       return { newState, newLog: afterEffectLog };
     }
   }
