@@ -1,4 +1,4 @@
-import { changeConnected, changeBoard } from "src/app/appstate";
+import { changeConnected } from "src/app/appstate";
 import { ServerMessage } from "src/shared/network/serverMessage";
 import { ClientMessage } from "src/shared/network/clientMessage";
 
@@ -32,8 +32,7 @@ function onServerMessage(event: MessageEvent): void {
   const serverMsg: ServerMessage = JSON.parse(event.data);
   switch (serverMsg.tag) {
     case "CurrentBoard": {
-      changeBoard(serverMsg.board);
-      break;
+      return;
     }
   }
 }

@@ -3,7 +3,6 @@ import path from "path";
 import uws from "uws";
 
 import { ClientMessage } from "src/shared/network/clientMessage";
-import { Board, generateBoard, boardData } from "src/shared/board";
 import { newRng, rngHandler } from "src/shared/handler/rng/randomSeedRng";
 
 main();
@@ -58,9 +57,9 @@ function onClientMessage(client: uws) {
     const clientMsg: ClientMessage = JSON.parse(msg);
     switch (clientMsg.tag) {
       case "GetCurrentBoard": {
-        const board: Board = generateBoard(rngHandler(newRng(clientMsg.seed)), boardData);
-        client.send(JSON.stringify({ tag: "CurrentBoard", board: board }));
-        break;
+        //const board: Board = generateBoard(rngHandler(newRng(clientMsg.seed)), boardData);
+        //client.send(JSON.stringify({ tag: "CurrentBoard", board: board }));
+        return;
       }
     }
   }

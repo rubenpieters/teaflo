@@ -1,12 +1,5 @@
-import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback, addBoardCallback, nodeLocation, changeCurrentFilter, addCurrentFilterCallback } from "src/app/appstate";
-import { changeSelectedNode, addNodeCallback, changeShownResources, addShownResourcesCallback } from "src/app/gamestate";
+import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
-import { Node } from "src/shared/node";
-import { Board, filterBoard } from "src/shared/board";
-import { ConnectResult, Solution } from "src/shared/connectResult";
-import { History, Action } from "src/app/history/history";
-import { showNodeType } from "src/shared/nodeType";
-import { showModifier } from "src/shared/rules/modifier";
 
 import { config } from "src/app/config";
 
@@ -17,35 +10,10 @@ let playBoardGroup: Phaser.Group;
 type BoardNode = {
   sprite: Phaser.Graphics,
 };
-let nodes: { [nodeId: number]: BoardNode } = {};
 
-let currentLimit: number = 0;
 let circle: Phaser.Text | undefined = undefined;
 
-const undoList: History = [];
-let redoList: History = [];
-
-
-let validFromNodes: number[] = [];
-let solution: Solution = {};
 const connectionSprites: Phaser.Graphics[] = [];
-let nodeSprites: Phaser.Graphics[] = [];
-
-
-type ClickStateFrom = {
-  tag: "ClickStateFrom",
-};
-
-type ClickStateTo = {
-  tag: "ClickStateTo",
-  fromNode: Node,
-};
-
-type ClickState = ClickStateFrom | ClickStateTo;
-
-let clickState: ClickState = { tag: "ClickStateFrom" };
-
-
 
 
 let zoom: number = 0;
@@ -255,7 +223,7 @@ export default class Menu extends Phaser.State {
     }, playGroup);
     undoBtn.setTextBounds(750 - 400, 575 - 300, 25, 25);
     undoBtn.inputEnabled = true;
-    undoBtn.events.onInputDown.add(undoAction);
+    // undoBtn.events.onInputDown.add(undoAction);
 
     // redo button
 
@@ -267,7 +235,7 @@ export default class Menu extends Phaser.State {
     }, playGroup);
     redoBtn.setTextBounds(775 - 400, 575 - 300, 25, 25);
     redoBtn.inputEnabled = true;
-    redoBtn.events.onInputDown.add(redoAction(this.game));
+    // redoBtn.events.onInputDown.add(redoAction(this.game));
 
     // filter button
 
@@ -279,7 +247,7 @@ export default class Menu extends Phaser.State {
     }, playGroup);
     filterBtn.setTextBounds(605 - 400, 575 - 300, 25, 25);
     filterBtn.inputEnabled = true;
-    filterBtn.events.onInputDown.add(filterAction);
+    // filterBtn.events.onInputDown.add(filterAction);
 
     // step run -1 button
 
@@ -292,7 +260,7 @@ export default class Menu extends Phaser.State {
     stepRunMinBtn.setTextBounds(630 - 400, 575 - 300, 40, 25);
     stepRunMinBtn.inputEnabled = true;
     const minus = (x: number) => { if (x - 1 > 0) {  return x - 1; } else { return x; } };
-    //stepRunMinBtn.events.onInputDown.add(stepRunAction(minus));
+    // stepRunMinBtn.events.onInputDown.add(stepRunAction(minus));
 
     // step run +1 button
 
@@ -304,7 +272,7 @@ export default class Menu extends Phaser.State {
     }, playGroup);
     stepRunBtn.setTextBounds(675 - 400, 575 - 300, 40, 25);
     stepRunBtn.inputEnabled = true;
-    //stepRunBtn.events.onInputDown.add(stepRunAction(x => x + 1));
+    // stepRunBtn.events.onInputDown.add(stepRunAction(x => x + 1));
 
     // start run button
 
@@ -316,7 +284,7 @@ export default class Menu extends Phaser.State {
     }, playGroup);
     startRunBtn.setTextBounds(720 - 400, 575 - 300, 30, 25);
     startRunBtn.inputEnabled = true;
-    startRunBtn.events.onInputDown.add(startRunAction);
+    // startRunBtn.events.onInputDown.add(startRunAction);
 
     // callbacks
 
@@ -351,53 +319,6 @@ export default class Menu extends Phaser.State {
     });
 
     // callbacks - play
-
-    addBoardCallback(board => {
-      nodeSprites = drawBoard(this.game, playBoardGroup, board);
-      validFromNodes = [board[0].id];
-    });
-
-    addShownResourcesCallback(result => {
-      const stepData = result.values;
-      modsText.setText(stepData.modifiers.map(showModifier).join("\n"));
-      let resourcesString: string = "";
-      if (! result.valid) {
-        resourcesString = "INVALID\n";
-      } else {
-        resourcesString = resourcesString +
-          "Basic Total: " + stepData.resources.Basic.Total + "\n" +
-          "Basic Temp: " + stepData.resources.Basic.Temp + "\n" +
-          "Stack Total: " + stepData.resources.Stack.Total + "\n" +
-          "Stack Temp: " + stepData.resources.Stack.Temp + "\n" +
-          "Victory Temp: " + stepData.resources.Victory.Temp + "\n" +
-          "Victory Total: " + stepData.resources.Victory.Total + "\n" +
-          "Growth: " + stepData.growth;
-      }
-      resourcesText.setText(resourcesString);
-    });
-
-    addNodeCallback(node => {
-      // nodeTypeText.setText(nodeType.meta.name);
-      nodeTypeDetail.setText(showNodeType(node));
-    });
-
-    addCurrentFilterCallback((input: {board: Node[], filter: string | undefined }) => {
-      if (input.filter === undefined) {
-        console.log("CLEAR");
-        playBoardGroup.forEachExists((node: Phaser.Sprite) => {
-          node.data.visibleOverride = false;
-        });
-      } else {
-        const nodeIds: number[] = filterBoard(input.filter, input.board).map(x => x.id);
-        console.log(nodeIds);
-        playBoardGroup.forEachExists((node: Phaser.Sprite) => {
-          node.data.visibleOverride = true;
-        });
-        for (const nodeId in nodeIds) {
-          nodes[nodeId].sprite.data.visibleOverride = false;
-        }
-      }
-    });
 
     serverConn = connectToServer((serverConn) => { getBoard(serverConn, "ABCD-EFGH"); });
   }
@@ -468,175 +389,4 @@ function onDown(game: Phaser.Game) {
       }
     }
   };
-}
-
-function nodeClick(game: Phaser.Game, node: Node) {
-  return function(nodeSprite: Phaser.Sprite) {
-    switch (clickState.tag) {
-      case "ClickStateFrom": {
-        console.log("click0: " + node.id);
-        if (validFromNodes.filter(x => x === node.id).length < 1) {
-          console.log("not valid from node");
-        } else {
-          clickState = { tag: "ClickStateTo", fromNode: node };
-        }
-        break;
-      }
-      case "ClickStateTo": {
-        console.log("click1: " + node.id);
-        const fromNode: Node = clickState.fromNode;
-        const toNode: Node = node;
-
-        /*const connectResult: ConnectResult = verifyAndAddConnection(fromNode, toNode, connectionSprites.length, validFromNodes, solution);
-        switch (connectResult.tag)  {
-          case "InvalidFromNode": {
-            console.log("invalid from node");
-            break;
-          }
-          case "InvalidAngle": {
-            console.log("invalid angle");
-            break;
-          }
-          case "ValidConnection": {
-            makeConnection(game, fromNode, toNode);
-            solution = connectResult.newSolution;
-            validFromNodes = connectResult.newValidFromNodes;
-            undoList.push({ tag: "AddConnectionAction", from: fromNode, to: toNode });
-            redoList = [];
-            break;
-          }
-        }
-
-        clickState = { tag: "ClickStateFrom" };*/
-        break;
-      }
-    }
-  };
-}
-
-function makeConnection(game: Phaser.Game, fromNode: Node, toNode: Node) {
-  const line: Phaser.Graphics = game.add.graphics(0, 0, playBoardGroup);
-  line.lineStyle(5, 0x000000);
-  line.moveTo(fromNode.x, fromNode.y);
-  line.lineTo(toNode.x, toNode.y);
-  line.endFill();
-  connectionSprites.push(line);
-}
-
-function drawBoard(game: Phaser.Game, group: Phaser.Group, board: Board): Phaser.Graphics[] {
-  const result: Phaser.Graphics[] = [];
-  nodes = {};
-  for (const node of board) {
-    const sprite = drawNode(game, group, node);
-    result.push(sprite);
-    nodes[node.id] = { sprite: sprite };
-  }
-  return result;
-}
-
-function drawNode(game: Phaser.Game, group: Phaser.Group, node: Node): Phaser.Graphics {
-  const size: number = 15;
-
-  const nodeSprite: Phaser.Graphics = game.add.graphics(node.x, node.y, group);
-  nodeSprite.beginFill(node.nodeType.meta.color);
-  nodeSprite.drawRect(size * -0.5, size * -0.5, size, size);
-  nodeSprite.endFill();
-  nodeSprite.inputEnabled = true;
-  nodeSprite.events.onInputOver.add(() => { changeSelectedNode(node.nodeType); });
-  nodeSprite.events.onInputDown.add(nodeClick(game, node));
-  return nodeSprite;
-}
-
-function undoAction() {
-  const [lastAction] = undoList.splice(-1, 1);
-  if (lastAction === undefined) {
-    // no undo action, do nothing
-  } else {
-    switch (lastAction.tag) {
-      case "AddConnectionAction": {
-        const index: number = validFromNodes.indexOf(lastAction.to.id);
-        if (index === -1) {
-          throw "Should not happen: to id " + lastAction.to.id + " was not added to valid from nodes";
-        } else {
-          validFromNodes.splice(index, 1);
-        }
-        solution[lastAction.from.id].splice(-1, 1);
-        const [connectionSprite] = connectionSprites.splice(-1, 1);
-        connectionSprite.destroy();
-        break;
-      }
-    }
-
-    // add action to redo list
-    redoList.push(lastAction);
-  }
-}
-
-function redoAction(game: Phaser.Game) {
-  return function() {
-    /*const [lastAction] = redoList.splice(-1, 1);
-    if (lastAction === undefined) {
-      // no redo action, do nothing
-    } else {
-      switch (lastAction.tag) {
-        case "AddConnectionAction": {
-          const connectResult: ConnectResult = verifyAndAddConnection(lastAction.from, lastAction.to, connectionSprites.length, validFromNodes, solution);
-          switch (connectResult.tag)  {
-            case "InvalidFromNode": {
-              console.log("invalid from node");
-              break;
-            }
-            case "InvalidAngle": {
-              console.log("invalid angle");
-              break;
-            }
-            case "ValidConnection": {
-              makeConnection(game, lastAction.from, lastAction.to);
-              solution = connectResult.newSolution;
-              validFromNodes = connectResult.newValidFromNodes;
-              break;
-            }
-          }
-          break;
-        }
-      }
-
-      undoList.push(lastAction);
-    }*/
-  };
-}
-
-function startRunAction() {
-  /*const stepResult = initVisit(solution, Number.POSITIVE_INFINITY);
-  const xy = nodeLocation(stepResult.lastVisitedNodeId);
-  if (circle !== undefined) {
-    circle.position.set(xy.x, xy.y);
-    circle.visible = true;
-  }
-  changeShownResources({ values: stepResult.stepValues, valid: stepResult.validSolution });*/
-}
-
-function stepRunAction(f: (n: number) => number) {
-  /*return function() {
-    currentLimit = f (currentLimit);
-    console.log("LIMIT: " + currentLimit);
-    const stepResult = initVisit(solution, currentLimit);
-    const xy = nodeLocation(stepResult.lastVisitedNodeId);
-    if (circle !== undefined) {
-      circle.position.set(xy.x, xy.y);
-      circle.visible = true;
-    }
-    changeShownResources({ values: stepResult.stepValues, valid: stepResult.validSolution });
-  };*/
-}
-
-function filterAction() {
-  const input = prompt("change filter to ('clear' to clear):");
-  if (input === null || input === "") {
-    // do nothing
-  } else if (input === "clear") {
-    changeCurrentFilter(undefined);
-  } else {
-    changeCurrentFilter(input);
-  }
 }

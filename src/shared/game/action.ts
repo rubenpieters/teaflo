@@ -118,7 +118,7 @@ export function doAction(
       return { newState, newLog: afterEffectLog };
     }
     case "Battle": {
-      const afterBattle = runBattle(newState, action.enemy, afterEffectLog);
+      const afterBattle = runBattle(newState, action.enemy, afterEffectLog, idGen);
       if (afterBattle.newState === "invalid") {
         return { newState: "invalid", newLog: afterBattle.newLog };
       }
