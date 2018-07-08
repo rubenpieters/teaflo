@@ -40,6 +40,15 @@ function basicBattleTest() {
         positions: [0], }] } },
         { tag: "GainGold", gain: 5 },
       ],
+      [{
+        tag: "PayGold",
+        pay: 5,
+      },
+      {
+        tag: "AddItem",
+        item: { triggers: [] },
+      }
+      ],
     ]
   }
   const solution: Solution = {
@@ -87,4 +96,4 @@ function basicDeathTest() {
 
 //basicCrewTest();
 //basicBattleTest();
-basicDeathTest();
+basicBattleTest();

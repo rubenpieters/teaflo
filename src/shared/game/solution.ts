@@ -33,18 +33,18 @@ function nextAction(
 ): ActionRest {
   const path: Path | undefined = solution.paths[index.path];
   if (path === undefined) {
-    throw ("invalid index: " + index)
+    throw ("invalid index: " + JSON.stringify(index));
   }
   if (index.card === "rest") {
     return path.restAction;
   }
   const card: Card | undefined = path.cards[index.card];
   if (card === undefined) {
-    throw ("invalid index: " + index)
+    throw ("invalid index: " + JSON.stringify(index));
   }
   const action: Action<Target> | undefined = card[index.action];
   if (action === undefined) {
-    throw ("invalid index " + index);
+    throw ("invalid index " + JSON.stringify(index));
   }
   return action;
 }
@@ -64,7 +64,10 @@ export function nextIndex(
     newAction += 1;
   }
 
-  if (newAction < solution.paths[newPath].cards[newCard].length) {
+  if (
+    newCard < solution.paths[newPath].cards.length &&
+    newAction < solution.paths[newPath].cards[newCard].length
+  ) {
     return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
   }
 
@@ -110,9 +113,14 @@ function solutionStep(
   return { result: { newIndex, newState: actionResult.newState }, log: actionLog };
 }
 
+export type SolutionResult = { state: GameState, log: SolutionLog } | "invalid"
+
 export function runSolution(
   solution: Solution,
-): { state: GameState, log: SolutionLog } | "invalid" {
+): SolutionResult {
+  if (solution.paths.length === 0) {
+    return { state: initialState, log: { actionLog: [] } };
+  }
   return _runSolution(solution, initialIndex, initialState, emptySolutionLog, plusOneGenerator());
 }
 
@@ -122,7 +130,7 @@ function _runSolution(
   state: GameState,
   log: SolutionLog,
   idGen: Generator,
-): { state: GameState, log: SolutionLog } | "invalid" {
+): SolutionResult {
   if (index === "done") {
     return { state, log };
   }

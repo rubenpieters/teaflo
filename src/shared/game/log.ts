@@ -49,8 +49,14 @@ function showAction(action: ActionRest): string {
     case "GainGold": {
       return "GainGold " + action.gain;
     }
+    case "PayGold": {
+      return "PayGold " + action.pay;
+    }
     case "Death": {
       return "Death "  + action.targetId;
+    }
+    case "AddItem": {
+      return "AddItem";
     }
   }
 }

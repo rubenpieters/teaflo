@@ -4,52 +4,63 @@ import { GameState, IdCrew } from "src/shared/game/state";
 import { Enemy, runBattle } from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
 import { Target, findTarget, onTargets, indexOfId } from "src/shared/game/target";
+import { Item } from "src/shared/game/item";
 
 export type Recruit = {
   tag: "Recruit",
   crew: Crew,
-}
+};
 
 export type Battle = {
   tag: "Battle",
   enemy: Enemy,
-}
+};
 
 export type Rest = {
   tag: "Rest",
-}
+};
 
 export type Damage = {
   tag: "Damage",
   positions: number[],
   value: number,
-}
+};
 
 export type GainHP<T> = {
   tag: "GainHP",
   target: T,
   value: number,
-}
+};
 
 export type GainAP<T> = {
   tag: "GainAP",
   target: T,
   value: number,
-}
+};
 
 export type BattleTurn = {
   tag: "BattleTurn",
   turn: number,
-}
+};
 
 export type GainGold = {
   tag: "GainGold",
   gain: number,
-}
+};
+
+export type PayGold = {
+  tag: "PayGold",
+  pay: number,
+};
 
 export type Death<T> = {
   tag: "Death",
   targetId: number,
+};
+
+export type AddItem = {
+  tag: "AddItem",
+  item: Item,
 }
 
 export type Action<T>
@@ -60,7 +71,9 @@ export type Action<T>
   | GainHP<T>
   | GainAP<T>
   | GainGold
+  | PayGold
   | Death<T>
+  | AddItem
 
 function fmap<A,B>(
   f: (a: A) => B,
@@ -74,7 +87,9 @@ function fmap<A,B>(
     case "GainHP": return {...action, ...{ target: f(action.target)}};
     case "GainAP":return {...action, ...{ target: f(action.target)}};
     case "GainGold": return action;
+    case "PayGold": return action;
     case "Death": return action;
+    case "AddItem": return action;
   }
 }
 
@@ -156,6 +171,14 @@ export function doAction(
       newState = focus(newState, over(x => x.gold, x => x + action.gain));
       return { newState, newLog: afterEffectLog };
     }
+    case "PayGold": {
+      if (newState.gold < action.pay) {
+        return { newState: "invalid", newLog: afterEffectLog };
+      } else {
+        newState = focus(newState, over(x => x.gold, x => x - action.pay));
+        return { newState, newLog: afterEffectLog };
+      }
+    }
     case "Death": {
       const index = indexOfId(action.targetId, newState.crew);
       if (index === "notFound") {
@@ -164,6 +187,10 @@ export function doAction(
         newState = focus(newState, set(x => x.crew, newState.crew.slice(0,index).concat(newState.crew.slice(index + 1))));
         return { newState, newLog: afterEffectLog };
       }
+    }
+    case "AddItem": {
+      newState = focus(newState, over(x => x.items, x => x.concat([action.item])));
+      return { newState, newLog: afterEffectLog };
     }
   }
 }

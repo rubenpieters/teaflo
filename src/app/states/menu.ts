@@ -1,7 +1,8 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
 import { addToSolution, addRestToSolution, changeSolution, addSolutionCallback, addCardsCallback } from "src/app/gamestate";
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
-import { Solution, Card } from "src/shared/game/solution";
+import { Solution, Card, runSolution } from "src/shared/game/solution";
+import { showSolutionLog } from "src/shared/game/log";
 
 import { config } from "src/app/config";
 
@@ -319,6 +320,12 @@ export default class Menu extends Phaser.State {
 
     addSolutionCallback(solution => {
       mkSolution(this.game, solution);
+      const solutionResult = runSolution(solution);
+      if (solutionResult === "invalid") {
+        console.log("invalid");
+      } else {
+        console.log(showSolutionLog(solutionResult.log));
+      }
     });
     changeSolution({ paths: [] });
 
