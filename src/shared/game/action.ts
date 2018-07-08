@@ -100,18 +100,36 @@ export function doAction(
   action: ActionRest,
   state: GameState,
   log: ActionRest[],
-  from: number,
+  from: { id: number, type: "item" | "crew" },
   idGen: Generator,
 ): { newState: GameState | "invalid", newLog: ActionRest[] } {
   let newState: GameState = state;
   let newLog: ActionRest[] = log;
 
+  // item interactions with effects
+  if (from.type === "item") {
+    for (const item of state.items.slice(from.id)) {
+      for (const trigger of item.triggers) {
+        if (trigger.onTag === action.tag && trigger.type === "before") {
+          const action = fmap(x => findTarget(x, item.id), trigger.action);
+          const afterTrigger = doAction(action, newState, newLog, { id: from.id + 1, type: "item" }, idGen);
+          if (afterTrigger.newState === "invalid") {
+            return { newState: "invalid", newLog };
+          }
+          newState = afterTrigger.newState;
+          newLog = afterTrigger.newLog;
+        }
+      }
+    }
+  }
+
+  const fromCrew = from.type === "crew" ? from.id : 0;
   // crew interactions with effects
-  for (const ally of state.crew.slice(from)) {
+  for (const ally of state.crew.slice(fromCrew)) {
     for (const trigger of ally.triggers) {
       if (trigger.onTag === action.tag && trigger.type === "before") {
         const action = fmap(x => findTarget(x, ally.id), trigger.action);
-        const afterTrigger = doAction(action, newState, newLog, from + 1, idGen);
+        const afterTrigger = doAction(action, newState, newLog, { id: from.id + 1, type: "crew" }, idGen);
         if (afterTrigger.newState === "invalid") {
           return { newState: "invalid", newLog };
         }

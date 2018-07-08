@@ -35,7 +35,7 @@ function battleStep(
 ): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionRest[] } {
   // do BattleTurn action
   const battleTurn: BattleTurn = { tag: "BattleTurn", turn };
-  const afterTurnResult = doAction(battleTurn, state, log, 0, idGen);
+  const afterTurnResult = doAction(battleTurn, state, log, { id: 0, type: "item" }, idGen);
   if (afterTurnResult.newState === "invalid") {
     return { result: "invalid", newLog: afterTurnResult.newLog };
   }
@@ -62,7 +62,8 @@ function battleStep(
   }
 
   let battleResult: { result: { newState: GameState, newEnemy: Enemy }, newLog: ActionRest[] }
-    = undefined;
+    // prevent used before defined warning
+    = (<any>"unused");
   switch (enemyAction.tag) {
     case "MeleeAttack": {
       const atkValue: number = enemy.rank * enemyAction.multiplier;
@@ -71,7 +72,7 @@ function battleStep(
         positions: enemyAction.positions,
         value: atkValue,
       };
-      const effectResult = doAction(action, state, afterTurnResult.newLog, 0, idGen);
+      const effectResult = doAction(action, state, afterTurnResult.newLog, { id: 0, type: "item" }, idGen);
       if (effectResult.newState === "invalid") {
         return { result: "invalid", newLog: effectResult.newLog };
       } else {
@@ -92,7 +93,7 @@ function battleStep(
       const afterDeath = doAction({ tag: "Death", targetId: ally.id },
         battleResult.result.newState,
         battleResult.newLog,
-        0,
+        { id: 0, type: "item" },
         idGen
       );
       battleResult = focus(battleResult,
