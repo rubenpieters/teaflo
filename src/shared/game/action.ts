@@ -61,7 +61,7 @@ export type Death<T> = {
 export type AddItem = {
   tag: "AddItem",
   item: Item,
-}
+};
 
 export type Action<T>
   = Recruit
@@ -74,8 +74,9 @@ export type Action<T>
   | PayGold
   | Death<T>
   | AddItem
+  ;
 
-function fmap<A,B>(
+function fmap<A, B>(
   f: (a: A) => B,
   action: Action<A>,
 ): Action<B> {
@@ -85,7 +86,7 @@ function fmap<A,B>(
     case "Damage": return action;
     case "BattleTurn": return action;
     case "GainHP": return {...action, ...{ target: f(action.target)}};
-    case "GainAP":return {...action, ...{ target: f(action.target)}};
+    case "GainAP": return {...action, ...{ target: f(action.target)}};
     case "GainGold": return action;
     case "PayGold": return action;
     case "Death": return action;
@@ -119,8 +120,8 @@ export function doAction(
       }
     }
   }
-  
-  const afterEffectLog = newLog.concat([action])
+
+  const afterEffectLog = newLog.concat([action]);
   switch (action.tag) {
     case "Rest": {
       return { newState, newLog: afterEffectLog };
@@ -130,11 +131,11 @@ export function doAction(
       for (const position in action.positions) {
         const allyAtPos: IdCrew | undefined = newState.crew[position];
         if (allyAtPos === undefined) {
-          return { newState: "invalid", newLog: afterEffectLog }
+          return { newState: "invalid", newLog: afterEffectLog };
         }
         resultCrew = focus(resultCrew,
           over(x => x[position].hp, x => x - action.value)
-        )
+        );
       }
       newState = focus(newState, set(x => x.crew, resultCrew));
       return { newState, newLog: afterEffectLog };
@@ -148,7 +149,7 @@ export function doAction(
     }
     case "Recruit": {
       const id = idGen.newId();
-      const idCrew = {...action.crew, ...{ id }}
+      const idCrew = {...action.crew, ...{ id }};
       newState = focus(newState,
         over(x => x.crew, x => x.concat([idCrew]))
       );
@@ -184,7 +185,7 @@ export function doAction(
       if (index === "notFound") {
         throw ("index " + index + " not found");
       } else {
-        newState = focus(newState, set(x => x.crew, newState.crew.slice(0,index).concat(newState.crew.slice(index + 1))));
+        newState = focus(newState, set(x => x.crew, newState.crew.slice(0, index).concat(newState.crew.slice(index + 1))));
         return { newState, newLog: afterEffectLog };
       }
     }

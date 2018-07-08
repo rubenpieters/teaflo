@@ -13,5 +13,5 @@ function generateId(ref: { x: number }) {
     const val = ref.x;
     ref.x += 1;
     return val;
-  }
+  };
 }

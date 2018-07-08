@@ -1,7 +1,7 @@
 import iassign from "immutable-assign";
 
-type GetModOps<S, A> = { get: (s: S) => A, modify: (a: A) => A }
-type GetMod<S> = <R>(e: <A>(gs: GetModOps<S, A>) => R) => R
+type GetModOps<S, A> = { get: (s: S) => A, modify: (a: A) => A };
+type GetMod<S> = <R>(e: <A>(gs: GetModOps<S, A>) => R) => R;
 
 export function focus<S>(
   s: S,
@@ -26,7 +26,7 @@ export function set<S, A>(
 
 // example usage
 
-const x = { a: 1, b: "2" }
+const x = { a: 1, b: "2" };
 
 focus(x,
   over(x => x.a, x => x + 1),

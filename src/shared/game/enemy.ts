@@ -9,21 +9,22 @@ import { doAttack } from "src/shared/game/attack";
 export type Enemy = {
   rank: number,
   actions: EnemyAttack[],
-}
+};
 
 type MeleeAttack = {
   tag: "MeleeAttack",
   multiplier: number,
   positions: number[],
-}
+};
 
 type Heal = {
   tag: "Heal",
-}
+};
 
 export type EnemyAttack
   = MeleeAttack
   | Heal
+  ;
 
 function battleStep(
   state: GameState,
@@ -47,14 +48,14 @@ function battleStep(
 
   newEnemy = state.crew.slice(1).reduce((acc, crew) => {
     if (crew.ranged) {
-      return doAttack(crew, acc)
+      return doAttack(crew, acc);
     } else {
-      return acc
+      return acc;
     }
   }, newEnemy);
 
   const actionIndex = turn % enemy.actions.length;
-  const enemyAction: EnemyAttack | undefined = enemy.actions[actionIndex]
+  const enemyAction: EnemyAttack | undefined = enemy.actions[actionIndex];
 
   if (enemyAction === undefined) {
     throw ("invalid actionIndex " + actionIndex);
@@ -69,7 +70,7 @@ function battleStep(
         tag: "Damage",
         positions: enemyAction.positions,
         value: atkValue,
-      }
+      };
       const effectResult = doAction(action, state, afterTurnResult.newLog, 0, idGen);
       if (effectResult.newState === "invalid") {
         return { result: "invalid", newLog: effectResult.newLog };
@@ -93,7 +94,7 @@ function battleStep(
         battleResult.newLog,
         0,
         idGen
-      )
+      );
       battleResult = focus(battleResult,
         set(x => x.result.newState, afterDeath.newState),
         set(x => x.newLog, afterDeath.newLog)
@@ -122,11 +123,11 @@ export function _runBattle(
 ): { newState: GameState | "invalid", newLog: ActionRest[] } {
   const { result, newLog } = battleStep(state, enemy, turn, log, idGen);
   if (result === "invalid") {
-    return { newState: "invalid", newLog }
+    return { newState: "invalid", newLog };
   } else if (result.newEnemy.rank < 0) {
     return { newState: result.newState, newLog };
   } else {
-    const { newState, newEnemy } = result
+    const { newState, newEnemy } = result;
 
     return _runBattle(newState, newEnemy, turn + 1, newLog, idGen);
   }

@@ -5,15 +5,16 @@ import { Crew } from "src/shared/game/crew";
 export type Damage = {
   tag: "Damage",
   multiplier: number,
-}
+};
 
 export type Status = {
   tag: "Status"
-}
+};
 
 export type Attack
   = Damage
   | Status
+  ;
 
 export function doAttack(
  crew: Crew,

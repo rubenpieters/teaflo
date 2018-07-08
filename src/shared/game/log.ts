@@ -2,11 +2,11 @@ import { ActionRest } from "src/shared/game/action";
 
 export type SolutionLog = {
   actionLog: ActionLog[],
-}
+};
 
 export const emptySolutionLog: SolutionLog = {
   actionLog: [],
-}
+};
 
 export function showSolutionLog(solutionLog: SolutionLog): string {
   return solutionLog.actionLog
@@ -17,7 +17,7 @@ export function showSolutionLog(solutionLog: SolutionLog): string {
 export type ActionLog = {
   action: ActionRest,
   loggedEffects: ActionRest[],
-}
+};
 
 function showActionLog(actionLog: ActionLog): string {
   return showAction(actionLog.action) + "\n" + actionLog.loggedEffects.map(a => " - " + showAction(a)).join("\n");
@@ -63,12 +63,13 @@ function showAction(action: ActionRest): string {
 
 type EnemyDamage = {
   tag: "EnemyDamage",
-}
+};
 
 type AllyDamage = {
   tag: "AllyDamage",
-}
+};
 
 export type LoggedEffect
   = EnemyDamage
   | AllyDamage
+  ;

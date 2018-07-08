@@ -10,22 +10,23 @@ export type Card = Action<Target>[];
 export type Path = {
   restAction: Rest,
   cards: Card[]
-}
+};
+
 export type Solution = {
   paths: Path[]
-}
+};
 
 export type SolutionIndex = {
   path: number,
   card: "rest" | number,
   action: number,
-}
+};
 
 export const initialIndex: SolutionIndex = {
   path: 0,
   card: "rest",
   action: 0,
-}
+};
 
 function nextAction(
   index: SolutionIndex,
@@ -82,7 +83,7 @@ export function nextIndex(
   }
 
   newPath += 1;
-  newCard = "rest"
+  newCard = "rest";
   newAction = 0;
 
   if (newPath < solution.paths.length) {
@@ -103,7 +104,7 @@ function solutionStep(
   const actionLog: ActionLog = {
     action: action,
     loggedEffects: actionResult.newLog,
-  }
+  };
 
   if (actionResult.newState === "invalid") {
     return { result: "invalid", log: actionLog };
@@ -113,7 +114,7 @@ function solutionStep(
   return { result: { newIndex, newState: actionResult.newState }, log: actionLog };
 }
 
-export type SolutionResult = { state: GameState, log: SolutionLog } | "invalid"
+export type SolutionResult = { state: GameState, log: SolutionLog } | "invalid";
 
 export function runSolution(
   solution: Solution,

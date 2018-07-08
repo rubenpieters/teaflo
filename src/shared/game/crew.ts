@@ -8,7 +8,7 @@ export type Crew = {
   triggers: Trigger[],
   ranged: boolean,
   attack: Attack,
-}
+};
 
 const stFighter: Crew = {
   ap: 5,
@@ -19,7 +19,7 @@ const stFighter: Crew = {
     tag: "Damage",
     multiplier: 1,
   },
-}
+};
 
 const stRanged: Crew = {
   ap: 1,
@@ -30,7 +30,7 @@ const stRanged: Crew = {
     tag: "Damage",
     multiplier: 1,
   },
-}
+};
 
 const recruitGrow1: Crew = {
   ap: 1,
@@ -45,7 +45,7 @@ const recruitGrow1: Crew = {
         value: 1,
       },
     },
-    
+
     {
       onTag: "Recruit",
       type: "before",
@@ -61,10 +61,10 @@ const recruitGrow1: Crew = {
     tag: "Damage",
     multiplier: 1,
   },
-}
+};
 
 export const allCrew = {
   stFighter: stFighter,
   stRanged: stRanged,
   recruitGrow1: recruitGrow1,
-}
+};

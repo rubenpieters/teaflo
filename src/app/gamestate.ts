@@ -25,14 +25,14 @@ export function changeSolution(solution: Solution) {
 export function addToSolution(card: Card) {
   const solution = focus(gameState.solution,
     over (x => x.paths[x.paths.length - 1].cards, x => x.concat([card])),
-  )
+  );
   changeSolution(solution);
 }
 
 export function addRestToSolution(rest: Rest) {
   const solution = focus(gameState.solution,
     over (x => x.paths, x => x.concat({ restAction: rest, cards: [] })),
-  )
+  );
   changeSolution(solution);
 }
 

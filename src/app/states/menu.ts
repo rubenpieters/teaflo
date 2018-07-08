@@ -17,9 +17,6 @@ type BoardNode = {
   sprite: Phaser.Graphics,
 };
 
-let circle: Phaser.Text | undefined = undefined;
-
-
 let zoom: number = 0;
 
 const gameX: number = 2500;
@@ -297,9 +294,6 @@ export default class Menu extends Phaser.State {
         top2.fill = "#F08080";
         menuGroup.visible = false;
         playGroup.visible = true;
-        if (circle !== undefined) {
-          circle.visible = false;
-        }
         break;
       }
     }});
@@ -413,9 +407,9 @@ function mkAvailableCards(
   }
 
   // create new
-  let x = -250;
+  const x = -250;
   let y = -250;
-  let sprites: Phaser.Sprite[] = [];
+  const sprites: Phaser.Sprite[] = [];
   for (const card of cards) {
     const sprite = game.add.sprite(x, y, "card1", 0, playBoardGroup);
     sprite.inputEnabled = true;
@@ -438,7 +432,7 @@ function mkSolution(
   // create new
   let x = 0;
   let y = 0;
-  let sprites: Phaser.Sprite[] = [];
+  const sprites: Phaser.Sprite[] = [];
   let index = 0;
   for (const path of solution.paths) {
     for (const card of path.cards) {
