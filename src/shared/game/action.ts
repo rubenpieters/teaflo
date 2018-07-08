@@ -74,7 +74,7 @@ function fmap<A,B>(
     case "GainHP": return {...action, ...{ target: f(action.target)}};
     case "GainAP":return {...action, ...{ target: f(action.target)}};
     case "GainGold": return action;
-    case "Death": return {...action, ...{ target: f(action.target)}};
+    case "Death": return action;
   }
 }
 

@@ -1,7 +1,12 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
+import { addToSolution, addRestToSolution, changeSolution, addSolutionCallback, addCardsCallback } from "src/app/gamestate";
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
+import { Solution, Card } from "src/shared/game/solution";
 
 import { config } from "src/app/config";
+
+let availableCardsCache: Phaser.Sprite[] = [];
+let solutionCache: Phaser.Sprite[] = [];
 
 let serverConn: ServerConnection | undefined = undefined;
 
@@ -12,8 +17,6 @@ type BoardNode = {
 };
 
 let circle: Phaser.Text | undefined = undefined;
-
-const connectionSprites: Phaser.Graphics[] = [];
 
 
 let zoom: number = 0;
@@ -128,16 +131,6 @@ export default class Menu extends Phaser.State {
     this.game.camera.y = this.game.height * -0.5;
 
     this.game.input.onDown.add(onDown(this.game), this);
-
-    // circle
-
-    circle = this.add.text(0, 0, "O", {
-      font: "40px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, playBoardGroup);
-    circle.setTextBounds(-13, -13, 26, 26);
 
     // right menu - background
 
@@ -320,6 +313,17 @@ export default class Menu extends Phaser.State {
 
     // callbacks - play
 
+    addCardsCallback(cards => {
+      mkAvailableCards(this.game, cards);
+    });
+
+    addSolutionCallback(solution => {
+      mkSolution(this.game, solution);
+    });
+    changeSolution({ paths: [] });
+
+    // connect to server
+
     serverConn = connectToServer((serverConn) => { getBoard(serverConn, "ABCD-EFGH"); });
   }
 
@@ -389,4 +393,65 @@ function onDown(game: Phaser.Game) {
       }
     }
   };
+}
+
+
+function mkAvailableCards(
+  game: Phaser.Game,
+  cards: Card[],
+) {
+  // clear old
+  for (const sprite of availableCardsCache) {
+    sprite.destroy();
+  }
+
+  // create new
+  let x = -250;
+  let y = -250;
+  let sprites: Phaser.Sprite[] = [];
+  for (const card of cards) {
+    const sprite = game.add.sprite(x, y, "card1", 0, playBoardGroup);
+    sprite.inputEnabled = true;
+    sprite.events.onInputDown.add(() => addToSolution(card));
+    sprites.push();
+    y += 50;
+  }
+  availableCardsCache = sprites;
+}
+
+function mkSolution(
+  game: Phaser.Game,
+  solution: Solution,
+) {
+  // clear old
+  for (const sprite of solutionCache) {
+    sprite.destroy();
+  }
+
+  // create new
+  let x = 0;
+  let y = 0;
+  let sprites: Phaser.Sprite[] = [];
+  let index = 0;
+  for (const path of solution.paths) {
+    for (const card of path.cards) {
+      const sprite = game.add.sprite(x, y, "card1", 0, playBoardGroup);
+      sprites.push(sprite);
+      y -= 50;
+    }
+
+    if (index === solution.paths.length - 1) {
+      const sprite = game.add.sprite(x, y, "slot", 0, playBoardGroup);
+      sprites.push(sprite);
+    }
+
+    y = 0;
+    x += 50;
+    index += 1;
+  }
+  const sprite = game.add.sprite(x, y, "slot", 0, playBoardGroup);
+  sprite.inputEnabled = true;
+  sprite.events.onInputDown.add(() => addRestToSolution({ tag: "Rest" }));
+  sprites.push(sprite);
+  solutionCache = sprites;
 }
