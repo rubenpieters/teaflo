@@ -43,6 +43,14 @@ export type BattleTurn = {
   turn: number,
 };
 
+export type StartBattle = {
+  tag: "StartBattle",
+};
+
+export type EndBattle = {
+  tag: "EndBattle",
+};
+
 export type GainGold = {
   tag: "GainGold",
   gain: number,
@@ -74,6 +82,8 @@ export type Action<T>
   | PayGold
   | Death<T>
   | AddItem
+  | StartBattle
+  | EndBattle
   ;
 
 function fmap<A, B>(
@@ -85,6 +95,8 @@ function fmap<A, B>(
     case "Battle": return action;
     case "Damage": return action;
     case "BattleTurn": return action;
+    case "StartBattle": return action;
+    case "EndBattle": return action;
     case "GainHP": return {...action, ...{ target: f(action.target)}};
     case "GainAP": return {...action, ...{ target: f(action.target)}};
     case "GainGold": return action;
@@ -184,6 +196,12 @@ export function doActionAt(
       return { newState, newLog: afterEffectLog };
     }
     case "BattleTurn": {
+      return { newState, newLog: afterEffectLog };
+    }
+    case "StartBattle": {
+      return { newState, newLog: afterEffectLog };
+    }
+    case "EndBattle": {
       return { newState, newLog: afterEffectLog };
     }
     case "GainHP": {

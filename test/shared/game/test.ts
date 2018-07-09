@@ -1,6 +1,7 @@
 import expect from "expect";
 import { Solution, Path, runSolution } from "src/shared/game/solution";
 import { allCrew } from "src/shared/game/crew";
+import { allItems } from "src/shared/game/item";
 import { showSolutionLog } from "src/shared/game/log";
 
 function basicCrewTest() {
@@ -93,7 +94,36 @@ function basicDeathTest() {
   }
 }
 
+function basicItemTest() {
+  const path1: Path = {
+    restAction: { tag: "Rest" },
+    cards: [
+      [{ tag: "Recruit", crew: allCrew.stFighter }],
+      [{ tag: "AddItem", item: allItems.plus11StartCombat }],
+      [{ tag: "Battle", enemy: { rank: 5, actions: [{
+        tag: "MeleeAttack",
+        multiplier: 1,
+        positions: [0], }] } },
+        { tag: "GainGold", gain: 5 },
+      ],
+    ]
+  }
+  const solution: Solution = {
+    paths: [path1]
+  }
+
+  const sol = runSolution(solution);
+  if (sol === "invalid") {
+    console.log("invalid");
+  } else {
+    const { state, log } = sol;
+    console.log(JSON.stringify(state));
+    console.log(showSolutionLog(log));
+  }
+}
+
 
 //basicCrewTest();
 //basicBattleTest();
-basicBattleTest();
+//basicBattleTest();
+basicItemTest();

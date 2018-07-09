@@ -110,8 +110,17 @@ export function runBattle(
   enemy: Enemy,
   log: ActionRest[],
   idGen: Generator,
-) {
-  return _runBattle(state, enemy, 0, log, idGen);
+): { newState: GameState | "invalid", newLog: ActionRest[] } {
+  const afterStartBattle = doAction({ tag: "StartBattle" }, state, log, idGen);
+  if (afterStartBattle.newState === "invalid") {
+    return afterStartBattle;
+  }
+  const afterBattle = _runBattle(afterStartBattle.newState, enemy, 0, afterStartBattle.newLog, idGen);
+  if (afterBattle.newState === "invalid") {
+    return afterBattle;
+  }
+  const afterEndBattle = doAction({ tag: "EndBattle" }, afterBattle.newState, afterBattle.newLog, idGen);
+  return afterEndBattle;
 }
 
 export function _runBattle(

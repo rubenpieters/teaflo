@@ -53,7 +53,28 @@ const recruitGrow1: Crew = {
         target: { tag: "Self" },
         value: 1,
       },
-    }
+    },
+  ],
+  ranged: false,
+  attack: {
+    tag: "Damage",
+    multiplier: 1,
+  },
+};
+
+const recruitGainAPWhenHP: Crew = {
+  ap: 4,
+  hp: 2,
+  triggers: [
+    {
+      onTag: "GainHP",
+      type: "before",
+      action: {
+        tag: "GainAP",
+        target: { tag: "Self" },
+        value: 1,
+      },
+    },
   ],
   ranged: false,
   attack: {

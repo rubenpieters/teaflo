@@ -40,6 +40,12 @@ function showAction(action: ActionRest): string {
     case "BattleTurn": {
       return "BattleTurn - " + action.turn;
     }
+    case "StartBattle": {
+      return "StartBattle";
+    }
+    case "EndBattle": {
+      return "EndBattle";
+    }
     case "GainHP": {
       return "Gain " + action.value + " HP (" + JSON.stringify(action.target) + ")";
     }
