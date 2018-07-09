@@ -133,7 +133,7 @@ export function _runBattle(
   const { result, newLog } = battleStep(state, enemy, turn, log, idGen);
   if (result === "invalid") {
     return { newState: "invalid", newLog };
-  } else if (result.newEnemy.rank < 0) {
+  } else if (result.newEnemy.rank <= 0) {
     return { newState: result.newState, newLog };
   } else {
     const { newState, newEnemy } = result;

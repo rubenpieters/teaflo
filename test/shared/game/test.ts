@@ -18,7 +18,8 @@ function basicCrewTest() {
   }
 
   const sol = runSolution(solution);
-  if (sol === "invalid") {
+  if (sol.state === "invalid") {
+    console.log(showSolutionLog(sol.log));
     console.log("invalid");
   } else {
     const { state, log } = sol;
@@ -57,7 +58,8 @@ function basicBattleTest() {
   }
 
   const sol = runSolution(solution);
-  if (sol === "invalid") {
+  if (sol.state === "invalid") {
+    console.log(showSolutionLog(sol.log));
     console.log("invalid");
   } else {
     const { state, log } = sol;
@@ -85,7 +87,8 @@ function basicDeathTest() {
   }
 
   const sol = runSolution(solution);
-  if (sol === "invalid") {
+  if (sol.state === "invalid") {
+    console.log(showSolutionLog(sol.log));
     console.log("invalid");
   } else {
     const { state, log } = sol;
@@ -98,9 +101,9 @@ function basicItemTest() {
   const path1: Path = {
     restAction: { tag: "Rest" },
     cards: [
-      [{ tag: "Recruit", crew: allCrew.stFighter }],
+      [{ tag: "Recruit", crew: allCrew.recruitGainAPWhenHP }],
       [{ tag: "AddItem", item: allItems.plus11StartCombat }],
-      [{ tag: "Battle", enemy: { rank: 5, actions: [{
+      [{ tag: "Battle", enemy: { rank: 6, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
         positions: [0], }] } },
@@ -113,7 +116,8 @@ function basicItemTest() {
   }
 
   const sol = runSolution(solution);
-  if (sol === "invalid") {
+  if (sol.state === "invalid") {
+    console.log(showSolutionLog(sol.log));
     console.log("invalid");
   } else {
     const { state, log } = sol;

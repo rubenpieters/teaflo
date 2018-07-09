@@ -87,4 +87,5 @@ export const allCrew = {
   stFighter: stFighter,
   stRanged: stRanged,
   recruitGrow1: recruitGrow1,
+  recruitGainAPWhenHP: recruitGainAPWhenHP,
 };

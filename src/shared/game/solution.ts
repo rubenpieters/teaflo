@@ -114,7 +114,7 @@ function solutionStep(
   return { result: { newIndex, newState: actionResult.newState }, log: actionLog };
 }
 
-export type SolutionResult = { state: GameState, log: SolutionLog } | "invalid";
+export type SolutionResult = { state: GameState | "invalid", log: SolutionLog };
 
 export function runSolution(
   solution: Solution,
@@ -138,10 +138,10 @@ function _runSolution(
 
   const solStep = solutionStep(index, state, solution, idGen);
   const stepResult = solStep.result;
+  const newSolutionLog = focus(log, over(x => x.actionLog, x => x.concat([solStep.log])));
   if (stepResult === "invalid") {
-    return "invalid";
+    return { state: "invalid", log: newSolutionLog };
   }
   const { newIndex, newState } = stepResult;
-  const newSolutionLog = focus(log, over(x => x.actionLog, x => x.concat([solStep.log])));
   return _runSolution(solution, newIndex, newState, newSolutionLog, idGen);
 }

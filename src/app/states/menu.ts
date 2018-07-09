@@ -315,10 +315,9 @@ export default class Menu extends Phaser.State {
     addSolutionCallback(solution => {
       mkSolution(this.game, solution);
       const solutionResult = runSolution(solution);
-      if (solutionResult === "invalid") {
-        console.log("invalid");
-      } else {
-        console.log(showSolutionLog(solutionResult.log));
+      console.log(showSolutionLog(solutionResult.log));
+      if (solutionResult.state === "invalid") {
+        console.log("/INVALID/");
       }
     });
     changeSolution({ paths: [] });
