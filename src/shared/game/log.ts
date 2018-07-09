@@ -47,10 +47,10 @@ function showAction(action: ActionRest): string {
       return "EndBattle";
     }
     case "GainHP": {
-      return "Gain " + action.value + " HP (" + JSON.stringify(action.target) + ")";
+      return "Gain " + action.value + " HP "  + (action.type === "permanent" ? "" : " Temp ") + "(" + JSON.stringify(action.target) + ")";
     }
     case "GainAP": {
-      return "Gain " + action.value + " AP (" + JSON.stringify(action.target) + ")";
+      return "Gain " + action.value + " AP "  + (action.type === "permanent" ? "" : " Temp ") + "(" + JSON.stringify(action.target) + ")";
     }
     case "GainGold": {
       return "GainGold " + action.gain;

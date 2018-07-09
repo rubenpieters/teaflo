@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Enemy } from "src/shared/game/enemy";
-import { Crew } from "src/shared/game/crew";
+import { Crew, damage, getAP } from "src/shared/game/crew";
 
 export type Damage = {
   tag: "Damage",
@@ -23,7 +23,7 @@ export function doAttack(
   const attack = crew.attack;
   switch (attack.tag) {
     case "Damage": {
-      return focus(enemy, over(x => x.rank, x => x - attack.multiplier * crew.ap));
+      return focus(enemy, over(x => x.rank, x => x - getAP(crew, attack.multiplier)));
     }
     case "Status": {
       return enemy;

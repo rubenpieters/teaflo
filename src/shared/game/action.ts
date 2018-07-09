@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Crew } from "src/shared/game/crew";
+import { Crew, damage } from "src/shared/game/crew";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { Enemy, runBattle } from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
@@ -30,12 +30,14 @@ export type GainHP<T> = {
   tag: "GainHP",
   target: T,
   value: number,
+  type: "permanent" | "temporary",
 };
 
 export type GainAP<T> = {
   tag: "GainAP",
   target: T,
   value: number,
+  type: "permanent" | "temporary",
 };
 
 export type BattleTurn = {
@@ -69,6 +71,10 @@ export type Death<T> = {
 export type AddItem = {
   tag: "AddItem",
   item: Item,
+};
+
+export type ClearTemp = {
+  tag: "ClearTemp",
 };
 
 export type Action<T>
@@ -175,7 +181,7 @@ export function doActionAt(
           return { newState: "invalid", newLog: afterEffectLog };
         }
         resultCrew = focus(resultCrew,
-          over(x => x[position].hp, x => x - action.value)
+          over(x => x[position], x => damage(x, action.value))
         );
       }
       newState = focus(newState, set(x => x.crew, resultCrew));
@@ -206,12 +212,18 @@ export function doActionAt(
       return { newState, newLog: afterEffectLog };
     }
     case "GainHP": {
-      const addHP = (c: IdCrew) => focus(c, over(x => x.hp, x => x + action.value));
+      const addHP = action.type === "permanent"
+        ? (c: IdCrew) => focus(c, over(x => x.hp, x => x + action.value))
+        : (c: IdCrew) => focus(c, over(x => x.hpTemp, x => x + action.value))
+        ;
       newState = onTargets(action.target, addHP, newState);
       return { newState, newLog: afterEffectLog };
     }
     case "GainAP": {
-      const addAP = (c: IdCrew) => focus(c, over(x => x.ap, x => x + action.value));
+      const addAP = action.type === "permanent"
+        ? (c: IdCrew) => focus(c, over(x => x.ap, x => x + action.value))
+        : (c: IdCrew) => focus(c, over(x => x.apTemp, x => x + action.value))
+        ;
       newState = onTargets(action.target, addAP, newState);
       return { newState, newLog: afterEffectLog };
     }

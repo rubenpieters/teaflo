@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Crew } from "src/shared/game/crew";
 import { GameState, IdCrew } from "src/shared/game/state";
+import { clearTemp } from "src/shared/game/crew";
 import { ActionRest, Action, BattleTurn, doAction } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { Target } from "src/shared/game/target";
@@ -119,7 +119,10 @@ export function runBattle(
   if (afterBattle.newState === "invalid") {
     return afterBattle;
   }
-  const afterEndBattle = doAction({ tag: "EndBattle" }, afterBattle.newState, afterBattle.newLog, idGen);
+  const afterClearTemp = focus(afterBattle,
+    over(x => (<GameState>x.newState).crew, x => x.map(x => clearTemp(x)))
+  );
+  const afterEndBattle = doAction({ tag: "EndBattle" }, <GameState>afterClearTemp.newState, afterClearTemp.newLog, idGen);
   return afterEndBattle;
 }
 

@@ -14,6 +14,7 @@ const plus11StartCombat: Item = {
         tag: "GainHP",
         target: { tag: "AllCrew" },
         value: 1,
+        type: "permanent",
       },
     },
     {
@@ -23,11 +24,28 @@ const plus11StartCombat: Item = {
         tag: "GainAP",
         target: { tag: "AllCrew" },
         value: 1,
+        type: "permanent",
       },
     },
-  ]
+  ],
 };
+
+const guard3StartCombat: Item = {
+  triggers: [
+    {
+      onTag: "StartBattle",
+      type: "before",
+      action: {
+        tag: "GainHP",
+        target: { tag: "AllCrew" },
+        value: 3,
+        type: "temporary",
+      },
+    },
+  ],
+}
 
 export const allItems = {
   plus11StartCombat: plus11StartCombat,
+  guard3StartCombat: guard3StartCombat,
 }
