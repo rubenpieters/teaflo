@@ -100,6 +100,15 @@ export function doAction(
   action: ActionRest,
   state: GameState,
   log: ActionRest[],
+  idGen: Generator,
+): { newState: GameState | "invalid", newLog: ActionRest[] } {
+  return doActionAt(action, state, log, { id: 0, type: "item" }, idGen);
+}
+
+export function doActionAt(
+  action: ActionRest,
+  state: GameState,
+  log: ActionRest[],
   from: { id: number, type: "item" | "crew" },
   idGen: Generator,
 ): { newState: GameState | "invalid", newLog: ActionRest[] } {
@@ -111,8 +120,9 @@ export function doAction(
     for (const item of state.items.slice(from.id)) {
       for (const trigger of item.triggers) {
         if (trigger.onTag === action.tag && trigger.type === "before") {
-          const action = fmap(x => findTarget(x, item.id), trigger.action);
-          const afterTrigger = doAction(action, newState, newLog, { id: from.id + 1, type: "item" }, idGen);
+          // TODO: targeting items not supported
+          const action = fmap(x => findTarget(x, (<any>"trying to target item")), trigger.action);
+          const afterTrigger = doActionAt(action, newState, newLog, { id: from.id + 1, type: "item" }, idGen);
           if (afterTrigger.newState === "invalid") {
             return { newState: "invalid", newLog };
           }
@@ -129,7 +139,7 @@ export function doAction(
     for (const trigger of ally.triggers) {
       if (trigger.onTag === action.tag && trigger.type === "before") {
         const action = fmap(x => findTarget(x, ally.id), trigger.action);
-        const afterTrigger = doAction(action, newState, newLog, { id: from.id + 1, type: "crew" }, idGen);
+        const afterTrigger = doActionAt(action, newState, newLog, { id: from.id + 1, type: "crew" }, idGen);
         if (afterTrigger.newState === "invalid") {
           return { newState: "invalid", newLog };
         }

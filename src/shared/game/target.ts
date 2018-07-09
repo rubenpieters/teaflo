@@ -1,6 +1,25 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, IdCrew } from "src/shared/game/state";
 
+// Action<TargetInfo>
+// Target<TargetInfo> (State => TargetInfo)
+
+/*
+type TargetFunction<S, T> = (s: S) => T;
+type TF = <R>(e: <S>(s: S) => R) => R;
+
+const tf: TF = e => {
+  return e((s: { gs: GameState, id: number }) => {
+    const id = indexOfId(s.id, s.gs.crew);
+    if (id === "notFound") {
+      throw "";
+    } else {
+      return s.gs.crew[id];
+    }
+  });
+}
+*/
+
 export type Self = {
   tag: "Self",
 };

@@ -35,7 +35,7 @@ function battleStep(
 ): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionRest[] } {
   // do BattleTurn action
   const battleTurn: BattleTurn = { tag: "BattleTurn", turn };
-  const afterTurnResult = doAction(battleTurn, state, log, { id: 0, type: "item" }, idGen);
+  const afterTurnResult = doAction(battleTurn, state, log, idGen);
   if (afterTurnResult.newState === "invalid") {
     return { result: "invalid", newLog: afterTurnResult.newLog };
   }
@@ -72,7 +72,7 @@ function battleStep(
         positions: enemyAction.positions,
         value: atkValue,
       };
-      const effectResult = doAction(action, state, afterTurnResult.newLog, { id: 0, type: "item" }, idGen);
+      const effectResult = doAction(action, state, afterTurnResult.newLog, idGen);
       if (effectResult.newState === "invalid") {
         return { result: "invalid", newLog: effectResult.newLog };
       } else {
@@ -93,7 +93,6 @@ function battleStep(
       const afterDeath = doAction({ tag: "Death", targetId: ally.id },
         battleResult.result.newState,
         battleResult.newLog,
-        { id: 0, type: "item" },
         idGen
       );
       battleResult = focus(battleResult,

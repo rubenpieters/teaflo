@@ -100,7 +100,7 @@ function solutionStep(
   idGen: Generator,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
   const action = nextAction(index, solution);
-  const actionResult = doAction(action, state, [], { id: 0, type: "item" }, idGen);
+  const actionResult = doAction(action, state, [], idGen);
   const actionLog: ActionLog = {
     action: action,
     loggedEffects: actionResult.newLog,

@@ -45,7 +45,6 @@ const recruitGrow1: Crew = {
         value: 1,
       },
     },
-
     {
       onTag: "Recruit",
       type: "before",
