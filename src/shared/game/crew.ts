@@ -9,7 +9,7 @@ export type Crew = {
   hpTemp: number,
   triggers: Trigger[],
   ranged: boolean,
-  attack: Attack,
+  attack: [Attack],
 };
 
 export function damage<C extends Crew>(
@@ -50,10 +50,10 @@ const stFighter: Crew = {
   hpTemp: 0,
   triggers: [],
   ranged: false,
-  attack: {
+  attack: [{
     tag: "Damage",
     multiplier: 1,
-  },
+  }],
 };
 
 const stRanged: Crew = {
@@ -63,10 +63,10 @@ const stRanged: Crew = {
   hpTemp: 0,
   triggers: [],
   ranged: true,
-  attack: {
+  attack: [{
     tag: "Damage",
     multiplier: 1,
-  },
+  }],
 };
 
 const recruitGrow1: Crew = {
@@ -97,10 +97,10 @@ const recruitGrow1: Crew = {
     },
   ],
   ranged: false,
-  attack: {
+  attack: [{
     tag: "Damage",
     multiplier: 1,
-  },
+  }],
 };
 
 const recruitGainAPWhenHP: Crew = {
@@ -121,11 +121,24 @@ const recruitGainAPWhenHP: Crew = {
     },
   ],
   ranged: false,
-  attack: {
+  attack: [{
     tag: "Damage",
     multiplier: 1,
-  },
+  }],
 };
+
+const recruitKillLast: Crew = {
+  ap: 10,
+  hp: 10,
+  apTemp: 0,
+  hpTemp: 0,
+  triggers: [],
+  ranged: false,
+  attack: [{
+    tag: "Damage",
+    multiplier: 1,
+  }],
+}
 
 export const allCrew = {
   stFighter: stFighter,

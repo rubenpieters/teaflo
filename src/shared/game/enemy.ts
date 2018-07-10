@@ -44,17 +44,38 @@ function battleStep(
 
 
   const meleeCrew: IdCrew | undefined = state.crew[0];
-  let newEnemy: Enemy = meleeCrew === undefined ? enemy : doAttack(meleeCrew, enemy);
+  const def = {
+    result: {
+      newState: state,
+      newEnemy: enemy,
+    },
+    newLog: log,
+  };
+  const afterMelee = meleeCrew === undefined ? def : doAttack(meleeCrew, enemy, state, log, idGen);
+  if (afterMelee.result === "invalid") {
+    return afterMelee;
+  }
 
-  newEnemy = state.crew.slice(1).reduce((acc, crew) => {
+  const afterRanged = state.crew.slice(1).reduce((acc, crew) => {
+    if (acc.result === "invalid") {
+      return acc
+    }
+
     if (crew.ranged) {
-      return doAttack(crew, acc);
+      return doAttack(crew, acc.result.newEnemy, acc.result.newState, acc.newLog, idGen);
     } else {
       return acc;
     }
-  }, newEnemy);
+  }, afterMelee);
 
+  if (afterRanged.result === "invalid") {
+    return afterRanged;
+  }
+  const newEnemy = afterRanged.result.newEnemy;
+
+  // use values of enemy before attack
   const actionIndex = turn % enemy.actions.length;
+  const enemyRank = enemy.rank;
   const enemyAction: EnemyAttack | undefined = enemy.actions[actionIndex];
 
   if (enemyAction === undefined) {
@@ -66,13 +87,13 @@ function battleStep(
     = (<any>"unused");
   switch (enemyAction.tag) {
     case "MeleeAttack": {
-      const atkValue: number = enemy.rank * enemyAction.multiplier;
+      const atkValue: number = enemyRank * enemyAction.multiplier;
       const action: Action<Target> = {
         tag: "Damage",
         positions: enemyAction.positions,
         value: atkValue,
       };
-      const effectResult = doAction(action, state, afterTurnResult.newLog, idGen);
+      const effectResult = doAction(action, afterRanged.result.newState, afterTurnResult.newLog, idGen);
       if (effectResult.newState === "invalid") {
         return { result: "invalid", newLog: effectResult.newLog };
       } else {

@@ -92,7 +92,7 @@ export type Action<T>
   | EndBattle
   ;
 
-function fmap<A, B>(
+export function fmap<A, B>(
   f: (a: A) => B,
   action: Action<A>,
 ): Action<B> {
