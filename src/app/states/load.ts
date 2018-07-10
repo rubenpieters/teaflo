@@ -24,6 +24,8 @@ export default class Load extends Phaser.State {
   public preload(): void {
     this.game.load.image("card1", "textures/card1.jpg");
     this.game.load.image("slot", "textures/slot.jpg");
+    this.game.load.image("ally", "textures/ally.jpg");
+    this.game.load.image("item", "textures/item.jpg");
   }
 
   private startMenu(): void {

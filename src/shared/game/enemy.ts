@@ -58,7 +58,7 @@ function battleStep(
 
   const afterRanged = state.crew.slice(1).reduce((acc, crew) => {
     if (acc.result === "invalid") {
-      return acc
+      return acc;
     }
 
     if (crew.ranged) {

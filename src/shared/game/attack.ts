@@ -18,7 +18,7 @@ export type Status = {
 export type ActionAttack = {
   tag: "ActionAttack",
   action: Action<TargetSpec>,
-}
+};
 
 export type Attack
   = Damage
@@ -60,7 +60,7 @@ export function doAttack(
         break;
       }
       case "ActionAttack": {
-        const action = fmap(x => findTarget(x, crew.id), attack.action);
+        const action = fmap(x => findTarget(x, state, crew.id), attack.action);
         const result = doAction(action, acc.result.newState, acc.newLog, idGen);
         if (result.newState === "invalid") {
           acc = {

@@ -2,6 +2,7 @@ import { changeConnected } from "src/app/appstate";
 import { changeAvailableCards } from "src/app/gamestate";
 import { Card } from "src/shared/game/solution";
 import { allCrew } from "src/shared/game/crew";
+import { allItems } from "src/shared/game/item";
 import { ServerMessage } from "src/shared/network/serverMessage";
 import { ClientMessage } from "src/shared/network/clientMessage";
 
@@ -32,6 +33,7 @@ export function getBoard(serverConn: ServerConnection, seed: string) {
   const cards: Card[] = [
     [{ tag: "Recruit", crew: allCrew.stFighter }],
     [{ tag: "Recruit", crew: allCrew.stRanged }],
+    [{ tag: "AddItem", item: allItems.guard3StartCombat }],
   ];
   changeAvailableCards(cards);
 }

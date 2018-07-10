@@ -9,7 +9,7 @@ export type Crew = {
   hpTemp: number,
   triggers: Trigger[],
   ranged: boolean,
-  attack: [Attack],
+  attack: Attack[],
 };
 
 export function damage<C extends Crew>(
@@ -134,11 +134,17 @@ const recruitKillLast: Crew = {
   hpTemp: 0,
   triggers: [],
   ranged: false,
-  attack: [{
-    tag: "Damage",
-    multiplier: 1,
-  }],
-}
+  attack: [
+/*    {
+      tag: "Death",
+      target:
+    },*/
+    {
+      tag: "Damage",
+      multiplier: 1,
+    },
+  ],
+};
 
 export const allCrew = {
   stFighter: stFighter,

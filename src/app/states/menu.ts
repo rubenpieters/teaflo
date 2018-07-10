@@ -3,19 +3,21 @@ import { addToSolution, addRestToSolution, changeSolution, addSolutionCallback, 
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
 import { Solution, Card, runSolution } from "src/shared/game/solution";
 import { showSolutionLog } from "src/shared/game/log";
+import { Crew } from "src/shared/game/crew";
+import { Item } from "src/shared/game/item";
 
 import { config } from "src/app/config";
 
 let availableCardsCache: Phaser.Sprite[] = [];
 let solutionCache: Phaser.Sprite[] = [];
+let crewCache: Phaser.Sprite[] = [];
+let itemCache: Phaser.Sprite[] = [];
+
+let nodeTypeDetail: Phaser.Text;
 
 let serverConn: ServerConnection | undefined = undefined;
 
 let playBoardGroup: Phaser.Group;
-
-type BoardNode = {
-  sprite: Phaser.Graphics,
-};
 
 let zoom: number = 0;
 
@@ -139,7 +141,7 @@ export default class Menu extends Phaser.State {
 
     // right menu
 
-    const nodeTypeDetail: Phaser.Text = this.game.add.text(0, 0, "--", {
+    nodeTypeDetail = this.game.add.text(0, 0, "--", {
       font: "14px Indie Flower",
       fill: "#77BFA3",
       boundsAlignH: "center",
@@ -318,6 +320,8 @@ export default class Menu extends Phaser.State {
       console.log(showSolutionLog(solutionResult.log));
       if (solutionResult.state === "invalid") {
         console.log("/INVALID/");
+      } else {
+        mkState(this.game, solutionResult.state.crew, solutionResult.state.items);
       }
     });
     changeSolution({ paths: [] });
@@ -413,6 +417,9 @@ function mkAvailableCards(
     const sprite = game.add.sprite(x, y, "card1", 0, playBoardGroup);
     sprite.inputEnabled = true;
     sprite.events.onInputDown.add(() => addToSolution(card));
+    sprite.events.onInputOver.add(() => {
+      nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
+    });
     sprites.push();
     y += 50;
   }
@@ -436,6 +443,10 @@ function mkSolution(
   for (const path of solution.paths) {
     for (const card of path.cards) {
       const sprite = game.add.sprite(x, y, "card1", 0, playBoardGroup);
+      sprite.inputEnabled = true;
+      sprite.events.onInputOver.add(() => {
+        nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
+      });
       sprites.push(sprite);
       y -= 50;
     }
@@ -454,4 +465,47 @@ function mkSolution(
   sprite.events.onInputDown.add(() => addRestToSolution({ tag: "Rest" }));
   sprites.push(sprite);
   solutionCache = sprites;
+}
+
+function mkState(
+  game: Phaser.Game,
+  crew: Crew[],
+  items: Item[],
+) {
+  // clear old
+  for (const sprite of crewCache) {
+    sprite.destroy();
+  }
+  for (const sprite of itemCache) {
+    sprite.destroy();
+  }
+
+  // create new
+  let x = 0;
+  let y = 100;
+  let sprites: Phaser.Sprite[] = [];
+  for (const ally of crew) {
+    const sprite = game.add.sprite(x, y, "ally", 0, playBoardGroup);
+    sprite.inputEnabled = true;
+    sprite.events.onInputOver.add(() => {
+      nodeTypeDetail.setText(JSON.stringify(ally, undefined, 2));
+    });
+    sprites.push(sprite);
+    x += 50;
+  }
+
+  y += 50;
+  x = 0;
+  crewCache = sprites;
+  sprites = [];
+  for (const item of items) {
+    const sprite = game.add.sprite(x, y, "item", 0, playBoardGroup);
+    sprite.inputEnabled = true;
+    sprite.events.onInputOver.add(() => {
+      nodeTypeDetail.setText(JSON.stringify(item, undefined, 2));
+    });
+    sprites.push(sprite);
+    x += 50;
+  }
+  itemCache = sprites;
 }

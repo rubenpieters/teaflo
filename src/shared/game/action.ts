@@ -63,7 +63,7 @@ export type PayGold = {
   pay: number,
 };
 
-export type Death<T> = {
+export type Death = {
   tag: "Death",
   targetId: number,
 };
@@ -86,7 +86,7 @@ export type Action<T>
   | GainAP<T>
   | GainGold
   | PayGold
-  | Death<T>
+  | Death
   | AddItem
   | StartBattle
   | EndBattle
@@ -140,7 +140,7 @@ export function doActionAt(
       for (const trigger of item.triggers) {
         if (trigger.onTag === action.tag && trigger.type === "before") {
           // TODO: targeting items not supported
-          const action = fmap(x => findTarget(x, (<any>"trying to target item")), trigger.action);
+          const action = fmap(x => findTarget(x, newState, (<any>"trying to target item")), trigger.action);
           const afterTrigger = doActionAt(action, newState, newLog, { id: from.id + 1, type: "item" }, idGen);
           if (afterTrigger.newState === "invalid") {
             return { newState: "invalid", newLog };
@@ -157,7 +157,7 @@ export function doActionAt(
   for (const ally of state.crew.slice(fromCrew)) {
     for (const trigger of ally.triggers) {
       if (trigger.onTag === action.tag && trigger.type === "before") {
-        const action = fmap(x => findTarget(x, ally.id), trigger.action);
+        const action = fmap(x => findTarget(x, newState, ally.id), trigger.action);
         const afterTrigger = doActionAt(action, newState, newLog, { id: from.id + 1, type: "crew" }, idGen);
         if (afterTrigger.newState === "invalid") {
           return { newState: "invalid", newLog };

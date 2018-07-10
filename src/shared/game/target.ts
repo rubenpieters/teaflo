@@ -28,9 +28,14 @@ export type AllCrew = {
   tag: "AllCrew",
 };
 
+export type LastCrew = {
+  tag: "LastCrew",
+};
+
 export type TargetSpec
   = Self
   | AllCrew
+  | LastCrew
   ;
 
 export type Positions = {
@@ -51,6 +56,7 @@ export type Target
 
 export function findTarget(
   targetSpec: TargetSpec,
+  state: GameState,
   selfId: number,
 ): Target {
   switch (targetSpec.tag) {
@@ -62,6 +68,17 @@ export function findTarget(
     }
     case "AllCrew": {
       return targetSpec;
+    }
+    case "LastCrew": {
+      if (state.crew.length > 0) {
+        return {
+          tag: "TargetId",
+          id: state.crew[state.crew.length - 1].id
+        };
+      } else {
+        // TODO: add target wiffing
+        throw "no crew while trying to target last crew";
+      }
     }
   }
 }

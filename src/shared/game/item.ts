@@ -3,7 +3,7 @@ import { Trigger } from "src/shared/game/trigger";
 
 export type Item = {
   triggers: Trigger[],
-}
+};
 
 const plus11StartCombat: Item = {
   triggers: [
@@ -43,9 +43,9 @@ const guard3StartCombat: Item = {
       },
     },
   ],
-}
+};
 
 export const allItems = {
   plus11StartCombat: plus11StartCombat,
   guard3StartCombat: guard3StartCombat,
-}
+};
