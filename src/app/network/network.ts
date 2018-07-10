@@ -1,8 +1,7 @@
 import { changeConnected } from "src/app/appstate";
 import { changeAvailableCards } from "src/app/gamestate";
 import { Card } from "src/shared/game/solution";
-import { allCrew } from "src/shared/game/crew";
-import { allItems } from "src/shared/game/item";
+import { allCards } from "src/shared/game/card";
 import { ServerMessage } from "src/shared/network/serverMessage";
 import { ClientMessage } from "src/shared/network/clientMessage";
 
@@ -31,9 +30,11 @@ export function getBoard(serverConn: ServerConnection, seed: string) {
 
   serverConn.socket.send(JSON.stringify(getBoardMessage));*/
   const cards: Card[] = [
-    [{ tag: "Recruit", crew: allCrew.stFighter }],
-    [{ tag: "Recruit", crew: allCrew.stRanged }],
-    [{ tag: "AddItem", item: allItems.guard3StartCombat }],
+    allCards.cardCrew_0000,
+    allCards.cardCrew_0001,
+    allCards.cardItem_0000,
+    allCards.cardBattle_0000,
+    allCards.cardBattle_0001,
   ];
   changeAvailableCards(cards);
 }

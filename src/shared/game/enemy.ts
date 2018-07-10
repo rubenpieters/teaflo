@@ -19,6 +19,7 @@ type MeleeAttack = {
 
 type Heal = {
   tag: "Heal",
+  value: number,
 };
 
 export type EnemyAttack
@@ -34,6 +35,7 @@ function battleStep(
   idGen: Generator,
 ): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionRest[] } {
   // do BattleTurn action
+  console.log("TEST " + turn);
   const battleTurn: BattleTurn = { tag: "BattleTurn", turn };
   const afterTurnResult = doAction(battleTurn, state, log, idGen);
   if (afterTurnResult.newState === "invalid") {
@@ -51,12 +53,12 @@ function battleStep(
     },
     newLog: log,
   };
-  const afterMelee = meleeCrew === undefined ? def : doAttack(meleeCrew, enemy, state, log, idGen);
+  const afterMelee = meleeCrew === undefined ? def : doAttack(meleeCrew, enemy, state, afterTurnResult.newLog, idGen);
   if (afterMelee.result === "invalid") {
     return afterMelee;
   }
 
-  const afterRanged = state.crew.slice(1).reduce((acc, crew) => {
+  const afterRanged = afterMelee.result.newState.crew.slice(1).reduce((acc, crew) => {
     if (acc.result === "invalid") {
       return acc;
     }
@@ -71,7 +73,7 @@ function battleStep(
   if (afterRanged.result === "invalid") {
     return afterRanged;
   }
-  const newEnemy = afterRanged.result.newEnemy;
+  let newEnemy = afterRanged.result.newEnemy;
 
   // use values of enemy before attack
   const actionIndex = turn % enemy.actions.length;
@@ -93,7 +95,7 @@ function battleStep(
         positions: enemyAction.positions,
         value: atkValue,
       };
-      const effectResult = doAction(action, afterRanged.result.newState, afterTurnResult.newLog, idGen);
+      const effectResult = doAction(action, afterRanged.result.newState, afterRanged.newLog, idGen);
       if (effectResult.newState === "invalid") {
         return { result: "invalid", newLog: effectResult.newLog };
       } else {
@@ -102,7 +104,10 @@ function battleStep(
       break;
     }
     case "Heal": {
-      battleResult = { result: { newState: state, newEnemy }, newLog: log };
+      if (newEnemy.rank > 0) {
+        newEnemy = focus(newEnemy, over(x => x.rank, x => x + enemyAction.value));
+      }
+      battleResult = { result: { newState: afterRanged.result.newState, newEnemy }, newLog: afterRanged.newLog };
       break;
     }
   }
@@ -165,3 +170,34 @@ export function _runBattle(
     return _runBattle(newState, newEnemy, turn + 1, newLog, idGen);
   }
 }
+
+const enemyAtk012R10: Enemy = {
+  rank: 10,
+  actions: [
+    {
+      tag: "MeleeAttack",
+      multiplier: 1,
+      positions: [0, 1, 2],
+    },
+  ],
+};
+
+const enemyHeal2R14: Enemy = {
+  rank: 14,
+  actions: [
+    {
+      tag: "MeleeAttack",
+      multiplier: 1,
+      positions: [0],
+    },
+    {
+      tag: "Heal",
+      value: 2,
+    },
+  ],
+};
+
+export const allEnemies = {
+  enemyAtk012: enemyAtk012R10,
+  enemyHeal2R14: enemyHeal2R14,
+};

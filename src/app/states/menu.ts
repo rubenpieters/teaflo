@@ -319,9 +319,10 @@ export default class Menu extends Phaser.State {
       const solutionResult = runSolution(solution);
       console.log(showSolutionLog(solutionResult.log));
       if (solutionResult.state === "invalid") {
-        console.log("/INVALID/");
+        resourcesText.setText("/INVALID/");
       } else {
         mkState(this.game, solutionResult.state.crew, solutionResult.state.items);
+        resourcesText.setText("gold: " + solutionResult.state.gold);
       }
     });
     changeSolution({ paths: [] });

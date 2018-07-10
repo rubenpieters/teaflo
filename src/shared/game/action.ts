@@ -130,7 +130,6 @@ export function doActionAt(
   from: { id: number, type: "item" | "crew" },
   idGen: Generator,
 ): { newState: GameState | "invalid", newLog: ActionRest[] } {
-  console.log(action.tag);
   let newState: GameState = state;
   let newLog: ActionRest[] = log;
 
