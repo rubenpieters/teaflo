@@ -12,13 +12,20 @@ type ParamCallBack<A> = (a: A) => void;
 const solutionCallbacks: ParamCallBack<Solution>[] = [];
 const cardsCallbacks: ParamCallBack<Card[]>[] = [];
 
-const gameState: GameState = {
+const initialGameState: GameState = {
   solution: { paths: [] },
   availableCards: [],
 };
 
+let gameState: GameState = initialGameState;
+
+export function resetGameState() {
+  changeAvailableCards(initialGameState.availableCards);
+  changeSolution(initialGameState.solution);
+}
+
 export function changeSolution(solution: Solution) {
-  gameState.solution = solution;
+  gameState = focus(gameState, set(x => x.solution, solution));
   solutionCallbacks.forEach(cb => cb(solution));
 }
 
@@ -57,7 +64,8 @@ export function addSolutionCallback(cb: ParamCallBack<Solution>) {
 }
 
 export function changeAvailableCards(cards: Card[]) {
-  gameState.availableCards = cards;
+  console.log("CARDS: " + cards.length);
+  gameState = focus(gameState, set(x => x.availableCards, cards));
   cardsCallbacks.forEach(cb => cb(cards));
 }
 

@@ -156,8 +156,7 @@ function guard3ItemTest() {
 }
 
 
-//basicCrewTest();
-//basicBattleTest();
-//basicBattleTest();
-//basicItemTest();
-guard3ItemTest();
+// basicCrewTest();
+basicBattleTest();
+// basicItemTest();
+// guard3ItemTest();

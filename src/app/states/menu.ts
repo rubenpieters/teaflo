@@ -19,7 +19,7 @@ let itemCache: Phaser.Sprite[] = [];
 
 let nodeTypeDetail: Phaser.Text;
 
-let serverConn: ServerConnection | undefined = undefined;
+// let serverConn: ServerConnection | undefined = undefined;
 
 let playBoardGroup: Phaser.Group;
 
@@ -43,7 +43,7 @@ export default class Menu extends Phaser.State {
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
 
-    this.game.canvas.oncontextmenu = (e) => e.preventDefault()
+    this.game.canvas.oncontextmenu = e => e.preventDefault();
   }
 
   public create(): void {
@@ -96,7 +96,8 @@ export default class Menu extends Phaser.State {
     }, menuGroup);
     board1Btn.setTextBounds(75 - 400, 165 - 300, 75, 50);
     board1Btn.inputEnabled = true;
-    board1Btn.events.onInputDown.add(() => { if (serverConn !== undefined) { getBoard(serverConn, "ABCD-EFGH"); } });
+    // board1Btn.events.onInputDown.add(() => { if (serverConn !== undefined) { getBoard(serverConn, "1"); } });
+    board1Btn.events.onInputDown.add(() => { getBoard(<any>undefined, "1"); });
 
     const board2Btn: Phaser.Text = this.add.text(0, 0, "board2", {
       font: "20px Indie Flower",
@@ -106,7 +107,8 @@ export default class Menu extends Phaser.State {
     }, menuGroup);
     board2Btn.setTextBounds(175 - 400, 165 - 300, 75, 50);
     board2Btn.inputEnabled = true;
-    board2Btn.events.onInputDown.add(() => { if (serverConn !== undefined) { getBoard(serverConn, "IJKL-MNOP"); } });
+    // board2Btn.events.onInputDown.add(() => { if (serverConn !== undefined) { getBoard(serverConn, "2"); } });
+    board2Btn.events.onInputDown.add(() => { getBoard(<any>undefined, "2"); });
 
     const home2: Phaser.Text = this.add.text(0, 0, "Top Solutions", {
       font: "35px Indie Flower",
@@ -335,7 +337,8 @@ export default class Menu extends Phaser.State {
 
     // connect to server
 
-    serverConn = connectToServer((serverConn) => { getBoard(serverConn, "ABCD-EFGH"); });
+    // serverConn = connectToServer((serverConn) => { getBoard(serverConn, "1"); });
+    getBoard(<any>undefined, "1");
   }
 
   public update() {
@@ -427,7 +430,7 @@ function mkAvailableCards(
     sprite.events.onInputOver.add(() => {
       nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
     });
-    sprites.push();
+    sprites.push(sprite);
     y += 50;
   }
   availableCardsCache = sprites;

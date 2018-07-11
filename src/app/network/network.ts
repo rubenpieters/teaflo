@@ -1,5 +1,5 @@
 import { changeConnected } from "src/app/appstate";
-import { changeAvailableCards } from "src/app/gamestate";
+import { resetGameState, changeAvailableCards } from "src/app/gamestate";
 import { Card } from "src/shared/game/solution";
 import { allCards } from "src/shared/game/card";
 import { ServerMessage } from "src/shared/network/serverMessage";
@@ -29,13 +29,24 @@ export function getBoard(serverConn: ServerConnection, seed: string) {
   };
 
   serverConn.socket.send(JSON.stringify(getBoardMessage));*/
-  const cards: Card[] = [
-    allCards.cardCrew_0000,
-    allCards.cardCrew_0001,
-    allCards.cardItem_0000,
-    allCards.cardBattle_0000,
-    allCards.cardBattle_0001,
-  ];
+  let cards: Card[];
+  if (seed === "1") {
+    cards = [
+      allCards.cardCrew_0000,
+      allCards.cardCrew_0001,
+      allCards.cardItem_0000,
+      allCards.cardBattle_0000,
+      allCards.cardBattle_0001,
+    ];
+  } else if (seed === "2") {
+    cards = [
+      allCards.cardCrew_0000,
+      allCards.cardCrew_0001,
+    ];
+  } else {
+    throw "unexpected seed: " + seed;
+  }
+  resetGameState();
   changeAvailableCards(cards);
 }
 
