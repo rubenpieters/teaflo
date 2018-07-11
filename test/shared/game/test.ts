@@ -8,9 +8,9 @@ function basicCrewTest() {
   const path1: Path = {
     restAction: { tag: "Rest" },
     cards: [
-      [{ tag: "Recruit", crew: allCrew.recruitGrow1 }],
-      [{ tag: "Recruit", crew: allCrew.stFighter }],
-      [{ tag: "Recruit", crew: allCrew.stFighter }],
+      { actions: [{ tag: "Recruit", crew: allCrew.recruitGrow1 }], id: 0 },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
     ]
   }
   const solution: Solution = {
@@ -34,15 +34,15 @@ function basicBattleTest() {
   const path1: Path = {
     restAction: { tag: "Rest" },
     cards: [
-      [{ tag: "Recruit", crew: allCrew.stFighter }],
-      [{ tag: "Recruit", crew: allCrew.stRanged }],
-      [{ tag: "Battle", enemy: { rank: 2, actions: [{
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
+      { actions: [{ tag: "Recruit", crew: allCrew.stRanged }], id: 0 },
+      { actions: [{ tag: "Battle", enemy: { rank: 2, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
         positions: [0], }] } },
         { tag: "GainGold", gain: 5 },
-      ],
-      [{
+      ], id: 0 },
+      { actions: [{
         tag: "PayGold",
         pay: 5,
       },
@@ -50,7 +50,7 @@ function basicBattleTest() {
         tag: "AddItem",
         item: { triggers: [] },
       }
-      ],
+      ], id: 0 },
     ]
   }
   const solution: Solution = {
@@ -72,14 +72,14 @@ function basicDeathTest() {
   const path1: Path = {
     restAction: { tag: "Rest" },
     cards: [
-      [{ tag: "Recruit", crew: allCrew.stFighter }],
-      [{ tag: "Recruit", crew: allCrew.stFighter }],
-      [{ tag: "Battle", enemy: { rank: 8, actions: [{
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
+      { actions: [{ tag: "Battle", enemy: { rank: 8, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
         positions: [0], }] } },
         { tag: "GainGold", gain: 5 },
-      ],
+      ], id: 0 },
     ]
   }
   const solution: Solution = {
@@ -101,14 +101,14 @@ function basicItemTest() {
   const path1: Path = {
     restAction: { tag: "Rest" },
     cards: [
-      [{ tag: "Recruit", crew: allCrew.recruitGainAPWhenHP }],
-      [{ tag: "AddItem", item: allItems.plus11StartCombat }],
-      [{ tag: "Battle", enemy: { rank: 6, actions: [{
+      { actions: [{ tag: "Recruit", crew: allCrew.recruitGainAPWhenHP }], id: 0 },
+      { actions: [{ tag: "AddItem", item: allItems.plus11StartCombat }], id: 0 },
+      { actions: [{ tag: "Battle", enemy: { rank: 6, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
         positions: [0], }] } },
         { tag: "GainGold", gain: 5 },
-      ],
+      ], id: 0 },
     ]
   }
   const solution: Solution = {
@@ -130,14 +130,14 @@ function guard3ItemTest() {
   const path1: Path = {
     restAction: { tag: "Rest" },
     cards: [
-      [{ tag: "Recruit", crew: allCrew.stFighter }],
-      [{ tag: "AddItem", item: allItems.guard3StartCombat }],
-      [{ tag: "Battle", enemy: { rank: 0, actions: [{
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
+      { actions: [{ tag: "AddItem", item: allItems.guard3StartCombat }], id: 0 },
+      { actions: [{ tag: "Battle", enemy: { rank: 0, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
         positions: [0], }] } },
         { tag: "GainGold", gain: 5 },
-      ],
+      ], id: 0 },
     ]
   }
   const solution: Solution = {

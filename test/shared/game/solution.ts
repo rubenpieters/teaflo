@@ -6,21 +6,21 @@ function basicTest() {
   const path1: Path = {
     restAction: { tag: "Rest" },
     cards: [
-      [
+      { actions: [
         { tag: "Recruit", crew: allCrew.stFighter },
         { tag: "Recruit", crew: allCrew.stFighter },
-      ],
-      [{ tag: "Recruit", crew: allCrew.stFighter }],
+      ], id: 0 },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
     ]
   }
   const path2: Path = {
     restAction: { tag: "Rest" },
     cards: [
-      [
+      { actions: [
         { tag: "Recruit", crew: allCrew.stFighter },
         { tag: "Recruit", crew: allCrew.stFighter },
-      ],
-      [{ tag: "Recruit", crew: allCrew.stFighter }],
+      ], id: 0 },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
     ]
   }
   const solution: Solution = {

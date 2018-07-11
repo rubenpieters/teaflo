@@ -1,5 +1,5 @@
 import { changeConnected } from "src/app/appstate";
-import { resetGameState, changeAvailableCards } from "src/app/gamestate";
+import { resetGameState, changeAvailableCards, LimitedCard } from "src/app/gamestate";
 import { Card } from "src/shared/game/solution";
 import { allCards } from "src/shared/game/card";
 import { ServerMessage } from "src/shared/network/serverMessage";
@@ -29,19 +29,19 @@ export function getBoard(serverConn: ServerConnection, seed: string) {
   };
 
   serverConn.socket.send(JSON.stringify(getBoardMessage));*/
-  let cards: Card[];
+  let cards: LimitedCard[];
   if (seed === "1") {
     cards = [
-      allCards.cardCrew_0000,
-      allCards.cardCrew_0001,
-      allCards.cardItem_0000,
-      allCards.cardBattle_0000,
-      allCards.cardBattle_0001,
+      {...allCards.cardCrew_0000, ...{ limit: 5 } },
+      {...allCards.cardCrew_0001, ...{ limit: 5 } },
+      {...allCards.cardItem_0000, ...{ limit: 5 } },
+      {...allCards.cardBattle_0000, ...{ limit: 5 } },
+      {...allCards.cardBattle_0001, ...{ limit: 5 } },
     ];
   } else if (seed === "2") {
     cards = [
-      allCards.cardCrew_0000,
-      allCards.cardCrew_0001,
+      {...allCards.cardCrew_0000, ...{ limit: 5 } },
+      {...allCards.cardCrew_0001, ...{ limit: 5 } },
     ];
   } else {
     throw "unexpected seed: " + seed;

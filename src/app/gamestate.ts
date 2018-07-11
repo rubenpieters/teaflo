@@ -2,15 +2,21 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Solution, Card } from "src/shared/game/solution";
 import { Rest } from "src/shared/game/action";
 
+export type Limit = {
+  limit: number,
+};
+
+export type LimitedCard = Card & Limit;
+
 export type GameState = {
   solution: Solution,
-  availableCards: Card[],
+  availableCards: LimitedCard[],
 };
 
 type ParamCallBack<A> = (a: A) => void;
 
 const solutionCallbacks: ParamCallBack<Solution>[] = [];
-const cardsCallbacks: ParamCallBack<Card[]>[] = [];
+const cardsCallbacks: ParamCallBack<LimitedCard[]>[] = [];
 
 const initialGameState: GameState = {
   solution: { paths: [] },
@@ -29,23 +35,59 @@ export function changeSolution(solution: Solution) {
   solutionCallbacks.forEach(cb => cb(solution));
 }
 
+export function minusLimit(limitTexts: Phaser.Text[], index: number) {
+  if (gameState.availableCards[index].limit > 0) {
+    gameState = focus(gameState,
+      over(x => x.availableCards[index].limit, x => x - 1)
+    );
+    limitTexts[index].setText(gameState.availableCards[index].limit.toString());
+    return "cardUsed";
+  } else {
+    return "limitIsZero";
+  }
+}
+
+export function plusLimit(limitTexts: Phaser.Text[], cardId: number) {
+  const index = findIdAvailableCard(cardId);
+  if (index === "notFound") {
+    throw ("index " + index + " not found in available cards");
+  }
+  gameState = focus(gameState,
+    over(x => x.availableCards[index].limit, x => x + 1)
+  );
+  console.log("new limit set");
+  limitTexts[index].setText(gameState.availableCards[index].limit.toString());
+}
+
+function findIdAvailableCard(cardId: number) {
+  let index: number | "notFound" = "notFound";
+  let i = 0;
+  for (const card of gameState.availableCards) {
+    if (card.id === cardId) {
+      index = i;
+    }
+    i += 1;
+  }
+  return index;
+}
+
 export function addToSolution(card: Card) {
   const solution = focus(gameState.solution,
-    over (x => x.paths[x.paths.length - 1].cards, x => x.concat([card])),
+    over(x => x.paths[x.paths.length - 1].cards, x => x.concat([card])),
   );
   changeSolution(solution);
 }
 
 export function addRestToSolution(rest: Rest) {
   const solution = focus(gameState.solution,
-    over (x => x.paths, x => x.concat({ restAction: rest, cards: [] })),
+    over(x => x.paths, x => x.concat({ restAction: rest, cards: [] })),
   );
   changeSolution(solution);
 }
 
 export function removeCardFromSolution(pathIndex: number, cardIndex: number) {
   const solution = focus(gameState.solution,
-    over (x => x.paths[pathIndex].cards, x => x.slice(0, cardIndex).concat(x.slice(cardIndex + 1, x.length))),
+    over(x => x.paths[pathIndex].cards, x => x.slice(0, cardIndex).concat(x.slice(cardIndex + 1, x.length))),
   );
   changeSolution(solution);
 }
@@ -63,12 +105,12 @@ export function addSolutionCallback(cb: ParamCallBack<Solution>) {
   solutionCallbacks.push(cb);
 }
 
-export function changeAvailableCards(cards: Card[]) {
+export function changeAvailableCards(cards: LimitedCard[]) {
   console.log("CARDS: " + cards.length);
   gameState = focus(gameState, set(x => x.availableCards, cards));
   cardsCallbacks.forEach(cb => cb(cards));
 }
 
-export function addCardsCallback(cb: ParamCallBack<Card[]>) {
+export function addCardsCallback(cb: ParamCallBack<LimitedCard[]>) {
   cardsCallbacks.push(cb);
 }

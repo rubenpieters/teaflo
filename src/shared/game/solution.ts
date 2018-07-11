@@ -5,7 +5,10 @@ import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Target } from "src/shared/game/target";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
 
-export type Card = Action<Target>[];
+export type Card = {
+  id: number,
+  actions: Action<Target>[],
+};
 
 export type Path = {
   restAction: Rest,
@@ -43,7 +46,7 @@ function nextAction(
   if (card === undefined) {
     throw ("invalid index: " + JSON.stringify(index));
   }
-  const action: Action<Target> | undefined = card[index.action];
+  const action: Action<Target> | undefined = card.actions[index.action];
   if (action === undefined) {
     throw ("invalid index " + JSON.stringify(index));
   }
@@ -67,7 +70,7 @@ export function nextIndex(
 
   if (
     newCard < solution.paths[newPath].cards.length &&
-    newAction < solution.paths[newPath].cards[newCard].length
+    newAction < solution.paths[newPath].cards[newCard].actions.length
   ) {
     return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
   }
@@ -77,7 +80,7 @@ export function nextIndex(
 
   if (
     newCard < solution.paths[newPath].cards.length &&
-    newAction < solution.paths[newPath].cards[newCard].length
+    newAction < solution.paths[newPath].cards[newCard].actions.length
   ) {
     return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
   }

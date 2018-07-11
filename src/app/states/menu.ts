@@ -1,5 +1,5 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
-import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFromSolution, changeSolution, addSolutionCallback, addCardsCallback } from "src/app/gamestate";
+import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFromSolution, changeSolution, addSolutionCallback, addCardsCallback, LimitedCard, minusLimit, plusLimit } from "src/app/gamestate";
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
 import { Solution, SolutionResult, Card, runSolution, runSolutionAll } from "src/shared/game/solution";
 import { SolutionLog, showSolutionLog } from "src/shared/game/log";
@@ -13,6 +13,7 @@ import { config } from "src/app/config";
 export type ValidResult = { state: GameState, log: SolutionLog };
 
 let availableCardsCache: Phaser.Sprite[] = [];
+let availableCardsTextCache: Phaser.Text[] = [];
 let solutionCache: Phaser.Sprite[] = [];
 let crewCache: Phaser.Sprite[] = [];
 let itemCache: Phaser.Sprite[] = [];
@@ -412,28 +413,59 @@ function onDown(game: Phaser.Game) {
 
 function mkAvailableCards(
   game: Phaser.Game,
-  cards: Card[],
+  cards: LimitedCard[],
 ) {
   // clear old
   for (const sprite of availableCardsCache) {
     sprite.destroy();
+  }
+  for (const text of availableCardsTextCache) {
+    text.destroy();
   }
 
   // create new
   const x = -250;
   let y = -250;
   const sprites: Phaser.Sprite[] = [];
+  const texts: Phaser.Text[] = [];
+  let i = 0;
   for (const card of cards) {
+    const text = game.add.text(x + 50, y, card.limit.toString(), {
+      font: "20px",
+      fill: "#000000",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, playBoardGroup);
+    texts.push(text);
+
     const sprite = game.add.sprite(x, y, "card1", 0, playBoardGroup);
     sprite.inputEnabled = true;
-    sprite.events.onInputDown.add(() => addToSolution(card));
+    sprite.events.onInputDown.add(onAvailableCardClick(texts, card, i));
     sprite.events.onInputOver.add(() => {
       nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
     });
     sprites.push(sprite);
+
     y += 50;
+    i += 1;
   }
   availableCardsCache = sprites;
+  availableCardsTextCache = texts;
+}
+
+function onAvailableCardClick(
+  texts: Phaser.Text[],
+  card: LimitedCard,
+  index: number,
+) {
+  return function() {
+    const result = minusLimit(texts, index);
+    if (result === "cardUsed") {
+      addToSolution(card);
+    } else {
+      console.log("card uses at 0");
+    }
+  };
 }
 
 function mkSolution(
@@ -469,7 +501,7 @@ function mkSolution(
       sprite.events.onInputOver.add(() => {
         nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
       });
-      sprite.events.onInputDown.add(onSolutionCardClick(game, resourcesText, solutionResults, pathIndex, cardIndex, i));
+      sprite.events.onInputDown.add(onSolutionCardClick(game, resourcesText, solutionResults, pathIndex, cardIndex, i, card.id));
       sprites.push(sprite);
       y -= 50;
       cardIndex += 1;
@@ -499,6 +531,7 @@ function onSolutionCardClick(
   pathIndex: number,
   cardIndex: number,
   i: number,
+  cardId: number,
 ) {
   return function(
     sprite: Phaser.Sprite,
@@ -508,6 +541,7 @@ function onSolutionCardClick(
       _mkState(game, resourcesText, solutionResults, i);
     } else if (pointer.rightButton.isDown) {
       removeCardFromSolution(pathIndex, cardIndex);
+      plusLimit(availableCardsTextCache, cardId);
     }
   };
 }
@@ -518,7 +552,6 @@ function _mkState(
   solutionResults: SolutionResult[],
   index: number,
 ) {
-  console.log("SHOWING: index " + index);
   let solutionResult: SolutionResult;
   if (index >= solutionResults.length) {
     solutionResult = solutionResults[solutionResults.length - 1];

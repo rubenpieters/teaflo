@@ -3,23 +3,38 @@ import { allCrew } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { allEnemies } from "src/shared/game/enemy";
 
-const cardCrew_0000: Card = [{ tag: "Recruit", crew: allCrew.stFighter }];
-const cardCrew_0001: Card = [{ tag: "Recruit", crew: allCrew.stRanged }];
+const cardCrew_0000: Card = {
+  actions: [{ tag: "Recruit", crew: allCrew.stFighter }],
+  id: 0,
+};
+const cardCrew_0001: Card = {
+  actions: [{ tag: "Recruit", crew: allCrew.stRanged }],
+  id: 1,
+};
 
-const cardItem_0000: Card = [
-  { tag: "PayGold", pay: 5 },
-  { tag: "AddItem", item: allItems.guard3StartCombat },
-];
+const cardItem_0000: Card = {
+  actions: [
+    { tag: "PayGold", pay: 5 },
+    { tag: "AddItem", item: allItems.guard3StartCombat },
+  ],
+  id: 2,
+};
 
-const cardBattle_0000: Card = [
-  { tag: "Battle", enemy: allEnemies.enemyAtk012 },
-  { tag: "GainGold", gain: 10 },
-];
+const cardBattle_0000: Card = {
+  actions: [
+    { tag: "Battle", enemy: allEnemies.enemyAtk012 },
+    { tag: "GainGold", gain: 10 },
+  ],
+  id: 3,
+};
 
-const cardBattle_0001: Card = [
-  { tag: "Battle", enemy: allEnemies.enemyHeal2R14 },
-  { tag: "GainGold", gain: 7 },
-];
+const cardBattle_0001: Card = {
+  actions: [
+    { tag: "Battle", enemy: allEnemies.enemyHeal2R14 },
+    { tag: "GainGold", gain: 7 },
+  ],
+  id: 4,
+};
 
 export const allCards = {
   cardCrew_0000: cardCrew_0000,
