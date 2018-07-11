@@ -37,12 +37,10 @@ export function addRestToSolution(rest: Rest) {
 }
 
 export function removeCardFromSolution(pathIndex: number, cardIndex: number) {
-  return function() {
-    const solution = focus(gameState.solution,
-      over (x => x.paths[pathIndex].cards, x => x.slice(0, cardIndex).concat(x.slice(cardIndex + 1, x.length))),
-    );
-    changeSolution(solution);
-  };
+  const solution = focus(gameState.solution,
+    over (x => x.paths[pathIndex].cards, x => x.slice(0, cardIndex).concat(x.slice(cardIndex + 1, x.length))),
+  );
+  changeSolution(solution);
 }
 
 export function removePathFromSolution(pathIndex: number) {

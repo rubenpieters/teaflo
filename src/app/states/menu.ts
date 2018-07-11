@@ -1,12 +1,16 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
 import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFromSolution, changeSolution, addSolutionCallback, addCardsCallback } from "src/app/gamestate";
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
-import { Solution, Card, runSolution } from "src/shared/game/solution";
-import { showSolutionLog } from "src/shared/game/log";
+import { Solution, SolutionResult, Card, runSolution, runSolutionAll } from "src/shared/game/solution";
+import { SolutionLog, showSolutionLog } from "src/shared/game/log";
 import { Crew } from "src/shared/game/crew";
 import { Item } from "src/shared/game/item";
+import { GameState } from "src/shared/game/state";
 
 import { config } from "src/app/config";
+
+
+export type ValidResult = { state: GameState, log: SolutionLog };
 
 let availableCardsCache: Phaser.Sprite[] = [];
 let solutionCache: Phaser.Sprite[] = [];
@@ -38,6 +42,8 @@ export default class Menu extends Phaser.State {
     this.scale.maxHeight = config.gameHeight;
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
+
+    this.game.canvas.oncontextmenu = (e) => e.preventDefault()
   }
 
   public create(): void {
@@ -315,14 +321,14 @@ export default class Menu extends Phaser.State {
     });
 
     addSolutionCallback(solution => {
-      mkSolution(this.game, solution);
-      const solutionResult = runSolution(solution);
-      console.log(showSolutionLog(solutionResult.log));
-      if (solutionResult.state === "invalid") {
+      const solutionResults = runSolutionAll(solution);
+      mkSolution(this.game, resourcesText, solution, solutionResults);
+      const solutionResult = solutionResults[solutionResults.length - 1];
+      // console.log(showSolutionLog(solutionResult.log));
+      if (solutionResults.length === 0 || solutionResult.state === "invalid") {
         resourcesText.setText("/INVALID/");
       } else {
-        mkState(this.game, solutionResult.state.crew, solutionResult.state.items);
-        resourcesText.setText("gold: " + solutionResult.state.gold);
+        mkState(this.game, resourcesText, (<ValidResult>solutionResult));
       }
     });
     changeSolution({ paths: [] });
@@ -429,7 +435,9 @@ function mkAvailableCards(
 
 function mkSolution(
   game: Phaser.Game,
+  resourcesText: Phaser.Text,
   solution: Solution,
+  solutionResults: SolutionResult[],
 ) {
   // clear old
   for (const sprite of solutionCache) {
@@ -441,7 +449,10 @@ function mkSolution(
   let y = 0;
   const sprites: Phaser.Sprite[] = [];
   let pathIndex = 0;
+  let i = 0;
   for (const path of solution.paths) {
+    // increase 1 for rest action
+    i += 1;
     const sprite = game.add.sprite(x, y, "rest", 0, playBoardGroup);
     sprite.inputEnabled = true;
     sprites.push(sprite);
@@ -455,10 +466,11 @@ function mkSolution(
       sprite.events.onInputOver.add(() => {
         nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
       });
-      sprite.events.onInputDown.add(removeCardFromSolution(pathIndex, cardIndex));
+      sprite.events.onInputDown.add(onSolutionCardClick(game, resourcesText, solutionResults, pathIndex, cardIndex, i));
       sprites.push(sprite);
       y -= 50;
       cardIndex += 1;
+      i += 1;
     }
 
     if (pathIndex === solution.paths.length - 1) {
@@ -477,11 +489,55 @@ function mkSolution(
   solutionCache = sprites;
 }
 
+function onSolutionCardClick(
+  game: Phaser.Game,
+  resourcesText: Phaser.Text,
+  solutionResults: SolutionResult[],
+  pathIndex: number,
+  cardIndex: number,
+  i: number,
+) {
+  return function(
+    sprite: Phaser.Sprite,
+    pointer: Phaser.Pointer,
+  ) {
+    if (pointer.leftButton.isDown) {
+      _mkState(game, resourcesText, solutionResults, i);
+    } else if (pointer.rightButton.isDown) {
+      removeCardFromSolution(pathIndex, cardIndex);
+    }
+  };
+}
+
+function _mkState(
+  game: Phaser.Game,
+  resourcesText: Phaser.Text,
+  solutionResults: SolutionResult[],
+  index: number,
+) {
+  console.log("SHOWING: index " + index);
+  let solutionResult: SolutionResult;
+  if (index >= solutionResults.length) {
+    solutionResult = solutionResults[solutionResults.length - 1];
+  } else {
+    solutionResult = solutionResults[index];
+  }
+  if (solutionResult.state === "invalid") {
+    resourcesText.setText("/INVALID/");
+  } else {
+    mkState(game, resourcesText, (<ValidResult>solutionResult));
+  }
+}
+
 function mkState(
   game: Phaser.Game,
-  crew: Crew[],
-  items: Item[],
+  resourcesText: Phaser.Text,
+  solutionResult: ValidResult,
 ) {
+  resourcesText.setText("gold: " + solutionResult.state.gold);
+  const crew: Crew[] = solutionResult.state.crew;
+  const items: Item[] = solutionResult.state.items;
+
   // clear old
   for (const sprite of crewCache) {
     sprite.destroy();

@@ -138,10 +138,43 @@ function _runSolution(
 
   const solStep = solutionStep(index, state, solution, idGen);
   const stepResult = solStep.result;
-  const newSolutionLog = focus(log, over(x => x.actionLog, x => x.concat([solStep.log])));
+  const newSolutionLog = focus(log, over(x => x.actionLog, x => x.concat(solStep.log)));
   if (stepResult === "invalid") {
     return { state: "invalid", log: newSolutionLog };
   }
   const { newIndex, newState } = stepResult;
   return _runSolution(solution, newIndex, newState, newSolutionLog, idGen);
+}
+
+export function runSolutionAll(
+  solution: Solution,
+): SolutionResult[] {
+  if (solution.paths.length === 0) {
+    return [];
+  }
+  return _runSolutionAll(solution, initialIndex, initialState, emptySolutionLog, plusOneGenerator(), []);
+}
+
+function _runSolutionAll(
+  solution: Solution,
+  index: SolutionIndex | "done",
+  state: GameState,
+  log: SolutionLog,
+  idGen: Generator,
+  acc: SolutionResult[],
+): SolutionResult[] {
+  if (index === "done") {
+    return acc;
+  }
+
+  const solStep = solutionStep(index, state, solution, idGen);
+  const stepResult = solStep.result;
+  const newSolutionLog = focus(log, over(x => x.actionLog, x => x.concat(solStep.log)));
+  if (stepResult === "invalid") {
+    return acc.concat({ state: "invalid", log: newSolutionLog });
+  } else {
+    const { newIndex, newState } = stepResult;
+    acc = acc.concat({ state: newState, log: newSolutionLog });
+    return _runSolutionAll(solution, newIndex, newState, newSolutionLog, idGen, acc);
+  }
 }
