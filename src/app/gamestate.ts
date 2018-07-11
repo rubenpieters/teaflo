@@ -36,6 +36,24 @@ export function addRestToSolution(rest: Rest) {
   changeSolution(solution);
 }
 
+export function removeCardFromSolution(pathIndex: number, cardIndex: number) {
+  return function() {
+    const solution = focus(gameState.solution,
+      over (x => x.paths[pathIndex].cards, x => x.slice(0, cardIndex).concat(x.slice(cardIndex + 1, x.length))),
+    );
+    changeSolution(solution);
+  };
+}
+
+export function removePathFromSolution(pathIndex: number) {
+  return function() {
+    const solution = focus(gameState.solution,
+      over (x => x.paths, x => x.slice(0, pathIndex).concat(x.slice(pathIndex + 1, x.length))),
+    );
+    changeSolution(solution);
+  };
+}
+
 export function addSolutionCallback(cb: ParamCallBack<Solution>) {
   solutionCallbacks.push(cb);
 }

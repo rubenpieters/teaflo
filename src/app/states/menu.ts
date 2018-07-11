@@ -1,5 +1,5 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
-import { addToSolution, addRestToSolution, changeSolution, addSolutionCallback, addCardsCallback } from "src/app/gamestate";
+import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFromSolution, changeSolution, addSolutionCallback, addCardsCallback } from "src/app/gamestate";
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
 import { Solution, Card, runSolution } from "src/shared/game/solution";
 import { showSolutionLog } from "src/shared/game/log";
@@ -440,26 +440,35 @@ function mkSolution(
   let x = 0;
   let y = 0;
   const sprites: Phaser.Sprite[] = [];
-  let index = 0;
+  let pathIndex = 0;
   for (const path of solution.paths) {
+    const sprite = game.add.sprite(x, y, "rest", 0, playBoardGroup);
+    sprite.inputEnabled = true;
+    sprites.push(sprite);
+    sprite.events.onInputDown.add(removePathFromSolution(pathIndex));
+    y -= 50;
+
+    let cardIndex = 0;
     for (const card of path.cards) {
       const sprite = game.add.sprite(x, y, "card1", 0, playBoardGroup);
       sprite.inputEnabled = true;
       sprite.events.onInputOver.add(() => {
         nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
       });
+      sprite.events.onInputDown.add(removeCardFromSolution(pathIndex, cardIndex));
       sprites.push(sprite);
       y -= 50;
+      cardIndex += 1;
     }
 
-    if (index === solution.paths.length - 1) {
+    if (pathIndex === solution.paths.length - 1) {
       const sprite = game.add.sprite(x, y, "slot", 0, playBoardGroup);
       sprites.push(sprite);
     }
 
     y = 0;
     x += 50;
-    index += 1;
+    pathIndex += 1;
   }
   const sprite = game.add.sprite(x, y, "slot", 0, playBoardGroup);
   sprite.inputEnabled = true;
