@@ -1,7 +1,7 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
 import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFromSolution, changeSolution, addSolutionCallback, addCardsCallback, LimitedCard, minusLimit, plusLimit } from "src/app/gamestate";
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
-import { Solution, SolutionResult, Card, runSolution, runSolutionAll } from "src/shared/game/solution";
+import { Solution, SolutionResult, runSolution, runSolutionAll } from "src/shared/game/solution";
 import { SolutionLog, showSolutionLog } from "src/shared/game/log";
 import { Crew } from "src/shared/game/crew";
 import { Item } from "src/shared/game/item";
@@ -461,7 +461,15 @@ function onAvailableCardClick(
   return function() {
     const result = minusLimit(texts, index);
     if (result === "cardUsed") {
-      addToSolution(card);
+      switch (card.tag) {
+        case "event": {
+          addToSolution(card);
+          break;
+        }
+        case "rest": {
+          break;
+        }
+      }
     } else {
       console.log("card uses at 0");
     }
@@ -495,7 +503,7 @@ function mkSolution(
     y -= 50;
 
     let cardIndex = 0;
-    for (const card of path.cards) {
+    for (const card of path.eventCards) {
       const sprite = game.add.sprite(x, y, "card1", 0, playBoardGroup);
       sprite.inputEnabled = true;
       sprite.events.onInputOver.add(() => {
@@ -519,7 +527,7 @@ function mkSolution(
   }
   const sprite = game.add.sprite(x, y, "slot", 0, playBoardGroup);
   sprite.inputEnabled = true;
-  sprite.events.onInputDown.add(() => addRestToSolution({ tag: "Rest" }));
+  sprite.events.onInputDown.add(() => addRestToSolution({ actions: [{ tag: "Rest" }], id: -1, tag: "rest" }));
   sprites.push(sprite);
   solutionCache = sprites;
 }

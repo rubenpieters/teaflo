@@ -6,11 +6,11 @@ import { showSolutionLog } from "src/shared/game/log";
 
 function basicCrewTest() {
   const path1: Path = {
-    restAction: { tag: "Rest" },
-    cards: [
-      { actions: [{ tag: "Recruit", crew: allCrew.recruitGrow1 }], id: 0 },
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
+      { actions: [{ tag: "Recruit", crew: allCrew.recruitGrow1 }], id: 0, tag: "event" },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
     ]
   }
   const solution: Solution = {
@@ -32,16 +32,16 @@ function basicCrewTest() {
 
 function basicBattleTest() {
   const path1: Path = {
-    restAction: { tag: "Rest" },
-    cards: [
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
-      { actions: [{ tag: "Recruit", crew: allCrew.stRanged }], id: 0 },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "Recruit", crew: allCrew.stRanged }], id: 0, tag: "event" },
       { actions: [{ tag: "Battle", enemy: { rank: 2, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
         positions: [0], }] } },
         { tag: "GainGold", gain: 5 },
-      ], id: 0 },
+      ], id: 0, tag: "event" },
       { actions: [{
         tag: "PayGold",
         pay: 5,
@@ -50,7 +50,7 @@ function basicBattleTest() {
         tag: "AddItem",
         item: { triggers: [] },
       }
-      ], id: 0 },
+      ], id: 0, tag: "event" },
     ]
   }
   const solution: Solution = {
@@ -70,16 +70,16 @@ function basicBattleTest() {
 
 function basicDeathTest() {
   const path1: Path = {
-    restAction: { tag: "Rest" },
-    cards: [
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
       { actions: [{ tag: "Battle", enemy: { rank: 8, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
         positions: [0], }] } },
         { tag: "GainGold", gain: 5 },
-      ], id: 0 },
+      ], id: 0, tag: "event" },
     ]
   }
   const solution: Solution = {
@@ -99,16 +99,16 @@ function basicDeathTest() {
 
 function basicItemTest() {
   const path1: Path = {
-    restAction: { tag: "Rest" },
-    cards: [
-      { actions: [{ tag: "Recruit", crew: allCrew.recruitGainAPWhenHP }], id: 0 },
-      { actions: [{ tag: "AddItem", item: allItems.plus11StartCombat }], id: 0 },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
+      { actions: [{ tag: "Recruit", crew: allCrew.recruitGainAPWhenHP }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddItem", item: allItems.plus11StartCombat }], id: 0, tag: "event" },
       { actions: [{ tag: "Battle", enemy: { rank: 6, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
         positions: [0], }] } },
         { tag: "GainGold", gain: 5 },
-      ], id: 0 },
+      ], id: 0, tag: "event" },
     ]
   }
   const solution: Solution = {
@@ -128,16 +128,16 @@ function basicItemTest() {
 
 function guard3ItemTest() {
   const path1: Path = {
-    restAction: { tag: "Rest" },
-    cards: [
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
-      { actions: [{ tag: "AddItem", item: allItems.guard3StartCombat }], id: 0 },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddItem", item: allItems.guard3StartCombat }], id: 0, tag: "event" },
       { actions: [{ tag: "Battle", enemy: { rank: 0, actions: [{
         tag: "MeleeAttack",
         multiplier: 1,
         positions: [0], }] } },
         { tag: "GainGold", gain: 5 },
-      ], id: 0 },
+      ], id: 0, tag: "event" },
     ]
   }
   const solution: Solution = {

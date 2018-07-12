@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Solution, Card } from "src/shared/game/solution";
-import { Rest } from "src/shared/game/action";
+import { Solution } from "src/shared/game/solution";
+import { Card, Rest, Event } from "src/shared/game/card";
 
 export type Limit = {
   limit: number,
@@ -71,23 +71,23 @@ function findIdAvailableCard(cardId: number) {
   return index;
 }
 
-export function addToSolution(card: Card) {
+export function addToSolution(event: Event) {
   const solution = focus(gameState.solution,
-    over(x => x.paths[x.paths.length - 1].cards, x => x.concat([card])),
+    over(x => x.paths[x.paths.length - 1].eventCards, x => x.concat(event)),
   );
   changeSolution(solution);
 }
 
 export function addRestToSolution(rest: Rest) {
   const solution = focus(gameState.solution,
-    over(x => x.paths, x => x.concat({ restAction: rest, cards: [] })),
+    over(x => x.paths, x => x.concat({ restCard: rest, eventCards: [] })),
   );
   changeSolution(solution);
 }
 
 export function removeCardFromSolution(pathIndex: number, cardIndex: number) {
   const solution = focus(gameState.solution,
-    over(x => x.paths[pathIndex].cards, x => x.slice(0, cardIndex).concat(x.slice(cardIndex + 1, x.length))),
+    over(x => x.paths[pathIndex].eventCards, x => x.slice(0, cardIndex).concat(x.slice(cardIndex + 1, x.length))),
   );
   changeSolution(solution);
 }

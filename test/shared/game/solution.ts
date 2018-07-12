@@ -4,23 +4,23 @@ import { allCrew } from "src/shared/game/crew";
 
 function basicTest() {
   const path1: Path = {
-    restAction: { tag: "Rest" },
-    cards: [
+    restCard: { actions: [{ tag: "Rest" }, { tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
       { actions: [
         { tag: "Recruit", crew: allCrew.stFighter },
         { tag: "Recruit", crew: allCrew.stFighter },
-      ], id: 0 },
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
+      ], id: 0, tag: "event" },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
     ]
   }
   const path2: Path = {
-    restAction: { tag: "Rest" },
-    cards: [
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
       { actions: [
         { tag: "Recruit", crew: allCrew.stFighter },
         { tag: "Recruit", crew: allCrew.stFighter },
-      ], id: 0 },
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0 },
+      ], id: 0, tag: "event" },
+      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
     ]
   }
   const solution: Solution = {
@@ -31,35 +31,35 @@ function basicTest() {
   const index1 = nextIndex(index0, solution);
   expect(index1).toEqual({
     path: 0,
-    card: 0,
-    action: 0,
+    card: "rest",
+    action: 1,
   });
   console.log("-- index2");
   const index2 = nextIndex((<SolutionIndex>index1), solution);
   expect(index2).toEqual({
     path: 0,
     card: 0,
-    action: 1,
+    action: 0,
   });
   console.log("-- index3");
   const index3 = nextIndex((<SolutionIndex>index2), solution);
   expect(index3).toEqual({
     path: 0,
-    card: 1,
-    action: 0,
+    card: 0,
+    action: 1,
   });
   console.log("-- index4");
   const index4 = nextIndex((<SolutionIndex>index3), solution);
   expect(index4).toEqual({
-    path: 1,
-    card: "rest",
+    path: 0,
+    card: 1,
     action: 0,
   });
   console.log("-- index5");
   const index5 = nextIndex((<SolutionIndex>index4), solution);
   expect(index5).toEqual({
     path: 1,
-    card: 0,
+    card: "rest",
     action: 0,
   });
   console.log("-- index6");
@@ -67,18 +67,25 @@ function basicTest() {
   expect(index6).toEqual({
     path: 1,
     card: 0,
-    action: 1,
+    action: 0,
   });
   console.log("-- index7");
   const index7 = nextIndex((<SolutionIndex>index6), solution);
   expect(index7).toEqual({
     path: 1,
-    card: 1,
-    action: 0,
+    card: 0,
+    action: 1,
   });
   console.log("-- index8");
   const index8 = nextIndex((<SolutionIndex>index7), solution);
-  expect(index8).toEqual("done");
+  expect(index8).toEqual({
+    path: 1,
+    card: 1,
+    action: 0,
+  });
+  console.log("-- index9");
+  const index9 = nextIndex((<SolutionIndex>index8), solution);
+  expect(index9).toEqual("done");
 }
 
 basicTest();

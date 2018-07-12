@@ -1,7 +1,6 @@
 import { changeConnected } from "src/app/appstate";
 import { resetGameState, changeAvailableCards, LimitedCard } from "src/app/gamestate";
-import { Card } from "src/shared/game/solution";
-import { allCards } from "src/shared/game/card";
+import { Card, allCards } from "src/shared/game/card";
 import { ServerMessage } from "src/shared/network/serverMessage";
 import { ClientMessage } from "src/shared/network/clientMessage";
 

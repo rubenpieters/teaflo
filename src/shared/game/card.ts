@@ -1,39 +1,62 @@
-import { Card } from "src/shared/game/solution";
+import { Action } from "src/shared/game/action";
+import { Target } from "src/shared/game/target";
 import { allCrew } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { allEnemies } from "src/shared/game/enemy";
 
+export type Event = {
+  tag: "event",
+  id: number,
+  actions: Action<Target>[],
+};
+
+export type Rest = {
+  tag: "rest",
+  id: number,
+  actions: Action<Target>[],
+};
+
+export type Card
+  = Event
+  | Rest
+  ;
+
 const cardCrew_0000: Card = {
-  actions: [{ tag: "Recruit", crew: allCrew.stFighter }],
   id: 0,
+  actions: [{ tag: "Recruit", crew: allCrew.stFighter }],
+  tag: "event",
 };
 const cardCrew_0001: Card = {
-  actions: [{ tag: "Recruit", crew: allCrew.stRanged }],
   id: 1,
+  actions: [{ tag: "Recruit", crew: allCrew.stRanged }],
+  tag: "event",
 };
 
 const cardItem_0000: Card = {
+  id: 2,
   actions: [
     { tag: "PayGold", pay: 5 },
     { tag: "AddItem", item: allItems.guard3StartCombat },
   ],
-  id: 2,
+  tag: "event",
 };
 
 const cardBattle_0000: Card = {
+  id: 3,
   actions: [
     { tag: "Battle", enemy: allEnemies.enemyAtk012 },
     { tag: "GainGold", gain: 10 },
   ],
-  id: 3,
+  tag: "event",
 };
 
 const cardBattle_0001: Card = {
+  id: 4,
   actions: [
     { tag: "Battle", enemy: allEnemies.enemyHeal2R14 },
     { tag: "GainGold", gain: 7 },
   ],
-  id: 4,
+  tag: "event",
 };
 
 export const allCards = {

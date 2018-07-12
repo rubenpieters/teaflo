@@ -90,6 +90,7 @@ export type Action<T>
   | AddItem
   | StartBattle
   | EndBattle
+  | Rest
   ;
 
 export function fmap<A, B>(
@@ -109,6 +110,7 @@ export function fmap<A, B>(
     case "PayGold": return action;
     case "Death": return action;
     case "AddItem": return action;
+    case "Rest": return action;
   }
 }
 
@@ -249,6 +251,9 @@ export function doActionAt(
     }
     case "AddItem": {
       newState = focus(newState, over(x => x.items, x => x.concat([action.item])));
+      return { newState, newLog: afterEffectLog };
+    }
+    case "Rest": {
       return { newState, newLog: afterEffectLog };
     }
   }
