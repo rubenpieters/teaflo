@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { clearTemp } from "src/shared/game/crew";
-import { ActionRest, Action, BattleTurn, doAction } from "src/shared/game/action";
+import { ActionTarget, Action, BattleTurn, doAction } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { Target } from "src/shared/game/target";
 import { doAttack } from "src/shared/game/attack";
@@ -31,9 +31,9 @@ function battleStep(
   state: GameState,
   enemy: Enemy,
   turn: number,
-  log: ActionRest[],
+  log: ActionTarget[],
   idGen: Generator,
-): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionRest[] } {
+): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionTarget[] } {
   // do BattleTurn action
   console.log("TEST " + turn);
   const battleTurn: BattleTurn = { tag: "BattleTurn", turn };
@@ -84,7 +84,7 @@ function battleStep(
     throw ("invalid actionIndex " + actionIndex);
   }
 
-  let battleResult: { result: { newState: GameState, newEnemy: Enemy }, newLog: ActionRest[] }
+  let battleResult: { result: { newState: GameState, newEnemy: Enemy }, newLog: ActionTarget[] }
     // prevent used before defined warning
     = (<any>"unused");
   switch (enemyAction.tag) {
@@ -134,9 +134,9 @@ function battleStep(
 export function runBattle(
   state: GameState,
   enemy: Enemy,
-  log: ActionRest[],
+  log: ActionTarget[],
   idGen: Generator,
-): { newState: GameState | "invalid", newLog: ActionRest[] } {
+): { newState: GameState | "invalid", newLog: ActionTarget[] } {
   const afterStartBattle = doAction({ tag: "StartBattle" }, state, log, idGen);
   if (afterStartBattle.newState === "invalid") {
     return afterStartBattle;
@@ -156,9 +156,9 @@ export function _runBattle(
   state: GameState,
   enemy: Enemy,
   turn: number,
-  log: ActionRest[],
+  log: ActionTarget[],
   idGen: Generator,
-): { newState: GameState | "invalid", newLog: ActionRest[] } {
+): { newState: GameState | "invalid", newLog: ActionTarget[] } {
   const { result, newLog } = battleStep(state, enemy, turn, log, idGen);
   if (result === "invalid") {
     return { newState: "invalid", newLog };

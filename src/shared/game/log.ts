@@ -1,4 +1,4 @@
-import { ActionRest } from "src/shared/game/action";
+import { ActionTarget } from "src/shared/game/action";
 
 export type SolutionLog = {
   actionLog: ActionLog[],
@@ -15,15 +15,15 @@ export function showSolutionLog(solutionLog: SolutionLog): string {
 }
 
 export type ActionLog = {
-  action: ActionRest,
-  loggedEffects: ActionRest[],
+  action: ActionTarget,
+  loggedEffects: ActionTarget[],
 };
 
 function showActionLog(actionLog: ActionLog): string {
   return showAction(actionLog.action) + "\n" + actionLog.loggedEffects.map(a => " - " + showAction(a)).join("\n");
 }
 
-function showAction(action: ActionRest): string {
+function showAction(action: ActionTarget): string {
   switch (action.tag) {
     case "Battle": {
       return "Battle";

@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Enemy } from "src/shared/game/enemy";
-import { Action, ActionRest, doAction, fmap } from "src/shared/game/action";
+import { Action, ActionTarget, doAction, fmap } from "src/shared/game/action";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { TargetSpec, findTarget } from "src/shared/game/target";
 import { Crew, damage, getAP } from "src/shared/game/crew";
@@ -30,10 +30,10 @@ export function doAttack(
  crew: IdCrew,
  enemy: Enemy,
  state: GameState,
- log: ActionRest[],
+ log: ActionTarget[],
  idGen: Generator,
-): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionRest[] } {
-  let acc: { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionRest[] } = {
+): { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionTarget[] } {
+  let acc: { result: { newState: GameState, newEnemy: Enemy } | "invalid", newLog: ActionTarget[] } = {
     result: {
       newState: state,
       newEnemy: enemy,

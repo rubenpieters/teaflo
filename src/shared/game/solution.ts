@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Card, Rest, Event } from "src/shared/game/card";
-import { Action, ActionRest, Recruit, Battle, doAction } from "src/shared/game/action";
+import { Action, ActionTarget, Recruit, Battle, doAction } from "src/shared/game/action";
 import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Target } from "src/shared/game/target";
@@ -30,7 +30,7 @@ export const initialIndex: SolutionIndex = {
 function nextAction(
   index: SolutionIndex,
   solution: Solution
-): ActionRest {
+): ActionTarget {
   const path: Path | undefined = solution.paths[index.path];
   if (path === undefined) {
     throw ("invalid index: " + JSON.stringify(index));

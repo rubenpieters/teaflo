@@ -114,26 +114,26 @@ export function fmap<A, B>(
   }
 }
 
-export type ActionRest = Action<Target> | Rest;
+export type ActionTarget = Action<Target>;
 
 export function doAction(
-  action: ActionRest,
+  action: ActionTarget,
   state: GameState,
-  log: ActionRest[],
+  log: ActionTarget[],
   idGen: Generator,
-): { newState: GameState | "invalid", newLog: ActionRest[] } {
+): { newState: GameState | "invalid", newLog: ActionTarget[] } {
   return doActionAt(action, state, log, { id: 0, type: "item" }, idGen);
 }
 
 export function doActionAt(
-  action: ActionRest,
+  action: ActionTarget,
   state: GameState,
-  log: ActionRest[],
+  log: ActionTarget[],
   from: { id: number, type: "item" | "crew" },
   idGen: Generator,
-): { newState: GameState | "invalid", newLog: ActionRest[] } {
+): { newState: GameState | "invalid", newLog: ActionTarget[] } {
   let newState: GameState = state;
-  let newLog: ActionRest[] = log;
+  let newLog: ActionTarget[] = log;
 
   // item interactions with effects
   if (from.type === "item") {
