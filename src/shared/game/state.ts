@@ -2,15 +2,16 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import { Item } from "src/shared/game/item";
 
-type Id = {
+export type Id = {
   id: number,
 };
 
 export type IdCrew = Crew & Id;
+export type IdItem = Item & Id;
 
 export type GameState = {
   crew: IdCrew[],
-  items: Item[],
+  items: IdItem[],
   gold: number,
 };
 

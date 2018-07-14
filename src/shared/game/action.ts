@@ -3,7 +3,7 @@ import { Crew, damage } from "src/shared/game/crew";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { Enemy, runBattle } from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, findTarget, onTargets, indexOfId } from "src/shared/game/target";
+import { Target, findTarget, onTargets, onCrew, indexOfId } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
 
 export type Recruit = {
@@ -141,7 +141,7 @@ export function doActionAt(
       for (const trigger of item.triggers) {
         if (trigger.onTag === action.tag && trigger.type === "before") {
           // TODO: targeting items not supported
-          const action = fmap(x => findTarget(x, newState, (<any>"trying to target item")), trigger.action);
+          const action = fmap(x => findTarget(x, newState, item.id, "item"), trigger.action);
           const afterTrigger = doActionAt(action, newState, newLog, { id: from.id + 1, type: "item" }, idGen);
           if (afterTrigger.newState === "invalid") {
             return { newState: "invalid", newLog };
@@ -158,7 +158,7 @@ export function doActionAt(
   for (const ally of state.crew.slice(fromCrew)) {
     for (const trigger of ally.triggers) {
       if (trigger.onTag === action.tag && trigger.type === "before") {
-        const action = fmap(x => findTarget(x, newState, ally.id), trigger.action);
+        const action = fmap(x => findTarget(x, newState, ally.id, "ally"), trigger.action);
         const afterTrigger = doActionAt(action, newState, newLog, { id: from.id + 1, type: "crew" }, idGen);
         if (afterTrigger.newState === "invalid") {
           return { newState: "invalid", newLog };
@@ -217,7 +217,7 @@ export function doActionAt(
         ? (c: IdCrew) => focus(c, over(x => x.hp, x => x + action.value))
         : (c: IdCrew) => focus(c, over(x => x.hpTemp, x => x + action.value))
         ;
-      newState = onTargets(action.target, addHP, newState);
+      newState = onCrew(action.target, newState, addHP);
       return { newState, newLog: afterEffectLog };
     }
     case "GainAP": {
@@ -225,7 +225,7 @@ export function doActionAt(
         ? (c: IdCrew) => focus(c, over(x => x.ap, x => x + action.value))
         : (c: IdCrew) => focus(c, over(x => x.apTemp, x => x + action.value))
         ;
-      newState = onTargets(action.target, addAP, newState);
+      newState = onCrew(action.target, newState, addAP);
       return { newState, newLog: afterEffectLog };
     }
     case "GainGold": {
@@ -250,7 +250,9 @@ export function doActionAt(
       }
     }
     case "AddItem": {
-      newState = focus(newState, over(x => x.items, x => x.concat([action.item])));
+      const id = idGen.newId();
+      const addedItem = {...action.item, ...{ id: id } };
+      newState = focus(newState, over(x => x.items, x => x.concat(addedItem)));
       return { newState, newLog: afterEffectLog };
     }
     case "Rest": {

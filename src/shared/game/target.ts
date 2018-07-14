@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, IdCrew } from "src/shared/game/state";
+import { GameState, Id, IdCrew, IdItem } from "src/shared/game/state";
 
 // Action<TargetInfo>
 // Target<TargetInfo> (State => TargetInfo)
@@ -24,7 +24,7 @@ export type Self = {
   tag: "Self",
 };
 
-export type AllCrew = {
+export type AllCrewSpec = {
   tag: "AllCrew",
 };
 
@@ -34,18 +34,25 @@ export type LastCrew = {
 
 export type TargetSpec
   = Self
-  | AllCrew
+  | AllCrewSpec
   | LastCrew
   ;
 
 export type Positions = {
   tag: "Positions",
+  type: TargetType
   positions: number[],
 };
 
 export type TargetId = {
   tag: "TargetId",
+  type: TargetType,
   id: number,
+};
+
+export type AllCrew = {
+  tag: "AllCrew",
+  type: "ally",
 };
 
 export type Target
@@ -54,25 +61,30 @@ export type Target
   | AllCrew
   ;
 
+export type TargetType = "ally" | "enemy" | "item";
+
 export function findTarget(
   targetSpec: TargetSpec,
   state: GameState,
   selfId: number,
+  selfType: TargetType,
 ): Target {
   switch (targetSpec.tag) {
     case "Self": {
       return {
         tag: "TargetId",
+        type: selfType,
         id: selfId,
       };
     }
     case "AllCrew": {
-      return targetSpec;
+      return {...targetSpec, ...{ type: "ally" } };
     }
     case "LastCrew": {
       if (state.crew.length > 0) {
         return {
           tag: "TargetId",
+          type: "ally",
           id: state.crew[state.crew.length - 1].id
         };
       } else {
@@ -83,25 +95,50 @@ export function findTarget(
   }
 }
 
-export function onTargets(
+export function onCrew(
   target: Target,
-  f: (crew: IdCrew) => IdCrew,
   state: GameState,
+  modify: (e: IdCrew) => IdCrew
+) {
+  if (target.type === "ally") {
+    return onTargets(target, state, gs => gs.crew, modify);
+  } else {
+    throw ("wrong target type: " + target.type + ", expected 'ally'");
+  }
+}
+
+export function onItem(
+  target: Target,
+  state: GameState,
+  modify: (e: IdItem) => IdItem
+) {
+  if (target.type === "item") {
+    return onTargets(target, state, gs => gs.items, modify);
+  } else {
+    throw ("wrong target type: " + target.type + ", expected 'item'");
+  }
+}
+
+export function onTargets<E extends Id>(
+  target: Target,
+  state: GameState,
+  get: (gs: GameState) => E[],
+  modify: (e: E) => E,
 ): GameState {
   switch (target.tag) {
     case "TargetId": {
-      const targetIndex = indexOfId(target.id, state.crew);
+      const targetIndex = indexOfId(target.id, get(state));
       if (targetIndex === "notFound") {
         return state;
       } else {
         return focus(state,
-          over(x => x.crew[targetIndex], f)
+          over(x => get(x)[targetIndex], modify),
         );
       }
     }
     case "AllCrew": {
       const newState: GameState = focus(state,
-        over(x => x.crew, x => x.map(f))
+        over(get, x => x.map(modify)),
       );
       return newState;
     }
@@ -111,13 +148,20 @@ export function onTargets(
   }
 }
 
-export function indexOfId(
+export function indexOfId<E extends Id>(
   id: number,
-  crew: IdCrew[],
-) {
+  es: E[],
+): number | "notFound" {
+  return findIndex(e => e.id === id, es);
+}
+
+function findIndex<A>(
+  predicate: (a: A) => boolean,
+  as: A[],
+): number | "notFound" {
   let index: number = 0;
-  for (const ally of crew) {
-    if (ally.id === id) {
+  for (const a of as) {
+    if (predicate(a)) {
       return index;
     }
     index += 1;
