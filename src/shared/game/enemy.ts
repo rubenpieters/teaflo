@@ -1,16 +1,25 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { clearTemp } from "src/shared/game/crew";
-import { ActionTarget, Action, BattleTurn, doAction } from "src/shared/game/action";
+import { ActionSpec } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { Target } from "src/shared/game/target";
-import { doAttack } from "src/shared/game/attack";
 
 export type Enemy = {
-  rank: number,
-  actions: EnemyAttack[],
+  hp: number,
+  actions: ActionSpec[],
 };
 
+export function damage<E extends Enemy>(
+  enemy: E,
+  damage: number,
+): E {
+  return focus(enemy,
+    over(x => x.hp, x => x - damage),
+  );
+}
+
+/*
 type MeleeAttack = {
   tag: "MeleeAttack",
   multiplier: number,
@@ -170,20 +179,21 @@ export function _runBattle(
     return _runBattle(newState, newEnemy, turn + 1, newLog, idGen);
   }
 }
+*/
 
 const enemyAtk012R10: Enemy = {
-  rank: 10,
+  hp: 10,
   actions: [
     {
-      tag: "MeleeAttack",
-      multiplier: 1,
-      positions: [0, 1, 2],
+      tag: "Damage",
+      target: { tag: "Positions", type: "ally", positions: [0, 1, 2] },
+      value: 5,
     },
   ],
 };
 
-const enemyHeal2R14: Enemy = {
-  rank: 14,
+/*const enemyHeal2R14: Enemy = {
+  hp: 14,
   actions: [
     {
       tag: "MeleeAttack",
@@ -195,9 +205,9 @@ const enemyHeal2R14: Enemy = {
       value: 2,
     },
   ],
-};
+};*/
 
 export const allEnemies = {
   enemyAtk012: enemyAtk012R10,
-  enemyHeal2R14: enemyHeal2R14,
+  // enemyHeal2R14: enemyHeal2R14,
 };

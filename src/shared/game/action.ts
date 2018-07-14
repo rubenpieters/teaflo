@@ -1,10 +1,231 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Crew, damage } from "src/shared/game/crew";
+import { Crew } from "src/shared/game/crew";
+import * as _Crew from "src/shared/game/crew";
 import { GameState, IdCrew } from "src/shared/game/state";
-import { Enemy, runBattle } from "src/shared/game/enemy";
+import { Enemy } from "src/shared/game/enemy";
+import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, findTarget, onTargets, onCrew, indexOfId } from "src/shared/game/target";
+import { Target, TargetSpec, onTarget, determineTarget } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
+
+export type Damage<T> = {
+  tag: "Damage",
+  target: T,
+  value: number,
+};
+
+export type AddEnemy = {
+  tag: "AddEnemy",
+  enemy: Enemy,
+};
+
+export type AddCrew = {
+  tag: "AddCrew",
+  crew: Crew,
+};
+
+export type AddItem = {
+  tag: "AddItem",
+  item: Item,
+};
+
+export type GainHP<T> = {
+  tag: "GainHP",
+  target: T,
+  value: number,
+  type: "permanent" | "temporary",
+};
+
+export type GainAP<T> = {
+  tag: "GainAP",
+  target: T,
+  value: number,
+  type: "permanent" | "temporary",
+};
+
+export type Rest = {
+  tag: "Rest",
+};
+
+export type GainGold = {
+  tag: "GainGold",
+  gain: number,
+};
+
+export type PayGold = {
+  tag: "PayGold",
+  pay: number,
+};
+
+export type Action<T>
+  = Damage<T>
+  | AddEnemy
+  | AddCrew
+  | AddItem
+  | GainHP<T>
+  | GainAP<T>
+  | Rest
+  | GainGold
+  | PayGold
+  ;
+
+export type ActionTarget = Action<Target>;
+
+export type ActionSpec = Action<TargetSpec>;
+
+export function fmap<A, B>(
+  f: (a: A) => B,
+  action: Action<A>,
+): Action<B> {
+  switch (action.tag) {
+    case "Damage": return {...action, ...{ target: f(action.target)}};
+    case "AddEnemy": return action;
+    case "AddCrew": return action;
+    case "AddItem": return action;
+    case "GainHP": return {...action, ...{ target: f(action.target)}};
+    case "GainAP": return {...action, ...{ target: f(action.target)}};
+    case "Rest": return action;
+    case "GainGold": return action;
+    case "PayGold": return action;
+  }
+}
+
+export function applyActionAndTriggers(
+  action: ActionTarget,
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionTarget[] } {
+  return applyActionAndTriggersAt(action, state, log, { id: 0, type: "item" }, idGen);
+}
+
+function applyActionAndTriggersAt(
+  action: ActionTarget,
+  state: GameState,
+  log: ActionTarget[],
+  from: { id: number, type: "item" | "crew" },
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionTarget[] } {
+    // item interactions with effects
+    if (from.type === "item") {
+      for (const item of state.items.slice(from.id)) {
+        for (const trigger of item.triggers) {
+          if (trigger.onTag === action.tag && trigger.type === "before") {
+            const action = fmap(x => determineTarget(x, state, item.id, "item"), trigger.action);
+            const afterTrigger = applyActionAndTriggersAt(action, state, log, { id: from.id + 1, type: "item" }, idGen);
+            if (afterTrigger.state === "invalid") {
+              return afterTrigger;
+            }
+            state = afterTrigger.state;
+            log = afterTrigger.log;
+          }
+        }
+      }
+    }
+
+    const fromCrew = from.type === "crew" ? from.id : 0;
+    // crew interactions with effects
+    for (const ally of state.crew.slice(fromCrew)) {
+      for (const trigger of ally.triggers) {
+        if (trigger.onTag === action.tag && trigger.type === "before") {
+          const action = fmap(x => determineTarget(x, state, ally.id, "ally"), trigger.action);
+          const afterTrigger = applyActionAndTriggersAt(action, state, log, { id: from.id + 1, type: "crew" }, idGen);
+          if (afterTrigger.state === "invalid") {
+            return afterTrigger;
+          }
+          state = afterTrigger.state;
+          log = afterTrigger.log;
+        }
+      }
+    }
+
+  const afterApply = applyAction(action, state, log, idGen);
+
+  return afterApply;
+}
+
+// applies the results of this action to the state
+function applyAction(
+  action: ActionTarget,
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionTarget[] } {
+  log = log.concat(action);
+
+  switch (action.tag) {
+    case "AddEnemy": {
+      const id = idGen.newId();
+      const addedEnemy = {...action.enemy, ...{ id } };
+      state = focus(state, over(x => x.enemies, x => x.concat(addedEnemy)));
+      return { state, log };
+    }
+    case "AddCrew": {
+      const id = idGen.newId();
+      const addedCrew = {...action.crew, ...{ id } };
+      state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
+      return { state, log };
+    }
+    case "AddItem": {
+      const id = idGen.newId();
+      const addedItem = {...action.item, ...{ id } };
+      state = focus(state, over(x => x.items, x => x.concat(addedItem)));
+      return { state, log };
+    }
+    case "Damage": {
+      state = onTarget(action.target, state,
+        ally => _Crew.damage(ally, action.value),
+        enemy => _Enemy.damage(enemy, action.value),
+        x => { throw "wrong target type for '" + action.tag + "'"; },
+      );
+      return { state, log };
+    }
+    case "GainHP": {
+      state = onTarget(action.target, state,
+        ally => _Crew.addHP(ally, action.type, action.value),
+        x => { throw "wrong target type for '" + action.tag + "'"; },
+        x => { throw "wrong target type for '" + action.tag + "'"; },
+      );
+      return { state, log };
+    }
+    case "GainAP": {
+      state = onTarget(action.target, state,
+        ally => _Crew.addAP(ally, action.type, action.value),
+        x => { throw "wrong target type for '" + action.tag + "'"; },
+        x => { throw "wrong target type for '" + action.tag + "'"; },
+      );
+      return { state, log };
+    }
+    case "Rest": {
+      return { state, log };
+    }
+    case "GainGold": {
+      state = focus(state, over(x => x.gold, x => x + action.gain));
+      return { state, log };
+    }
+    case "PayGold": {
+      if (state.gold < action.pay) {
+        return { state: "invalid", log };
+      } else {
+        state = focus(state, over(x => x.gold, x => x - action.pay));
+        return { state, log };
+      }
+    }
+  }
+}
+
+/*
+
+export type Damage<T> = {
+  tag: "Damage",
+  target: T,
+  value: number,
+};
+
+export type AddEnemy = {
+  tag: "AddEnemy",
+  enemy: Enemy,
+};
 
 export type Recruit = {
   tag: "Recruit",
@@ -18,12 +239,6 @@ export type Battle = {
 
 export type Rest = {
   tag: "Rest",
-};
-
-export type Damage = {
-  tag: "Damage",
-  positions: number[],
-  value: number,
 };
 
 export type GainHP<T> = {
@@ -78,9 +293,10 @@ export type ClearTemp = {
 };
 
 export type Action<T>
-  = Recruit
+  = Damage<T>
+  | AddEnemy
+  | Recruit
   | Battle
-  | Damage
   | BattleTurn
   | GainHP<T>
   | GainAP<T>
@@ -98,9 +314,10 @@ export function fmap<A, B>(
   action: Action<A>,
 ): Action<B> {
   switch (action.tag) {
+    case "Damage": return {...action, ...{ target: f(action.target)}};
+    case "AddEnemy": return action;
     case "Recruit": return action;
     case "Battle": return action;
-    case "Damage": return action;
     case "BattleTurn": return action;
     case "StartBattle": return action;
     case "EndBattle": return action;
@@ -111,6 +328,32 @@ export function fmap<A, B>(
     case "Death": return action;
     case "AddItem": return action;
     case "Rest": return action;
+  }
+}
+
+// applies the results of this action
+function applyAction(
+  action: ActionTarget,
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionTarget[] } {
+  log = log.concat(action);
+
+  switch (action.tag) {
+    case "AddEnemy": {
+      const id = idGen.newId();
+      const addedEnemy = {...action.enemy, ...{ id }}
+      state = focus(state, over(x => x.enemies, x => x.concat(addedEnemy)));
+      return { state, log };
+    }
+    case "Damage": {
+      // action.target
+
+      return { state, log };
+    }
+    default:
+      throw "unimplemented";
   }
 }
 
@@ -140,7 +383,6 @@ export function doActionAt(
     for (const item of state.items.slice(from.id)) {
       for (const trigger of item.triggers) {
         if (trigger.onTag === action.tag && trigger.type === "before") {
-          // TODO: targeting items not supported
           const action = fmap(x => findTarget(x, newState, item.id, "item"), trigger.action);
           const afterTrigger = doActionAt(action, newState, newLog, { id: from.id + 1, type: "item" }, idGen);
           if (afterTrigger.newState === "invalid") {
@@ -260,3 +502,4 @@ export function doActionAt(
     }
   }
 }
+*/

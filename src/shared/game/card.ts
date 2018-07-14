@@ -23,12 +23,12 @@ export type Card
 
 const cardCrew_0000: Card = {
   id: 0,
-  actions: [{ tag: "Recruit", crew: allCrew.stFighter }],
+  actions: [{ tag: "AddCrew", crew: allCrew.stFighter }],
   tag: "event",
 };
 const cardCrew_0001: Card = {
   id: 1,
-  actions: [{ tag: "Recruit", crew: allCrew.stRanged }],
+  actions: [{ tag: "AddCrew", crew: allCrew.stRanged }],
   tag: "event",
 };
 
@@ -44,7 +44,7 @@ const cardItem_0000: Card = {
 const cardBattle_0000: Card = {
   id: 3,
   actions: [
-    { tag: "Battle", enemy: allEnemies.enemyAtk012 },
+    { tag: "AddEnemy", enemy: allEnemies.enemyAtk012 },
     { tag: "GainGold", gain: 10 },
   ],
   tag: "event",
@@ -53,7 +53,7 @@ const cardBattle_0000: Card = {
 const cardBattle_0001: Card = {
   id: 4,
   actions: [
-    { tag: "Battle", enemy: allEnemies.enemyHeal2R14 },
+    // TODO: { tag: "Battle", enemy: allEnemies.enemyHeal2R14 },
     { tag: "GainGold", gain: 7 },
   ],
   tag: "event",

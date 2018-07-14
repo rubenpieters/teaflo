@@ -1,3 +1,4 @@
+/*
 import { focus, over, set } from "src/shared/iassign-util";
 import { Enemy } from "src/shared/game/enemy";
 import { Action, ActionTarget, doAction, fmap } from "src/shared/game/action";
@@ -5,6 +6,7 @@ import { GameState, IdCrew } from "src/shared/game/state";
 import { TargetSpec, findTarget } from "src/shared/game/target";
 import { Crew, damage, getAP } from "src/shared/game/crew";
 import { Generator } from "src/shared/handler/id/generator";
+
 
 export type Damage = {
   tag: "Damage",
@@ -81,4 +83,4 @@ export function doAttack(
     }
   }
   return acc;
-}
+}*/

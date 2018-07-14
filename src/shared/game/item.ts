@@ -8,21 +8,21 @@ export type Item = {
 const plus11StartCombat: Item = {
   triggers: [
     {
-      onTag: "StartBattle",
+      onTag: "AddEnemy",
       type: "before",
       action: {
         tag: "GainHP",
-        target: { tag: "AllCrew" },
+        target: { tag: "All", type: "ally" },
         value: 1,
         type: "permanent",
       },
     },
     {
-      onTag: "StartBattle",
+      onTag: "AddEnemy",
       type: "before",
       action: {
         tag: "GainAP",
-        target: { tag: "AllCrew" },
+        target: { tag: "All", type: "ally" },
         value: 1,
         type: "permanent",
       },
@@ -33,11 +33,11 @@ const plus11StartCombat: Item = {
 const guard3StartCombat: Item = {
   triggers: [
     {
-      onTag: "StartBattle",
+      onTag: "AddEnemy",
       type: "before",
       action: {
         tag: "GainHP",
-        target: { tag: "AllCrew" },
+        target: { tag: "All", type: "ally" },
         value: 3,
         type: "temporary",
       },

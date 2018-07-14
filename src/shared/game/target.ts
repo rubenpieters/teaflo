@@ -1,31 +1,179 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, Id, IdCrew, IdItem } from "src/shared/game/state";
+import { GameState, Id, IdCrew, IdEnemy, IdItem } from "src/shared/game/state";
+import { Enemy } from "src/shared/game/enemy";
 
-// Action<TargetInfo>
-// Target<TargetInfo> (State => TargetInfo)
+export type Self = {
+  tag: "Self",
+};
+
+export type All = {
+  tag: "All",
+  type: TargetType,
+};
+
+export type Last = {
+  tag: "Last",
+  type: TargetType,
+};
+
+export type Positions = {
+  tag: "Positions",
+  type: TargetType,
+  positions: number[],
+};
+
+export type TargetSpec
+  = Self
+  | All
+  | Last
+  | Positions
+  ;
+
+export function determineTarget(
+  target: TargetSpec,
+  state: GameState,
+  selfId: number,
+  selfType: TargetType
+): Target {
+  const coll = typeColl(state, selfType);
+  switch (target.tag) {
+    case "Self": {
+      const index = indexOfId(selfId, coll);
+      if (index === "notFound") {
+        throw ("index " + index + " not found");
+      } else {
+        return {
+          tag: "Target",
+          type: selfType,
+          positions: [index],
+        };
+      }
+    }
+    case "All": {
+      return {
+        tag: "Target",
+        type: target.type,
+        positions: coll.map((v, i) => i),
+      };
+    }
+    case "Last": {
+      return {
+        tag: "Target",
+        type: target.type,
+        positions: [coll.length - 1],
+      };
+    }
+    case "Positions": {
+      return {
+        tag: "Target",
+        type: target.type,
+        positions: target.positions,
+      };
+    }
+  }
+}
+
+export function typeColl(
+  state: GameState,
+  type: TargetType
+): (IdCrew | IdEnemy | IdItem)[] {
+  switch (type) {
+    case "ally": {
+      return state.crew;
+    }
+    case "enemy": {
+      return state.enemies;
+    }
+    case "item": {
+      return state.items;
+    }
+  }
+}
+
+export function indexOfId<E extends Id>(
+  id: number,
+  es: E[],
+): number | "notFound" {
+  return findIndex(e => e.id === id, es);
+}
+
+function findIndex<A>(
+  predicate: (a: A) => boolean,
+  as: A[],
+): number | "notFound" {
+  let index: number = 0;
+  for (const a of as) {
+    if (predicate(a)) {
+      return index;
+    }
+    index += 1;
+  }
+  return "notFound";
+}
+
+export type Target = {
+  tag: "Target",
+  type: TargetType;
+  positions: number[],
+};
+
+export type TargetType = "ally" | "enemy" | "item";
+
+export function onTarget(
+  target: Target,
+  state: GameState,
+  allyF: (ally: IdCrew) => IdCrew,
+  enemyF: (enemy: IdEnemy) => IdEnemy,
+  itemF: (item: IdItem) => IdItem,
+) {
+  switch (target.type) {
+    case "ally": {
+      return focus(state,
+        over(x => x.crew, x => x.map((a, i) => {
+          if (target.positions.indexOf(i) === -1) {
+            return a;
+          } else {
+            return allyF(a);
+          }
+        })),
+      );
+    }
+    case "enemy": {
+      return focus(state,
+        over(x => x.enemies, x => x.map((a, i) => {
+          if (target.positions.indexOf(i) === -1) {
+            return a;
+          } else {
+            return enemyF(a);
+          }
+        })),
+      );
+    }
+    case "item": {
+      return focus(state,
+        over(x => x.items, x => x.map((a, i) => {
+          if (target.positions.indexOf(i) === -1) {
+            return a;
+          } else {
+            return itemF(a);
+          }
+        })),
+      );
+    }
+  }
+}
 
 /*
-type TargetFunction<S, T> = (s: S) => T;
-type TF = <R>(e: <S>(s: S) => R) => R;
-
-const tf: TF = e => {
-  return e((s: { gs: GameState, id: number }) => {
-    const id = indexOfId(s.id, s.gs.crew);
-    if (id === "notFound") {
-      throw "";
-    } else {
-      return s.gs.crew[id];
-    }
-  });
-}
-*/
-
 export type Self = {
   tag: "Self",
 };
 
 export type AllCrewSpec = {
   tag: "AllCrew",
+};
+
+export type TargetEnemySpec = {
+  tag: "TargetEnemy",
 };
 
 export type LastCrew = {
@@ -35,6 +183,7 @@ export type LastCrew = {
 export type TargetSpec
   = Self
   | AllCrewSpec
+  | TargetEnemySpec
   | LastCrew
   ;
 
@@ -55,13 +204,13 @@ export type AllCrew = {
   type: "ally",
 };
 
-export type Target
-  = Positions
-  | TargetId
-  | AllCrew
-  ;
+export type TargetEnemy = {
+  tag: "TargetEnemy",
+  type: "enemy",
+};
 
-export type TargetType = "ally" | "enemy" | "item";
+
+
 
 export function findTarget(
   targetSpec: TargetSpec,
@@ -91,6 +240,9 @@ export function findTarget(
         // TODO: add target wiffing
         throw "no crew while trying to target last crew";
       }
+    }
+    case "TargetEnemy": {
+      return {...targetSpec, ...{ type: "enemy" } };
     }
   }
 }
@@ -148,23 +300,5 @@ export function onTargets<E extends Id>(
   }
 }
 
-export function indexOfId<E extends Id>(
-  id: number,
-  es: E[],
-): number | "notFound" {
-  return findIndex(e => e.id === id, es);
-}
 
-function findIndex<A>(
-  predicate: (a: A) => boolean,
-  as: A[],
-): number | "notFound" {
-  let index: number = 0;
-  for (const a of as) {
-    if (predicate(a)) {
-      return index;
-    }
-    index += 1;
-  }
-  return "notFound";
-}
+*/

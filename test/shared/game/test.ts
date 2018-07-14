@@ -4,6 +4,7 @@ import { allCrew } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { showSolutionLog } from "src/shared/game/log";
 
+/*
 function basicCrewTest() {
   const path1: Path = {
     restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
@@ -160,3 +161,4 @@ function guard3ItemTest() {
 basicBattleTest();
 // basicItemTest();
 // guard3ItemTest();
+*/

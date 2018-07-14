@@ -25,26 +25,20 @@ function showActionLog(actionLog: ActionLog): string {
 
 function showAction(action: ActionTarget): string {
   switch (action.tag) {
-    case "Battle": {
-      return "Battle";
+    case "AddEnemy": {
+      return "AddEnemy";
     }
-    case "Recruit": {
-      return "Recruit";
+    case "AddCrew": {
+      return "AddCrew";
+    }
+    case "AddItem": {
+      return "AddItem";
     }
     case "Rest": {
       return "Rest";
     }
     case "Damage": {
       return "Damage";
-    }
-    case "BattleTurn": {
-      return "BattleTurn - " + action.turn;
-    }
-    case "StartBattle": {
-      return "StartBattle";
-    }
-    case "EndBattle": {
-      return "EndBattle";
     }
     case "GainHP": {
       return "Gain " + action.value + " HP "  + (action.type === "permanent" ? "" : " Temp ") + "(" + JSON.stringify(action.target) + ")";
@@ -57,12 +51,6 @@ function showAction(action: ActionTarget): string {
     }
     case "PayGold": {
       return "PayGold " + action.pay;
-    }
-    case "Death": {
-      return "Death "  + action.targetId;
-    }
-    case "AddItem": {
-      return "AddItem";
     }
   }
 }

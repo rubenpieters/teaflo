@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Trigger } from "src/shared/game/trigger";
-import { Attack } from "src/shared/game/attack";
+import { ActionSpec } from "src/shared/game/action";
 
 export type Crew = {
   ap: number,
@@ -9,13 +9,13 @@ export type Crew = {
   hpTemp: number,
   triggers: Trigger[],
   ranged: boolean,
-  attack: Attack[],
+  attack: ActionSpec[],
 };
 
-export function damage<C extends Crew>(
-  crew: C,
+export function damage<E extends Crew>(
+  crew: E,
   damage: number,
-): C {
+): E {
  if (damage <= crew.hpTemp) {
    return focus(crew, over(x => x.hpTemp, x => x - damage));
  }
@@ -25,6 +25,28 @@ export function damage<C extends Crew>(
     set(x => x.hpTemp, 0),
     over(x => x.hp, x => x - leftoverDamage),
   );
+}
+
+export function addHP<E extends Crew>(
+  crew: E,
+  type: "permanent" | "temporary",
+  amount: number
+) {
+  return type === "permanent"
+  ? focus(crew, over(x => x.hp, x => x + amount))
+  : focus(crew, over(x => x.hpTemp, x => x + amount))
+  ;
+}
+
+export function addAP<E extends Crew>(
+  crew: E,
+  type: "permanent" | "temporary",
+  amount: number
+) {
+  return type === "permanent"
+  ? focus(crew, over(x => x.ap, x => x + amount))
+  : focus(crew, over(x => x.apTemp, x => x + amount))
+  ;
 }
 
 export function getAP<C extends Crew>(
@@ -52,7 +74,8 @@ const stFighter: Crew = {
   ranged: false,
   attack: [{
     tag: "Damage",
-    multiplier: 1,
+    target: { tag: "Positions", type: "enemy", positions: [0] },
+    value: 5,
   }],
 };
 
@@ -65,7 +88,8 @@ const stRanged: Crew = {
   ranged: true,
   attack: [{
     tag: "Damage",
-    multiplier: 1,
+    target: { tag: "Positions", type: "enemy", positions: [0] },
+    value: 1,
   }],
 };
 
@@ -99,7 +123,8 @@ const recruitGrow1: Crew = {
   ranged: false,
   attack: [{
     tag: "Damage",
-    multiplier: 1,
+    target: { tag: "Positions", type: "enemy", positions: [0] },
+    value: 1,
   }],
 };
 
@@ -123,7 +148,8 @@ const recruitGainAPWhenHP: Crew = {
   ranged: false,
   attack: [{
     tag: "Damage",
-    multiplier: 1,
+    target: { tag: "Positions", type: "enemy", positions: [0] },
+    value: 1,
   }],
 };
 
@@ -135,13 +161,14 @@ const recruitKillLast: Crew = {
   triggers: [],
   ranged: false,
   attack: [
-/*    {
+    /*{
       tag: "Death",
-      target:
+      target: { tag: "Last", type: "ally" }
     },*/
     {
       tag: "Damage",
-      multiplier: 1,
+      target: { tag: "Positions", type: "enemy", positions: [0] },
+      value: 10,
     },
   ],
 };

@@ -7,20 +7,20 @@ function basicTest() {
     restCard: { actions: [{ tag: "Rest" }, { tag: "Rest" }], id: 0, tag: "rest" },
     eventCards: [
       { actions: [
-        { tag: "Recruit", crew: allCrew.stFighter },
-        { tag: "Recruit", crew: allCrew.stFighter },
+        { tag: "Rest" },
+        { tag: "Rest" },
       ], id: 0, tag: "event" },
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "Rest" }], id: 0, tag: "event" },
     ]
   }
   const path2: Path = {
     restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
     eventCards: [
       { actions: [
-        { tag: "Recruit", crew: allCrew.stFighter },
-        { tag: "Recruit", crew: allCrew.stFighter },
+        { tag: "Rest" },
+        { tag: "Rest" },
       ], id: 0, tag: "event" },
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "Rest" }], id: 0, tag: "event" },
     ]
   }
   const solution: Solution = {
