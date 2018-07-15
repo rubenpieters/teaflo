@@ -5,6 +5,7 @@ import { Solution, SolutionResult, runSolution, runSolutionAll } from "src/share
 import { SolutionLog, showSolutionLog } from "src/shared/game/log";
 import { Crew } from "src/shared/game/crew";
 import { Item } from "src/shared/game/item";
+import { Enemy } from "src/shared/game/enemy";
 import { GameState } from "src/shared/game/state";
 
 import { config } from "src/app/config";
@@ -17,6 +18,7 @@ let availableCardsTextCache: Phaser.Text[] = [];
 let solutionCache: Phaser.Sprite[] = [];
 let crewCache: Phaser.Sprite[] = [];
 let itemCache: Phaser.Sprite[] = [];
+let enemyCache: Phaser.Sprite[] = [];
 
 let nodeTypeDetail: Phaser.Text;
 
@@ -581,6 +583,7 @@ function mkState(
   resourcesText.setText("gold: " + solutionResult.state.gold);
   const crew: Crew[] = solutionResult.state.crew;
   const items: Item[] = solutionResult.state.items;
+  const enemies: Enemy[] = solutionResult.state.enemies;
 
   // clear old
   for (const sprite of crewCache) {
@@ -589,6 +592,10 @@ function mkState(
   for (const sprite of itemCache) {
     sprite.destroy();
   }
+  for (const sprite of enemyCache) {
+    sprite.destroy();
+  }
+
 
   // create new
   let x = 0;
@@ -603,10 +610,10 @@ function mkState(
     sprites.push(sprite);
     x += 50;
   }
+  crewCache = sprites;
 
   y += 50;
   x = 0;
-  crewCache = sprites;
   sprites = [];
   for (const item of items) {
     const sprite = game.add.sprite(x, y, "item", 0, playBoardGroup);
@@ -618,4 +625,18 @@ function mkState(
     x += 50;
   }
   itemCache = sprites;
+
+  y += 50;
+  x = 0;
+  sprites = [];
+  for (const enemy of enemies) {
+    const sprite = game.add.sprite(x, y, "ally", 0, playBoardGroup);
+    sprite.inputEnabled = true;
+    sprite.events.onInputOver.add(() => {
+      nodeTypeDetail.setText(JSON.stringify(enemy, undefined, 2));
+    });
+    sprites.push(sprite);
+    x += 50;
+  }
+  enemyCache = sprites;
 }

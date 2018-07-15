@@ -201,6 +201,8 @@ function applyActionAndTriggersAt(
   return afterApply;
 }
 
+// TODO: invalid solution if position is damaged with no ally
+
 // applies the results of this action to the state
 function applyAction(
   action: ActionTarget,
@@ -296,7 +298,7 @@ function applyAction(
         case "ally": {
           const index = indexOfId(action.id, state.crew);
           if (index === "notFound") {
-            throw ("index " + index + " not found");
+            throw ("index " + action.id + " not found");
           } else {
             state = focus(state,
               set(x => x.crew, state.crew.slice(0, index).concat(state.crew.slice(index + 1)))
@@ -307,7 +309,7 @@ function applyAction(
         case "enemy": {
           const index = indexOfId(action.id, state.enemies);
           if (index === "notFound") {
-            throw ("index " + index + " not found");
+            throw ("index " + action.id + " not found");
           } else {
             state = focus(state,
               set(x => x.enemies, state.enemies.slice(0, index).concat(state.enemies.slice(index + 1)))
@@ -318,7 +320,7 @@ function applyAction(
         case "item": {
           const index = indexOfId(action.id, state.items);
           if (index === "notFound") {
-            throw ("index " + index + " not found");
+            throw ("index " + action.id + " not found");
           } else {
             state = focus(state,
               set(x => x.items, state.items.slice(0, index).concat(state.items.slice(index + 1)))
@@ -330,6 +332,15 @@ function applyAction(
       break;
     }
   }
+
+  return { state, log };
+}
+
+export function checkDeaths(
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionTarget[] } {
 
   for (const ally of state.crew) {
     if (ally.hp <= 0) {

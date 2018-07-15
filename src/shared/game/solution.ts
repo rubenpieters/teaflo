@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Card, Rest, Event } from "src/shared/game/card";
-import { Action, ActionTarget, applyActionAndTriggers, enemyTurn } from "src/shared/game/action";
+import { Action, ActionTarget, applyActionAndTriggers, enemyTurn, checkDeaths } from "src/shared/game/action";
 import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Target } from "src/shared/game/target";
@@ -123,9 +123,19 @@ function solutionStep(
   if (actionResult.state === "invalid") {
     return { result: "invalid", log: actionLog };
   }
+  state = actionResult.state;
+  log = actionResult.log;
+
+  const afterDeaths = checkDeaths(state, log, idGen);
+  if (afterDeaths.state === "invalid") {
+    return { result: "invalid", log: actionLog };
+  }
+  state = afterDeaths.state;
+  log = afterDeaths.log;
+
   const newIndex = nextIndex(index, solution);
 
-  return { result: { newIndex, newState: actionResult.state }, log: actionLog };
+  return { result: { newIndex, newState: state }, log: { action: action, loggedEffects: log } };
 }
 
 export type SolutionResult = { state: GameState | "invalid", log: SolutionLog };

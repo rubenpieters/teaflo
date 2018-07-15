@@ -21,19 +21,25 @@ export type Card
   | Rest
   ;
 
-const cardCrew_0000: Card = {
+const cardBattleTurn: Card = {
   id: 0,
+  actions: [{ tag: "BattleTurn" }],
+  tag: "event"
+};
+
+const cardCrew_0000: Card = {
+  id: 1,
   actions: [{ tag: "AddCrew", crew: allCrew.stFighter }],
   tag: "event",
 };
 const cardCrew_0001: Card = {
-  id: 1,
+  id: 2,
   actions: [{ tag: "AddCrew", crew: allCrew.stRanged }],
   tag: "event",
 };
 
 const cardItem_0000: Card = {
-  id: 2,
+  id: 3,
   actions: [
     { tag: "PayGold", pay: 5 },
     { tag: "AddItem", item: allItems.guard3StartCombat },
@@ -42,7 +48,7 @@ const cardItem_0000: Card = {
 };
 
 const cardBattle_0000: Card = {
-  id: 3,
+  id: 4,
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemyAtk012 },
     { tag: "GainGold", gain: 10 },
@@ -51,7 +57,7 @@ const cardBattle_0000: Card = {
 };
 
 const cardBattle_0001: Card = {
-  id: 4,
+  id: 5,
   actions: [
     // TODO: { tag: "Battle", enemy: allEnemies.enemyHeal2R14 },
     { tag: "GainGold", gain: 7 },
@@ -60,6 +66,8 @@ const cardBattle_0001: Card = {
 };
 
 export const allCards = {
+  cardBattleTurn: cardBattleTurn,
+
   cardCrew_0000: cardCrew_0000,
   cardCrew_0001: cardCrew_0001,
 

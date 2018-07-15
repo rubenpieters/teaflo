@@ -31,6 +31,7 @@ export function getBoard(serverConn: ServerConnection, seed: string) {
   let cards: LimitedCard[];
   if (seed === "1") {
     cards = [
+      {...allCards.cardBattleTurn, ...{ limit: Infinity }},
       {...allCards.cardCrew_0000, ...{ limit: 5 } },
       {...allCards.cardCrew_0001, ...{ limit: 5 } },
       {...allCards.cardItem_0000, ...{ limit: 5 } },
