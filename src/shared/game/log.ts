@@ -58,6 +58,9 @@ function showAction(action: ActionTarget): string {
     case "Death": {
       return "Death " + action.type + " " + action.id;
     }
+    case "AddStatus": {
+      return "AddStatus " + JSON.stringify(action.status) + " to " + JSON.stringify(action.target);
+    }
   }
 }
 

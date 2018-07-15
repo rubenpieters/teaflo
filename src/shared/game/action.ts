@@ -7,6 +7,8 @@ import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
 import { Target, TargetSpec, onTarget, determineTarget, TargetType, indexOfId, typeColl } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
+import { Status } from "src/shared/game/status";
+import * as _Status from "src/shared/game/status";
 
 export type Damage<T> = {
   tag: "Damage",
@@ -67,6 +69,12 @@ export type Death = {
   type: TargetType,
 };
 
+export type AddStatus<T> = {
+  tag: "AddStatus",
+  target: T,
+  status: Status,
+};
+
 export type Action<T>
   = Damage<T>
   | AddEnemy
@@ -79,6 +87,7 @@ export type Action<T>
   | PayGold
   | BattleTurn
   | Death
+  | AddStatus<T>
   ;
 
 export type ActionTarget = Action<Target>;
@@ -101,6 +110,7 @@ export function fmap<A, B>(
     case "PayGold": return action;
     case "BattleTurn": return action;
     case "Death": return action;
+    case "AddStatus": return {...action, ...{ target: f(action.target)}};
   }
 }
 
@@ -213,13 +223,13 @@ function applyAction(
   switch (action.tag) {
     case "AddEnemy": {
       const id = idGen.newId();
-      const addedEnemy = {...action.enemy, ...{ id, actionIndex: 0 } };
+      const addedEnemy = {...action.enemy, ...{ id, actionIndex: 0, status: [] } };
       state = focus(state, over(x => x.enemies, x => x.concat(addedEnemy)));
       break;
     }
     case "AddCrew": {
       const id = idGen.newId();
-      const addedCrew = {...action.crew, ...{ id, actionIndex: 0 } };
+      const addedCrew = {...action.crew, ...{ id, actionIndex: 0, status: []   } };
       state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
       break;
     }
@@ -332,6 +342,14 @@ function applyAction(
           break;
         }
       }
+      break;
+    }
+    case "AddStatus": {
+      state = onTarget(action.target, state,
+        ally => _Status.addStatus(ally, action.status),
+        enemy => _Status.addStatus(enemy, action.status),
+        x => { throw "wrong target type for '" + action.tag + "'"; },
+      );
       break;
     }
   }
