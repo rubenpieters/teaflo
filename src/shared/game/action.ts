@@ -5,7 +5,7 @@ import { GameState, IdCrew } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, TargetSpec, onTarget, determineTarget } from "src/shared/game/target";
+import { Target, TargetSpec, onTarget, determineTarget, TargetType } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
 
 export type Damage<T> = {
@@ -90,6 +90,51 @@ export function fmap<A, B>(
   }
 }
 
+export function enemyTurn(
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionTarget[] }  {
+  let acc: GameState | "invalid" = state;
+  let i = 0;
+  for (const enemy of state.enemies) {
+    if (acc === "invalid") {
+      return { state: "invalid", log };
+    } else {
+      const afterEnemy = _Enemy.act(enemy, acc, log, idGen, i);
+      acc = afterEnemy.state;
+      log = afterEnemy.log;
+    }
+    i += 0;
+  }
+  return { state: acc, log };
+}
+
+export function determineAndApplyActionAndTriggers(
+  action: ActionSpec,
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+  selfId: number,
+  selfType: TargetType,
+): { state: GameState | "invalid", log: ActionTarget[] }  {
+  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType), action);
+  return determineAndApplyActionAndTriggersAt(action, state, log, { id: 0, type: "item" }, idGen, selfId, selfType);
+}
+
+export function determineAndApplyActionAndTriggersAt(
+  action: ActionSpec,
+  state: GameState,
+  log: ActionTarget[],
+  from: { id: number, type: "item" | "crew" },
+  idGen: Generator,
+  selfId: number,
+  selfType: TargetType,
+): { state: GameState | "invalid", log: ActionTarget[] }  {
+  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType), action);
+  return applyActionAndTriggersAt(actionTarget, state, log, from, idGen);
+}
+
 export function applyActionAndTriggers(
   action: ActionTarget,
   state: GameState,
@@ -111,8 +156,7 @@ function applyActionAndTriggersAt(
       for (const item of state.items.slice(from.id)) {
         for (const trigger of item.triggers) {
           if (trigger.onTag === action.tag && trigger.type === "before") {
-            const action = fmap(x => determineTarget(x, state, item.id, "item"), trigger.action);
-            const afterTrigger = applyActionAndTriggersAt(action, state, log, { id: from.id + 1, type: "item" }, idGen);
+            const afterTrigger = determineAndApplyActionAndTriggersAt(trigger.action, state, log, { id: from.id + 1, type: "item" }, idGen, item.id, "item");
             if (afterTrigger.state === "invalid") {
               return afterTrigger;
             }
@@ -128,8 +172,7 @@ function applyActionAndTriggersAt(
     for (const ally of state.crew.slice(fromCrew)) {
       for (const trigger of ally.triggers) {
         if (trigger.onTag === action.tag && trigger.type === "before") {
-          const action = fmap(x => determineTarget(x, state, ally.id, "ally"), trigger.action);
-          const afterTrigger = applyActionAndTriggersAt(action, state, log, { id: from.id + 1, type: "crew" }, idGen);
+          const afterTrigger = determineAndApplyActionAndTriggersAt(trigger.action, state, log, { id: from.id + 1, type: "crew" }, idGen, ally.id, "ally");
           if (afterTrigger.state === "invalid") {
             return afterTrigger;
           }
@@ -156,7 +199,7 @@ function applyAction(
   switch (action.tag) {
     case "AddEnemy": {
       const id = idGen.newId();
-      const addedEnemy = {...action.enemy, ...{ id } };
+      const addedEnemy = {...action.enemy, ...{ id, actionIndex: 0 } };
       state = focus(state, over(x => x.enemies, x => x.concat(addedEnemy)));
       return { state, log };
     }

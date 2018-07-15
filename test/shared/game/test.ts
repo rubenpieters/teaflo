@@ -4,14 +4,13 @@ import { allCrew } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { showSolutionLog } from "src/shared/game/log";
 
-/*
 function basicCrewTest() {
   const path1: Path = {
     restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
     eventCards: [
-      { actions: [{ tag: "Recruit", crew: allCrew.recruitGrow1 }], id: 0, tag: "event" },
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.recruitGrow1 }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event" },
     ]
   }
   const solution: Solution = {
@@ -31,16 +30,20 @@ function basicCrewTest() {
   }
 }
 
+
 function basicBattleTest() {
   const path1: Path = {
     restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
     eventCards: [
-      { actions: [{ tag: "Recruit", crew: allCrew.stFighter }], id: 0, tag: "event" },
-      { actions: [{ tag: "Recruit", crew: allCrew.stRanged }], id: 0, tag: "event" },
-      { actions: [{ tag: "Battle", enemy: { rank: 2, actions: [{
-        tag: "MeleeAttack",
-        multiplier: 1,
-        positions: [0], }] } },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stRanged }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddEnemy", enemy: { hp: 2, actions: [
+        {
+          tag: "Damage",
+          target: { tag: "Positions", type: "ally", positions: [0] },
+          value: 2,
+        },
+        ] } },
         { tag: "GainGold", gain: 5 },
       ], id: 0, tag: "event" },
       { actions: [{
@@ -68,6 +71,8 @@ function basicBattleTest() {
     console.log(showSolutionLog(log));
   }
 }
+
+/*
 
 function basicDeathTest() {
   const path1: Path = {
@@ -155,10 +160,10 @@ function guard3ItemTest() {
     console.log(showSolutionLog(log));
   }
 }
+*/
 
 
 // basicCrewTest();
 basicBattleTest();
 // basicItemTest();
 // guard3ItemTest();
-*/

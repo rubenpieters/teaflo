@@ -7,9 +7,13 @@ export type Id = {
   id: number,
 };
 
+export type ActionIndex = {
+  actionIndex: number,
+};
+
 export type IdCrew = Crew & Id;
 export type IdItem = Item & Id;
-export type IdEnemy = Enemy & Id;
+export type IdEnemy = Enemy & Id & ActionIndex;
 
 export type GameState = {
   crew: IdCrew[],

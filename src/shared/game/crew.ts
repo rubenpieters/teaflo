@@ -100,7 +100,7 @@ const recruitGrow1: Crew = {
   hpTemp: 0,
   triggers: [
     {
-      onTag: "Recruit",
+      onTag: "AddCrew",
       type: "before",
       action: {
         tag: "GainHP",
@@ -110,7 +110,7 @@ const recruitGrow1: Crew = {
       },
     },
     {
-      onTag: "Recruit",
+      onTag: "AddCrew",
       type: "before",
       action: {
         tag: "GainAP",

@@ -1,9 +1,9 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, IdCrew } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
 import { clearTemp } from "src/shared/game/crew";
-import { ActionSpec } from "src/shared/game/action";
+import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target } from "src/shared/game/target";
+import { Target, indexOfId } from "src/shared/game/target";
 
 export type Enemy = {
   hp: number,
@@ -17,6 +17,20 @@ export function damage<E extends Enemy>(
   return focus(enemy,
     over(x => x.hp, x => x - damage),
   );
+}
+
+export function act(
+  enemy: IdEnemy,
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+  index: number,
+): { state: GameState | "invalid", log: ActionTarget[] }  {
+  const action = enemy.actions[enemy.actionIndex];
+  state = focus(state,
+    over(x => x.enemies[0].actionIndex, x => x + 1),
+  );
+  return determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy");
 }
 
 /*

@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Card, Rest, Event } from "src/shared/game/card";
-import { Action, ActionTarget, applyActionAndTriggers } from "src/shared/game/action";
+import { Action, ActionTarget, applyActionAndTriggers, enemyTurn } from "src/shared/game/action";
 import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Target } from "src/shared/game/target";
@@ -102,9 +102,19 @@ function solutionStep(
   solution: Solution,
   idGen: Generator,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
-  // TODO: if index.newAction === 0 then enemies take an action
   const action = nextAction(index, solution);
-  const actionResult = applyActionAndTriggers(action, state, [], idGen);
+  let log: ActionTarget[] = [];
+  if (index.action === 0) {
+    const afterEnemy = enemyTurn(state, log, idGen);
+    log = afterEnemy.log;
+    if (afterEnemy.state === "invalid") {
+      // TODO: what should the action be for the log?
+      return { result: "invalid", log: { action, loggedEffects: log } };
+    } else {
+      state = afterEnemy.state;
+    }
+  }
+  const actionResult = applyActionAndTriggers(action, state, log, idGen);
   const actionLog: ActionLog = {
     action: action,
     loggedEffects: actionResult.log,
