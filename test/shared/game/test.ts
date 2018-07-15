@@ -73,6 +73,53 @@ function basicBattleTest() {
   }
 }
 
+function basicStatusTest() {
+  const path1: Path = {
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
+      { actions: [
+        { tag: "AddCrew", crew: allCrew.stFighter },
+        { tag: "AddStatus", status: { tag: "Poison" , value: 3 }, target: { tag: "Target", type: "ally", positions: [0] } },
+      ], id: 0, tag: "event" },
+      { actions: [
+        { tag: "Rest" },
+      ], id: 0, tag: "event" },
+      { actions: [
+        { tag: "Rest" },
+      ], id: 0, tag: "event" },
+      { actions: [
+        { tag: "Rest" },
+      ], id: 0, tag: "event" },
+      { actions: [
+        { tag: "Rest" },
+      ], id: 0, tag: "event" },
+      { actions: [
+        { tag: "Rest" },
+      ], id: 0, tag: "event" },
+    ]
+  }
+  const solution: Solution = {
+    paths: [path1]
+  }
+
+  const sol = runSolution(solution);
+  if (sol.state === "invalid") {
+    console.log(showSolutionLog(sol.log));
+    console.log("invalid");
+  } else {
+    const { state, log } = sol;
+    console.log(JSON.stringify(state));
+    console.log(showSolutionLog(log));
+  }
+}
+
+
+// basicCrewTest();
+// basicBattleTest();
+basicStatusTest();
+// basicItemTest();
+// guard3ItemTest();
+
 /*
 
 function basicDeathTest() {
@@ -162,9 +209,3 @@ function guard3ItemTest() {
   }
 }
 */
-
-
-// basicCrewTest();
-basicBattleTest();
-// basicItemTest();
-// guard3ItemTest();

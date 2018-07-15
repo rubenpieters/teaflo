@@ -1,4 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
+import { ActionTarget, ActionSpec } from "src/shared/game/action";
+import { Generator } from "src/shared/handler/id/generator";
+import { TargetType } from "src/shared/game/target";
 
 export type Poison = {
   tag: "Poison",
@@ -6,7 +9,7 @@ export type Poison = {
 };
 
 export type Regen = {
-  tag: "Poison",
+  tag: "Regen",
   value: number,
 };
 
@@ -47,4 +50,39 @@ function findIndex<A>(
     index += 1;
   }
   return "notFound";
+}
+
+export function applyStatus<E extends HasStatus>(
+  index: number,
+  e: E,
+): E {
+  if (e.status[index].value === 1) {
+    e = focus(e,
+      over(x => x.status, x => x.slice(0, index).concat(x.slice(index + 1, x.length - 1))),
+    );
+  } else {
+    e = focus(e,
+      over(x => x.status[index].value, x => x - 1),
+    );
+  }
+  return e;
+}
+
+export function statusToAction(
+  status: Status,
+): ActionSpec {
+  switch (status.tag) {
+    case "Poison": {
+      return {
+        tag: "Damage",
+        target: {
+          tag: "Self",
+        },
+        value: status.value,
+      };
+    }
+    case "Regen": {
+      throw "unimplemented";
+    }
+  }
 }

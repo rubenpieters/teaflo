@@ -1,13 +1,13 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import * as _Crew from "src/shared/game/crew";
-import { GameState, IdCrew } from "src/shared/game/state";
+import { GameState, IdCrew, Id } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
 import { Target, TargetSpec, onTarget, determineTarget, TargetType, indexOfId, typeColl } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
-import { Status } from "src/shared/game/status";
+import { Status, HasStatus } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 
 export type Damage<T> = {
@@ -385,6 +385,56 @@ export function checkDeaths(
       state = afterDeath.state;
       log = afterDeath.log;
     }
+  }
+
+  return { state, log };
+}
+
+export function checkStatusEnemy(
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionTarget[] } {
+  let i = 0;
+  for (const enemy of state.enemies) {
+    for (const status of enemy.status) {
+      const action = _Status.statusToAction(status);
+      const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy");
+      if (afterApply.state === "invalid") {
+        return afterApply;
+      }
+      state = focus(afterApply.state,
+        set(x => x.crew[i], _Status.applyStatus(i, enemy)),
+      );
+      log = afterApply.log;
+
+    }
+    i += 1;
+  }
+
+  return { state, log };
+}
+
+export function checkStatusCrew(
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionTarget[] } {
+  let i = 0;
+  for (const ally of state.crew) {
+    for (const status of ally.status) {
+      const action = _Status.statusToAction(status);
+      const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, ally.id, "ally");
+      if (afterApply.state === "invalid") {
+        return afterApply;
+      }
+      state = focus(afterApply.state,
+        set(x => x.crew[i], _Status.applyStatus(i, ally)),
+      );
+      log = afterApply.log;
+
+    }
+    i += 1;
   }
 
   return { state, log };
