@@ -1,6 +1,8 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Trigger } from "src/shared/game/trigger";
-import { ActionSpec } from "src/shared/game/action";
+import { GameState, IdCrew } from "src/shared/game/state";
+import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "src/shared/game/action";
+import { Generator } from "src/shared/handler/id/generator";
 
 export type Crew = {
   ap: number,
@@ -9,7 +11,7 @@ export type Crew = {
   hpTemp: number,
   triggers: Trigger[],
   ranged: boolean,
-  attack: ActionSpec[],
+  actions: ActionSpec[],
 };
 
 export function damage<E extends Crew>(
@@ -56,6 +58,23 @@ export function getAP<C extends Crew>(
   return multiplier * (crew.ap + crew.apTemp);
 }
 
+export function act(
+  crew: IdCrew,
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+  index: number,
+): { state: GameState | "invalid", log: ActionTarget[] }  {
+  const action = crew.actions[crew.actionIndex];
+  state = focus(state,
+    over(x => x.crew[index].actionIndex, x => {
+      const newX = x + 1;
+      return newX >= crew.actions.length ? 0 : newX;
+    }),
+  );
+  return determineAndApplyActionAndTriggers(action, state, log, idGen, crew.id, "ally");
+}
+
 export function clearTemp<C extends Crew>(
   crew: C,
 ): C {
@@ -72,7 +91,7 @@ const stFighter: Crew = {
   hpTemp: 0,
   triggers: [],
   ranged: false,
-  attack: [{
+  actions: [{
     tag: "Damage",
     target: { tag: "Positions", type: "enemy", positions: [0] },
     value: 5,
@@ -86,7 +105,7 @@ const stRanged: Crew = {
   hpTemp: 0,
   triggers: [],
   ranged: true,
-  attack: [{
+  actions: [{
     tag: "Damage",
     target: { tag: "Positions", type: "enemy", positions: [0] },
     value: 1,
@@ -121,7 +140,7 @@ const recruitGrow1: Crew = {
     },
   ],
   ranged: false,
-  attack: [{
+  actions: [{
     tag: "Damage",
     target: { tag: "Positions", type: "enemy", positions: [0] },
     value: 1,
@@ -146,7 +165,7 @@ const recruitGainAPWhenHP: Crew = {
     },
   ],
   ranged: false,
-  attack: [{
+  actions: [{
     tag: "Damage",
     target: { tag: "Positions", type: "enemy", positions: [0] },
     value: 1,
@@ -160,7 +179,7 @@ const recruitKillLast: Crew = {
   hpTemp: 0,
   triggers: [],
   ranged: false,
-  attack: [
+  actions: [
     /*{
       tag: "Death",
       target: { tag: "Last", type: "ally" }

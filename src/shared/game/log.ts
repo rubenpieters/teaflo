@@ -38,7 +38,7 @@ function showAction(action: ActionTarget): string {
       return "Rest";
     }
     case "Damage": {
-      return "Damage";
+      return "Damage " + action.value + " to " + JSON.stringify(action.target);
     }
     case "GainHP": {
       return "Gain " + action.value + " HP "  + (action.type === "permanent" ? "" : " Temp ") + "(" + JSON.stringify(action.target) + ")";
@@ -51,6 +51,12 @@ function showAction(action: ActionTarget): string {
     }
     case "PayGold": {
       return "PayGold " + action.pay;
+    }
+    case "BattleTurn": {
+      return "BattleTurn";
+    }
+    case "Death": {
+      return "Death " + action.type + " " + action.id;
     }
   }
 }

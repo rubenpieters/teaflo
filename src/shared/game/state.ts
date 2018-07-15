@@ -11,7 +11,7 @@ export type ActionIndex = {
   actionIndex: number,
 };
 
-export type IdCrew = Crew & Id;
+export type IdCrew = Crew & Id & ActionIndex;
 export type IdItem = Item & Id;
 export type IdEnemy = Enemy & Id & ActionIndex;
 

@@ -46,6 +46,7 @@ function basicBattleTest() {
         ] } },
         { tag: "GainGold", gain: 5 },
       ], id: 0, tag: "event" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
       { actions: [{
         tag: "PayGold",
         pay: 5,

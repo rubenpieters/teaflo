@@ -5,7 +5,7 @@ import { GameState, IdCrew } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, TargetSpec, onTarget, determineTarget, TargetType } from "src/shared/game/target";
+import { Target, TargetSpec, onTarget, determineTarget, TargetType, indexOfId } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
 
 export type Damage<T> = {
@@ -57,6 +57,16 @@ export type PayGold = {
   pay: number,
 };
 
+export type BattleTurn = {
+  tag: "BattleTurn",
+};
+
+export type Death = {
+  tag: "Death",
+  id: number,
+  type: TargetType,
+};
+
 export type Action<T>
   = Damage<T>
   | AddEnemy
@@ -67,6 +77,8 @@ export type Action<T>
   | Rest
   | GainGold
   | PayGold
+  | BattleTurn
+  | Death
   ;
 
 export type ActionTarget = Action<Target>;
@@ -87,6 +99,8 @@ export function fmap<A, B>(
     case "Rest": return action;
     case "GainGold": return action;
     case "PayGold": return action;
+    case "BattleTurn": return action;
+    case "Death": return action;
   }
 }
 
@@ -201,19 +215,19 @@ function applyAction(
       const id = idGen.newId();
       const addedEnemy = {...action.enemy, ...{ id, actionIndex: 0 } };
       state = focus(state, over(x => x.enemies, x => x.concat(addedEnemy)));
-      return { state, log };
+      break;
     }
     case "AddCrew": {
       const id = idGen.newId();
-      const addedCrew = {...action.crew, ...{ id } };
+      const addedCrew = {...action.crew, ...{ id, actionIndex: 0 } };
       state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
-      return { state, log };
+      break;
     }
     case "AddItem": {
       const id = idGen.newId();
       const addedItem = {...action.item, ...{ id } };
       state = focus(state, over(x => x.items, x => x.concat(addedItem)));
-      return { state, log };
+      break;
     }
     case "Damage": {
       state = onTarget(action.target, state,
@@ -221,7 +235,7 @@ function applyAction(
         enemy => _Enemy.damage(enemy, action.value),
         x => { throw "wrong target type for '" + action.tag + "'"; },
       );
-      return { state, log };
+      break;
     }
     case "GainHP": {
       state = onTarget(action.target, state,
@@ -229,7 +243,7 @@ function applyAction(
         x => { throw "wrong target type for '" + action.tag + "'"; },
         x => { throw "wrong target type for '" + action.tag + "'"; },
       );
-      return { state, log };
+      break;
     }
     case "GainAP": {
       state = onTarget(action.target, state,
@@ -237,24 +251,111 @@ function applyAction(
         x => { throw "wrong target type for '" + action.tag + "'"; },
         x => { throw "wrong target type for '" + action.tag + "'"; },
       );
-      return { state, log };
+      break;
     }
     case "Rest": {
-      return { state, log };
+      break;
     }
     case "GainGold": {
       state = focus(state, over(x => x.gold, x => x + action.gain));
-      return { state, log };
+      break;
     }
     case "PayGold": {
       if (state.gold < action.pay) {
         return { state: "invalid", log };
-      } else {
-        state = focus(state, over(x => x.gold, x => x - action.pay));
-        return { state, log };
       }
+      state = focus(state, over(x => x.gold, x => x - action.pay));
+      break;
+    }
+    case "BattleTurn": {
+      const meleeCrew: IdCrew | undefined = state.crew[0];
+      const def = { state, log };
+      const afterMelee = meleeCrew === undefined ? def : _Crew.act(meleeCrew, state, log, idGen, 0);
+      if (afterMelee.state === "invalid") {
+        return afterMelee;
+      }
+      state = afterMelee.state;
+      log = afterMelee.log;
+
+      let i = 1;
+      for (const rangedCrew of state.crew.slice(1)) {
+        if (rangedCrew.ranged) {
+          const afterRanged = _Crew.act(rangedCrew, state, log, idGen, i);
+          if (afterRanged.state === "invalid") {
+            return afterRanged;
+          }
+          state = afterRanged.state;
+          log = afterRanged.log;
+        }
+        i += 1;
+      }
+      break;
+    }
+    case "Death": {
+      switch (action.type) {
+        case "ally": {
+          const index = indexOfId(action.id, state.crew);
+          if (index === "notFound") {
+            throw ("index " + index + " not found");
+          } else {
+            state = focus(state,
+              set(x => x.crew, state.crew.slice(0, index).concat(state.crew.slice(index + 1)))
+            );
+          }
+          break;
+        }
+        case "enemy": {
+          const index = indexOfId(action.id, state.enemies);
+          if (index === "notFound") {
+            throw ("index " + index + " not found");
+          } else {
+            state = focus(state,
+              set(x => x.enemies, state.enemies.slice(0, index).concat(state.enemies.slice(index + 1)))
+            );
+          }
+          break;
+        }
+        case "item": {
+          const index = indexOfId(action.id, state.items);
+          if (index === "notFound") {
+            throw ("index " + index + " not found");
+          } else {
+            state = focus(state,
+              set(x => x.items, state.items.slice(0, index).concat(state.items.slice(index + 1)))
+            );
+          }
+          break;
+        }
+      }
+      break;
     }
   }
+
+  for (const ally of state.crew) {
+    if (ally.hp <= 0) {
+      const deathAction: ActionTarget = { tag: "Death", type: "ally", id: ally.id };
+      const afterDeath = applyActionAndTriggers(deathAction, state, log, idGen);
+      if (afterDeath.state === "invalid") {
+        return afterDeath;
+      }
+      state = afterDeath.state;
+      log = afterDeath.log;
+    }
+  }
+
+  for (const enemy of state.enemies) {
+    if (enemy.hp <= 0) {
+      const deathAction: ActionTarget = { tag: "Death", type: "enemy", id: enemy.id };
+      const afterDeath = applyActionAndTriggers(deathAction, state, log, idGen);
+      if (afterDeath.state === "invalid") {
+        return afterDeath;
+      }
+      state = afterDeath.state;
+      log = afterDeath.log;
+    }
+  }
+
+  return { state, log };
 }
 
 /*

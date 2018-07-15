@@ -28,7 +28,10 @@ export function act(
 ): { state: GameState | "invalid", log: ActionTarget[] }  {
   const action = enemy.actions[enemy.actionIndex];
   state = focus(state,
-    over(x => x.enemies[0].actionIndex, x => x + 1),
+    over(x => x.enemies[index].actionIndex, x => {
+      const newX = x + 1;
+      return newX >= enemy.actions.length ? 0 : newX;
+    }),
   );
   return determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy");
 }
