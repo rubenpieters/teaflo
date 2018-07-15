@@ -5,7 +5,7 @@ import { GameState, IdCrew } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, TargetSpec, onTarget, determineTarget, TargetType, indexOfId } from "src/shared/game/target";
+import { Target, TargetSpec, onTarget, determineTarget, TargetType, indexOfId, typeColl } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
 
 export type Damage<T> = {
@@ -201,8 +201,6 @@ function applyActionAndTriggersAt(
   return afterApply;
 }
 
-// TODO: invalid solution if position is damaged with no ally
-
 // applies the results of this action to the state
 function applyAction(
   action: ActionTarget,
@@ -232,6 +230,11 @@ function applyAction(
       break;
     }
     case "Damage": {
+      // if not all positions exists, then invalid solution
+      if (Math.max(...action.target.positions) >= typeColl(state, action.target.type).length) {
+        return { state: "invalid", log };
+      }
+      // apply damage
       state = onTarget(action.target, state,
         ally => _Crew.damage(ally, action.value),
         enemy => _Enemy.damage(enemy, action.value),
