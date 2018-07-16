@@ -328,10 +328,14 @@ export default class Menu extends Phaser.State {
     addSolutionCallback(solution => {
       const solutionResults = runSolutionAll(solution);
       mkSolution(this.game, resourcesText, solution, solutionResults);
-      const solutionResult = solutionResults[solutionResults.length - 1];
-      // console.log(showSolutionLog(solutionResult.log));
-      if (solutionResults.length === 0 || solutionResult.state === "invalid") {
+      const solutionResult: SolutionResult | undefined = solutionResults[solutionResults.length - 1];
+      if (solutionResult === undefined) {
         resourcesText.setText("/INVALID/");
+        mkState(this.game, resourcesText, <ValidResult>runSolution({ paths: [] }));
+      } else if (solutionResult.state === "invalid") {
+        resourcesText.setText("/INVALID/");
+        // TODO: use last valid solution result?
+        mkState(this.game, resourcesText, <ValidResult>runSolution({ paths: [] }));
       } else {
         mkState(this.game, resourcesText, (<ValidResult>solutionResult));
       }
@@ -501,7 +505,7 @@ function mkSolution(
     const sprite = game.add.sprite(x, y, "rest", 0, playBoardGroup);
     sprite.inputEnabled = true;
     sprites.push(sprite);
-    sprite.events.onInputDown.add(removePathFromSolution(pathIndex));
+    sprite.events.onInputDown.add(removePathFromSolution(availableCardsTextCache, pathIndex));
     y -= 50;
 
     let cardIndex = 0;

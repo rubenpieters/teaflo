@@ -92,8 +92,11 @@ export function removeCardFromSolution(pathIndex: number, cardIndex: number) {
   changeSolution(solution);
 }
 
-export function removePathFromSolution(pathIndex: number) {
+export function removePathFromSolution(limitTexts: Phaser.Text[], pathIndex: number) {
   return function() {
+    for (const card of gameState.solution.paths[pathIndex].eventCards) {
+      plusLimit(limitTexts, card.id);
+    }
     const solution = focus(gameState.solution,
       over (x => x.paths, x => x.slice(0, pathIndex).concat(x.slice(pathIndex + 1, x.length))),
     );
