@@ -14,7 +14,6 @@ const plus11StartCombat: Item = {
         tag: "GainHP",
         target: { tag: "All", type: "ally" },
         value: 1,
-        type: "permanent",
       },
     },
     {
@@ -24,7 +23,6 @@ const plus11StartCombat: Item = {
         tag: "GainAP",
         target: { tag: "All", type: "ally" },
         value: 1,
-        type: "permanent",
       },
     },
   ],
@@ -39,7 +37,6 @@ const guard3StartCombat: Item = {
         tag: "GainHP",
         target: { tag: "All", type: "ally" },
         value: 3,
-        type: "temporary",
       },
     },
   ],

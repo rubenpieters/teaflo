@@ -7,14 +7,21 @@ import { Generator } from "src/shared/handler/id/generator";
 export type Crew = {
   ap: number,
   hp: number,
-  apTemp: number,
-  hpTemp: number,
   triggers: Trigger[],
   ranged: boolean,
   actions: ActionSpec[],
 };
 
 export function damage<E extends Crew>(
+  crew: E,
+  damage: number,
+) {
+  return focus(crew,
+    over(x => x.hp, x => x - damage),
+  );
+}
+
+/*export function damage<E extends Crew>(
   crew: E,
   damage: number,
 ): E {
@@ -27,35 +34,27 @@ export function damage<E extends Crew>(
     set(x => x.hpTemp, 0),
     over(x => x.hp, x => x - leftoverDamage),
   );
-}
+}*/
 
 export function addHP<E extends Crew>(
   crew: E,
-  type: "permanent" | "temporary",
   amount: number
 ) {
-  return type === "permanent"
-  ? focus(crew, over(x => x.hp, x => x + amount))
-  : focus(crew, over(x => x.hpTemp, x => x + amount))
-  ;
+  return focus(crew, over(x => x.hp, x => x + amount));
 }
 
 export function addAP<E extends Crew>(
   crew: E,
-  type: "permanent" | "temporary",
   amount: number
 ) {
-  return type === "permanent"
-  ? focus(crew, over(x => x.ap, x => x + amount))
-  : focus(crew, over(x => x.apTemp, x => x + amount))
-  ;
+  return focus(crew, over(x => x.ap, x => x + amount));
 }
 
 export function getAP<C extends Crew>(
   crew: C,
   multiplier: number,
 ): number {
-  return multiplier * (crew.ap + crew.apTemp);
+  return multiplier * (crew.ap + 0); // TODO: add status for increasing damage
 }
 
 export function act(
@@ -75,20 +74,9 @@ export function act(
   return determineAndApplyActionAndTriggers(action, state, log, idGen, crew.id, "ally");
 }
 
-export function clearTemp<C extends Crew>(
-  crew: C,
-): C {
-  return focus(crew,
-    set(x => x.hpTemp, 0),
-    set(x => x.apTemp, 0),
-  );
-}
-
 const stFighter: Crew = {
   ap: 5,
   hp: 5,
-  apTemp: 0,
-  hpTemp: 0,
   triggers: [],
   ranged: false,
   actions: [{
@@ -101,8 +89,6 @@ const stFighter: Crew = {
 const stRanged: Crew = {
   ap: 1,
   hp: 1,
-  apTemp: 0,
-  hpTemp: 0,
   triggers: [],
   ranged: true,
   actions: [{
@@ -115,8 +101,6 @@ const stRanged: Crew = {
 const recruitGrow1: Crew = {
   ap: 1,
   hp: 1,
-  apTemp: 0,
-  hpTemp: 0,
   triggers: [
     {
       onTag: "AddCrew",
@@ -125,7 +109,6 @@ const recruitGrow1: Crew = {
         tag: "GainHP",
         target: { tag: "Self" },
         value: 1,
-        type: "permanent",
       },
     },
     {
@@ -135,7 +118,6 @@ const recruitGrow1: Crew = {
         tag: "GainAP",
         target: { tag: "Self" },
         value: 1,
-        type: "permanent",
       },
     },
   ],
@@ -150,8 +132,6 @@ const recruitGrow1: Crew = {
 const recruitGainAPWhenHP: Crew = {
   ap: 4,
   hp: 2,
-  apTemp: 0,
-  hpTemp: 0,
   triggers: [
     {
       onTag: "GainHP",
@@ -160,7 +140,6 @@ const recruitGainAPWhenHP: Crew = {
         tag: "GainAP",
         target: { tag: "Self" },
         value: 1,
-        type: "permanent",
       },
     },
   ],
@@ -175,8 +154,6 @@ const recruitGainAPWhenHP: Crew = {
 const recruitKillLast: Crew = {
   ap: 10,
   hp: 10,
-  apTemp: 0,
-  hpTemp: 0,
   triggers: [],
   ranged: false,
   actions: [

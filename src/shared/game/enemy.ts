@@ -1,6 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
-import { clearTemp } from "src/shared/game/crew";
 import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { Target, indexOfId } from "src/shared/game/target";

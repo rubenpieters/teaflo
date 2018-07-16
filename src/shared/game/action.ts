@@ -35,14 +35,12 @@ export type GainHP<T> = {
   tag: "GainHP",
   target: T,
   value: number,
-  type: "permanent" | "temporary",
 };
 
 export type GainAP<T> = {
   tag: "GainAP",
   target: T,
   value: number,
-  type: "permanent" | "temporary",
 };
 
 export type Rest = {
@@ -254,7 +252,7 @@ function applyAction(
     }
     case "GainHP": {
       state = onTarget(action.target, state,
-        ally => _Crew.addHP(ally, action.type, action.value),
+        ally => _Crew.addHP(ally, action.value),
         x => { throw "wrong target type for '" + action.tag + "'"; },
         x => { throw "wrong target type for '" + action.tag + "'"; },
       );
@@ -262,7 +260,7 @@ function applyAction(
     }
     case "GainAP": {
       state = onTarget(action.target, state,
-        ally => _Crew.addAP(ally, action.type, action.value),
+        ally => _Crew.addAP(ally, action.value),
         x => { throw "wrong target type for '" + action.tag + "'"; },
         x => { throw "wrong target type for '" + action.tag + "'"; },
       );
