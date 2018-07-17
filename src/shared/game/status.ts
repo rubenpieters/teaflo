@@ -13,28 +13,41 @@ export type Regen = {
   value: number,
 };
 
+export type Guard = {
+  tag: "Guard",
+  value: number,
+  guard: number,
+};
+
 export type Status
   = Poison
   | Regen
+  | Guard
   ;
 
+export const allStatus: Status["tag"][] = ["Poison", "Regen", "Guard"];
+
+// conditional types
+type StatusType<A> =
+  A extends "Poison" ? Poison :
+  A extends "Regen" ? Regen :
+  A extends "Guard" ? Guard :
+  never;
+
 export type HasStatus = {
-  status: Status[],
+  // lookup types
+  [key in Status["tag"]]?: StatusType<key>
 };
 
 export function addStatus<E extends HasStatus>(
   e: E,
   status: Status,
 ): E {
-  const index = findIndex(e.status, s => s.tag === status.tag);
-  if (index === "notFound") {
-    return focus(e,
-      over(x => x.status, x => x.concat(status)),
-    );
+  if (e[status.tag] === undefined) {
+    return focus(e, set(x => x[status.tag], status));
   } else {
-    return focus(e,
-      over(x => x.status[index].value, x => x + status.value),
-    );
+    // cast to prevent 'undefined' warning
+    return focus(e, over(x => (<Status>x[status.tag]).value, x => x + status.value));
   }
 }
 
@@ -55,15 +68,19 @@ function findIndex<A>(
 export function applyStatus<E extends HasStatus>(
   index: number,
   e: E,
+  tag: Status["tag"],
 ): E {
-  if (e.status[index].value === 1) {
-    e = focus(e,
-      over(x => x.status, x => x.slice(0, index).concat(x.slice(index + 1, x.length - 1))),
-    );
-  } else {
-    e = focus(e,
-      over(x => x.status[index].value, x => x - 1),
-    );
+  const status = e[tag];
+  if (status !== undefined) {
+    if (status.value === 1) {
+      e = focus(e,
+        set(x => x[tag], undefined),
+      );
+    } else {
+      e = focus(e,
+        over(x => (<Status>x[tag]).value, x => x - 1),
+      );
+    }
   }
   return e;
 }
@@ -83,6 +100,9 @@ export function statusToAction(
     }
     case "Regen": {
       throw "unimplemented";
+    }
+    case "Guard": {
+      return { tag: "Noop" };
     }
   }
 }

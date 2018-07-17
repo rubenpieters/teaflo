@@ -3,6 +3,8 @@ import { Trigger } from "src/shared/game/trigger";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
+import { HasStatus, Guard } from "src/shared/game/status";
+import * as _Status from "src/shared/game/status";
 
 export type Crew = {
   ap: number,
@@ -12,29 +14,24 @@ export type Crew = {
   actions: ActionSpec[],
 };
 
-export function damage<E extends Crew>(
+export function damage<E extends Crew & HasStatus>(
   crew: E,
   damage: number,
 ) {
-  return focus(crew,
-    over(x => x.hp, x => x - damage),
-  );
+  if (crew.Guard === undefined) {
+    return focus(crew, over(x => x.hp, x => x - damage));
+  } else {
+    if (damage <= crew.Guard.guard) {
+      return focus(crew, over(x => (<Guard>x.Guard).guard, x => x - damage));
+    }
+
+    const leftoverDamage = damage - crew.Guard.guard;
+    return focus(crew,
+      set(x => x.Guard, undefined),
+      over(x => x.hp, x => x - leftoverDamage),
+    );
+  }
 }
-
-/*export function damage<E extends Crew>(
-  crew: E,
-  damage: number,
-): E {
- if (damage <= crew.hpTemp) {
-   return focus(crew, over(x => x.hpTemp, x => x - damage));
- }
-
-  const leftoverDamage = damage - crew.hpTemp;
-  return focus(crew,
-    set(x => x.hpTemp, 0),
-    over(x => x.hp, x => x - leftoverDamage),
-  );
-}*/
 
 export function addHP<E extends Crew>(
   crew: E,

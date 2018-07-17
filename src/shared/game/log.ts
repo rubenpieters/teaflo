@@ -61,6 +61,9 @@ function showAction(action: ActionTarget): string {
     case "AddStatus": {
       return "AddStatus " + JSON.stringify(action.status) + " to " + JSON.stringify(action.target);
     }
+    case "Noop": {
+      return "Noop";
+    }
   }
 }
 
