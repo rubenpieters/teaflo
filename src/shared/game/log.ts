@@ -40,6 +40,9 @@ function showAction(action: ActionTarget): string {
     case "Damage": {
       return "Damage " + action.value + " to " + JSON.stringify(action.target);
     }
+    case "Heal": {
+      return "Heal " + action.value + " to " + JSON.stringify(action.target);
+    }
     case "GainHP": {
       return "Gain " + action.value + " HP "  + "(" + JSON.stringify(action.target) + ")";
     }

@@ -9,6 +9,7 @@ import * as _Status from "src/shared/game/status";
 export type Crew = {
   ap: number,
   hp: number,
+  maxHp: number,
   triggers: Trigger[],
   ranged: boolean,
   actions: ActionSpec[],
@@ -33,11 +34,24 @@ export function damage<E extends Crew & HasStatus>(
   }
 }
 
+export function heal<E extends Crew>(
+  crew: E,
+  amount: number,
+) {
+  if (crew.hp + amount > crew.maxHp) {
+    return focus(crew, set(x => x.hp, crew.maxHp));
+  }
+  return focus(crew, over(x => x.hp, x => crew.hp + amount));
+}
+
 export function addHP<E extends Crew>(
   crew: E,
   amount: number
 ) {
-  return focus(crew, over(x => x.hp, x => x + amount));
+  return focus(crew,
+    over(x => x.hp, x => x + amount),
+    over(x => x.maxHp, x => x + amount),
+  );
 }
 
 export function addAP<E extends Crew>(
@@ -74,6 +88,7 @@ export function act(
 const stFighter: Crew = {
   ap: 5,
   hp: 5,
+  maxHp: 5,
   triggers: [],
   ranged: false,
   actions: [{
@@ -86,6 +101,7 @@ const stFighter: Crew = {
 const stRanged: Crew = {
   ap: 1,
   hp: 1,
+  maxHp: 1,
   triggers: [],
   ranged: true,
   actions: [{
@@ -98,6 +114,7 @@ const stRanged: Crew = {
 const recruitGrow1: Crew = {
   ap: 1,
   hp: 1,
+  maxHp: 1,
   triggers: [
     {
       onTag: "AddCrew",
@@ -129,6 +146,7 @@ const recruitGrow1: Crew = {
 const recruitGainAPWhenHP: Crew = {
   ap: 4,
   hp: 2,
+  maxHp: 2,
   triggers: [
     {
       onTag: "GainHP",
@@ -151,6 +169,7 @@ const recruitGainAPWhenHP: Crew = {
 const recruitKillLast: Crew = {
   ap: 10,
   hp: 10,
+  maxHp: 10,
   triggers: [],
   ranged: false,
   actions: [

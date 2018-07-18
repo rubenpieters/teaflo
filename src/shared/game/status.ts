@@ -99,7 +99,13 @@ export function statusToAction(
       };
     }
     case "Regen": {
-      throw "unimplemented";
+      return {
+        tag: "Heal",
+        target: {
+          tag: "Self",
+        },
+        value: status.value,
+      };
     }
     case "Guard": {
       return { tag: "Noop" };

@@ -16,6 +16,12 @@ export type Damage<T> = {
   value: number,
 };
 
+export type Heal<T> = {
+  tag: "Heal",
+  target: T,
+  value: number,
+};
+
 export type AddEnemy = {
   tag: "AddEnemy",
   enemy: Enemy,
@@ -79,6 +85,7 @@ export type Noop = {
 
 export type Action<T>
   = Damage<T>
+  | Heal<T>
   | AddEnemy
   | AddCrew
   | AddItem
@@ -103,6 +110,7 @@ export function fmap<A, B>(
 ): Action<B> {
   switch (action.tag) {
     case "Damage": return {...action, ...{ target: f(action.target)}};
+    case "Heal": return {...action, ...{ target: f(action.target)}};
     case "AddEnemy": return action;
     case "AddCrew": return action;
     case "AddItem": return action;
@@ -252,6 +260,14 @@ function applyAction(
       state = onTarget(action.target, state,
         ally => _Crew.damage(ally, action.value),
         enemy => _Enemy.damage(enemy, action.value),
+        x => { throw "wrong target type for '" + action.tag + "'"; },
+      );
+      break;
+    }
+    case "Heal": {
+      state = onTarget(action.target, state,
+        ally => _Crew.heal(ally, action.value),
+        enemy => _Enemy.heal(enemy, action.value),
         x => { throw "wrong target type for '" + action.tag + "'"; },
       );
       break;

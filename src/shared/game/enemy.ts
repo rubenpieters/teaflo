@@ -6,6 +6,7 @@ import { Target, indexOfId } from "src/shared/game/target";
 
 export type Enemy = {
   hp: number,
+  maxHp: number,
   actions: ActionSpec[],
 };
 
@@ -33,6 +34,16 @@ export function act(
     }),
   );
   return determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy");
+}
+
+export function heal<E extends Enemy>(
+  e: E,
+  amount: number,
+) {
+  if (e.hp + amount > e.maxHp) {
+    return focus(e, set(x => x.hp, e.maxHp));
+  }
+  return focus(e, over(x => x.hp, x => e.hp + amount));
 }
 
 /*
@@ -199,6 +210,7 @@ export function _runBattle(
 
 const enemyAtk012R10: Enemy = {
   hp: 10,
+  maxHp: 10,
   actions: [
     {
       tag: "Damage",
