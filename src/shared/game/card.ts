@@ -59,8 +59,16 @@ const cardBattle_0000: Card = {
 const cardBattle_0001: Card = {
   id: 5,
   actions: [
-    // TODO: { tag: "Battle", enemy: allEnemies.enemyHeal2R14 },
+    // TODO: { tag: "AddEnemy", enemy: allEnemies.enemyHeal2R14 },
     { tag: "GainGold", gain: 7 },
+  ],
+  tag: "event",
+};
+
+const cardBattle_0002: Card = {
+  id: 6,
+  actions: [
+    { tag: "AddEnemy", enemy: allEnemies.enemyRegenApMinR20 },
   ],
   tag: "event",
 };
@@ -75,4 +83,5 @@ export const allCards = {
 
   cardBattle_0000: cardBattle_0000,
   cardBattle_0001: cardBattle_0001,
+  cardBattle_0002: cardBattle_0002,
 };

@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import * as _Crew from "src/shared/game/crew";
-import { GameState, IdCrew, Id } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy, Id } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
@@ -49,6 +49,12 @@ export type GainAP<T> = {
   value: number,
 };
 
+export type DamageAP<T> = {
+  tag: "DamageAP",
+  target: T,
+  value: number,
+};
+
 export type Rest = {
   tag: "Rest",
 };
@@ -91,6 +97,7 @@ export type Action<T>
   | AddItem
   | GainHP<T>
   | GainAP<T>
+  | DamageAP<T>
   | Rest
   | GainGold
   | PayGold
@@ -116,6 +123,7 @@ export function fmap<A, B>(
     case "AddItem": return action;
     case "GainHP": return {...action, ...{ target: f(action.target)}};
     case "GainAP": return {...action, ...{ target: f(action.target)}};
+    case "DamageAP": return {...action, ...{ target: f(action.target)}};
     case "Rest": return action;
     case "GainGold": return action;
     case "PayGold": return action;
@@ -235,13 +243,13 @@ function applyAction(
   switch (action.tag) {
     case "AddEnemy": {
       const id = idGen.newId();
-      const addedEnemy = {...action.enemy, ...{ id, actionIndex: 0, status: [] } };
+      const addedEnemy: IdEnemy = {...action.enemy, ...{ id, actionIndex: 0, tag: "enemy" } };
       state = focus(state, over(x => x.enemies, x => x.concat(addedEnemy)));
       break;
     }
     case "AddCrew": {
       const id = idGen.newId();
-      const addedCrew = {...action.crew, ...{ id, actionIndex: 0, status: []   } };
+      const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally" } };
       state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
       break;
     }
@@ -280,7 +288,15 @@ function applyAction(
       );
       break;
     }
-    case "GainAP": {
+    case "DamageAP": {
+      state = onTarget(action.target, state,
+        ally => _Crew.damageAP(ally, action.value),
+        x => { throw "wrong target type for '" + action.tag + "'"; },
+        x => { throw "wrong target type for '" + action.tag + "'"; },
+      );
+      break;
+    }
+    case "DamageAP": {
       state = onTarget(action.target, state,
         ally => _Crew.addAP(ally, action.value),
         x => { throw "wrong target type for '" + action.tag + "'"; },
@@ -429,7 +445,7 @@ export function checkStatusEnemy(
           return afterApply;
         }
         state = focus(afterApply.state,
-          set(x => x.crew[i], _Status.applyStatus(i, enemy, statusTag)),
+          set(x => x.enemies[i], _Status.applyStatus(i, enemy, statusTag)),
         );
         log = afterApply.log;
       }

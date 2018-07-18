@@ -61,6 +61,16 @@ export function addAP<E extends Crew>(
   return focus(crew, over(x => x.ap, x => x + amount));
 }
 
+export function damageAP<E extends Crew>(
+  crew: E,
+  amount: number
+) {
+  if (amount >= crew.ap) {
+    return focus(crew, set(x => x.ap, 0));
+  }
+  return focus(crew, over(x => x.ap, x => x - amount));
+}
+
 export function getAP<C extends Crew>(
   crew: C,
   multiplier: number,

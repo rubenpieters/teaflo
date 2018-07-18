@@ -235,7 +235,33 @@ const enemyAtk012R10: Enemy = {
   ],
 };*/
 
+const enemyRegenApMinR20: Enemy = {
+  hp: 20,
+  maxHp: 20,
+  actions: [
+    {
+      tag: "AddStatus",
+      target: { tag: "Self" },
+      status: {
+        tag: "Regen",
+        value: 6,
+      }
+    },
+    {
+      tag: "DamageAP",
+      target: { tag: "All", type: "ally" },
+      value: 1,
+    },
+    {
+      tag: "Damage",
+      target: { tag: "Positions", type: "ally", positions: [0, 1, 2] },
+      value: 10
+    }
+  ]
+};
+
 export const allEnemies = {
   enemyAtk012: enemyAtk012R10,
+  enemyRegenApMinR20: enemyRegenApMinR20,
   // enemyHeal2R14: enemyHeal2R14,
 };
