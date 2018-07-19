@@ -5,6 +5,15 @@ import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "sr
 import { Generator } from "src/shared/handler/id/generator";
 import { HasStatus, Guard } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
+import { showAction } from "src/shared/game/log";
+
+export function showCrew(
+  crew: IdCrew
+) {
+  return {...crew,
+    actions: crew.actions.map(showAction),
+    triggers: crew.triggers.map(t => { return {...t, action: showAction(t.action)}; }) };
+}
 
 export type Crew = {
   ap: number,

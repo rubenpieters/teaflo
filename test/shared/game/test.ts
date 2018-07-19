@@ -37,7 +37,15 @@ function basicBattleTest() {
     eventCards: [
       { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event" },
       { actions: [{ tag: "AddCrew", crew: allCrew.stRanged }], id: 0, tag: "event" },
-      { actions: [{ tag: "AddEnemy", enemy: { hp: 2, actions: [
+      { actions: [{ tag: "AddEnemy", enemy: { hp: 10, maxHp: 10, actions: [
+        {
+          tag: "AddStatus",
+          target: { tag: "Self" },
+          status: {
+            tag: "Regen",
+            value: 2,
+          }
+        },
         {
           tag: "Damage",
           target: { tag: "Positions", type: "ally", positions: [0] },
@@ -46,6 +54,7 @@ function basicBattleTest() {
         ] } },
         { tag: "GainGold", gain: 5 },
       ], id: 0, tag: "event" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
       { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
       { actions: [{
         tag: "PayGold",
@@ -115,8 +124,8 @@ function basicStatusTest() {
 
 
 // basicCrewTest();
-// basicBattleTest();
-basicStatusTest();
+basicBattleTest();
+// basicStatusTest();
 // basicItemTest();
 // guard3ItemTest();
 

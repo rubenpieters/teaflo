@@ -3,12 +3,12 @@ import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFro
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
 import { Solution, SolutionResult, runSolution, runSolutionAll } from "src/shared/game/solution";
 import { SolutionLog, showSolutionLog } from "src/shared/game/log";
-import { Crew } from "src/shared/game/crew";
-import { Item } from "src/shared/game/item";
-import { Enemy } from "src/shared/game/enemy";
+import { showCrew } from "src/shared/game/crew";
+import { IdCrew, IdEnemy, IdItem } from "src/shared/game/state";
 import { GameState } from "src/shared/game/state";
-
 import { config } from "src/app/config";
+import { showItem } from "src/shared/game/item";
+import { showEnemy } from "src/shared/game/enemy";
 
 
 export type ValidResult = { state: GameState, log: SolutionLog };
@@ -585,9 +585,9 @@ function mkState(
   solutionResult: ValidResult,
 ) {
   resourcesText.setText("gold: " + solutionResult.state.gold);
-  const crew: Crew[] = solutionResult.state.crew;
-  const items: Item[] = solutionResult.state.items;
-  const enemies: Enemy[] = solutionResult.state.enemies;
+  const crew: IdCrew[] = solutionResult.state.crew;
+  const items: IdItem[] = solutionResult.state.items;
+  const enemies: IdEnemy[] = solutionResult.state.enemies;
 
   // clear old
   for (const sprite of crewCache) {
@@ -609,7 +609,7 @@ function mkState(
     const sprite = game.add.sprite(x, y, "ally", 0, playBoardGroup);
     sprite.inputEnabled = true;
     sprite.events.onInputOver.add(() => {
-      nodeTypeDetail.setText(JSON.stringify(ally, undefined, 2));
+      nodeTypeDetail.setText(JSON.stringify(showCrew(ally), undefined, 2));
     });
     sprites.push(sprite);
     x += 50;
@@ -623,7 +623,7 @@ function mkState(
     const sprite = game.add.sprite(x, y, "item", 0, playBoardGroup);
     sprite.inputEnabled = true;
     sprite.events.onInputOver.add(() => {
-      nodeTypeDetail.setText(JSON.stringify(item, undefined, 2));
+      nodeTypeDetail.setText(JSON.stringify(showItem(item), undefined, 2));
     });
     sprites.push(sprite);
     x += 50;
@@ -637,7 +637,7 @@ function mkState(
     const sprite = game.add.sprite(x, y, "ally", 0, playBoardGroup);
     sprite.inputEnabled = true;
     sprite.events.onInputOver.add(() => {
-      nodeTypeDetail.setText(JSON.stringify(enemy, undefined, 2));
+      nodeTypeDetail.setText(JSON.stringify(showEnemy(enemy), undefined, 2));
     });
     sprites.push(sprite);
     x += 50;

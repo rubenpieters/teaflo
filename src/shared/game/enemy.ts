@@ -3,6 +3,15 @@ import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
 import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { Target, indexOfId } from "src/shared/game/target";
+import { showAction } from "src/shared/game/log";
+
+export function showEnemy(
+  enemy: IdEnemy
+) {
+  return {...enemy,
+    actions: enemy.actions.map(showAction),
+  };
+}
 
 export type Enemy = {
   hp: number,
