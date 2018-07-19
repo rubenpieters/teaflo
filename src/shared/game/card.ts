@@ -3,7 +3,7 @@ import { Target } from "src/shared/game/target";
 import { allCrew } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { allEnemies } from "src/shared/game/enemy";
-import { showAction } from "./log";
+import { showAction } from "src/shared/game/log";
 
 export function showCard(card: Card) {
   return { ...card, actions: card.actions.map(showAction) };

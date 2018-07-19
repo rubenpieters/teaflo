@@ -31,13 +31,13 @@ function showActionLog(actionLog: ActionLog): string {
 export function showAction<T extends TargetSpec | Target>(action: Action<T>): string {
   switch (action.tag) {
     case "AddEnemy": {
-      return "AddEnemy\n" + JSON.stringify(showEnemy(action.enemy), undefined, 2);
+      return "AddEnemy";
     }
     case "AddCrew": {
-      return "AddCrew\n" + JSON.stringify(showCrew(action.crew), undefined, 2);
+      return "AddCrew";
     }
     case "AddItem": {
-      return "AddItem\n" + JSON.stringify(showItem(action.item), undefined, 2);
+      return "AddItem";
     }
     case "Rest": {
       return "Rest";

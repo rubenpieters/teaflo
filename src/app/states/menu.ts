@@ -338,6 +338,7 @@ export default class Menu extends Phaser.State {
         // TODO: use last valid solution result?
         mkState(this.game, resourcesText, <ValidResult>runSolution({ paths: [] }));
       } else {
+        console.log(solutionResult.log);
         mkState(this.game, resourcesText, (<ValidResult>solutionResult));
       }
     });

@@ -273,11 +273,13 @@ function applyAction(
       break;
     }
     case "Heal": {
+      console.log(state.enemies);
       state = onTarget(action.target, state,
         ally => _Crew.heal(ally, action.value),
         enemy => _Enemy.heal(enemy, action.value),
         x => { throw "wrong target type for '" + action.tag + "'"; },
       );
+      console.log(state.enemies);
       break;
     }
     case "GainHP": {

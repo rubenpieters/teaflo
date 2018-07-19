@@ -49,9 +49,12 @@ export function heal<E extends Enemy>(
   e: E,
   amount: number,
 ) {
+  console.log("HEALING FOR " + amount);
   if (e.hp + amount > e.maxHp) {
+    console.log("1");
     return focus(e, set(x => x.hp, e.maxHp));
   }
+  console.log("2");
   return focus(e, over(x => x.hp, x => e.hp + amount));
 }
 

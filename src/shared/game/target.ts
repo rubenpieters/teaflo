@@ -35,9 +35,9 @@ export function determineTarget(
   selfId: number,
   selfType: TargetType
 ): Target {
-  const coll = typeColl(state, selfType);
   switch (target.tag) {
     case "Self": {
+      const coll = typeColl(state, selfType);
       const index = indexOfId(selfId, coll);
       if (index === "notFound") {
         throw ("index " + index + " not found");
@@ -50,6 +50,7 @@ export function determineTarget(
       }
     }
     case "All": {
+      const coll = typeColl(state, target.type);
       return {
         tag: "Target",
         type: target.type,
@@ -57,6 +58,7 @@ export function determineTarget(
       };
     }
     case "Last": {
+      const coll = typeColl(state, selfType);
       return {
         tag: "Target",
         type: target.type,
