@@ -162,7 +162,6 @@ export function determineAndApplyActionAndTriggers(
   selfId: number,
   selfType: TargetType,
 ): { state: GameState | "invalid", log: ActionTarget[] }  {
-  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType), action);
   return determineAndApplyActionAndTriggersAt(action, state, log, { id: 0, type: "item" }, idGen, selfId, selfType);
 }
 
@@ -273,13 +272,11 @@ function applyAction(
       break;
     }
     case "Heal": {
-      console.log(state.enemies);
       state = onTarget(action.target, state,
         ally => _Crew.heal(ally, action.value),
         enemy => _Enemy.heal(enemy, action.value),
         x => { throw "wrong target type for '" + action.tag + "'"; },
       );
-      console.log(state.enemies);
       break;
     }
     case "GainHP": {
@@ -447,7 +444,7 @@ export function checkStatusEnemy(
           return afterApply;
         }
         state = focus(afterApply.state,
-          set(x => x.enemies[i], _Status.applyStatus(i, enemy, statusTag)),
+          over(x => x.enemies[i], x => _Status.applyStatus(i, x, statusTag)),
         );
         log = afterApply.log;
       }
