@@ -1,4 +1,9 @@
 import { ActionTarget, Action } from "src/shared/game/action";
+import { Target, TargetSpec, showTarget } from "src/shared/game/target";
+import { showStatus } from "src/shared/game/status";
+import { showCrew } from "./crew";
+import { showEnemy } from "./enemy";
+import { showItem } from "./item";
 
 export type SolutionLog = {
   actionLog: ActionLog[],
@@ -23,34 +28,34 @@ function showActionLog(actionLog: ActionLog): string {
   return showAction(actionLog.action) + "\n" + actionLog.loggedEffects.map(a => " - " + showAction(a)).join("\n");
 }
 
-export function showAction<T>(action: Action<T>): string {
+export function showAction<T extends TargetSpec | Target>(action: Action<T>): string {
   switch (action.tag) {
     case "AddEnemy": {
-      return "AddEnemy";
+      return "AddEnemy\n" + JSON.stringify(showEnemy(action.enemy), undefined, 2);
     }
     case "AddCrew": {
-      return "AddCrew";
+      return "AddCrew\n" + JSON.stringify(showCrew(action.crew), undefined, 2);
     }
     case "AddItem": {
-      return "AddItem";
+      return "AddItem\n" + JSON.stringify(showItem(action.item), undefined, 2);
     }
     case "Rest": {
       return "Rest";
     }
     case "Damage": {
-      return "Damage " + action.value + " to " + JSON.stringify(action.target);
+      return "Damage " + action.value + " to " + showTarget(action.target);
     }
     case "Heal": {
-      return "Heal " + action.value + " to " + JSON.stringify(action.target);
+      return "Heal " + action.value + " to " + showTarget(action.target);
     }
     case "GainHP": {
-      return "Gain " + action.value + " HP "  + "(" + JSON.stringify(action.target) + ")";
+      return "Gain " + action.value + " HP "  + "(" + showTarget(action.target) + ")";
     }
     case "GainAP": {
-      return "Gain " + action.value + " AP "  + "(" + JSON.stringify(action.target) + ")";
+      return "Gain " + action.value + " AP "  + "(" + showTarget(action.target) + ")";
     }
     case "DamageAP": {
-      return "DamageAP " + action.value + " to " + JSON.stringify(action.target);
+      return "DamageAP " + action.value + " to " + showTarget(action.target);
     }
     case "GainGold": {
       return "GainGold " + action.gain;
@@ -65,7 +70,7 @@ export function showAction<T>(action: Action<T>): string {
       return "Death " + action.type + " " + action.id;
     }
     case "AddStatus": {
-      return "AddStatus " + JSON.stringify(action.status) + " to " + JSON.stringify(action.target);
+      return "AddStatus " + showStatus(action.status) + " to " + showTarget(action.target);
     }
     case "Noop": {
       return "Noop";

@@ -6,7 +6,7 @@ import { Target, indexOfId } from "src/shared/game/target";
 import { showAction } from "src/shared/game/log";
 
 export function showEnemy(
-  enemy: IdEnemy
+  enemy: Enemy
 ) {
   return {...enemy,
     actions: enemy.actions.map(showAction),

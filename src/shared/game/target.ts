@@ -163,6 +163,26 @@ export function onTarget(
   }
 }
 
+export function showTarget(target: Target | TargetSpec): string {
+  switch (target.tag) {
+    case "Target": {
+      return target.positions + " " + target.type;
+    }
+    case "Self": {
+      return "self";
+    }
+    case "All": {
+      return "all " + target.type;
+    }
+    case "Last": {
+      return "last " + target.type;
+    }
+    case "Positions": {
+      return target.positions + " " + target.type;
+    }
+  }
+}
+
 /*
 export type Self = {
   tag: "Self",

@@ -4,7 +4,7 @@ import { IdItem } from "src/shared/game/state";
 import { showAction } from "src/shared/game/log";
 
 export function showItem(
-  item: IdItem
+  item: Item
 ) {
   return {...item,
     triggers: item.triggers.map(t => { return {...t, action: showAction(t.action)}; }) };

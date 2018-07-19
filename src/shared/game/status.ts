@@ -25,6 +25,20 @@ export type Status
   | Guard
   ;
 
+export function showStatus(status: Status) {
+  switch (status.tag) {
+    case "Poison": {
+      return "Poison " + status.value + " T";
+    }
+    case "Regen": {
+      return "Regen " + status.value + " T";
+    }
+    case "Guard": {
+      return "Guard " + status.guard + " " + status.value + " T";
+    }
+  }
+}
+
 export const allStatus: Status["tag"][] = ["Poison", "Regen", "Guard"];
 
 // conditional types

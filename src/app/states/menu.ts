@@ -9,6 +9,7 @@ import { GameState } from "src/shared/game/state";
 import { config } from "src/app/config";
 import { showItem } from "src/shared/game/item";
 import { showEnemy } from "src/shared/game/enemy";
+import { showCard } from "src/shared/game/card";
 
 
 export type ValidResult = { state: GameState, log: SolutionLog };
@@ -448,7 +449,7 @@ function mkAvailableCards(
     sprite.inputEnabled = true;
     sprite.events.onInputDown.add(onAvailableCardClick(texts, card, i));
     sprite.events.onInputOver.add(() => {
-      nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
+      nodeTypeDetail.setText(JSON.stringify(showCard(card), undefined, 2));
     });
     sprites.push(sprite);
 

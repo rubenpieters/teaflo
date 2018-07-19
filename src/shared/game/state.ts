@@ -13,7 +13,7 @@ export type ActionIndex = {
 };
 
 export type IdCrew = Crew & Id & ActionIndex & HasStatus & { tag: "ally" };
-export type IdItem = Item & Id;
+export type IdItem = Item & Id & { tag: "item" };
 export type IdEnemy = Enemy & Id & ActionIndex & HasStatus & { tag: "enemy" };
 
 export type GameState = {

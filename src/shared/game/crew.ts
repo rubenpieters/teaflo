@@ -8,7 +8,7 @@ import * as _Status from "src/shared/game/status";
 import { showAction } from "src/shared/game/log";
 
 export function showCrew(
-  crew: IdCrew
+  crew: Crew
 ) {
   return {...crew,
     actions: crew.actions.map(showAction),
