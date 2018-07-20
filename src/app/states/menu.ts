@@ -468,18 +468,27 @@ function onAvailableCardClick(
 ) {
   return function() {
     const result = minusLimit(texts, index);
-    if (result === "cardUsed") {
-      switch (card.tag) {
-        case "event": {
-          addToSolution(card);
-          break;
+    switch (result) {
+      case "cardUsed": {
+        switch (card.tag) {
+          case "event": {
+            addToSolution(card);
+            break;
+          }
+          case "rest": {
+            break;
+          }
         }
-        case "rest": {
-          break;
-        }
+        break;
       }
-    } else {
-      console.log("card uses at 0");
+      case "limitIsZero": {
+        console.log("card uses at 0");
+        break;
+      }
+      case "noPaths": {
+        console.log("no paths yet");
+        break;
+      }
     }
   };
 }

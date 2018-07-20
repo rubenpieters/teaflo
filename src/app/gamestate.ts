@@ -36,14 +36,16 @@ export function changeSolution(solution: Solution) {
 }
 
 export function minusLimit(limitTexts: Phaser.Text[], index: number) {
-  if (gameState.availableCards[index].limit > 0) {
+  if (gameState.solution.paths.length == 0) {
+    return "noPaths";
+  } else if (gameState.availableCards[index].limit <= 0) {
+    return "limitIsZero";
+  } else {
     gameState = focus(gameState,
       over(x => x.availableCards[index].limit, x => x - 1)
     );
     limitTexts[index].setText(gameState.availableCards[index].limit.toString());
     return "cardUsed";
-  } else {
-    return "limitIsZero";
   }
 }
 
@@ -55,7 +57,7 @@ export function plusLimit(limitTexts: Phaser.Text[], cardId: number) {
   gameState = focus(gameState,
     over(x => x.availableCards[index].limit, x => x + 1)
   );
-  console.log("new limit set");
+  // console.log("new limit set");
   limitTexts[index].setText(gameState.availableCards[index].limit.toString());
 }
 
