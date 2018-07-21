@@ -10,6 +10,8 @@ import { Item } from "src/shared/game/item";
 import { Status, HasStatus } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 
+// Action
+
 export type Damage<T> = {
   tag: "Damage",
   target: T,
@@ -107,9 +109,45 @@ export type Action<T>
   | Noop
   ;
 
+// Spec
+
+
+export type ApDamage<T> = {
+  tag: "ApDamage",
+  target: T,
+  multiplier: number,
+};
+
+export type Spec<T>
+  = Action<T>
+  | ApDamage<T>
+  ;
+
+function determineSpec(
+  action: ActionSpec,
+  state: GameState,
+  selfId: number,
+  selfType: TargetType,
+): Action<TargetSpec> {
+  switch (action.tag) {
+    case "ApDamage": {
+      if (selfType !== "ally") {
+        throw "Wrong self type for action " + action.tag + ", was: " + selfType;
+      }
+      const self: Crew = state.crew[selfId];
+      return {
+        tag: "Damage",
+        target: action.target,
+        value: action.multiplier * self.ap,
+      };
+    }
+    default: return action;
+  }
+}
+
 export type ActionTarget = Action<Target>;
 
-export type ActionSpec = Action<TargetSpec>;
+export type ActionSpec = Spec<TargetSpec>;
 
 export function fmap<A, B>(
   f: (a: A) => B,
@@ -162,6 +200,8 @@ export function determineAndApplyActionAndTriggers(
   selfId: number,
   selfType: TargetType,
 ): { state: GameState | "invalid", log: ActionTarget[] }  {
+  const actionSpec = determineSpec(action, state, selfId, selfType);
+  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType), actionSpec);
   return determineAndApplyActionAndTriggersAt(action, state, log, { id: 0, type: "item" }, idGen, selfId, selfType);
 }
 
@@ -174,7 +214,8 @@ export function determineAndApplyActionAndTriggersAt(
   selfId: number,
   selfType: TargetType,
 ): { state: GameState | "invalid", log: ActionTarget[] }  {
-  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType), action);
+  const actionSpec = determineSpec(action, state, selfId, selfType);
+  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType), actionSpec);
   return applyActionAndTriggersAt(actionTarget, state, log, from, idGen);
 }
 

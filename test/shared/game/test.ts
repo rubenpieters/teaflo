@@ -122,12 +122,57 @@ function basicStatusTest() {
   }
 }
 
+function basicApDamageTest() {
+  const path1: Path = {
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
+      { actions: [{ tag: "AddCrew", crew: {
+        ap: 0,
+        hp: 5,
+        maxHp: 5,
+        triggers: [],
+        ranged: false,
+        actions: [{
+          tag: "ApDamage",
+          target: { tag: "Positions", type: "enemy", positions: [0] },
+          multiplier: 1,
+        }] }, }
+      ]
+      , id: 0, tag: "event" },
+      { actions: [{ tag: "AddEnemy", enemy: { hp: 2, maxHp: 2, actions: [
+        {
+          tag: "Damage",
+          target: { tag: "Positions", type: "ally", positions: [0] },
+          value: 1,
+        },
+        ] } },
+        { tag: "GainGold", gain: 5 },
+      ], id: 0, tag: "event" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
+    ]
+  }
+  const solution: Solution = {
+    paths: [path1]
+  }
+
+  const sol = runSolution(solution);
+  if (sol.state === "invalid") {
+    console.log(showSolutionLog(sol.log));
+    console.log("invalid");
+  } else {
+    const { state, log } = sol;
+    console.log(JSON.stringify(state));
+    console.log(showSolutionLog(log));
+  }
+}
+
 
 // basicCrewTest();
-basicBattleTest();
+// basicBattleTest();
 // basicStatusTest();
 // basicItemTest();
 // guard3ItemTest();
+basicApDamageTest();
 
 /*
 
