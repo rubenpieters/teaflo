@@ -19,9 +19,9 @@ export type Crew = {
   ap: number,
   hp: number,
   maxHp: number,
-  triggers: Trigger[],
   ranged: boolean,
   actions: ActionSpec[],
+  triggers: Trigger[],
 };
 
 export function damage<E extends Crew & HasStatus>(
@@ -143,6 +143,7 @@ const recruitGrow1: Crew = {
         target: { tag: "Self" },
         value: 1,
       },
+      conditions: [],
     },
     {
       onTag: "AddCrew",
@@ -152,6 +153,7 @@ const recruitGrow1: Crew = {
         target: { tag: "Self" },
         value: 1,
       },
+      conditions: [],
     },
   ],
   ranged: false,
@@ -175,6 +177,7 @@ const recruitGainAPWhenHP: Crew = {
         target: { tag: "Self" },
         value: 1,
       },
+      conditions: [],
     },
   ],
   ranged: false,

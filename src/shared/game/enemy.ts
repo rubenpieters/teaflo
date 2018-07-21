@@ -4,6 +4,7 @@ import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "sr
 import { Generator } from "src/shared/handler/id/generator";
 import { Target, indexOfId } from "src/shared/game/target";
 import { showAction } from "src/shared/game/log";
+import { Trigger } from "src/shared/game/trigger";
 
 export function showEnemy(
   enemy: Enemy
@@ -17,6 +18,7 @@ export type Enemy = {
   hp: number,
   maxHp: number,
   actions: ActionSpec[],
+  triggers: Trigger[],
 };
 
 export function damage<E extends Enemy>(
@@ -227,6 +229,19 @@ const enemyAtk012R10: Enemy = {
       value: 5,
     },
   ],
+  triggers: [
+    {
+      onTag: "Death",
+      type: "before",
+      action: {
+        tag: "GainGold",
+        gain: 5,
+      },
+      conditions: [
+        { tag: "OwnId" },
+      ],
+    },
+  ],
 };
 
 /*const enemyHeal2R14: Enemy = {
@@ -266,7 +281,8 @@ const enemyRegenApMinR20: Enemy = {
       target: { tag: "Positions", type: "ally", positions: [0, 1, 2] },
       value: 10
     }
-  ]
+  ],
+  triggers: [],
 };
 
 export const allEnemies = {

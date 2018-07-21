@@ -9,6 +9,7 @@ import { Target, TargetSpec, onTarget, determineTarget, TargetType, indexOfId, t
 import { Item } from "src/shared/game/item";
 import { Status, HasStatus } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
+import { checkConditions } from "src/shared/game/trigger";
 
 // Action
 
@@ -202,14 +203,14 @@ export function determineAndApplyActionAndTriggers(
 ): { state: GameState | "invalid", log: ActionTarget[] }  {
   const actionSpec = determineSpec(action, state, selfId, selfType);
   const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType), actionSpec);
-  return determineAndApplyActionAndTriggersAt(action, state, log, { id: 0, type: "item" }, idGen, selfId, selfType);
+  return determineAndApplyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen, selfId, selfType);
 }
 
 export function determineAndApplyActionAndTriggersAt(
   action: ActionSpec,
   state: GameState,
   log: ActionTarget[],
-  from: { id: number, type: "item" | "crew" },
+  from: { id: number, type: "item" | "crew" | "enemy" },
   idGen: Generator,
   selfId: number,
   selfType: TargetType,
@@ -225,38 +226,23 @@ export function applyActionAndTriggers(
   log: ActionTarget[],
   idGen: Generator,
 ): { state: GameState | "invalid", log: ActionTarget[] } {
-  return applyActionAndTriggersAt(action, state, log, { id: 0, type: "item" }, idGen);
+  return applyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen);
 }
 
 function applyActionAndTriggersAt(
   action: ActionTarget,
   state: GameState,
   log: ActionTarget[],
-  from: { id: number, type: "item" | "crew" },
+  from: { id: number, type: "item" | "crew" | "enemy" },
   idGen: Generator,
 ): { state: GameState | "invalid", log: ActionTarget[] } {
-    // item interactions with effects
-    if (from.type === "item") {
-      for (const item of state.items.slice(from.id)) {
-        for (const trigger of item.triggers) {
-          if (trigger.onTag === action.tag && trigger.type === "before") {
-            const afterTrigger = determineAndApplyActionAndTriggersAt(trigger.action, state, log, { id: from.id + 1, type: "item" }, idGen, item.id, "item");
-            if (afterTrigger.state === "invalid") {
-              return afterTrigger;
-            }
-            state = afterTrigger.state;
-            log = afterTrigger.log;
-          }
-        }
-      }
-    }
-
-    const fromCrew = from.type === "crew" ? from.id : 0;
-    // crew interactions with effects
-    for (const ally of state.crew.slice(fromCrew)) {
-      for (const trigger of ally.triggers) {
-        if (trigger.onTag === action.tag && trigger.type === "before") {
-          const afterTrigger = determineAndApplyActionAndTriggersAt(trigger.action, state, log, { id: from.id + 1, type: "crew" }, idGen, ally.id, "ally");
+  // enemy interactions with effects
+  if (from.type === "enemy") {
+    for (const enemy of state.enemies.slice(from.id)) {
+      for (const trigger of enemy.triggers) {
+        if (trigger.onTag === action.tag && trigger.type === "before" && checkConditions(trigger.conditions, action, state, enemy.id, "enemy")) {
+          const afterTrigger = determineAndApplyActionAndTriggersAt(
+            trigger.action, state, log, { id: from.id + 1, type: "enemy" }, idGen, enemy.id, "enemy");
           if (afterTrigger.state === "invalid") {
             return afterTrigger;
           }
@@ -265,6 +251,39 @@ function applyActionAndTriggersAt(
         }
       }
     }
+  }
+
+  // item interactions with effects
+  if (from.type === "item" || from.type === "enemy") {
+    const startId = from.type === "item" ? from.id : 0;
+    for (const item of state.items.slice(startId)) {
+      for (const trigger of item.triggers) {
+        if (trigger.onTag === action.tag && trigger.type === "before" && checkConditions(trigger.conditions, action, state, item.id, "item")) {
+          const afterTrigger = determineAndApplyActionAndTriggersAt(trigger.action, state, log, { id: from.id + 1, type: "item" }, idGen, item.id, "item");
+          if (afterTrigger.state === "invalid") {
+            return afterTrigger;
+          }
+          state = afterTrigger.state;
+          log = afterTrigger.log;
+        }
+      }
+    }
+  }
+
+  const fromCrew = from.type === "crew" ? from.id : 0;
+  // crew interactions with effects
+  for (const ally of state.crew.slice(fromCrew)) {
+    for (const trigger of ally.triggers) {
+      if (trigger.onTag === action.tag && trigger.type === "before" && checkConditions(trigger.conditions, action, state, ally.id, "ally")) {
+        const afterTrigger = determineAndApplyActionAndTriggersAt(trigger.action, state, log, { id: from.id + 1, type: "crew" }, idGen, ally.id, "ally");
+        if (afterTrigger.state === "invalid") {
+          return afterTrigger;
+        }
+        state = afterTrigger.state;
+        log = afterTrigger.log;
+      }
+    }
+  }
 
   const afterApply = applyAction(action, state, log, idGen);
 
@@ -278,6 +297,7 @@ function applyAction(
   log: ActionTarget[],
   idGen: Generator,
 ): { state: GameState | "invalid", log: ActionTarget[] } {
+  console.log(action.tag);
   log = log.concat(action);
 
   switch (action.tag) {

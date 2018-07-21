@@ -24,6 +24,7 @@ const plus11StartCombat: Item = {
         target: { tag: "All", type: "ally" },
         value: 1,
       },
+      conditions: [],
     },
     {
       onTag: "AddEnemy",
@@ -33,6 +34,7 @@ const plus11StartCombat: Item = {
         target: { tag: "All", type: "ally" },
         value: 1,
       },
+      conditions: [],
     },
   ],
 };
@@ -47,6 +49,7 @@ const guard3StartCombat: Item = {
         target: { tag: "All", type: "ally" },
         value: 3,
       },
+      conditions: [],
     },
   ],
 };

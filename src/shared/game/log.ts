@@ -1,4 +1,4 @@
-import { ActionTarget, Action } from "src/shared/game/action";
+import { ActionTarget, Action, Spec } from "src/shared/game/action";
 import { Target, TargetSpec, showTarget } from "src/shared/game/target";
 import { showStatus } from "src/shared/game/status";
 import { showCrew } from "./crew";
@@ -28,7 +28,7 @@ function showActionLog(actionLog: ActionLog): string {
   return showAction(actionLog.action) + "\n" + actionLog.loggedEffects.map(a => " - " + showAction(a)).join("\n");
 }
 
-export function showAction<T extends TargetSpec | Target>(action: Action<T>): string {
+export function showAction<T extends TargetSpec | Target>(action: Spec<T>): string {
   switch (action.tag) {
     case "AddEnemy": {
       return "AddEnemy";
@@ -44,6 +44,9 @@ export function showAction<T extends TargetSpec | Target>(action: Action<T>): st
     }
     case "Damage": {
       return "Damage " + action.value + " to " + showTarget(action.target);
+    }
+    case "ApDamage": {
+      return "Damage " + action.multiplier + " * (AP) " + " to " + showTarget(action.target);
     }
     case "Heal": {
       return "Heal " + action.value + " to " + showTarget(action.target);

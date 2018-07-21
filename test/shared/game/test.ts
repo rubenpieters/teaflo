@@ -51,8 +51,21 @@ function basicBattleTest() {
           target: { tag: "Positions", type: "ally", positions: [0] },
           value: 2,
         },
-        ] } },
-        { tag: "GainGold", gain: 5 },
+        ], triggers: [
+          {
+            onTag: "Death",
+            type: "before",
+            action: {
+              tag: "GainGold",
+              gain: 5,
+            },
+            conditions: [
+              { tag: "OwnId" },
+            ],
+          }
+        ]
+      } 
+    },
       ], id: 0, tag: "event" },
       { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
       { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
@@ -145,7 +158,7 @@ function basicApDamageTest() {
           target: { tag: "Positions", type: "ally", positions: [0] },
           value: 1,
         },
-        ] } },
+        ], triggers: [] } },
         { tag: "GainGold", gain: 5 },
       ], id: 0, tag: "event" },
       { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
@@ -168,11 +181,11 @@ function basicApDamageTest() {
 
 
 // basicCrewTest();
-// basicBattleTest();
+basicBattleTest();
 // basicStatusTest();
 // basicItemTest();
 // guard3ItemTest();
-basicApDamageTest();
+// basicApDamageTest();
 
 /*
 
