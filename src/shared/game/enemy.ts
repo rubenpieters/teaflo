@@ -293,7 +293,7 @@ const enemy8HpAtk2: Enemy = {
       tag: "Damage",
       target: { tag: "Positions", type: "ally", positions: [0, 1] },
       value: 7
-    }
+    },
   ],
   triggers: [
     {
@@ -301,7 +301,7 @@ const enemy8HpAtk2: Enemy = {
       type: "before",
       action: {
         tag: "GainGold",
-        gain: 5,
+        gain: 7,
       },
       conditions: [
         { tag: "OwnId" },
@@ -322,9 +322,40 @@ const enemy8HpAtk2: Enemy = {
   ],
 };
 
+const enemy15hpAtk1AllHeal2: Enemy = {
+  hp: 15,
+  maxHp: 15,
+  actions: [
+    {
+      tag: "Damage",
+      target: { tag: "All", type: "ally" },
+      value: 1
+    },
+    {
+      tag: "Heal",
+      target: { tag: "Self" },
+      value: 2
+    },
+  ],
+  triggers: [
+    {
+      onTag: "Death",
+      type: "before",
+      action: {
+        tag: "GainGold",
+        gain: 5,
+      },
+      conditions: [
+        { tag: "OwnId" },
+      ],
+    },
+  ],
+};
+
 export const allEnemies = {
   enemyAtk012: enemyAtk012R10,
   enemyRegenApMinR20: enemyRegenApMinR20,
   enemy8HpAtk2: enemy8HpAtk2,
+  enemy15hpAtk1AllHeal2: enemy15hpAtk1AllHeal2,
   // enemyHeal2R14: enemyHeal2R14,
 };

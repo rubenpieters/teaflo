@@ -41,8 +41,11 @@ export function getBoard(serverConn: ServerConnection, seed: string) {
     ];
   } else if (seed === "2") {
     cards = [
+      {...allCards.cardBattleTurn, ...{ limit: Infinity }},
       {...allCards.cardCrew_0000, ...{ limit: 5 } },
       {...allCards.cardCrew_0001, ...{ limit: 5 } },
+      {...allCards.cardBattle_0003, ...{ limit: 1 } },
+      {...allCards.cardBattle_0004, ...{ limit: 1 } },
     ];
   } else {
     throw "unexpected seed: " + seed;

@@ -78,6 +78,22 @@ const cardBattle_0002: Card = {
   tag: "event",
 };
 
+const cardBattle_0003: Card = {
+  id: 7,
+  actions: [
+    { tag: "AddEnemy", enemy: allEnemies.enemy8HpAtk2 },
+  ],
+  tag: "event",
+};
+
+const cardBattle_0004: Card = {
+  id: 8,
+  actions: [
+    { tag: "AddEnemy", enemy: allEnemies.enemy15hpAtk1AllHeal2 },
+  ],
+  tag: "event",
+};
+
 export const allCards = {
   cardBattleTurn: cardBattleTurn,
 
@@ -89,4 +105,6 @@ export const allCards = {
   cardBattle_0000: cardBattle_0000,
   cardBattle_0001: cardBattle_0001,
   cardBattle_0002: cardBattle_0002,
+  cardBattle_0003: cardBattle_0003,
+  cardBattle_0004: cardBattle_0004,
 };
