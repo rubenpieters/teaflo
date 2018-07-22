@@ -5,7 +5,7 @@ import { GameState, IdCrew, IdEnemy, Id, IdItem } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, TargetSpec, onTarget, determineTarget, TargetType, indexOfId, typeColl } from "src/shared/game/target";
+import { Target, TargetSpec, Origin, onTarget, determineTarget, TargetType, indexOfId, typeColl } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
 import { Status, HasStatus } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
@@ -200,10 +200,9 @@ export function determineAndApplyActionAndTriggers(
   idGen: Generator,
   selfId: number,
   selfType: TargetType,
+  origin: Origin,
 ): { state: GameState | "invalid", log: ActionTarget[] }  {
-  const actionSpec = determineSpec(action, state, selfId, selfType);
-  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType), actionSpec);
-  return determineAndApplyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen, selfId, selfType);
+  return determineAndApplyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen, selfId, selfType, origin);
 }
 
 export function determineAndApplyActionAndTriggersAt(
@@ -214,10 +213,11 @@ export function determineAndApplyActionAndTriggersAt(
   idGen: Generator,
   selfId: number,
   selfType: TargetType,
+  origin: Origin,
 ): { state: GameState | "invalid", log: ActionTarget[] }  {
   const actionSpec = determineSpec(action, state, selfId, selfType);
-  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType), actionSpec);
-  return applyActionAndTriggersAt(actionTarget, state, log, from, idGen);
+  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType, origin), actionSpec);
+  return applyActionAndTriggersAt(actionTarget, state, log, from, idGen, origin);
 }
 
 export function applyActionAndTriggers(
@@ -225,8 +225,9 @@ export function applyActionAndTriggers(
   state: GameState,
   log: ActionTarget[],
   idGen: Generator,
+  origin: Origin,
 ): { state: GameState | "invalid", log: ActionTarget[] } {
-  return applyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen);
+  return applyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen, origin);
 }
 
 function applyActionAndTriggersAt(
@@ -235,6 +236,7 @@ function applyActionAndTriggersAt(
   log: ActionTarget[],
   from: { id: number, type: "item" | "crew" | "enemy" },
   idGen: Generator,
+  origin: Origin,
 ): { state: GameState | "invalid", log: ActionTarget[] } {
   // enemy interactions with effects
   if (from.type === "enemy") {
@@ -242,7 +244,7 @@ function applyActionAndTriggersAt(
       for (const trigger of enemy.triggers) {
         if (trigger.onTag === action.tag && trigger.type === "before" && checkConditions(trigger.conditions, action, state, enemy.id, "enemy")) {
           const afterTrigger = determineAndApplyActionAndTriggersAt(
-            trigger.action, state, log, { id: from.id + 1, type: "enemy" }, idGen, enemy.id, "enemy");
+            trigger.action, state, log, { id: from.id + 1, type: "enemy" }, idGen, enemy.id, "enemy", origin);
           if (afterTrigger.state === "invalid") {
             return afterTrigger;
           }
@@ -259,7 +261,8 @@ function applyActionAndTriggersAt(
     for (const item of state.items.slice(startId)) {
       for (const trigger of item.triggers) {
         if (trigger.onTag === action.tag && trigger.type === "before" && checkConditions(trigger.conditions, action, state, item.id, "item")) {
-          const afterTrigger = determineAndApplyActionAndTriggersAt(trigger.action, state, log, { id: from.id + 1, type: "item" }, idGen, item.id, "item");
+          const afterTrigger = determineAndApplyActionAndTriggersAt(
+            trigger.action, state, log, { id: from.id + 1, type: "item" }, idGen, item.id, "item", origin);
           if (afterTrigger.state === "invalid") {
             return afterTrigger;
           }
@@ -275,7 +278,8 @@ function applyActionAndTriggersAt(
   for (const ally of state.crew.slice(fromCrew)) {
     for (const trigger of ally.triggers) {
       if (trigger.onTag === action.tag && trigger.type === "before" && checkConditions(trigger.conditions, action, state, ally.id, "ally")) {
-        const afterTrigger = determineAndApplyActionAndTriggersAt(trigger.action, state, log, { id: from.id + 1, type: "crew" }, idGen, ally.id, "ally");
+        const afterTrigger = determineAndApplyActionAndTriggersAt(
+          trigger.action, state, log, { id: from.id + 1, type: "crew" }, idGen, ally.id, "ally", origin);
         if (afterTrigger.state === "invalid") {
           return afterTrigger;
         }
@@ -465,7 +469,7 @@ export function checkDeaths(
   for (const ally of state.crew) {
     if (ally.hp <= 0) {
       const deathAction: ActionTarget = { tag: "Death", type: "ally", id: ally.id };
-      const afterDeath = applyActionAndTriggers(deathAction, state, log, idGen);
+      const afterDeath = applyActionAndTriggers(deathAction, state, log, idGen, "noOrigin");
       if (afterDeath.state === "invalid") {
         return afterDeath;
       }
@@ -477,7 +481,7 @@ export function checkDeaths(
   for (const enemy of state.enemies) {
     if (enemy.hp <= 0) {
       const deathAction: ActionTarget = { tag: "Death", type: "enemy", id: enemy.id };
-      const afterDeath = applyActionAndTriggers(deathAction, state, log, idGen);
+      const afterDeath = applyActionAndTriggers(deathAction, state, log, idGen, "noOrigin");
       if (afterDeath.state === "invalid") {
         return afterDeath;
       }
@@ -500,7 +504,7 @@ export function checkStatusEnemy(
       const status = enemy[statusTag];
       if (status !== undefined) {
         const action = _Status.statusToAction(status);
-        const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy");
+        const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy", "noOrigin");
         if (afterApply.state === "invalid") {
           return afterApply;
         }
@@ -527,7 +531,7 @@ export function checkStatusCrew(
       const status = ally[statusTag];
       if (status !== undefined) {
         const action = _Status.statusToAction(status);
-        const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, ally.id, "ally");
+        const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, ally.id, "ally", "noOrigin");
         if (afterApply.state === "invalid") {
           return afterApply;
         }

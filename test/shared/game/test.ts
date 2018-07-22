@@ -179,13 +179,63 @@ function basicApDamageTest() {
   }
 }
 
+function retaliateTest() {
+  const path1: Path = {
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    eventCards: [
+      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stRanged }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddEnemy", enemy: { hp: 100, maxHp: 100, actions: [
+        {
+          tag: "Damage",
+          target: { tag: "Positions", type: "ally", positions: [] },
+          value: 0,
+        },
+        ], triggers: 
+          [
+            {
+              onTag: "Damage",
+              type: "before",
+              action: {
+                tag: "Damage",
+                target: { tag: "OriginTarget" },
+                value: 1,
+              },
+              conditions: [
+                { tag: "TypeCondition", type: "enemy" },
+              ],
+            },
+          ]
+        } 
+      },
+      ], id: 0, tag: "event" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
+    ]
+  }
+  const solution: Solution = {
+    paths: [path1]
+  }
+
+  const sol = runSolution(solution);
+  if (sol.state === "invalid") {
+    console.log(showSolutionLog(sol.log));
+    console.log("invalid");
+  } else {
+    const { state, log } = sol;
+    console.log(JSON.stringify(state));
+    console.log(showSolutionLog(log));
+  }
+}
+
 
 // basicCrewTest();
-basicBattleTest();
+// basicBattleTest();
 // basicStatusTest();
 // basicItemTest();
 // guard3ItemTest();
 // basicApDamageTest();
+retaliateTest();
 
 /*
 

@@ -17,9 +17,15 @@ export type ApCondition = {
   tag: "ApCondition"
 };
 
+export type TypeCondition = {
+  tag: "TypeCondition",
+  type: TargetType,
+};
+
 export type Condition
   = OwnId
   | ApCondition
+  | TypeCondition
   ;
 
 export function checkConditions(
@@ -44,7 +50,7 @@ export function checkCondition(
   state: GameState,
   selfId: number,
   selfType: TargetType,
-) {
+): boolean {
   switch (condition.tag) {
     case "OwnId": {
       if (hasTarget(action)) {
@@ -56,7 +62,17 @@ export function checkCondition(
       }
     }
     case "ApCondition": {
+      // TODO
       return true;
+    }
+    case "TypeCondition": {
+      if (hasTarget(action)) {
+        return action.target.type === condition.type;
+      } else if (hasType(action)) {
+        return action.type === condition.type;
+      } else {
+        throw "action " + action.tag + " does not have a target type!";
+      }
     }
   }
 }
@@ -67,6 +83,10 @@ function hasTarget<T>(a: {}): a is { target: T } {
 
 function hasId(a: {}): a is { id: number } {
   return (<Object>a).hasOwnProperty("id");
+}
+
+function hasType(a: {}): a is { type: TargetType } {
+  return (<Object>a).hasOwnProperty("type");
 }
 
 function findIndex<A>(

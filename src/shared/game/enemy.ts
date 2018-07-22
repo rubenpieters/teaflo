@@ -44,7 +44,7 @@ export function act(
       return newX >= enemy.actions.length ? 0 : newX;
     }),
   );
-  return determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy");
+  return determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy", { id: enemy.id, type: "enemy" });
 }
 
 export function heal<E extends Enemy>(
@@ -285,8 +285,46 @@ const enemyRegenApMinR20: Enemy = {
   triggers: [],
 };
 
+const enemy8HpAtk2: Enemy = {
+  hp: 8,
+  maxHp: 8,
+  actions: [
+    {
+      tag: "Damage",
+      target: { tag: "Positions", type: "ally", positions: [0, 1] },
+      value: 7
+    }
+  ],
+  triggers: [
+    {
+      onTag: "Death",
+      type: "before",
+      action: {
+        tag: "GainGold",
+        gain: 5,
+      },
+      conditions: [
+        { tag: "OwnId" },
+      ],
+    },
+    {
+      onTag: "Damage",
+      type: "before",
+      action: {
+        tag: "Damage",
+        target: { tag: "OriginTarget" },
+        value: 1,
+      },
+      conditions: [
+        { tag: "TypeCondition", type: "enemy" },
+      ],
+    },
+  ],
+};
+
 export const allEnemies = {
   enemyAtk012: enemyAtk012R10,
   enemyRegenApMinR20: enemyRegenApMinR20,
+  enemy8HpAtk2: enemy8HpAtk2,
   // enemyHeal2R14: enemyHeal2R14,
 };

@@ -129,7 +129,7 @@ function solutionStep(
       state = afterCrewStatus.state;
     }
   }
-  const actionResult = applyActionAndTriggers(action, state, log, idGen);
+  const actionResult = applyActionAndTriggers(action, state, log, idGen, "noOrigin");
   const actionLog: ActionLog = {
     action: action,
     loggedEffects: actionResult.log,

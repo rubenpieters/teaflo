@@ -2,6 +2,11 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, Id, IdCrew, IdEnemy, IdItem } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 
+export type Origin = {
+  id: number,
+  type: TargetType,
+} | "noOrigin";
+
 export type Self = {
   tag: "Self",
 };
@@ -22,18 +27,24 @@ export type Positions = {
   positions: number[],
 };
 
+export type OriginTarget = {
+  tag: "OriginTarget",
+};
+
 export type TargetSpec
   = Self
   | All
   | Last
   | Positions
+  | OriginTarget
   ;
 
 export function determineTarget(
   target: TargetSpec,
   state: GameState,
   selfId: number,
-  selfType: TargetType
+  selfType: TargetType,
+  origin: Origin,
 ): Target {
   switch (target.tag) {
     case "Self": {
@@ -71,6 +82,17 @@ export function determineTarget(
         type: target.type,
         positions: target.positions,
       };
+    }
+    case "OriginTarget": {
+      if (origin === "noOrigin") {
+        throw "No origin!";
+      } else {
+        return {
+          tag: "Target",
+          type: origin.type,
+          positions: [origin.id],
+        };
+      }
     }
   }
 }
@@ -181,6 +203,9 @@ export function showTarget(target: Target | TargetSpec): string {
     }
     case "Positions": {
       return target.positions + " " + target.type;
+    }
+    case "OriginTarget": {
+      return "origin";
     }
   }
 }
