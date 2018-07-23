@@ -39,15 +39,19 @@ const plus11StartCombat: Item = {
   ],
 };
 
-const guard3StartCombat: Item = {
+const guard1StartCombat: Item = {
   triggers: [
     {
       onTag: "AddEnemy",
       type: "before",
       action: {
-        tag: "GainHP",
+        tag: "AddStatus",
         target: { tag: "All", type: "ally" },
-        value: 3,
+        status: {
+          tag: "Guard",
+          value: 1,
+          guard: 1,
+        },
       },
       conditions: [],
     },
@@ -56,5 +60,5 @@ const guard3StartCombat: Item = {
 
 export const allItems = {
   plus11StartCombat: plus11StartCombat,
-  guard3StartCombat: guard3StartCombat,
+  guard1StartCombat: guard1StartCombat,
 };

@@ -47,7 +47,7 @@ const cardItem_0000: Card = {
   id: 3,
   actions: [
     { tag: "PayGold", pay: 5 },
-    { tag: "AddItem", item: allItems.guard3StartCombat },
+    { tag: "AddItem", item: allItems.guard1StartCombat },
   ],
   tag: "event",
 };

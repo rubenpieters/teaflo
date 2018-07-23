@@ -4,13 +4,14 @@ import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "sr
 import { Generator } from "src/shared/handler/id/generator";
 import { Target, indexOfId } from "src/shared/game/target";
 import { showAction } from "src/shared/game/log";
-import { Trigger } from "src/shared/game/trigger";
+import { Trigger, showTrigger } from "src/shared/game/trigger";
 
 export function showEnemy(
   enemy: Enemy
 ) {
   return {...enemy,
     actions: enemy.actions.map(showAction),
+    triggers: enemy.triggers.map(showTrigger),
   };
 }
 

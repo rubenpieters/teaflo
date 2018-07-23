@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Trigger } from "src/shared/game/trigger";
+import { Trigger, showTrigger } from "src/shared/game/trigger";
 import { GameState, IdCrew } from "src/shared/game/state";
 import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
@@ -12,7 +12,7 @@ export function showCrew(
 ) {
   return {...crew,
     actions: crew.actions.map(showAction),
-    triggers: crew.triggers.map(t => { return {...t, action: showAction(t.action)}; }) };
+    triggers: crew.triggers.map(showTrigger) };
 }
 
 export type Crew = {

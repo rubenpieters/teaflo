@@ -1,6 +1,7 @@
 import { ActionSpec, ActionTarget } from "src/shared/game/action";
 import { TargetSpec, TargetType } from "src/shared/game/target";
 import { GameState } from "src/shared/game/state";
+import { showAction } from "./log";
 
 export type Trigger = {
   onTag: string,
@@ -13,10 +14,6 @@ export type OwnId = {
   tag: "OwnId"
 };
 
-export type ApCondition = {
-  tag: "ApCondition"
-};
-
 export type TypeCondition = {
   tag: "TypeCondition",
   type: TargetType,
@@ -24,9 +21,27 @@ export type TypeCondition = {
 
 export type Condition
   = OwnId
-  | ApCondition
   | TypeCondition
   ;
+
+export function showTrigger(
+  trigger: Trigger,
+) {
+  return trigger.type + " " + trigger.onTag + " (if " + trigger.conditions.map(showCondition).join(" & ") + " ):\n " + showAction(trigger.action);
+}
+
+function showCondition(
+  condition: Condition,
+) {
+  switch (condition.tag) {
+    case "OwnId": {
+      return "own id";
+    }
+    case "TypeCondition": {
+      return "target is " + condition.type;
+    }
+  }
+}
 
 export function checkConditions(
   conditions: Condition[],
@@ -60,10 +75,6 @@ export function checkCondition(
       } else {
         throw "action " + action.tag + " does not have a target!";
       }
-    }
-    case "ApCondition": {
-      // TODO
-      return true;
     }
     case "TypeCondition": {
       if (hasTarget(action)) {
