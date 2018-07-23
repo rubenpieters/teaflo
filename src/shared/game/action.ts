@@ -311,9 +311,13 @@ function applyAction(
       break;
     }
     case "AddCrew": {
-      const id = idGen.newId();
-      const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally" } };
-      state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
+      if (state.crew.length >= 4) {
+        return { state: "invalid", log };
+      } else {
+        const id = idGen.newId();
+        const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally" } };
+        state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
+      }
       break;
     }
     case "AddItem": {
