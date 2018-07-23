@@ -301,7 +301,6 @@ function applyAction(
   log: ActionTarget[],
   idGen: Generator,
 ): { state: GameState | "invalid", log: ActionTarget[] } {
-  console.log(action.tag);
   log = log.concat(action);
 
   switch (action.tag) {

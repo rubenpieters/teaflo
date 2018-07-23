@@ -57,7 +57,6 @@ export function plusLimit(limitTexts: Phaser.Text[], cardId: number) {
   gameState = focus(gameState,
     over(x => x.availableCards[index].limit, x => x + 1)
   );
-  // console.log("new limit set");
   limitTexts[index].setText(gameState.availableCards[index].limit.toString());
 }
 
@@ -111,7 +110,6 @@ export function addSolutionCallback(cb: ParamCallBack<Solution>) {
 }
 
 export function changeAvailableCards(cards: LimitedCard[]) {
-  console.log("CARDS: " + cards.length);
   gameState = focus(gameState, set(x => x.availableCards, cards));
   cardsCallbacks.forEach(cb => cb(cards));
 }
