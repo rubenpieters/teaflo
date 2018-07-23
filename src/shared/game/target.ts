@@ -16,6 +16,10 @@ export type All = {
   type: TargetType,
 };
 
+export type AllCrewPos = {
+  tag: "AllCrewPos",
+};
+
 export type Last = {
   tag: "Last",
   type: TargetType,
@@ -34,6 +38,7 @@ export type OriginTarget = {
 export type TargetSpec
   = Self
   | All
+  | AllCrewPos
   | Last
   | Positions
   | OriginTarget
@@ -61,21 +66,19 @@ export function determineTarget(
       }
     }
     case "All": {
-      if (target.type === "ally") {
-        // This means we always have to take into account non-existing positions
-        return {
-          tag: "Target",
-          type: target.type,
-          positions: [...Array(state.crewLimit).keys()],
-        };
-      } else {
-        const coll = typeColl(state, target.type);
-        return {
-          tag: "Target",
-          type: target.type,
-          positions: coll.map((v, i) => i),
-        };
-      }
+      const coll = typeColl(state, target.type);
+      return {
+        tag: "Target",
+        type: target.type,
+        positions: coll.map((v, i) => i),
+      };
+    }
+    case "AllCrewPos": {
+      return {
+        tag: "Target",
+        type: "ally",
+        positions: [...Array(state.crewLimit).keys()],
+      };
     }
     case "Last": {
       const coll = typeColl(state, selfType);
@@ -206,6 +209,9 @@ export function showTarget(target: Target | TargetSpec): string {
     }
     case "All": {
       return "all " + target.type;
+    }
+    case "AllCrewPos": {
+      return "all crew pos";
     }
     case "Last": {
       return "last " + target.type;

@@ -167,7 +167,7 @@ const enemy15hpAtk1AllHeal2: Enemy = {
   actions: [
     {
       tag: "Damage",
-      target: { tag: "All", type: "ally" },
+      target: { tag: "AllCrewPos" },
       value: 1
     },
     {
