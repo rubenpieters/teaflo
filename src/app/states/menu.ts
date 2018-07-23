@@ -330,13 +330,14 @@ export default class Menu extends Phaser.State {
       const solutionResults = runSolutionAll(solution);
       mkSolution(this.game, resourcesText, solution, solutionResults);
       const solutionResult: SolutionResult | undefined = solutionResults[solutionResults.length - 1];
+
       if (solutionResult === undefined) {
         resourcesText.setText("/INVALID/");
         mkState(this.game, resourcesText, <ValidResult>runSolution({ paths: [] }));
       } else if (solutionResult.state === "invalid") {
-        resourcesText.setText("/INVALID/");
         // TODO: use last valid solution result?
         mkState(this.game, resourcesText, <ValidResult>runSolution({ paths: [] }));
+        resourcesText.setText("/INVALID/");
       } else {
         console.log(solutionResult.log);
         mkState(this.game, resourcesText, (<ValidResult>solutionResult));
