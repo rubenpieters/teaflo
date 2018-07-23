@@ -61,12 +61,21 @@ export function determineTarget(
       }
     }
     case "All": {
-      const coll = typeColl(state, target.type);
-      return {
-        tag: "Target",
-        type: target.type,
-        positions: coll.map((v, i) => i),
-      };
+      if (target.type === "ally") {
+        // This means we always have to take into account non-existing positions
+        return {
+          tag: "Target",
+          type: target.type,
+          positions: [...Array(state.crewLimit).keys()],
+        };
+      } else {
+        const coll = typeColl(state, target.type);
+        return {
+          tag: "Target",
+          type: target.type,
+          positions: coll.map((v, i) => i),
+        };
+      }
     }
     case "Last": {
       const coll = typeColl(state, selfType);

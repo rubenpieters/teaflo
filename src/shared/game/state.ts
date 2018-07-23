@@ -21,6 +21,7 @@ export type GameState = {
   enemies: IdEnemy[],
   items: IdItem[],
   gold: number,
+  crewLimit: number,
 };
 
 export const initialState: GameState = {
@@ -28,4 +29,5 @@ export const initialState: GameState = {
   enemies: [],
   items: [],
   gold: 0,
+  crewLimit: 4,
 };

@@ -311,7 +311,7 @@ function applyAction(
       break;
     }
     case "AddCrew": {
-      if (state.crew.length >= 4) {
+      if (state.crew.length >= state.crewLimit) {
         return { state: "invalid", log };
       } else {
         const id = idGen.newId();
