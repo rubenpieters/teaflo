@@ -9,7 +9,7 @@ import { Target, TargetSpec, Origin, onTarget, determineTarget, TargetType, inde
 import { Item } from "src/shared/game/item";
 import { Status, HasStatus } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
-import { checkConditions } from "src/shared/game/trigger";
+import { Condition, checkConditions } from "src/shared/game/trigger";
 
 // Action
 
@@ -119,9 +119,17 @@ export type ApDamage<T> = {
   multiplier: number,
 };
 
+export type ConditionAction<T> = {
+  tag: "ConditionAction",
+  conditions: Condition[],
+  trueAction: Spec<T>,
+  falseAction: Spec<T>,
+};
+
 export type Spec<T>
   = Action<T>
   | ApDamage<T>
+  | ConditionAction<T>
   ;
 
 function determineSpec(
@@ -142,6 +150,14 @@ function determineSpec(
         value: action.multiplier * self.ap,
       };
     }
+    case "ConditionAction": {
+      // TODO: there is no sensible action to pass for checkConditions
+      if (checkConditions(action.conditions, <any>undefined, state, selfId, selfType)) {
+        return determineSpec(action.trueAction, state, selfId, selfType);
+      } else {
+        return determineSpec(action.falseAction, state, selfId, selfType);
+      }
+    }
     default: return action;
   }
 }
@@ -155,20 +171,20 @@ export function fmap<A, B>(
   action: Action<A>,
 ): Action<B> {
   switch (action.tag) {
-    case "Damage": return {...action, ...{ target: f(action.target)}};
-    case "Heal": return {...action, ...{ target: f(action.target)}};
+    case "Damage": return {...action, target: f(action.target)};
+    case "Heal": return {...action, target: f(action.target)};
     case "AddEnemy": return action;
     case "AddCrew": return action;
     case "AddItem": return action;
-    case "GainHP": return {...action, ...{ target: f(action.target)}};
-    case "GainAP": return {...action, ...{ target: f(action.target)}};
-    case "DamageAP": return {...action, ...{ target: f(action.target)}};
+    case "GainHP": return {...action, target: f(action.target)};
+    case "GainAP": return {...action, target: f(action.target)};
+    case "DamageAP": return {...action, target: f(action.target)};
     case "Rest": return action;
     case "GainGold": return action;
     case "PayGold": return action;
     case "BattleTurn": return action;
     case "Death": return action;
-    case "AddStatus": return {...action, ...{ target: f(action.target)}};
+    case "AddStatus": return {...action, target: f(action.target)};
     case "Noop": return action;
   }
 }

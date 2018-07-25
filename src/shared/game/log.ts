@@ -1,9 +1,10 @@
 import { ActionTarget, Action, Spec } from "src/shared/game/action";
 import { Target, TargetSpec, showTarget } from "src/shared/game/target";
 import { showStatus } from "src/shared/game/status";
-import { showCrew } from "./crew";
-import { showEnemy } from "./enemy";
-import { showItem } from "./item";
+import { showCrew } from "src/shared/game/crew";
+import { showEnemy } from "src/shared/game/enemy";
+import { showItem } from "src/shared/game/item";
+import { showCondition } from "src/shared/game/trigger";
 
 export type SolutionLog = {
   actionLog: ActionLog[],
@@ -77,6 +78,9 @@ export function showAction<T extends TargetSpec | Target>(action: Spec<T>): stri
     }
     case "Noop": {
       return "Noop";
+    }
+    case "ConditionAction": {
+      return "if " +  action.conditions.map(showCondition).join(" & ") + " then " + showAction(action.trueAction) + " else " + showAction(action.falseAction);
     }
   }
 }

@@ -46,6 +46,9 @@ export function getBoard(serverConn: ServerConnection, seed: string) {
       {...allCards.cardCrew_0001, ...{ limit: 5 } },
       {...allCards.cardBattle_0003, ...{ limit: 1 } },
       {...allCards.cardBattle_0004, ...{ limit: 1 } },
+      {...allCards.cardBattle_0005, ...{ limit: 1 } },
+      {...allCards.cardBattle_0006, ...{ limit: 1 } },
+      {...allCards.cardItem_0000, ...{ limit: 1 } },
     ];
   } else {
     throw "unexpected seed: " + seed;

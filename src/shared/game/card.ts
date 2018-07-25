@@ -94,6 +94,25 @@ const cardBattle_0004: Card = {
   tag: "event",
 };
 
+const cardBattle_0005: Card = {
+  id: 9,
+  actions: [
+    { tag: "AddEnemy", enemy: allEnemies.enemy15hpAtk1AllHeal2 },
+  ],
+  tag: "event",
+};
+
+const cardBattle_0006: Card = {
+  id: 10,
+  actions: [
+    { tag: "AddEnemy", enemy: allEnemies.enemy5HpAtkInFront },
+    { tag: "AddEnemy", enemy: allEnemies.enemy5HpAtkInFront },
+    { tag: "AddEnemy", enemy: allEnemies.enemy5HpAtkInFront },
+    { tag: "AddEnemy", enemy: allEnemies.enemy5HpAtkInFront },
+  ],
+  tag: "event",
+};
+
 export const allCards = {
   cardBattleTurn: cardBattleTurn,
 
@@ -107,4 +126,6 @@ export const allCards = {
   cardBattle_0002: cardBattle_0002,
   cardBattle_0003: cardBattle_0003,
   cardBattle_0004: cardBattle_0004,
+  cardBattle_0005: cardBattle_0005,
+  cardBattle_0006: cardBattle_0006,
 };
