@@ -522,14 +522,15 @@ export function checkStatusEnemy(
     for (const statusTag of _Status.allStatus) {
       const status = enemy[statusTag];
       if (status !== undefined) {
-        const action = _Status.statusToAction(status);
+        const action = _Status.statusToAction(status, enemy.id, "enemy");
+        state = focus(state,
+          over(x => x.enemies[i], x => _Status.applyStatus(i, x, statusTag)),
+        );
         const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy", "noOrigin");
         if (afterApply.state === "invalid") {
           return afterApply;
         }
-        state = focus(afterApply.state,
-          over(x => x.enemies[i], x => _Status.applyStatus(i, x, statusTag)),
-        );
+        state = afterApply.state;
         log = afterApply.log;
       }
     }
@@ -549,14 +550,15 @@ export function checkStatusCrew(
     for (const statusTag of _Status.allStatus) {
       const status = ally[statusTag];
       if (status !== undefined) {
-        const action = _Status.statusToAction(status);
+        const action = _Status.statusToAction(status, ally.id, "ally");
+        state = focus(state,
+          set(x => x.crew[i], _Status.applyStatus(i, ally, statusTag)),
+        );
         const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, ally.id, "ally", "noOrigin");
         if (afterApply.state === "invalid") {
           return afterApply;
         }
-        state = focus(afterApply.state,
-          set(x => x.crew[i], _Status.applyStatus(i, ally, statusTag)),
-        );
+        state = afterApply.state;
         log = afterApply.log;
       }
     }

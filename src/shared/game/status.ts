@@ -19,10 +19,16 @@ export type Guard = {
   guard: number,
 };
 
+export type Doom = {
+  tag: "Doom",
+  value: number,
+};
+
 export type Status
   = Poison
   | Regen
   | Guard
+  | Doom
   ;
 
 export function showStatus(status: Status) {
@@ -36,16 +42,20 @@ export function showStatus(status: Status) {
     case "Guard": {
       return "Guard " + status.guard + " " + status.value + " T";
     }
+    case "Doom": {
+      return "Doom " + status.value + " T";
+    }
   }
 }
 
-export const allStatus: Status["tag"][] = ["Poison", "Regen", "Guard"];
+export const allStatus: Status["tag"][] = ["Poison", "Regen", "Guard", "Doom"];
 
 // conditional types
 type StatusType<A> =
   A extends "Poison" ? Poison :
   A extends "Regen" ? Regen :
   A extends "Guard" ? Guard :
+  A extends "Doom" ? Doom :
   never;
 
 export type HasStatus = {
@@ -101,6 +111,8 @@ export function applyStatus<E extends HasStatus>(
 
 export function statusToAction(
   status: Status,
+  selfId: number,
+  selfType: TargetType,
 ): ActionSpec {
   switch (status.tag) {
     case "Poison": {
@@ -123,6 +135,17 @@ export function statusToAction(
     }
     case "Guard": {
       return { tag: "Noop" };
+    }
+    case "Doom": {
+      if (status.value === 1) {
+        return {
+          tag: "Death",
+          id: selfId,
+          type: selfType,
+        };
+      } else {
+        return { tag: "Noop" };
+      }
     }
   }
 }

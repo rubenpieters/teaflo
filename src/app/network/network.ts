@@ -48,6 +48,7 @@ export function getBoard(serverConn: ServerConnection, seed: string) {
       {...allCards.cardBattle_0004, ...{ limit: 1 } },
       {...allCards.cardBattle_0005, ...{ limit: 1 } },
       {...allCards.cardBattle_0006, ...{ limit: 1 } },
+      {...allCards.cardBattle_0007, ...{ limit: 1 } },
       {...allCards.cardItem_0000, ...{ limit: 1 } },
     ];
   } else {

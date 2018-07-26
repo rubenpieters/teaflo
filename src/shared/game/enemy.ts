@@ -261,6 +261,52 @@ const enemy5HpAtkInFront: Enemy = {
   ],
 };
 
+const enemy20HpDoom: Enemy = {
+  hp: 20,
+  maxHp: 20,
+  actions: [
+    {
+      tag: "AddStatus",
+      target: { tag: "All", type: "ally" },
+      status: {
+        tag: "Doom",
+        value: 5,
+      },
+    },
+    {
+      tag: "Noop",
+    },
+    {
+      tag: "Noop",
+    },
+    {
+      tag: "Noop",
+    },
+    {
+      tag: "Noop",
+    },
+    {
+      tag: "Noop",
+    },
+    {
+      tag: "Noop",
+    },
+  ],
+  triggers: [
+    {
+      onTag: "Death",
+      type: "before",
+      action: {
+        tag: "GainGold",
+        gain: 1,
+      },
+      conditions: [
+        { tag: "OwnId" },
+      ],
+    },
+  ],
+};
+
 export const allEnemies = {
   enemyAtk012: enemyAtk012R10,
   enemyRegenApMinR20: enemyRegenApMinR20,
@@ -269,4 +315,5 @@ export const allEnemies = {
   // enemyHeal2R14: enemyHeal2R14,
   enemy14hpApMin: enemy14hpApMin,
   enemy5HpAtkInFront: enemy5HpAtkInFront,
+  enemy20HpDoom: enemy20HpDoom,
 };
