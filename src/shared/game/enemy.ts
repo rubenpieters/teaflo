@@ -5,6 +5,7 @@ import { Generator } from "src/shared/handler/id/generator";
 import { Target, indexOfId } from "src/shared/game/target";
 import { showAction } from "src/shared/game/log";
 import { Trigger, showTrigger } from "src/shared/game/trigger";
+import { HasNext } from "src/shared/game/next";
 
 export function showEnemy(
   enemy: Enemy
@@ -18,7 +19,7 @@ export function showEnemy(
 export type Enemy = {
   hp: number,
   maxHp: number,
-  actions: ActionSpec[],
+  actions: (ActionSpec & HasNext)[],
   triggers: Trigger[],
 };
 
@@ -41,8 +42,16 @@ export function act(
   const action = enemy.actions[enemy.actionIndex];
   state = focus(state,
     over(x => x.enemies[index].actionIndex, x => {
-      const newX = x + 1;
-      return newX >= enemy.actions.length ? 0 : newX;
+      const next = state.enemies[index].actions[x].next;
+      switch (next.tag) {
+        case "NextId": {
+          const newX = x + 1;
+          return newX >= enemy.actions.length ? 0 : newX;
+        }
+        case "Repeat": {
+          return x;
+        }
+      }
     }),
   );
   return determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy", { id: enemy.id, type: "enemy" });
@@ -66,6 +75,7 @@ const enemyAtk012R10: Enemy = {
       tag: "Damage",
       target: { tag: "Positions", type: "ally", positions: [0, 1, 2] },
       value: 5,
+      next: { tag: "NextId" },
     },
   ],
   triggers: [
@@ -108,17 +118,20 @@ const enemyRegenApMinR20: Enemy = {
       status: {
         tag: "Regen",
         value: 6,
-      }
+      },
+      next: { tag: "NextId" },
     },
     {
       tag: "DamageAP",
       target: { tag: "All", type: "ally" },
       value: 1,
+      next: { tag: "NextId" },
     },
     {
       tag: "Damage",
       target: { tag: "Positions", type: "ally", positions: [0, 1, 2] },
-      value: 10
+      value: 10,
+      next: { tag: "NextId" },
     }
   ],
   triggers: [],
@@ -131,7 +144,8 @@ const enemy8HpAtk2: Enemy = {
     {
       tag: "Damage",
       target: { tag: "Positions", type: "ally", positions: [0, 1] },
-      value: 7
+      value: 7,
+      next: { tag: "NextId" },
     },
   ],
   triggers: [
@@ -168,12 +182,14 @@ const enemy15hpAtk1AllHeal2: Enemy = {
     {
       tag: "Damage",
       target: { tag: "AllCrewPos" },
-      value: 1
+      value: 1,
+      next: { tag: "NextId" },
     },
     {
       tag: "Heal",
       target: { tag: "Self" },
-      value: 2
+      value: 2,
+      next: { tag: "NextId" },
     },
   ],
   triggers: [
@@ -199,16 +215,19 @@ const enemy14hpApMin: Enemy = {
       tag: "DamageAP",
       target: { tag: "All", type: "ally" },
       value: 1,
+      next: { tag: "NextId" },
     },
     {
       tag: "DamageAP",
       target: { tag: "All", type: "ally" },
       value: 1,
+      next: { tag: "NextId" },
     },
     {
       tag: "Damage",
       target: { tag: "Positions", type: "ally", positions: [0, 1] },
-      value: 10
+      value: 10,
+      next: { tag: "NextId" },
     }
   ],
   triggers: [
@@ -243,8 +262,9 @@ const enemy5HpAtkInFront: Enemy = {
         target: { tag: "Positions", type: "ally", positions: [0] },
         value: 4
       },
-      falseAction: { tag: "Noop" }
-    }
+      falseAction: { tag: "Noop" },
+      next: { tag: "NextId" },
+    },
   ],
   triggers: [
     {
@@ -272,24 +292,11 @@ const enemy20HpDoom: Enemy = {
         tag: "Doom",
         value: 5,
       },
+      next: { tag: "NextId" },
     },
     {
       tag: "Noop",
-    },
-    {
-      tag: "Noop",
-    },
-    {
-      tag: "Noop",
-    },
-    {
-      tag: "Noop",
-    },
-    {
-      tag: "Noop",
-    },
-    {
-      tag: "Noop",
+      next: { tag: "Repeat" },
     },
   ],
   triggers: [

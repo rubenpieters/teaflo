@@ -44,12 +44,14 @@ function basicBattleTest() {
           status: {
             tag: "Regen",
             value: 2,
-          }
+          },
+          next: { tag: "NextId" },
         },
         {
           tag: "Damage",
           target: { tag: "Positions", type: "ally", positions: [0] },
           value: 2,
+          next: { tag: "NextId" },
         },
         ], triggers: [
           {
@@ -157,6 +159,7 @@ function basicApDamageTest() {
           tag: "Damage",
           target: { tag: "Positions", type: "ally", positions: [0] },
           value: 1,
+          next: { tag: "NextId" },
         },
         ], triggers: [] } },
         { tag: "GainGold", gain: 5 },
@@ -190,6 +193,7 @@ function retaliateTest() {
           tag: "Damage",
           target: { tag: "Positions", type: "ally", positions: [] },
           value: 0,
+          next: { tag: "NextId" },
         },
         ], triggers: 
           [
