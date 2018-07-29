@@ -190,6 +190,37 @@ function addToSolution(
   return "cardAdded";
 }
 
+function removeEventFromSolution(
+  board: Board,
+  card: Card,
+  pathIndex: number,
+  eventIndex: number,
+) {
+  board.solution.paths[pathIndex].eventCards =
+    board.solution.paths[pathIndex].eventCards.slice(0, eventIndex).concat(
+      board.solution.paths[pathIndex].eventCards.slice(eventIndex + 1, board.solution.paths[pathIndex].eventCards.length)
+    );
+  const index = board.availableCards.findIndex(c => c.id === card.id);
+  board.availableCards[index].limit += 1;
+  chLeftMenuTab(board, board.selectedLeftMenu);
+  mkSolution(board);
+}
+
+function removeRestFromSolution(
+  board: Board,
+  card: Card,
+  pathIndex: number,
+) {
+  board.solution.paths =
+    board.solution.paths.slice(0, pathIndex).concat(
+      board.solution.paths.slice(pathIndex + 1, board.solution.paths.length)
+    );
+  const index = board.availableCards.findIndex(c => c.id === card.id);
+  board.availableCards[index].limit += 1;
+  chLeftMenuTab(board, board.selectedLeftMenu);
+  mkSolution(board);
+}
+
 function mkSolution(
   board: Board,
   // solutionResults: SolutionResult[],
@@ -212,9 +243,8 @@ function mkSolution(
     sprite.beginFill(0x223377);
     sprite.drawRect(0, 0, 40, 20);
     sprite.endFill();
-    // const sprite = board.game.add.sprite(x, y, "rest", 0, board.group);
-    // sprite.inputEnabled = true;
-    // sprite.events.onInputDown.add(removePathFromSolution(availableCardsTextCache, pathIndex));
+    sprite.inputEnabled = true;
+    sprite.events.onInputDown.add(onSolutionRestCardClick(board, path.restCard, pathIndex));
     sprites.push(sprite);
     y -= 25;
 
@@ -228,7 +258,7 @@ function mkSolution(
       /*sprite.events.onInputOver.add(() => {
         nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
       });*/
-      sprite.events.onInputDown.add(() => addToSolution(board, card));
+      sprite.events.onInputDown.add(onSolutionEventCardClick(board, card, pathIndex, cardIndex));
       sprites.push(sprite);
 
       y -= 25;
@@ -250,4 +280,39 @@ function mkSolution(
   // sprite.events.onInputDown.add(() => addRestToSolution({ actions: [{ tag: "Rest" }], id: -1, tag: "rest", subtag: "rest" }));
   // sprites.push(sprite);
   board.graphics.solutionGfx = sprites;
+}
+
+function onSolutionRestCardClick(
+  board: Board,
+  card: Rest,
+  pathIndex: number,
+) {
+  return function(
+    sprite: Phaser.Sprite,
+    pointer: Phaser.Pointer,
+  ) {
+    if (pointer.leftButton.isDown) {
+      // show solution up to here
+    } else if (pointer.rightButton.isDown) {
+      removeRestFromSolution(board, card, pathIndex);
+    }
+  };
+}
+
+function onSolutionEventCardClick(
+  board: Board,
+  card: Event,
+  pathIndex: number,
+  eventIndex: number,
+) {
+  return function(
+    sprite: Phaser.Sprite,
+    pointer: Phaser.Pointer,
+  ) {
+    if (pointer.leftButton.isDown) {
+      // show solution up to here
+    } else if (pointer.rightButton.isDown) {
+      removeEventFromSolution(board, card, pathIndex, eventIndex);
+    }
+  };
 }
