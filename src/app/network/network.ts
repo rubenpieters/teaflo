@@ -1,5 +1,5 @@
 import { changeConnected } from "src/app/appstate";
-import { resetGameState, changeAvailableCards, LimitedCard } from "src/app/gamestate";
+import { Board, chAvailableCards, LimitedCard } from "src/app/gamestate";
 import { Card, allCards } from "src/shared/game/card";
 import { ServerMessage } from "src/shared/network/serverMessage";
 import { ClientMessage } from "src/shared/network/clientMessage";
@@ -21,7 +21,7 @@ export function connectToServer(cb: (serverConn: ServerConnection) => void): Ser
   return { socket: socket };
 }
 
-export function getBoard(serverConn: ServerConnection, seed: string) {
+export function getBoard(serverConn: ServerConnection, board: Board, seed: string) {
   /*const getBoardMessage: ClientMessage = {
     tag: "GetCurrentBoard",
     seed: seed,
@@ -54,8 +54,8 @@ export function getBoard(serverConn: ServerConnection, seed: string) {
   } else {
     throw "unexpected seed: " + seed;
   }
-  resetGameState();
-  changeAvailableCards(cards);
+  chAvailableCards(board, cards);
+  // chSolution(board, ..);
 }
 
 function onServerMessage(event: MessageEvent): void {

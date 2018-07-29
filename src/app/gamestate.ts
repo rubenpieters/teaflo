@@ -7,138 +7,129 @@ export type Limit = {
 };
 
 export type LimitedCard = Card & Limit;
-export type LimitedCardId = Card & Limit & { index: number };
 
 export type LeftMenuOption = "crew" | "enemy" | "item" | "general" | "rest";
 
 export const allLeftMenuOptions: LeftMenuOption[] = ["crew", "enemy", "item", "general", "rest"];
 
-type LeftMenu = {
-  option: LeftMenuOption,
-  cards: LimitedCardId[],
-};
-
-export type GameState = {
-  solution: Solution,
+export type Board = {
   availableCards: LimitedCard[],
+  solution: Solution,
   selectedLeftMenu: LeftMenuOption,
+  graphics: BoardGraphics,
+  game: Phaser.Game,
+  group: Phaser.Group,
 };
 
-type ParamCallBack<A> = (a: A) => void;
-
-const solutionCallbacks: ParamCallBack<Solution>[] = [];
-const cardsCallbacks: ParamCallBack<LimitedCard[]>[] = [];
-const leftMenuCallbacks: ParamCallBack<LeftMenu>[] = [];
-
-const initialGameState: GameState = {
-  solution: { paths: [] },
-  availableCards: [],
-  selectedLeftMenu: "crew",
+type BoardGraphics = {
+  leftMenuTabs: Phaser.Graphics[],
+  availableCardsGfx: AvailableCardGfx[],
 };
 
-let gameState: GameState = initialGameState;
-
-export function resetGameState() {
-  changeAvailableCards(initialGameState.availableCards);
-  changeSolution(initialGameState.solution);
-}
-
-export function changeSolution(solution: Solution) {
-  gameState = focus(gameState, set(x => x.solution, solution));
-  solutionCallbacks.forEach(cb => cb(solution));
-}
-
-export function minusLimit(limitText: Phaser.Text, index: number) {
-  if (gameState.solution.paths.length == 0) {
-    return "noPaths";
-  } else if (gameState.availableCards[index].limit <= 0) {
-    return "limitIsZero";
-  } else {
-    gameState = focus(gameState,
-      over(x => x.availableCards[index].limit, x => x - 1)
-    );
-    limitText.setText(gameState.availableCards[index].limit.toString());
-    return "cardUsed";
-  }
-}
-
-export function plusLimit(limitTexts: Phaser.Text[], cardId: number) {
-  const index = findIdAvailableCard(cardId);
-  if (index === "notFound") {
-    throw ("index " + index + " not found in available cards");
-  }
-  gameState = focus(gameState,
-    over(x => x.availableCards[index].limit, x => x + 1)
-  );
-  // limitTexts[index].setText(gameState.availableCards[index].limit.toString());
-}
-
-function findIdAvailableCard(cardId: number) {
-  let index: number | "notFound" = "notFound";
-  let i = 0;
-  for (const card of gameState.availableCards) {
-    if (card.id === cardId) {
-      index = i;
-    }
-    i += 1;
-  }
-  return index;
-}
-
-export function addToSolution(event: Event) {
-  const solution = focus(gameState.solution,
-    over(x => x.paths[x.paths.length - 1].eventCards, x => x.concat(event)),
-  );
-  changeSolution(solution);
-}
-
-export function addRestToSolution(rest: Rest) {
-  const solution = focus(gameState.solution,
-    over(x => x.paths, x => x.concat({ restCard: rest, eventCards: [] })),
-  );
-  changeSolution(solution);
-}
-
-export function removeCardFromSolution(pathIndex: number, cardIndex: number) {
-  const solution = focus(gameState.solution,
-    over(x => x.paths[pathIndex].eventCards, x => x.slice(0, cardIndex).concat(x.slice(cardIndex + 1, x.length))),
-  );
-  changeSolution(solution);
-}
-
-export function removePathFromSolution(limitTexts: Phaser.Text[], pathIndex: number) {
-  return function() {
-    for (const card of gameState.solution.paths[pathIndex].eventCards) {
-      plusLimit(limitTexts, card.id);
-    }
-    const solution = focus(gameState.solution,
-      over (x => x.paths, x => x.slice(0, pathIndex).concat(x.slice(pathIndex + 1, x.length))),
-    );
-    changeSolution(solution);
+export function newBoard(
+  game: Phaser.Game,
+  group: Phaser.Group,
+) {
+  const board: Board = {
+    solution: { paths: [] },
+    availableCards: [],
+    selectedLeftMenu: "crew",
+    graphics: {
+      leftMenuTabs: [],
+      availableCardsGfx: [],
+    },
+    game,
+    group,
   };
+
+  // left menu
+
+  const leftMenu: Phaser.Graphics = game.add.graphics(0, 75, group);
+  leftMenu.beginFill(0x227744);
+  leftMenu.drawRect(0, 0, 200, 525);
+  leftMenu.endFill();
+
+  // left menu tabs
+  board.graphics.leftMenuTabs = allLeftMenuOptions.map((ct, i) => mkLeftMenuTab(board, ct, i));
+
+  board.graphics.availableCardsGfx = popLeftMenu(board);
+
+  chLeftMenuTab(board, "crew");
+  return board;
 }
 
-export function addSolutionCallback(cb: ParamCallBack<Solution>) {
-  solutionCallbacks.push(cb);
+function mkLeftMenuTab(
+  board: Board,
+  cardType: LeftMenuOption,
+  i: number
+) {
+  const leftMenuTab: Phaser.Graphics = board.game.add.graphics((40 * i), 35, board.group);
+  leftMenuTab.beginFill(0x227744);
+  leftMenuTab.drawRect(0, 0, 40, 40);
+  leftMenuTab.endFill();
+  leftMenuTab.tint = 0xFFFFFF;
+  leftMenuTab.inputEnabled = true;
+  leftMenuTab.events.onInputDown.add(() => chLeftMenuTab(board, cardType));
+  return leftMenuTab;
 }
 
-export function changeAvailableCards(cards: LimitedCard[]) {
-  gameState = focus(gameState, set(x => x.availableCards, cards));
-  cardsCallbacks.forEach(cb => cb(cards));
+function chLeftMenuTab(
+  board: Board,
+  cardType: LeftMenuOption,
+) {
+  board.selectedLeftMenu = cardType;
+  board.graphics.leftMenuTabs.map(g => g.tint = 0xFFFFFF);
+  board.graphics.leftMenuTabs[allLeftMenuOptions.indexOf(cardType)].tint = 0xAAAAAA;
+  board.graphics.availableCardsGfx = popLeftMenu(board);
 }
 
-export function addCardsCallback(cb: ParamCallBack<LimitedCard[]>) {
-  cardsCallbacks.push(cb);
+type AvailableCardGfx = {
+  title: Phaser.Graphics,
+  limitText: Phaser.Text,
+};
+
+export function chAvailableCards(
+  board: Board,
+  availableCards: LimitedCard[],
+) {
+  board.availableCards = availableCards;
+  board.graphics.availableCardsGfx = popLeftMenu(board);
 }
 
-export function addLeftMenuCallback(cb: ParamCallBack<LeftMenu>) {
-  leftMenuCallbacks.push(cb);
-}
+function popLeftMenu(
+  board: Board,
+): AvailableCardGfx[] {
+  // clear old
+  console.log("s: " + board.graphics.availableCardsGfx.length);
+  for (const gfx of board.graphics.availableCardsGfx) {
+    gfx.title.destroy();
+    gfx.limitText.destroy();
+  }
 
-export function changeLeftMenu(leftMenuOption: LeftMenuOption) {
-  gameState = focus(gameState, over(x => x.selectedLeftMenu, x => leftMenuOption));
-  const filteredCards = gameState.availableCards
-    .map((card, i) => { return {...card, ...{ index: i }}; })
-    .filter((card) => card.subtag === leftMenuOption);
-  leftMenuCallbacks.forEach(cb => cb({ option: leftMenuOption, cards: filteredCards }));
+  const filteredCards = board.availableCards
+    .filter((card) => card.subtag === board.selectedLeftMenu);
+
+  const x = 5;
+  let y = 80;
+  const gfx: AvailableCardGfx[] = [];
+  for (const card of filteredCards) {
+    const limitText = board.game.add.text(x + 170, y, card.limit.toString(), {
+      font: "20px",
+      fill: "#000000",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, board.group);
+
+    const title: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
+    title.beginFill(0x449966);
+    title.drawRect(0, 0, 165, 30);
+    title.endFill();
+    title.inputEnabled = true;
+    title.events.onInputDown.add(() => card.id);
+    // title.events.onInputDown.add(onAvailableCardClick(text, card, card.index));
+    y += 35;
+
+    gfx.push({ title, limitText });
+  }
+  return gfx;
 }
