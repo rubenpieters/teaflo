@@ -50,9 +50,17 @@ export function newBoard(
   leftMenu.endFill();
 
   // left menu tabs
+
   board.graphics.leftMenuTabs = allLeftMenuOptions.map((ct, i) => mkLeftMenuTab(board, ct, i));
 
   board.graphics.availableCardsGfx = popLeftMenu(board);
+
+  // right menu
+
+  const rightMenu: Phaser.Graphics = game.add.graphics(600, 40, group);
+  rightMenu.beginFill(0x227744);
+  rightMenu.drawRect(0, 0, 200, 560);
+  rightMenu.endFill();
 
   chLeftMenuTab(board, "crew");
   return board;
@@ -86,6 +94,7 @@ function chLeftMenuTab(
 type AvailableCardGfx = {
   title: Phaser.Graphics,
   limitText: Phaser.Text,
+  effects: Phaser.Graphics[],
 };
 
 export function chAvailableCards(
@@ -104,6 +113,7 @@ function popLeftMenu(
   for (const gfx of board.graphics.availableCardsGfx) {
     gfx.title.destroy();
     gfx.limitText.destroy();
+    gfx.effects.map(x => x.destroy());
   }
 
   const filteredCards = board.availableCards
@@ -125,11 +135,27 @@ function popLeftMenu(
     title.drawRect(0, 0, 165, 30);
     title.endFill();
     title.inputEnabled = true;
-    title.events.onInputDown.add(() => card.id);
+    title.events.onInputDown.add(() => console.log("id: " + card.id));
     // title.events.onInputDown.add(onAvailableCardClick(text, card, card.index));
     y += 35;
 
-    gfx.push({ title, limitText });
+    const effects: Phaser.Graphics[] = [];
+    let i = 0;
+    for (const action of card.actions) {
+      const effect: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
+      effect.beginFill(0x66BB88);
+      effect.drawRect(0, 0, 165, 20);
+      effect.endFill();
+      effect.tint = 0xFFFFFF;
+      effect.inputEnabled = true;
+      effect.events.onInputDown.add(() => console.log("id: " + card.id + " index " + i));
+      effects.push(effect);
+
+      y += 25;
+      i += 1;
+    }
+
+    gfx.push({ title, limitText, effects });
   }
   return gfx;
 }

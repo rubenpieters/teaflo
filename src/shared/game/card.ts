@@ -28,6 +28,13 @@ export type Card
   | Rest
   ;
 
+const cardRest: Card = {
+  id: 0,
+  actions: [{ tag: "Rest" }],
+  tag: "rest",
+  subtag: "rest",
+};
+
 const cardBattleTurn: Card = {
   id: 0,
   actions: [{ tag: "BattleTurn" }],
@@ -137,6 +144,7 @@ const cardBattle_0007: Card = {
 
 export const allCards = {
   cardBattleTurn: cardBattleTurn,
+  cardRest: cardRest,
 
   cardCrew_0000: cardCrew_0000,
   cardCrew_0001: cardCrew_0001,

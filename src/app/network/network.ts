@@ -42,6 +42,7 @@ export function getBoard(serverConn: ServerConnection, board: Board, seed: strin
   } else if (seed === "2") {
     cards = [
       {...allCards.cardBattleTurn, ...{ limit: Infinity }},
+      {...allCards.cardRest, ...{ limit: Infinity }},
       {...allCards.cardCrew_0000, ...{ limit: 5 } },
       {...allCards.cardCrew_0001, ...{ limit: 5 } },
       {...allCards.cardBattle_0003, ...{ limit: 1 } },
