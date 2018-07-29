@@ -1,5 +1,5 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
-import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFromSolution, changeSolution, addSolutionCallback, addCardsCallback, LimitedCard, minusLimit, plusLimit, addLeftMenuCallback, changeLeftMenu, LeftMenuOption, allLeftMenuOptions } from "src/app/gamestate";
+import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFromSolution, changeSolution, addSolutionCallback, addCardsCallback, LimitedCard, minusLimit, plusLimit, addLeftMenuCallback, changeLeftMenu, LeftMenuOption, allLeftMenuOptions, LimitedCardId } from "src/app/gamestate";
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
 import { Solution, SolutionResult, runSolution, runSolutionAll } from "src/shared/game/solution";
 import { SolutionLog, showSolutionLog } from "src/shared/game/log";
@@ -20,6 +20,8 @@ let solutionCache: Phaser.Sprite[] = [];
 let crewCache: Phaser.Sprite[] = [];
 let itemCache: Phaser.Sprite[] = [];
 let enemyCache: Phaser.Sprite[] = [];
+let leftCardsCache: Phaser.Graphics[] = [];
+let leftTextsCache: Phaser.Text[] = [];
 
 let nodeTypeDetail: Phaser.Text;
 
@@ -275,18 +277,19 @@ export default class Menu extends Phaser.State {
     });
     changeSolution({ paths: [] });
 
-    addLeftMenuCallback(leftMenuOption => {
+    addLeftMenuCallback(p => {
       for (const x of allLeftMenuOptions) {
         leftTabs[x].tint = 0xFFFFFF;
       }
-      leftTabs[leftMenuOption].tint = 0xAAAAAA;
+      leftTabs[p.option].tint = 0xAAAAAA;
+      mkLeftMenu(this.game, playGroup, p.cards);
     });
-    changeLeftMenu("crew");
 
     // connect to server
 
     // serverConn = connectToServer((serverConn) => { getBoard(serverConn, "1"); });
     getBoard(<any>undefined, "1");
+    changeLeftMenu("crew");
   }
 
   public update() {
@@ -387,7 +390,7 @@ function mkAvailableCards(
 
     const sprite = game.add.sprite(x, y, "card1", 0, playBoardGroup);
     sprite.inputEnabled = true;
-    sprite.events.onInputDown.add(onAvailableCardClick(texts, card, i));
+    // sprite.events.onInputDown.add(onAvailableCardClick(texts, card, i));
     sprite.events.onInputOver.add(() => {
       nodeTypeDetail.setText(JSON.stringify(showCard(card), undefined, 2));
     });
@@ -401,12 +404,12 @@ function mkAvailableCards(
 }
 
 function onAvailableCardClick(
-  texts: Phaser.Text[],
+  text: Phaser.Text,
   card: LimitedCard,
   index: number,
 ) {
   return function() {
-    const result = minusLimit(texts, index);
+    const result = minusLimit(text, index);
     switch (result) {
       case "cardUsed": {
         switch (card.tag) {
@@ -483,7 +486,7 @@ function mkSolution(
   }
   const sprite = game.add.sprite(x, y, "slot", 0, playBoardGroup);
   sprite.inputEnabled = true;
-  sprite.events.onInputDown.add(() => addRestToSolution({ actions: [{ tag: "Rest" }], id: -1, tag: "rest" }));
+  sprite.events.onInputDown.add(() => addRestToSolution({ actions: [{ tag: "Rest" }], id: -1, tag: "rest", subtag: "rest" }));
   sprites.push(sprite);
   solutionCache = sprites;
 }
@@ -593,4 +596,46 @@ function mkState(
     x += 50;
   }
   enemyCache = sprites;
+}
+
+function mkLeftMenu(
+  game: Phaser.Game,
+  group: Phaser.Group,
+  cards: LimitedCardId[],
+) {
+  // clear old
+  for (const sprite of leftCardsCache) {
+    sprite.destroy();
+  }
+  for (const text of leftTextsCache) {
+    text.destroy();
+  }
+
+  const x = 5;
+  let y = 80;
+  const sprites = [];
+  const texts: Phaser.Text[] = [];
+  for (const card of cards) {
+    const text = game.add.text(x + 170 - 400, y - 300, card.limit.toString(), {
+      font: "20px",
+      fill: "#000000",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, group);
+    texts.push(text);
+
+    const sprite: Phaser.Graphics = game.add.graphics(x - 400, y - 300, group);
+    sprite.beginFill(0x449966);
+    sprite.drawRect(0, 0, 165, 30);
+    sprite.endFill();
+    sprite.inputEnabled = true;
+    sprite.events.onInputDown.add(onAvailableCardClick(text, card, card.index));
+    sprite.events.onInputOver.add(() => {
+      nodeTypeDetail.setText(JSON.stringify(showCard(card), undefined, 2));
+    });
+    sprites.push(sprite);
+    y += 35;
+  }
+  leftCardsCache = sprites;
+  leftTextsCache = texts;
 }

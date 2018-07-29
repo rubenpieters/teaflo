@@ -7,10 +7,16 @@ export type Limit = {
 };
 
 export type LimitedCard = Card & Limit;
+export type LimitedCardId = Card & Limit & { index: number };
 
 export type LeftMenuOption = "crew" | "enemy" | "item" | "general" | "rest";
 
 export const allLeftMenuOptions: LeftMenuOption[] = ["crew", "enemy", "item", "general", "rest"];
+
+type LeftMenu = {
+  option: LeftMenuOption,
+  cards: LimitedCardId[],
+};
 
 export type GameState = {
   solution: Solution,
@@ -22,7 +28,7 @@ type ParamCallBack<A> = (a: A) => void;
 
 const solutionCallbacks: ParamCallBack<Solution>[] = [];
 const cardsCallbacks: ParamCallBack<LimitedCard[]>[] = [];
-const leftMenuCallbacks: ParamCallBack<LeftMenuOption>[] = [];
+const leftMenuCallbacks: ParamCallBack<LeftMenu>[] = [];
 
 const initialGameState: GameState = {
   solution: { paths: [] },
@@ -42,7 +48,7 @@ export function changeSolution(solution: Solution) {
   solutionCallbacks.forEach(cb => cb(solution));
 }
 
-export function minusLimit(limitTexts: Phaser.Text[], index: number) {
+export function minusLimit(limitText: Phaser.Text, index: number) {
   if (gameState.solution.paths.length == 0) {
     return "noPaths";
   } else if (gameState.availableCards[index].limit <= 0) {
@@ -51,7 +57,7 @@ export function minusLimit(limitTexts: Phaser.Text[], index: number) {
     gameState = focus(gameState,
       over(x => x.availableCards[index].limit, x => x - 1)
     );
-    limitTexts[index].setText(gameState.availableCards[index].limit.toString());
+    limitText.setText(gameState.availableCards[index].limit.toString());
     return "cardUsed";
   }
 }
@@ -64,7 +70,7 @@ export function plusLimit(limitTexts: Phaser.Text[], cardId: number) {
   gameState = focus(gameState,
     over(x => x.availableCards[index].limit, x => x + 1)
   );
-  limitTexts[index].setText(gameState.availableCards[index].limit.toString());
+  // limitTexts[index].setText(gameState.availableCards[index].limit.toString());
 }
 
 function findIdAvailableCard(cardId: number) {
@@ -125,11 +131,14 @@ export function addCardsCallback(cb: ParamCallBack<LimitedCard[]>) {
   cardsCallbacks.push(cb);
 }
 
-export function addLeftMenuCallback(cb: ParamCallBack<LeftMenuOption>) {
+export function addLeftMenuCallback(cb: ParamCallBack<LeftMenu>) {
   leftMenuCallbacks.push(cb);
 }
 
 export function changeLeftMenu(leftMenuOption: LeftMenuOption) {
   gameState = focus(gameState, over(x => x.selectedLeftMenu, x => leftMenuOption));
-  leftMenuCallbacks.forEach(cb => cb(leftMenuOption));
+  const filteredCards = gameState.availableCards
+    .map((card, i) => { return {...card, ...{ index: i }}; })
+    .filter((card) => card.subtag === leftMenuOption);
+  leftMenuCallbacks.forEach(cb => cb({ option: leftMenuOption, cards: filteredCards }));
 }

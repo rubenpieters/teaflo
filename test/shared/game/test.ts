@@ -6,11 +6,11 @@ import { showSolutionLog } from "src/shared/game/log";
 
 function basicCrewTest() {
   const path1: Path = {
-    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest", subtag: "general" },
     eventCards: [
-      { actions: [{ tag: "AddCrew", crew: allCrew.recruitGrow1 }], id: 0, tag: "event" },
-      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event" },
-      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.recruitGrow1 }], id: 0, tag: "event", subtag: "general" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event", subtag: "general" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event", subtag: "general" },
     ]
   }
   const solution: Solution = {
@@ -33,10 +33,10 @@ function basicCrewTest() {
 
 function basicBattleTest() {
   const path1: Path = {
-    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest", subtag: "general" },
     eventCards: [
-      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event" },
-      { actions: [{ tag: "AddCrew", crew: allCrew.stRanged }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event", subtag: "general" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stRanged }], id: 0, tag: "event", subtag: "general" },
       { actions: [{ tag: "AddEnemy", enemy: { hp: 10, maxHp: 10, actions: [
         {
           tag: "AddStatus",
@@ -68,9 +68,9 @@ function basicBattleTest() {
         ]
       } 
     },
-      ], id: 0, tag: "event" },
-      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
-      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event", subtag: "general" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event", subtag: "general" },
       { actions: [{
         tag: "PayGold",
         pay: 5,
@@ -79,7 +79,7 @@ function basicBattleTest() {
         tag: "AddItem",
         item: { triggers: [] },
       }
-      ], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
     ]
   }
   const solution: Solution = {
@@ -99,27 +99,27 @@ function basicBattleTest() {
 
 function basicStatusTest() {
   const path1: Path = {
-    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest", subtag: "general" },
     eventCards: [
       { actions: [
         { tag: "AddCrew", crew: allCrew.stFighter },
         { tag: "AddStatus", status: { tag: "Poison" , value: 3 }, target: { tag: "Target", type: "ally", positions: [0] } },
-      ], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
       { actions: [
         { tag: "Rest" },
-      ], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
       { actions: [
         { tag: "Rest" },
-      ], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
       { actions: [
         { tag: "Rest" },
-      ], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
       { actions: [
         { tag: "Rest" },
-      ], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
       { actions: [
         { tag: "Rest" },
-      ], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
     ]
   }
   const solution: Solution = {
@@ -139,7 +139,7 @@ function basicStatusTest() {
 
 function basicApDamageTest() {
   const path1: Path = {
-    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest", subtag: "general" },
     eventCards: [
       { actions: [{ tag: "AddCrew", crew: {
         ap: 0,
@@ -153,7 +153,7 @@ function basicApDamageTest() {
           multiplier: 1,
         }] }, }
       ]
-      , id: 0, tag: "event" },
+      , id: 0, tag: "event", subtag: "general" },
       { actions: [{ tag: "AddEnemy", enemy: { hp: 2, maxHp: 2, actions: [
         {
           tag: "Damage",
@@ -163,8 +163,8 @@ function basicApDamageTest() {
         },
         ], triggers: [] } },
         { tag: "GainGold", gain: 5 },
-      ], id: 0, tag: "event" },
-      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event", subtag: "general" },
     ]
   }
   const solution: Solution = {
@@ -184,10 +184,10 @@ function basicApDamageTest() {
 
 function retaliateTest() {
   const path1: Path = {
-    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest" },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest", subtag: "general" },
     eventCards: [
-      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event" },
-      { actions: [{ tag: "AddCrew", crew: allCrew.stRanged }], id: 0, tag: "event" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stFighter }], id: 0, tag: "event", subtag: "general" },
+      { actions: [{ tag: "AddCrew", crew: allCrew.stRanged }], id: 0, tag: "event", subtag: "general" },
       { actions: [{ tag: "AddEnemy", enemy: { hp: 100, maxHp: 100, actions: [
         {
           tag: "Damage",
@@ -212,9 +212,9 @@ function retaliateTest() {
           ]
         } 
       },
-      ], id: 0, tag: "event" },
-      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
-      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event" },
+      ], id: 0, tag: "event", subtag: "general" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event", subtag: "general" },
+      { actions: [{ tag: "BattleTurn" }], id: 0, tag: "event", subtag: "general" },
     ]
   }
   const solution: Solution = {

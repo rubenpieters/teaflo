@@ -11,12 +11,14 @@ export function showCard(card: Card) {
 
 export type Event = {
   tag: "event",
+  subtag: "crew" | "enemy" | "item" | "general" | "rest",
   id: number,
   actions: Action<Target>[],
 };
 
 export type Rest = {
   tag: "rest",
+  subtag: "crew" | "enemy" | "item" | "general" | "rest",
   id: number,
   actions: Action<Target>[],
 };
@@ -29,18 +31,21 @@ export type Card
 const cardBattleTurn: Card = {
   id: 0,
   actions: [{ tag: "BattleTurn" }],
-  tag: "event"
+  tag: "event",
+  subtag: "general",
 };
 
 const cardCrew_0000: Card = {
   id: 1,
   actions: [{ tag: "AddCrew", crew: allCrew.stFighter }],
   tag: "event",
+  subtag: "crew",
 };
 const cardCrew_0001: Card = {
   id: 2,
   actions: [{ tag: "AddCrew", crew: allCrew.stRanged }],
   tag: "event",
+  subtag: "crew",
 };
 
 const cardItem_0000: Card = {
@@ -50,6 +55,7 @@ const cardItem_0000: Card = {
     { tag: "AddItem", item: allItems.guard1StartCombat },
   ],
   tag: "event",
+  subtag: "item",
 };
 
 const cardBattle_0000: Card = {
@@ -59,6 +65,7 @@ const cardBattle_0000: Card = {
     { tag: "GainGold", gain: 10 },
   ],
   tag: "event",
+  subtag: "enemy",
 };
 
 const cardBattle_0001: Card = {
@@ -68,6 +75,7 @@ const cardBattle_0001: Card = {
     { tag: "GainGold", gain: 7 },
   ],
   tag: "event",
+  subtag: "enemy",
 };
 
 const cardBattle_0002: Card = {
@@ -76,6 +84,7 @@ const cardBattle_0002: Card = {
     { tag: "AddEnemy", enemy: allEnemies.enemyRegenApMinR20 },
   ],
   tag: "event",
+  subtag: "enemy",
 };
 
 const cardBattle_0003: Card = {
@@ -84,6 +93,7 @@ const cardBattle_0003: Card = {
     { tag: "AddEnemy", enemy: allEnemies.enemy8HpAtk2 },
   ],
   tag: "event",
+  subtag: "enemy",
 };
 
 const cardBattle_0004: Card = {
@@ -92,6 +102,7 @@ const cardBattle_0004: Card = {
     { tag: "AddEnemy", enemy: allEnemies.enemy15hpAtk1AllHeal2 },
   ],
   tag: "event",
+  subtag: "enemy",
 };
 
 const cardBattle_0005: Card = {
@@ -100,6 +111,7 @@ const cardBattle_0005: Card = {
     { tag: "AddEnemy", enemy: allEnemies.enemy14hpApMin },
   ],
   tag: "event",
+  subtag: "enemy",
 };
 
 const cardBattle_0006: Card = {
@@ -111,6 +123,7 @@ const cardBattle_0006: Card = {
     { tag: "AddEnemy", enemy: allEnemies.enemy5HpAtkInFront },
   ],
   tag: "event",
+  subtag: "enemy",
 };
 
 const cardBattle_0007: Card = {
@@ -119,6 +132,7 @@ const cardBattle_0007: Card = {
     { tag: "AddEnemy", enemy: allEnemies.enemy20HpDoom },
   ],
   tag: "event",
+  subtag: "enemy",
 };
 
 export const allCards = {
