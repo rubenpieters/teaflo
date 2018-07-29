@@ -8,19 +8,26 @@ export type Limit = {
 
 export type LimitedCard = Card & Limit;
 
+export type LeftMenuOption = "crew" | "enemy" | "item" | "general" | "rest";
+
+export const allLeftMenuOptions: LeftMenuOption[] = ["crew", "enemy", "item", "general", "rest"];
+
 export type GameState = {
   solution: Solution,
   availableCards: LimitedCard[],
+  selectedLeftMenu: LeftMenuOption,
 };
 
 type ParamCallBack<A> = (a: A) => void;
 
 const solutionCallbacks: ParamCallBack<Solution>[] = [];
 const cardsCallbacks: ParamCallBack<LimitedCard[]>[] = [];
+const leftMenuCallbacks: ParamCallBack<LeftMenuOption>[] = [];
 
 const initialGameState: GameState = {
   solution: { paths: [] },
   availableCards: [],
+  selectedLeftMenu: "crew",
 };
 
 let gameState: GameState = initialGameState;
@@ -116,4 +123,13 @@ export function changeAvailableCards(cards: LimitedCard[]) {
 
 export function addCardsCallback(cb: ParamCallBack<LimitedCard[]>) {
   cardsCallbacks.push(cb);
+}
+
+export function addLeftMenuCallback(cb: ParamCallBack<LeftMenuOption>) {
+  leftMenuCallbacks.push(cb);
+}
+
+export function changeLeftMenu(leftMenuOption: LeftMenuOption) {
+  gameState = focus(gameState, over(x => x.selectedLeftMenu, x => leftMenuOption));
+  leftMenuCallbacks.forEach(cb => cb(leftMenuOption));
 }

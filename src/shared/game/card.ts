@@ -97,7 +97,7 @@ const cardBattle_0004: Card = {
 const cardBattle_0005: Card = {
   id: 9,
   actions: [
-    { tag: "AddEnemy", enemy: allEnemies.enemy15hpAtk1AllHeal2 },
+    { tag: "AddEnemy", enemy: allEnemies.enemy14hpApMin },
   ],
   tag: "event",
 };

@@ -1,5 +1,5 @@
 import { changeSelectedScreen, getSelectedScreen, addSelectedScreenCallback, addConnectedCallback } from "src/app/appstate";
-import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFromSolution, changeSolution, addSolutionCallback, addCardsCallback, LimitedCard, minusLimit, plusLimit } from "src/app/gamestate";
+import { addToSolution, addRestToSolution, removeCardFromSolution, removePathFromSolution, changeSolution, addSolutionCallback, addCardsCallback, LimitedCard, minusLimit, plusLimit, addLeftMenuCallback, changeLeftMenu, LeftMenuOption, allLeftMenuOptions } from "src/app/gamestate";
 import { ServerConnection, connectToServer, getBoard } from "src/app/network/network";
 import { Solution, SolutionResult, runSolution, runSolutionAll } from "src/shared/game/solution";
 import { SolutionLog, showSolutionLog } from "src/shared/game/log";
@@ -54,31 +54,32 @@ export default class Menu extends Phaser.State {
     this.stage.backgroundColor = 0xDCDCDC;
 
     const top1: Phaser.Text = this.add.text(0, 0, "Home", {
-      font: "60px Indie Flower",
+      font: "15px Indie Flower",
       fill: "#F08080",
       boundsAlignH: "center",
       boundsAlignV: "middle",
     });
-    top1.setTextBounds(0 - 400, 0 - 300, 250, 100);
+    top1.setTextBounds(20 - 400, 10 - 300, 40, 20);
     top1.inputEnabled = true;
     top1.events.onInputDown.add(() => changeSelectedScreen("Home"));
 
     const top2: Phaser.Text = this.add.text(0, 0, "Play", {
-      font: "60px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "center",
-      boundsAlignV: "middle",
-    });
-    top2.setTextBounds(250 - 400, 0 - 300, 250, 100);
-    top2.inputEnabled = true;
-    top2.events.onInputDown.add(() => changeSelectedScreen("Play"));
-
-    const connectionIndicator: Phaser.Text = this.add.text(620 - 400, 10 - 300, "No Connection", {
       font: "15px Indie Flower",
       fill: "#77BFA3",
       boundsAlignH: "center",
       boundsAlignV: "middle",
     });
+    top2.setTextBounds(70 - 400, 10 - 300, 40, 20);
+    top2.inputEnabled = true;
+    top2.events.onInputDown.add(() => changeSelectedScreen("Play"));
+
+    const connectionIndicator: Phaser.Text = this.add.text(0, 0, "No Connection", {
+      font: "15px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    });
+    connectionIndicator.setTextBounds(690 - 400, 10 - 300, 90, 20);
 
     // Menu Screen
 
@@ -144,6 +145,31 @@ export default class Menu extends Phaser.State {
 
     this.game.input.onDown.add(onDown(this.game), this);
 
+    // left menu - background
+
+    const leftMenu: Phaser.Graphics = this.game.add.graphics(0 - 400, 75 - 300, playGroup);
+    leftMenu.beginFill(0x227744);
+    leftMenu.drawRect(0, 0, 200, 525);
+    leftMenu.endFill();
+
+    const createMenuTab = (cardType: LeftMenuOption, i: number) => {
+      const leftMenuTab: Phaser.Graphics = this.game.add.graphics((40 * i) - 400, 35 - 300, playGroup);
+      leftMenuTab.beginFill(0x227744);
+      leftMenuTab.drawRect(0, 0, 40, 40);
+      leftMenuTab.endFill();
+      leftMenuTab.tint = 0xFFFFFF;
+      leftMenuTab.inputEnabled = true;
+      leftMenuTab.events.onInputDown.add(() => changeLeftMenu(cardType));
+      return leftMenuTab;
+    };
+    const leftTabs = {
+      crew: createMenuTab("crew", 0),
+      enemy: createMenuTab("enemy", 1),
+      item: createMenuTab("item", 2),
+      general: createMenuTab("general", 3),
+      rest: createMenuTab("rest", 4),
+    };
+
     // right menu - background
 
     const rightMenu: Phaser.Graphics = this.game.add.graphics(550 - 400, 75 - 300, playGroup);
@@ -161,30 +187,7 @@ export default class Menu extends Phaser.State {
     }, playGroup);
     nodeTypeDetail.setTextBounds(570 - 400, 90 - 300, 210, 245);
 
-    // bottom menu - background
-
-    const bottomMenu: Phaser.Graphics = this.game.add.graphics(0 - 400, 450 - 300, playGroup);
-    bottomMenu.beginFill(0x227744);
-    bottomMenu.drawRect(0, 0, 800, 150);
-    bottomMenu.endFill();
-
     // bottom menu
-
-    /*const nodeTypeTitle: Phaser.Text = this.game.add.text(0, 0, "Node Type", {
-      font: "20px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "center",
-      boundsAlignV: "middle"
-    }, playGroup);
-    nodeTypeTitle.setTextBounds(10 - 400, 425 - 300, 100, 25);
-
-    const nodeTypeText: Phaser.Text = this.game.add.text(0, 0, "--", {
-      font: "20px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "center",
-      boundsAlignV: "middle"
-    }, playGroup);
-    nodeTypeText.setTextBounds(10 - 400, 450 - 300, 100, 25);*/
 
     const resourcesTitle: Phaser.Text = this.game.add.text(0, 0, "Resources", {
       font: "20px Indie Flower",
@@ -217,79 +220,6 @@ export default class Menu extends Phaser.State {
       boundsAlignV: "middle",
     }, playGroup);
     modsText.setTextBounds(260 - 400, 450 - 300, 100, 150);
-
-    // undo button
-
-    const undoBtn: Phaser.Text = this.add.text(0, 0, "U", {
-      font: "22px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, playGroup);
-    undoBtn.setTextBounds(750 - 400, 575 - 300, 25, 25);
-    undoBtn.inputEnabled = true;
-    // undoBtn.events.onInputDown.add(undoAction);
-
-    // redo button
-
-    const redoBtn: Phaser.Text = this.add.text(0, 0, "R", {
-      font: "22px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, playGroup);
-    redoBtn.setTextBounds(775 - 400, 575 - 300, 25, 25);
-    redoBtn.inputEnabled = true;
-    // redoBtn.events.onInputDown.add(redoAction(this.game));
-
-    // filter button
-
-    const filterBtn: Phaser.Text = this.add.text(0, 0, "F", {
-      font: "22px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, playGroup);
-    filterBtn.setTextBounds(605 - 400, 575 - 300, 25, 25);
-    filterBtn.inputEnabled = true;
-    // filterBtn.events.onInputDown.add(filterAction);
-
-    // step run -1 button
-
-    const stepRunMinBtn: Phaser.Text = this.add.text(0, 0, "-1>", {
-      font: "22px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, playGroup);
-    stepRunMinBtn.setTextBounds(630 - 400, 575 - 300, 40, 25);
-    stepRunMinBtn.inputEnabled = true;
-    const minus = (x: number) => { if (x - 1 > 0) {  return x - 1; } else { return x; } };
-    // stepRunMinBtn.events.onInputDown.add(stepRunAction(minus));
-
-    // step run +1 button
-
-    const stepRunBtn: Phaser.Text = this.add.text(0, 0, "+1>", {
-      font: "22px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, playGroup);
-    stepRunBtn.setTextBounds(675 - 400, 575 - 300, 40, 25);
-    stepRunBtn.inputEnabled = true;
-    // stepRunBtn.events.onInputDown.add(stepRunAction(x => x + 1));
-
-    // start run button
-
-    const startRunBtn: Phaser.Text = this.add.text(0, 0, ">>", {
-      font: "22px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, playGroup);
-    startRunBtn.setTextBounds(720 - 400, 575 - 300, 30, 25);
-    startRunBtn.inputEnabled = true;
-    // startRunBtn.events.onInputDown.add(startRunAction);
 
     // callbacks
 
@@ -344,6 +274,14 @@ export default class Menu extends Phaser.State {
       }
     });
     changeSolution({ paths: [] });
+
+    addLeftMenuCallback(leftMenuOption => {
+      for (const x of allLeftMenuOptions) {
+        leftTabs[x].tint = 0xFFFFFF;
+      }
+      leftTabs[leftMenuOption].tint = 0xAAAAAA;
+    });
+    changeLeftMenu("crew");
 
     // connect to server
 
