@@ -24,6 +24,7 @@ export type Board = {
 type BoardGraphics = {
   leftMenuTabs: Phaser.Graphics[],
   availableCardsGfx: AvailableCardGfx[],
+  solutionGfx: Phaser.Graphics[],
 };
 
 export function newBoard(
@@ -37,6 +38,7 @@ export function newBoard(
     graphics: {
       leftMenuTabs: [],
       availableCardsGfx: [],
+      solutionGfx: [],
     },
     game,
     group,
@@ -135,7 +137,7 @@ function popLeftMenu(
     title.drawRect(0, 0, 165, 30);
     title.endFill();
     title.inputEnabled = true;
-    title.events.onInputDown.add(() => console.log("id: " + card.id));
+    title.events.onInputDown.add(() => addToSolution(board, card));
     // title.events.onInputDown.add(onAvailableCardClick(text, card, card.index));
     y += 35;
 
@@ -158,4 +160,94 @@ function popLeftMenu(
     gfx.push({ title, limitText, effects });
   }
   return gfx;
+}
+
+function addToSolution(
+  board: Board,
+  card: Card,
+) {
+  const index = board.availableCards.findIndex(c => c.id === card.id);
+  if (board.availableCards[index].limit <= 0) {
+    return "noUses";
+  }
+  switch (card.tag) {
+    case "event": {
+      if (board.solution.paths.length === 0) {
+        return "noPaths";
+      } else {
+        board.solution.paths[board.solution.paths.length - 1].eventCards.push(card);
+      }
+      break;
+    }
+    case "rest": {
+      board.solution.paths.push({ restCard: card, eventCards: [] });
+      break;
+    }
+  }
+  board.availableCards[index].limit -= 1;
+  mkSolution(board);
+  chLeftMenuTab(board, board.selectedLeftMenu);
+  return "cardAdded";
+}
+
+function mkSolution(
+  board: Board,
+  // solutionResults: SolutionResult[],
+) {
+  // clear old
+  for (const sprite of board.graphics.solutionGfx) {
+    sprite.destroy();
+  }
+
+  // create new
+  let x = 230;
+  let y = 350;
+  const sprites: Phaser.Graphics[] = [];
+  let pathIndex = 0;
+  let i = 0;
+  for (const path of board.solution.paths) {
+    // increase 1 for rest action
+    i += 1;
+    const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
+    sprite.beginFill(0x223377);
+    sprite.drawRect(0, 0, 40, 20);
+    sprite.endFill();
+    // const sprite = board.game.add.sprite(x, y, "rest", 0, board.group);
+    // sprite.inputEnabled = true;
+    // sprite.events.onInputDown.add(removePathFromSolution(availableCardsTextCache, pathIndex));
+    sprites.push(sprite);
+    y -= 25;
+
+    let cardIndex = 0;
+    for (const card of path.eventCards) {
+      const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
+      sprite.beginFill(0x223377);
+      sprite.drawRect(0, 0, 40, 20);
+      sprite.endFill();
+      sprite.inputEnabled = true;
+      /*sprite.events.onInputOver.add(() => {
+        nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
+      });*/
+      sprite.events.onInputDown.add(() => addToSolution(board, card));
+      sprites.push(sprite);
+
+      y -= 25;
+      cardIndex += 1;
+      i += 1;
+    }
+
+    /*if (pathIndex === board.solution.paths.length - 1) {
+      const sprite = board.game.add.sprite(x, y, "slot", 0, board.group);
+      sprites.push(sprite);
+    }*/
+
+    y = 350;
+    x += 45;
+    pathIndex += 1;
+  }
+  /* const sprite = board.game.add.sprite(x, y, "slot", 0, board.group);
+  sprite.inputEnabled = true; */
+  // sprite.events.onInputDown.add(() => addRestToSolution({ actions: [{ tag: "Rest" }], id: -1, tag: "rest", subtag: "rest" }));
+  // sprites.push(sprite);
+  board.graphics.solutionGfx = sprites;
 }
