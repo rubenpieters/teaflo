@@ -1,6 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Solution } from "src/shared/game/solution";
+import { Solution, runSolutionAll } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
+import { GameState } from "src/shared/game/state";
 
 export type Limit = {
   limit: number,
@@ -25,6 +26,7 @@ type BoardGraphics = {
   leftMenuTabs: Phaser.Graphics[],
   availableCardsGfx: AvailableCardGfx[],
   solutionGfx: Phaser.Graphics[],
+  stateGfx: Phaser.Graphics[],
 };
 
 export function newBoard(
@@ -39,6 +41,7 @@ export function newBoard(
       leftMenuTabs: [],
       availableCardsGfx: [],
       solutionGfx: [],
+      stateGfx: [],
     },
     game,
     group,
@@ -185,6 +188,7 @@ function addToSolution(
     }
   }
   board.availableCards[index].limit -= 1;
+
   mkSolution(board);
   chLeftMenuTab(board, board.selectedLeftMenu);
   return "cardAdded";
@@ -280,6 +284,23 @@ function mkSolution(
   // sprite.events.onInputDown.add(() => addRestToSolution({ actions: [{ tag: "Rest" }], id: -1, tag: "rest", subtag: "rest" }));
   // sprites.push(sprite);
   board.graphics.solutionGfx = sprites;
+
+  // update solution
+
+  const solutionResults = runSolutionAll(board.solution);
+  if (solutionResults.length === 0) {
+    console.log("empty state");
+    clearState(board);
+  } else {
+    const lastResult = solutionResults[solutionResults.length - 1];
+    console.log(lastResult.log);
+    if (lastResult.state === "invalid") {
+      console.log("invalid state");
+      clearState(board);
+    } else {
+      mkState(board, lastResult.state);
+    }
+  }
 }
 
 function onSolutionRestCardClick(
@@ -315,4 +336,43 @@ function onSolutionEventCardClick(
       removeEventFromSolution(board, card, pathIndex, eventIndex);
     }
   };
+}
+
+function clearState(
+  board: Board,
+) {
+  for (const sprite of board.graphics.stateGfx) {
+    sprite.destroy();
+  }
+}
+
+function mkState(
+  board: Board,
+  gs: GameState
+) {
+  clearState(board);
+
+  let x = 330;
+  let y = 420;
+  const sprites: Phaser.Graphics[] = [];
+  for (const ally of gs.crew) {
+    const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
+    sprite.beginFill(0x4477CC);
+    sprite.drawRect(0, 0, 20, 40);
+    sprite.endFill();
+    sprites.push(sprite);
+    x -= 25;
+  }
+
+  x = 360;
+  for (const enemy of gs.enemies) {
+    const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
+    sprite.beginFill(0xCC7744);
+    sprite.drawRect(0, 0, 20, 40);
+    sprite.endFill();
+    sprites.push(sprite);
+    x += 25;
+  }
+
+  board.graphics.stateGfx = sprites;
 }
