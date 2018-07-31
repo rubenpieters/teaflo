@@ -361,6 +361,14 @@ function mkState(
     sprite.drawRect(0, 0, 20, 40);
     sprite.endFill();
     sprites.push(sprite);
+
+    const hpRatio = ally.hp / ally.maxHp;
+    const hpSprite: Phaser.Graphics = board.game.add.graphics(x, y + 45, board.group);
+    hpSprite.beginFill(0xFF0000);
+    hpSprite.drawRect(0, 0, 20 * hpRatio, 5);
+    hpSprite.endFill();
+    sprites.push(hpSprite);
+
     x -= 25;
   }
 
@@ -371,6 +379,14 @@ function mkState(
     sprite.drawRect(0, 0, 20, 40);
     sprite.endFill();
     sprites.push(sprite);
+
+    const hpRatio = enemy.hp / enemy.maxHp;
+    const hpSprite: Phaser.Graphics = board.game.add.graphics(x, y + 45, board.group);
+    hpSprite.beginFill(0xFF0000);
+    hpSprite.drawRect(0, 0, 20 * hpRatio, 5);
+    hpSprite.endFill();
+    sprites.push(hpSprite);
+
     x += 25;
   }
 
