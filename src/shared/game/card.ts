@@ -12,14 +12,14 @@ export function showCard(card: Card) {
 export type Event = {
   tag: "event",
   subtag: "crew" | "enemy" | "item" | "general" | "rest",
-  id: number,
+  id: number | "created",
   actions: Action<Target>[],
 };
 
 export type Rest = {
   tag: "rest",
   subtag: "crew" | "enemy" | "item" | "general" | "rest",
-  id: number,
+  id: number | "created",
   actions: Action<Target>[],
 };
 

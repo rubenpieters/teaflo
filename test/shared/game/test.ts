@@ -151,7 +151,9 @@ function basicApDamageTest() {
           tag: "ApDamage",
           target: { tag: "Positions", type: "enemy", positions: [0] },
           multiplier: 1,
-        }] }, }
+        }],
+        abilities: [],
+      }, }
       ]
       , id: 0, tag: "event", subtag: "general" },
       { actions: [{ tag: "AddEnemy", enemy: { hp: 2, maxHp: 2, actions: [

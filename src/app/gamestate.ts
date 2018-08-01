@@ -2,6 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Solution, runSolutionAll } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
+import { abilityToAction } from "src/shared/game/ability";
 
 export type Limit = {
   limit: number,
@@ -169,9 +170,12 @@ function addToSolution(
   board: Board,
   card: Card,
 ) {
-  const index = board.availableCards.findIndex(c => c.id === card.id);
-  if (board.availableCards[index].limit <= 0) {
-    return "noUses";
+  if (card.id !== "created") {
+    const index = board.availableCards.findIndex(c => c.id === card.id);
+    if (board.availableCards[index].limit <= 0) {
+      return "noUses";
+    }
+    board.availableCards[index].limit -= 1;
   }
   switch (card.tag) {
     case "event": {
@@ -187,7 +191,6 @@ function addToSolution(
       break;
     }
   }
-  board.availableCards[index].limit -= 1;
 
   mkSolution(board);
   chLeftMenuTab(board, board.selectedLeftMenu);
@@ -204,8 +207,10 @@ function removeEventFromSolution(
     board.solution.paths[pathIndex].eventCards.slice(0, eventIndex).concat(
       board.solution.paths[pathIndex].eventCards.slice(eventIndex + 1, board.solution.paths[pathIndex].eventCards.length)
     );
-  const index = board.availableCards.findIndex(c => c.id === card.id);
-  board.availableCards[index].limit += 1;
+  if (card.id !== "created") {
+    const index = board.availableCards.findIndex(c => c.id === card.id);
+    board.availableCards[index].limit += 1;
+  }
   chLeftMenuTab(board, board.selectedLeftMenu);
   mkSolution(board);
 }
@@ -216,8 +221,10 @@ function removeRestFromSolution(
   pathIndex: number,
 ) {
   for (const card of board.solution.paths[pathIndex].eventCards) {
-    const index = board.availableCards.findIndex(c => c.id === card.id);
-    board.availableCards[index].limit += 1;
+    if (card.id !== "created") {
+      const index = board.availableCards.findIndex(c => c.id === card.id);
+      board.availableCards[index].limit += 1;
+    }
   } 
   board.solution.paths =
     board.solution.paths.slice(0, pathIndex).concat(
@@ -358,6 +365,7 @@ function mkState(
 
   let x = 330;
   let y = 420;
+  let allyId = 0;
   const sprites: Phaser.Graphics[] = [];
   for (const ally of gs.crew) {
     const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
@@ -373,7 +381,26 @@ function mkState(
     hpSprite.endFill();
     sprites.push(hpSprite);
 
+    for (const ability of ally.abilities) {
+      const sprite: Phaser.Graphics = board.game.add.graphics(x, y + 75, board.group);
+      sprite.beginFill(0x449966);
+      sprite.drawRect(0, 0, 20, 15);
+      sprite.endFill();
+      sprite.inputEnabled = true;
+      const abilityCard: Card = {
+        id: "created",
+        actions: [
+          abilityToAction(ability, allyId),
+        ],
+        tag: "event",
+        subtag: "general",
+      }
+      sprite.events.onInputDown.add(() => addToSolution(board, abilityCard));
+      sprites.push(sprite);
+    }
+
     x -= 25;
+    allyId += 1;
   }
 
   x = 360;

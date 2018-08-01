@@ -92,6 +92,13 @@ export type Noop = {
   tag: "Noop",
 };
 
+export type Swap = {
+  tag: "Swap",
+  type: TargetType,
+  from: number,
+  to: number,
+};
+
 export type Action<T>
   = Damage<T>
   | Heal<T>
@@ -108,6 +115,7 @@ export type Action<T>
   | Death
   | AddStatus<T>
   | Noop
+  | Swap
   ;
 
 // Spec
@@ -186,6 +194,7 @@ export function fmap<A, B>(
     case "Death": return action;
     case "AddStatus": return {...action, target: f(action.target)};
     case "Noop": return action;
+    case "Swap": return action;
   }
 }
 
@@ -472,6 +481,28 @@ function applyAction(
       break;
     }
     case "Noop": {
+      break;
+    }
+    case "Swap": {
+      switch (action.type) {
+        case "ally": {
+          state = focus(state,
+           set(x => x.crew[action.from], state.crew[action.to]),
+           set(x => x.crew[action.to], state.crew[action.from]),
+          );
+          break;
+        }
+        case "enemy": {
+          state = focus(state,
+           set(x => x.enemies[action.from], state.enemies[action.to]),
+           set(x => x.enemies[action.to], state.enemies[action.from]),
+          );
+          break;
+        }
+        case "item": {
+          throw "swap not implemented for item";
+        }
+      }
       break;
     }
   }

@@ -6,6 +6,7 @@ import { Generator } from "src/shared/handler/id/generator";
 import { HasStatus, Guard } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 import { showAction } from "src/shared/game/log";
+import { Ability } from "src/shared/game/ability";
 
 export function showCrew(
   crew: Crew
@@ -22,6 +23,7 @@ export type Crew = {
   ranged: boolean,
   actions: ActionSpec[],
   triggers: Trigger[],
+  abilities: Ability[],
 };
 
 export function damage<E extends Crew & HasStatus>(
@@ -115,6 +117,11 @@ const stFighter: Crew = {
     target: { tag: "Positions", type: "enemy", positions: [0] },
     value: 5,
   }],
+  abilities: [
+    {
+      tag: "SwapSelf",
+    }
+  ],
 };
 
 const stRanged: Crew = {
@@ -128,6 +135,7 @@ const stRanged: Crew = {
     target: { tag: "Positions", type: "enemy", positions: [0] },
     value: 1,
   }],
+  abilities: [],
 };
 
 const recruitGrow1: Crew = {
@@ -162,6 +170,7 @@ const recruitGrow1: Crew = {
     target: { tag: "Positions", type: "enemy", positions: [0] },
     value: 1,
   }],
+  abilities: [],
 };
 
 const recruitGainAPWhenHP: Crew = {
@@ -186,6 +195,7 @@ const recruitGainAPWhenHP: Crew = {
     target: { tag: "Positions", type: "enemy", positions: [0] },
     value: 1,
   }],
+  abilities: [],
 };
 
 const recruitKillLast: Crew = {
@@ -205,6 +215,7 @@ const recruitKillLast: Crew = {
       value: 10,
     },
   ],
+  abilities: [],
 };
 
 export const allCrew = {
