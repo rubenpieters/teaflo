@@ -56,41 +56,17 @@ export default class Menu extends Phaser.State {
 
     const menuGroup = this.game.add.group();
 
-    const home1: Phaser.Text = this.game.add.text(0, 0, "Current Board", {
-      font: "35px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, menuGroup);
-    home1.setTextBounds(50, 100, 150, 75);
-
-    const board1Btn: Phaser.Text = this.game.add.text(0, 0, "board1", {
-      font: "20px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, menuGroup);
-    board1Btn.setTextBounds(75, 165, 75, 50);
-    board1Btn.inputEnabled = true;
-    board1Btn.events.onInputDown.add(() => { getBoard(<any>undefined, board, "1"); });
-
-    const board2Btn: Phaser.Text = this.game.add.text(0, 0, "board2", {
-      font: "20px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, menuGroup);
-    board2Btn.setTextBounds(175, 165, 75, 50);
-    board2Btn.inputEnabled = true;
-    board2Btn.events.onInputDown.add(() => { getBoard(<any>undefined, board, "2"); });
-
-    const home2: Phaser.Text = this.game.add.text(0, 0, "Top Solutions", {
-      font: "35px Indie Flower",
-      fill: "#77BFA3",
-      boundsAlignH: "left",
-      boundsAlignV: "middle",
-    }, menuGroup);
-    home2.setTextBounds(50, 200, 150, 75);
+    for (const i of [1, 2, 3]) {
+      const levelBtn: Phaser.Text = this.game.add.text(0, 0, "level" + i, {
+        font: "20px Indie Flower",
+        fill: "#77BFA3",
+        boundsAlignH: "left",
+        boundsAlignV: "middle",
+      }, menuGroup);
+      levelBtn.setTextBounds(75, 30 + i * 30, 75, 50);
+      levelBtn.inputEnabled = true;
+      levelBtn.events.onInputDown.add(() => { getBoard(<any>undefined, board, i + ""); });
+    }
 
     // callbacks
 
