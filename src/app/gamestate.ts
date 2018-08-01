@@ -215,6 +215,10 @@ function removeRestFromSolution(
   card: Card,
   pathIndex: number,
 ) {
+  for (const card of board.solution.paths[pathIndex].eventCards) {
+    const index = board.availableCards.findIndex(c => c.id === card.id);
+    board.availableCards[index].limit += 1;
+  } 
   board.solution.paths =
     board.solution.paths.slice(0, pathIndex).concat(
       board.solution.paths.slice(pathIndex + 1, board.solution.paths.length)
