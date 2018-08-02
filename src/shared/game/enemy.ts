@@ -132,7 +132,7 @@ const enemyRegenApMinR20: Enemy = {
       target: { tag: "Positions", type: "ally", positions: [0, 1, 2] },
       value: 10,
       next: { tag: "NextId" },
-    }
+    },
   ],
   triggers: [],
 };
@@ -314,6 +314,32 @@ const enemy20HpDoom: Enemy = {
   ],
 };
 
+const enemyAtk2Hp15: Enemy = {
+  hp: 15,
+  maxHp: 15,
+  actions: [
+    {
+      tag: "Damage",
+      target: { tag: "Positions", type: "ally", positions: [0] },
+      value: 2,
+      next: { tag: "NextId" },
+    },
+  ],
+  triggers: [
+    {
+      onTag: "Death",
+      type: "before",
+      action: {
+        tag: "GainGold",
+        gain: 4,
+      },
+      conditions: [
+        { tag: "OwnId" },
+      ],
+    },
+  ],
+};
+
 export const allEnemies = {
   enemyAtk012: enemyAtk012R10,
   enemyRegenApMinR20: enemyRegenApMinR20,
@@ -323,4 +349,5 @@ export const allEnemies = {
   enemy14hpApMin: enemy14hpApMin,
   enemy5HpAtkInFront: enemy5HpAtkInFront,
   enemy20HpDoom: enemy20HpDoom,
+  enemyAtk2Hp15: enemyAtk2Hp15,
 };

@@ -82,6 +82,9 @@ export function showAction<T extends TargetSpec | Target>(action: Spec<T>): stri
     case "ConditionAction": {
       return "if " +  action.conditions.map(showCondition).join(" & ") + " then " + showAction(action.trueAction) + " else " + showAction(action.falseAction);
     }
+    case "Swap": {
+      return "Swap " + action.type + " " + action.from + " " + action.to;
+    }
   }
 }
 

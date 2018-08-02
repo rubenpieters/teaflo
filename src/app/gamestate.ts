@@ -225,7 +225,7 @@ function removeRestFromSolution(
       const index = board.availableCards.findIndex(c => c.id === card.id);
       board.availableCards[index].limit += 1;
     }
-  } 
+  }
   board.solution.paths =
     board.solution.paths.slice(0, pathIndex).concat(
       board.solution.paths.slice(pathIndex + 1, board.solution.paths.length)
@@ -364,7 +364,7 @@ function mkState(
   clearState(board);
 
   let x = 330;
-  let y = 420;
+  const y = 420;
   let allyId = 0;
   const sprites: Phaser.Graphics[] = [];
   for (const ally of gs.crew) {
@@ -394,7 +394,7 @@ function mkState(
         ],
         tag: "event",
         subtag: "general",
-      }
+      };
       sprite.events.onInputDown.add(() => addToSolution(board, abilityCard));
       sprites.push(sprite);
     }

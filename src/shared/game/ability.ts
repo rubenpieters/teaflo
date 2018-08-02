@@ -9,11 +9,12 @@ export type SwapSelf = {
 
 export type HealSelf = {
   tag: "HealSelf",
-}
+};
 
 export type Ability
   = SwapSelf
   | HealSelf
+  ;
 
 export function abilityToAction(
   ability: Ability,
@@ -26,7 +27,7 @@ export function abilityToAction(
         type: "ally",
         from: selfId,
         to: 0, // TODO: from user input
-      }
+      };
     }
     case "HealSelf": {
       throw "unimplemented";

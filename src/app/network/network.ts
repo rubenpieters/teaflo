@@ -56,6 +56,8 @@ export function getBoard(serverConn: ServerConnection, board: Board, seed: strin
     cards = [
       {...allCards.cardBattleTurn, ...{ limit: Infinity }},
       {...allCards.cardRest, ...{ limit: Infinity }},
+      {...allCards.cardCrew_0000, ...{ limit: 5 } },
+      {...allCards.cardBattle_0008, ...{ limit: 1 } },
     ];
   } else {
     throw "unexpected seed: " + seed;
