@@ -218,9 +218,32 @@ const recruitKillLast: Crew = {
   abilities: [],
 };
 
+const abilityHeal: Crew = {
+  ap: 10,
+  hp: 10,
+  maxHp: 10,
+  triggers: [],
+  ranged: true,
+  actions: [
+    {
+      tag: "Heal",
+      target: { tag: "All", type: "ally" },
+      value: 1,
+    },
+  ],
+  abilities: [
+    {
+      tag: "Heal",
+      target: { tag: "All", type: "ally" },
+      value: 4,
+    }
+  ],
+};
+
 export const allCrew = {
   stFighter: stFighter,
   stRanged: stRanged,
   recruitGrow1: recruitGrow1,
   recruitGainAPWhenHP: recruitGainAPWhenHP,
+  abilityHeal: abilityHeal,
 };

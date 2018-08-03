@@ -140,7 +140,7 @@ export type Spec<T>
   | ConditionAction<T>
   ;
 
-function determineSpec(
+export function determineSpec(
   action: ActionSpec,
   state: GameState,
   selfId: number,

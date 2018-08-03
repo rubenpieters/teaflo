@@ -48,9 +48,19 @@ const cardCrew_0000: Card = {
   tag: "event",
   subtag: "crew",
 };
+
 const cardCrew_0001: Card = {
   id: 2,
   actions: [{ tag: "AddCrew", crew: allCrew.stRanged }],
+  tag: "event",
+  subtag: "crew",
+};
+
+const cardCrew_0002: Card = {
+  id: 13,
+  actions: [
+    { tag: "AddCrew", crew: allCrew.abilityHeal },
+  ],
   tag: "event",
   subtag: "crew",
 };
@@ -160,6 +170,7 @@ export const allCards = {
 
   cardCrew_0000: cardCrew_0000,
   cardCrew_0001: cardCrew_0001,
+  cardCrew_0002: cardCrew_0002,
 
   cardItem_0000: cardItem_0000,
 

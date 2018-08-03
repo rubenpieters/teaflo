@@ -1,23 +1,21 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { TargetType } from "src/shared/game/target";
-import { Action } from "src/shared/game/action";
+import { TargetType, determineTarget } from "src/shared/game/target";
+import { Action, ActionSpec, determineSpec, fmap } from "src/shared/game/action";
 import { Target } from "src/shared/game/target";
+import { GameState } from "src/shared/game/state";
 
 export type SwapSelf = {
   tag: "SwapSelf",
 };
 
-export type HealSelf = {
-  tag: "HealSelf",
-};
-
 export type Ability
   = SwapSelf
-  | HealSelf
+  | ActionSpec
   ;
 
 export function abilityToAction(
   ability: Ability,
+  state: GameState,
   selfId: number,
 ): Action<Target> {
   switch (ability.tag) {
@@ -29,8 +27,10 @@ export function abilityToAction(
         to: 0, // TODO: from user input
       };
     }
-    case "HealSelf": {
-      throw "unimplemented";
+    default: {
+      const actionSpec = determineSpec(ability, state, selfId, "ally");
+      const actionTarget = fmap(x => determineTarget(x, state, selfId, "ally", "noOrigin"), actionSpec);
+      return actionTarget;
     }
   }
 }

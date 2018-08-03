@@ -21,6 +21,7 @@ export type Board = {
   graphics: BoardGraphics,
   game: Phaser.Game,
   group: Phaser.Group,
+  lastState?: GameState,
 };
 
 type BoardGraphics = {
@@ -301,14 +302,17 @@ function mkSolution(
   const solutionResults = runSolutionAll(board.solution);
   if (solutionResults.length === 0) {
     console.log("empty state");
+    board.lastState = undefined;
     clearState(board);
   } else {
     const lastResult = solutionResults[solutionResults.length - 1];
     console.log(lastResult.log);
     if (lastResult.state === "invalid") {
       console.log("invalid state");
+      board.lastState = undefined;
       clearState(board);
     } else {
+      board.lastState = lastResult.state;
       mkState(board, lastResult.state);
     }
   }
@@ -387,10 +391,11 @@ function mkState(
       sprite.drawRect(0, 0, 20, 15);
       sprite.endFill();
       sprite.inputEnabled = true;
+
       const abilityCard: Card = {
         id: "created",
         actions: [
-          abilityToAction(ability, allyId),
+          abilityToAction(ability, board.lastState!, allyId),
         ],
         tag: "event",
         subtag: "general",
