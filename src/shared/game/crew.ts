@@ -233,9 +233,17 @@ const abilityHeal: Crew = {
   ],
   abilities: [
     {
-      tag: "Heal",
-      target: { tag: "All", type: "ally" },
-      value: 4,
+      tag: "CombinedSpec",
+      actions: [
+        {
+          tag: "Heal",
+          target: { tag: "All", type: "ally" },
+          value: 4,
+        },
+        {
+          tag: "DeathSelf",
+        },
+      ]
     }
   ],
 };

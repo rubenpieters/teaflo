@@ -85,6 +85,15 @@ export function showAction<T extends TargetSpec | Target>(action: Spec<T>): stri
     case "Swap": {
       return "Swap " + action.type + " " + action.from + " " + action.to;
     }
+    case "CombinedAction": {
+      return "Combined " + action.actions.length;
+    }
+    case "CombinedSpec": {
+      return "CombinedSpec " + action.actions.length;
+    }
+    case "DeathSelf": {
+      return "DeathSelf";
+    }
   }
 }
 

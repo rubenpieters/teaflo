@@ -99,6 +99,11 @@ export type Swap = {
   to: number,
 };
 
+export type CombinedAction<T> = {
+  tag: "CombinedAction",
+  actions: Action<T>[],
+};
+
 export type Action<T>
   = Damage<T>
   | Heal<T>
@@ -116,6 +121,7 @@ export type Action<T>
   | AddStatus<T>
   | Noop
   | Swap
+  | CombinedAction<T>
   ;
 
 // Spec
@@ -134,10 +140,21 @@ export type ConditionAction<T> = {
   falseAction: Spec<T>,
 };
 
+export type DeathSelf = {
+  tag: "DeathSelf",
+};
+
+export type CombinedSpec<T> = {
+  tag: "CombinedSpec",
+  actions: Spec<T>[],
+};
+
 export type Spec<T>
   = Action<T>
   | ApDamage<T>
   | ConditionAction<T>
+  | DeathSelf
+  | CombinedSpec<T>
   ;
 
 export function determineSpec(
@@ -165,6 +182,19 @@ export function determineSpec(
       } else {
         return determineSpec(action.falseAction, state, selfId, selfType);
       }
+    }
+    case "DeathSelf": {
+      return {
+        tag: "Death",
+        id: selfId,
+        type: selfType,
+      };
+    }
+    case "CombinedSpec": {
+      return {...action,
+        tag: "CombinedAction",
+        actions: action.actions.map(x => determineSpec(x, state, selfId, selfType)),
+      };
     }
     default: return action;
   }
@@ -195,6 +225,7 @@ export function fmap<A, B>(
     case "AddStatus": return {...action, target: f(action.target)};
     case "Noop": return action;
     case "Swap": return action;
+    case "CombinedAction": return {...action, actions: action.actions.map(x => fmap(f, x))};
   }
 }
 
@@ -504,6 +535,16 @@ function applyAction(
         }
       }
       break;
+    }
+    case "CombinedAction": {
+      for (const embeddedAction of action.actions) {
+        const result = applyAction(embeddedAction, state, log, idGen);
+        log = result.log;
+        if (result.state === "invalid") {
+          return { state: "invalid", log };
+        }
+        state = result.state;
+      }
     }
   }
 
