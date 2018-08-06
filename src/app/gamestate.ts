@@ -102,6 +102,7 @@ type AvailableCardGfx = {
   title: Phaser.Graphics,
   limitText: Phaser.Text,
   effects: Phaser.Graphics[],
+  nameText: Phaser.Text,
 };
 
 export function chAvailableCards(
@@ -121,6 +122,7 @@ function popLeftMenu(
     gfx.title.destroy();
     gfx.limitText.destroy();
     gfx.effects.map(x => x.destroy());
+    gfx.nameText.destroy();
   }
 
   const filteredCards = board.availableCards
@@ -130,20 +132,28 @@ function popLeftMenu(
   let y = 80;
   const gfx: AvailableCardGfx[] = [];
   for (const card of filteredCards) {
-    const limitText = board.game.add.text(x + 170, y, card.limit.toString(), {
-      font: "20px",
-      fill: "#000000",
-      boundsAlignH: "center",
-      boundsAlignV: "middle"
-    }, board.group);
-
     const title: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
     title.beginFill(0x449966);
     title.drawRect(0, 0, 165, 30);
     title.endFill();
     title.inputEnabled = true;
     title.events.onInputDown.add(() => addToSolution(board, card));
-    // title.events.onInputDown.add(onAvailableCardClick(text, card, card.index));
+
+    const limitText = board.game.add.text(x + 170, y, card.limit.toString(), {
+      font: "20px",
+      fill: "#000000",
+      boundsAlignH: "center",
+      boundsAlignV: "middle"
+    }, board.group);
+    
+    const nameText: Phaser.Text = board.game.add.text(0, 0, card.name, {
+      font: "12px",
+      fill: "#222222",
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    }, board.group);
+    nameText.setTextBounds(x, y, 165, 30);
+
     y += 35;
 
     const effects: Phaser.Graphics[] = [];
@@ -162,7 +172,7 @@ function popLeftMenu(
       i += 1;
     }
 
-    gfx.push({ title, limitText, effects });
+    gfx.push({ title, limitText, effects, nameText });
   }
   return gfx;
 }
@@ -394,6 +404,7 @@ function mkState(
 
       const abilityCard: Card = {
         id: "created",
+        name: "-- created --",
         actions: [
           abilityToAction(ability, board.lastState!, allyId),
         ],

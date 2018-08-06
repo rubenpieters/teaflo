@@ -11,6 +11,7 @@ export function showCard(card: Card) {
 
 export type Event = {
   tag: "event",
+  name: string,
   subtag: "crew" | "enemy" | "item" | "general" | "rest",
   id: number | "created",
   actions: Action<Target>[],
@@ -18,6 +19,7 @@ export type Event = {
 
 export type Rest = {
   tag: "rest",
+  name: string,
   subtag: "crew" | "enemy" | "item" | "general" | "rest",
   id: number | "created",
   actions: Action<Target>[],
@@ -30,6 +32,7 @@ export type Card
 
 const cardRest: Card = {
   id: 0,
+  name: "Rest",
   actions: [{ tag: "Rest" }],
   tag: "rest",
   subtag: "rest",
@@ -37,6 +40,7 @@ const cardRest: Card = {
 
 const cardBattleTurn: Card = {
   id: 0,
+  name: "Battle",
   actions: [{ tag: "BattleTurn" }],
   tag: "event",
   subtag: "general",
@@ -44,6 +48,7 @@ const cardBattleTurn: Card = {
 
 const cardCrew_0000: Card = {
   id: 1,
+  name: "Fighter",
   actions: [{ tag: "AddCrew", crew: allCrew.stFighter }],
   tag: "event",
   subtag: "crew",
@@ -51,6 +56,7 @@ const cardCrew_0000: Card = {
 
 const cardCrew_0001: Card = {
   id: 2,
+  name: "Archer",
   actions: [{ tag: "AddCrew", crew: allCrew.stRanged }],
   tag: "event",
   subtag: "crew",
@@ -58,6 +64,7 @@ const cardCrew_0001: Card = {
 
 const cardCrew_0002: Card = {
   id: 13,
+  name: "Healer",
   actions: [
     { tag: "AddCrew", crew: allCrew.abilityHeal },
   ],
@@ -67,6 +74,7 @@ const cardCrew_0002: Card = {
 
 const cardItem_0000: Card = {
   id: 3,
+  name: "Shield",
   actions: [
     { tag: "PayGold", pay: 5 },
     { tag: "AddItem", item: allItems.guard1StartCombat },
@@ -77,6 +85,7 @@ const cardItem_0000: Card = {
 
 const cardBattle_0000: Card = {
   id: 4,
+  name: "Enemy0",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemyAtk012 },
     { tag: "GainGold", gain: 10 },
@@ -87,6 +96,7 @@ const cardBattle_0000: Card = {
 
 const cardBattle_0001: Card = {
   id: 5,
+  name: "Enemy1",
   actions: [
     // TODO: { tag: "AddEnemy", enemy: allEnemies.enemyHeal2R14 },
     { tag: "GainGold", gain: 7 },
@@ -97,6 +107,7 @@ const cardBattle_0001: Card = {
 
 const cardBattle_0002: Card = {
   id: 6,
+  name: "Enemy2",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemyRegenApMinR20 },
   ],
@@ -106,6 +117,7 @@ const cardBattle_0002: Card = {
 
 const cardBattle_0003: Card = {
   id: 7,
+  name: "Enemy3",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy8HpAtk2 },
   ],
@@ -115,6 +127,7 @@ const cardBattle_0003: Card = {
 
 const cardBattle_0004: Card = {
   id: 8,
+  name: "Enemy4",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy15hpAtk1AllHeal2 },
   ],
@@ -124,6 +137,7 @@ const cardBattle_0004: Card = {
 
 const cardBattle_0005: Card = {
   id: 9,
+  name: "Enemy5",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy14hpApMin },
   ],
@@ -133,6 +147,7 @@ const cardBattle_0005: Card = {
 
 const cardBattle_0006: Card = {
   id: 10,
+  name: "Enemy6",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy5HpAtkInFront },
     { tag: "AddEnemy", enemy: allEnemies.enemy5HpAtkInFront },
@@ -145,6 +160,7 @@ const cardBattle_0006: Card = {
 
 const cardBattle_0007: Card = {
   id: 11,
+  name: "Enemy7",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy20HpDoom },
   ],
@@ -155,6 +171,7 @@ const cardBattle_0007: Card = {
 
 const cardBattle_0008: Card = {
   id: 12,
+  name: "Enemy8",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemyAtk2Hp15 },
   ],
