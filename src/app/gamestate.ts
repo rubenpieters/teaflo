@@ -3,6 +3,7 @@ import { Solution, runSolutionAll } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
 import { abilityToAction } from "src/shared/game/ability";
+import { actionShort } from "../shared/game/log";
 
 export type Limit = {
   limit: number,
@@ -102,6 +103,7 @@ type AvailableCardGfx = {
   title: Phaser.Graphics,
   limitText: Phaser.Text,
   effects: Phaser.Graphics[],
+  effectTexts: Phaser.Text[],
   nameText: Phaser.Text,
 };
 
@@ -117,11 +119,11 @@ function popLeftMenu(
   board: Board,
 ): AvailableCardGfx[] {
   // clear old
-  console.log("s: " + board.graphics.availableCardsGfx.length);
   for (const gfx of board.graphics.availableCardsGfx) {
     gfx.title.destroy();
     gfx.limitText.destroy();
     gfx.effects.map(x => x.destroy());
+    gfx.effectTexts.map(x => x.destroy());
     gfx.nameText.destroy();
   }
 
@@ -139,24 +141,30 @@ function popLeftMenu(
     title.inputEnabled = true;
     title.events.onInputDown.add(() => addToSolution(board, card));
 
-    const limitText = board.game.add.text(x + 170, y, card.limit.toString(), {
-      font: "20px",
+    const limitContent = Number.isFinite(card.limit) ? card.limit.toString() : "∞";
+    const limitText = board.game.add.text(x + 170, y, limitContent, {
+      font: "Arial",
+      fontSize: 20,
       fill: "#000000",
       boundsAlignH: "center",
       boundsAlignV: "middle"
     }, board.group);
     
+    const nameBoxWidth = 165;
+    const fontSize = Math.min(21, Math.round(nameBoxWidth / card.name.length));
     const nameText: Phaser.Text = board.game.add.text(0, 0, card.name, {
-      font: "12px",
+      font: "Arial",
+      fontSize: fontSize,
       fill: "#222222",
       boundsAlignH: "center",
       boundsAlignV: "middle",
     }, board.group);
-    nameText.setTextBounds(x, y, 165, 30);
+    nameText.setTextBounds(x, y, nameBoxWidth, 33);
 
     y += 35;
 
     const effects: Phaser.Graphics[] = [];
+    const effectTexts: Phaser.Text[] = [];
     let i = 0;
     for (const action of card.actions) {
       const effect: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
@@ -167,12 +175,23 @@ function popLeftMenu(
       effect.inputEnabled = true;
       effect.events.onInputDown.add(() => console.log("id: " + card.id + " index " + i));
       effects.push(effect);
+      
+      const fontSize = Math.round(Math.min(21, nameBoxWidth / actionShort(action).length) * .70);
+      const effectText: Phaser.Text = board.game.add.text(0, 0, actionShort(action), {
+        font: "Arial",
+        fontSize: fontSize,
+        fill: "#222222",
+        boundsAlignH: "center",
+        boundsAlignV: "middle",
+      }, board.group);
+      effectText.setTextBounds(x, y, nameBoxWidth, 22);
+      effectTexts.push(effectText);
 
       y += 25;
       i += 1;
     }
 
-    gfx.push({ title, limitText, effects, nameText });
+    gfx.push({ title, limitText, effects, effectTexts, nameText });
   }
   return gfx;
 }

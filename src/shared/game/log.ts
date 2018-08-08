@@ -29,6 +29,75 @@ function showActionLog(actionLog: ActionLog): string {
   return showAction(actionLog.action) + "\n" + actionLog.loggedEffects.map(a => " - " + showAction(a)).join("\n");
 }
 
+
+export function actionShort<T extends TargetSpec | Target>(action: Spec<T>): string {
+  switch (action.tag) {
+    case "AddEnemy": {
+      return "AddEnemy";
+    }
+    case "AddCrew": {
+      return "AddCrew";
+    }
+    case "AddItem": {
+      return "AddItem";
+    }
+    case "Rest": {
+      return "Rest";
+    }
+    case "Damage": {
+      return "Damage";
+    }
+    case "ApDamage": {
+      return "Damage";
+    }
+    case "Heal": {
+      return "Heal";
+    }
+    case "GainHP": {
+      return "Gain" + action.value + " HP "  + "(" + showTarget(action.target) + ")";
+    }
+    case "GainAP": {
+      return "Gain " + action.value + " AP "  + "(" + showTarget(action.target) + ")";
+    }
+    case "DamageAP": {
+      return "DamageAP " + action.value + " to " + showTarget(action.target);
+    }
+    case "GainGold": {
+      return "GainGold " + action.gain;
+    }
+    case "PayGold": {
+      return "PayGold " + action.pay;
+    }
+    case "BattleTurn": {
+      return "BattleTurn";
+    }
+    case "Death": {
+      return "Death " + action.type + " " + action.id;
+    }
+    case "AddStatus": {
+      return "AddStatus to " + showTarget(action.target);
+    }
+    case "Noop": {
+      return "Noop";
+    }
+    case "ConditionAction": {
+      return "ConditionAction";
+    }
+    case "Swap": {
+      return "Swap " + action.type + " " + action.from + " " + action.to;
+    }
+    case "CombinedAction": {
+      return "Combined " + action.actions.length;
+    }
+    case "CombinedSpec": {
+      return "CombinedSpec " + action.actions.length;
+    }
+    case "DeathSelf": {
+      return "DeathSelf";
+    }
+  }
+}
+
 export function showAction<T extends TargetSpec | Target>(action: Spec<T>): string {
   switch (action.tag) {
     case "AddEnemy": {

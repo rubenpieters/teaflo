@@ -4,23 +4,23 @@ import { allCrew } from "src/shared/game/crew";
 
 function basicTest() {
   const path1: Path = {
-    restCard: { actions: [{ tag: "Rest" }, { tag: "Rest" }], id: 0, tag: "rest", subtag: "general" },
+    restCard: { actions: [{ tag: "Rest" }, { tag: "Rest" }], id: 0, name: "", tag: "rest", subtag: "general" },
     eventCards: [
       { actions: [
         { tag: "Rest" },
         { tag: "Rest" },
-      ], id: 0, tag: "event", subtag: "general" },
-      { actions: [{ tag: "Rest" }], id: 0, tag: "event", subtag: "general" },
+      ], id: 0, tag: "event", name: "", subtag: "general" },
+      { actions: [{ tag: "Rest" }], id: 0, name: "", tag: "event", subtag: "general" },
     ]
   }
   const path2: Path = {
-    restCard: { actions: [{ tag: "Rest" }], id: 0, tag: "rest", subtag: "general" },
+    restCard: { actions: [{ tag: "Rest" }], id: 0, name: "", tag: "rest", subtag: "general" },
     eventCards: [
       { actions: [
         { tag: "Rest" },
         { tag: "Rest" },
-      ], id: 0, tag: "event", subtag: "general" },
-      { actions: [{ tag: "Rest" }], id: 0, tag: "event", subtag: "general" },
+      ], id: 0, name: "", tag: "event", subtag: "general" },
+      { actions: [{ tag: "Rest" }], id: 0, name: "", tag: "event", subtag: "general" },
     ]
   }
   const solution: Solution = {
