@@ -52,7 +52,7 @@ export function heal<E extends Crew>(
   if (crew.hp + amount > crew.maxHp) {
     return focus(crew, set(x => x.hp, crew.maxHp));
   }
-  return focus(crew, over(x => x.hp, x => crew.hp + amount));
+  return focus(crew, set(x => x.hp, crew.hp + amount));
 }
 
 export function addHP<E extends Crew>(

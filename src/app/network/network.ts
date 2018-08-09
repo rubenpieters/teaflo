@@ -1,8 +1,7 @@
 import { changeConnected } from "src/app/appstate";
 import { Board, chAvailableCards, LimitedCard } from "src/app/gamestate";
-import { Card, allCards } from "src/shared/game/card";
+import { allCards } from "src/shared/game/card";
 import { ServerMessage } from "src/shared/network/serverMessage";
-import { ClientMessage } from "src/shared/network/clientMessage";
 
 export type ServerConnection = {
   socket: WebSocket,
@@ -21,7 +20,7 @@ export function connectToServer(cb: (serverConn: ServerConnection) => void): Ser
   return { socket: socket };
 }
 
-export function getBoard(serverConn: ServerConnection, board: Board, seed: string) {
+export function getBoard(_serverConn: ServerConnection, board: Board, seed: string) {
   /*const getBoardMessage: ClientMessage = {
     tag: "GetCurrentBoard",
     seed: seed,

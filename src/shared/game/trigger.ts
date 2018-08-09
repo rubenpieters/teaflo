@@ -1,5 +1,5 @@
 import { ActionSpec, ActionTarget } from "src/shared/game/action";
-import { TargetSpec, TargetType, typeColl } from "src/shared/game/target";
+import { TargetType, typeColl } from "src/shared/game/target";
 import { GameState } from "src/shared/game/state";
 import { showAction } from "src/shared/game/log";
 
@@ -45,10 +45,10 @@ export function showCondition(
       return "own id";
     }
     case "TypeCondition": {
-      return "target is " + condition.type;
+      return `target is ${condition.type}`;
     }
     case "InPosition": {
-      return "in position " + condition.position;
+      return `in position ${condition.position}`;
     }
   }
 }
@@ -83,7 +83,7 @@ export function checkCondition(
       } else if (hasId(action)) {
         return action.id === selfId;
       } else {
-        throw "action " + action.tag + " does not have a target!";
+        throw `action ${action.tag} does not have a target!`;
       }
     }
     case "TypeCondition": {
@@ -92,13 +92,13 @@ export function checkCondition(
       } else if (hasType(action)) {
         return action.type === condition.type;
       } else {
-        throw "action " + action.tag + " does not have a target type!";
+        throw `action ${action.tag} does not have a target type!`;
       }
     }
     case "InPosition": {
       const index = findIndex(x => x.id === selfId, typeColl(state, selfType));
       if (index === "notFound") {
-        throw "can not find id " + selfId + " of type " + selfType;
+        throw `can not find id ${selfId} of type ${selfType}`;
       }
       return index === condition.position;
     }

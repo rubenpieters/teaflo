@@ -1,13 +1,13 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import * as _Crew from "src/shared/game/crew";
-import { GameState, IdCrew, IdEnemy, Id, IdItem } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy, IdItem } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
 import { Target, TargetSpec, Origin, onTarget, determineTarget, TargetType, indexOfId, typeColl } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
-import { Status, HasStatus } from "src/shared/game/status";
+import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 import { Condition, checkConditions } from "src/shared/game/trigger";
 
@@ -391,7 +391,7 @@ function applyAction(
       state = onTarget(action.target, state,
         ally => _Crew.damage(ally, action.value),
         enemy => _Enemy.damage(enemy, action.value),
-        x => { throw "wrong target type for '" + action.tag + "'"; },
+        _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
@@ -399,31 +399,31 @@ function applyAction(
       state = onTarget(action.target, state,
         ally => _Crew.heal(ally, action.value),
         enemy => _Enemy.heal(enemy, action.value),
-        x => { throw "wrong target type for '" + action.tag + "'"; },
+        _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
     case "GainHP": {
       state = onTarget(action.target, state,
         ally => _Crew.addHP(ally, action.value),
-        x => { throw "wrong target type for '" + action.tag + "'"; },
-        x => { throw "wrong target type for '" + action.tag + "'"; },
+        _ => { throw `wrong target type for '${action.tag}`; },
+        _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
     case "DamageAP": {
       state = onTarget(action.target, state,
         ally => _Crew.damageAP(ally, action.value),
-        x => { throw "wrong target type for '" + action.tag + "'"; },
-        x => { throw "wrong target type for '" + action.tag + "'"; },
+        _ => { throw `wrong target type for '${action.tag}`; },
+        _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
     case "DamageAP": {
       state = onTarget(action.target, state,
         ally => _Crew.addAP(ally, action.value),
-        x => { throw "wrong target type for '" + action.tag + "'"; },
-        x => { throw "wrong target type for '" + action.tag + "'"; },
+        _ => { throw `wrong target type for '${action.tag}`; },
+        _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
@@ -470,7 +470,7 @@ function applyAction(
         case "ally": {
           const index = indexOfId(action.id, state.crew);
           if (index === "notFound") {
-            throw ("index " + action.id + " not found");
+            throw (`index ${action.id} not found`);
           } else {
             state = focus(state,
               set(x => x.crew, state.crew.slice(0, index).concat(state.crew.slice(index + 1)))
@@ -481,7 +481,7 @@ function applyAction(
         case "enemy": {
           const index = indexOfId(action.id, state.enemies);
           if (index === "notFound") {
-            throw ("index " + action.id + " not found");
+            throw (`index ${action.id} not found`);
           } else {
             state = focus(state,
               set(x => x.enemies, state.enemies.slice(0, index).concat(state.enemies.slice(index + 1)))
@@ -492,7 +492,7 @@ function applyAction(
         case "item": {
           const index = indexOfId(action.id, state.items);
           if (index === "notFound") {
-            throw ("index " + action.id + " not found");
+            throw (`index ${action.id} not found`);
           } else {
             state = focus(state,
               set(x => x.items, state.items.slice(0, index).concat(state.items.slice(index + 1)))
@@ -507,7 +507,7 @@ function applyAction(
       state = onTarget(action.target, state,
         ally => _Status.addStatus(ally, action.status),
         enemy => _Status.addStatus(enemy, action.status),
-        x => { throw "wrong target type for '" + action.tag + "'"; },
+        _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }

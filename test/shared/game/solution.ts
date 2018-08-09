@@ -1,6 +1,5 @@
 import expect from "expect";
 import { Solution, Path, SolutionIndex, nextIndex, initialIndex } from "src/shared/game/solution";
-import { allCrew } from "src/shared/game/crew";
 
 function basicTest() {
   const path1: Path = {

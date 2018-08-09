@@ -23,12 +23,3 @@ export function set<S, A>(
 ): GetMod<S> {
   return e => e({ get, modify: x => a });
 }
-
-// example usage
-
-const x = { a: 1, b: "2" };
-
-focus(x,
-  over(x => x.a, x => x + 1),
-  over(x => x.b, x => x + "x"),
-);

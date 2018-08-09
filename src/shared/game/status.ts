@@ -1,6 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { ActionTarget, ActionSpec } from "src/shared/game/action";
-import { Generator } from "src/shared/handler/id/generator";
+import { ActionSpec } from "src/shared/game/action";
 import { TargetType } from "src/shared/game/target";
 
 export type Poison = {
@@ -34,16 +33,16 @@ export type Status
 export function showStatus(status: Status) {
   switch (status.tag) {
     case "Poison": {
-      return "Poison " + status.value + " T";
+      return `Poison ${status.value} T`;
     }
     case "Regen": {
-      return "Regen " + status.value + " T";
+      return `Regen ${status.value} T`;
     }
     case "Guard": {
-      return "Guard " + status.guard + " " + status.value + " T";
+      return `Guard ${status.guard} ${status.value} T`;
     }
     case "Doom": {
-      return "Doom " + status.value + " T";
+      return `Doom ${status.value} T`;
     }
   }
 }
@@ -75,22 +74,8 @@ export function addStatus<E extends HasStatus>(
   }
 }
 
-function findIndex<A>(
-  as: A[],
-  predicate: (a: A) => boolean,
-): number | "notFound" {
-  let index: number = 0;
-  for (const a of as) {
-    if (predicate(a)) {
-      return index;
-    }
-    index += 1;
-  }
-  return "notFound";
-}
-
 export function applyStatus<E extends HasStatus>(
-  index: number,
+  _index: number,
   e: E,
   tag: Status["tag"],
 ): E {

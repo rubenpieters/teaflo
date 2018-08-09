@@ -1,4 +1,3 @@
-import { focus, over, set } from "src/shared/iassign-util";
 import { Solution, runSolutionAll } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
@@ -94,7 +93,7 @@ function chLeftMenuTab(
   cardType: LeftMenuOption,
 ) {
   board.selectedLeftMenu = cardType;
-  board.graphics.leftMenuTabs.map(g => g.tint = 0xFFFFFF);
+  board.graphics.leftMenuTabs.forEach(g => g.tint = 0xFFFFFF);
   board.graphics.leftMenuTabs[allLeftMenuOptions.indexOf(cardType)].tint = 0xAAAAAA;
   board.graphics.availableCardsGfx = popLeftMenu(board);
 }
@@ -122,8 +121,8 @@ function popLeftMenu(
   for (const gfx of board.graphics.availableCardsGfx) {
     gfx.title.destroy();
     gfx.limitText.destroy();
-    gfx.effects.map(x => x.destroy());
-    gfx.effectTexts.map(x => x.destroy());
+    gfx.effects.forEach(x => x.destroy());
+    gfx.effectTexts.forEach(x => x.destroy());
     gfx.nameText.destroy();
   }
 
@@ -173,7 +172,7 @@ function popLeftMenu(
       effect.endFill();
       effect.tint = 0xFFFFFF;
       effect.inputEnabled = true;
-      effect.events.onInputDown.add(() => console.log("id: " + card.id + " index " + i));
+      effect.events.onInputDown.add(() => console.log(`id: ${card.id} index ${i}`));
       effects.push(effect);
       
       const fontSize = Math.round(Math.min(21, nameBoxWidth / actionShort(action).length) * .70);
@@ -280,10 +279,8 @@ function mkSolution(
   let y = 350;
   const sprites: Phaser.Graphics[] = [];
   let pathIndex = 0;
-  let i = 0;
   for (const path of board.solution.paths) {
     // increase 1 for rest action
-    i += 1;
     const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
     sprite.beginFill(0x223377);
     sprite.drawRect(0, 0, 40, 20);
@@ -308,7 +305,6 @@ function mkSolution(
 
       y -= 25;
       cardIndex += 1;
-      i += 1;
     }
 
     /*if (pathIndex === board.solution.paths.length - 1) {
@@ -353,7 +349,7 @@ function onSolutionRestCardClick(
   pathIndex: number,
 ) {
   return function(
-    sprite: Phaser.Sprite,
+    _sprite: Phaser.Sprite,
     pointer: Phaser.Pointer,
   ) {
     if (pointer.leftButton.isDown) {
@@ -371,7 +367,7 @@ function onSolutionEventCardClick(
   eventIndex: number,
 ) {
   return function(
-    sprite: Phaser.Sprite,
+    _sprite: Phaser.Sprite,
     pointer: Phaser.Pointer,
   ) {
     if (pointer.leftButton.isDown) {

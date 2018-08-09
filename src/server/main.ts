@@ -3,7 +3,6 @@ import path from "path";
 import uws from "uws";
 
 import { ClientMessage } from "src/shared/network/clientMessage";
-import { newRng, rngHandler } from "src/shared/handler/rng/randomSeedRng";
 
 main();
 
@@ -18,7 +17,7 @@ function main(): void {
   }
 
   // initialize websocket server
-  console.log("binding to port: " + parsedPort);
+  console.log(`binding to port: ${parsedPort}`);
   const websocketServer: uws.Server = mkServer(parsedPort);
 
   // initialize db connection
@@ -34,12 +33,12 @@ function mkServer(port: number): uws.Server {
 
   const app = express();
 
-  console.log("dist folder: " + distFolder);
+  console.log(`dist folder: ${distFolder}`);
 
-  app.get("/", (req, res) => { res.sendFile(indexFile); });
+  app.get("/", (_req, res) => { res.sendFile(indexFile); });
   app.use("/js", express.static(jsFolder));
 
-  const server = app.listen(port, () => { console.log("listening on " + port); });
+  const server = app.listen(port, () => { console.log(`listening on ${port}`); });
 
   const websocketServer: uws.Server = new uws.Server({ server: server });
 
@@ -51,7 +50,7 @@ function onSocketConnection(client: uws) {
   client.on("message", onClientMessage(client));
 }
 
-function onClientMessage(client: uws) { 
+function onClientMessage(_client: uws) { 
   return function(msg: string) {
     console.log("received " + msg);
     const clientMsg: ClientMessage = JSON.parse(msg);

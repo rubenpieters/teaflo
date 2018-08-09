@@ -1,6 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Trigger } from "src/shared/game/trigger";
-import { IdItem } from "src/shared/game/state";
 import { showAction } from "src/shared/game/log";
 
 export function showItem(

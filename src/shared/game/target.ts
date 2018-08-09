@@ -1,6 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, Id, IdCrew, IdEnemy, IdItem } from "src/shared/game/state";
-import { Enemy } from "src/shared/game/enemy";
 
 export type Origin = {
   id: number,
@@ -70,7 +69,7 @@ export function determineTarget(
       return {
         tag: "Target",
         type: target.type,
-        positions: coll.map((v, i) => i),
+        positions: coll.map((_v, i) => i),
       };
     }
     case "AllCrewPos": {
@@ -202,22 +201,22 @@ export function onTarget(
 export function showTarget(target: Target | TargetSpec): string {
   switch (target.tag) {
     case "Target": {
-      return target.positions + " " + target.type;
+      return `${target.positions} ${target.type}`;
     }
     case "Self": {
       return "self";
     }
     case "All": {
-      return "all " + target.type;
+      return `all ${target.type}`;
     }
     case "AllCrewPos": {
       return "all crew pos";
     }
     case "Last": {
-      return "last " + target.type;
+      return `last ${target.type}`;
     }
     case "Positions": {
-      return target.positions + " " + target.type;
+      return `${target.positions} ${target.type}`;
     }
     case "OriginTarget": {
       return "origin";

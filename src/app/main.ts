@@ -33,7 +33,7 @@ function startApp(): void {
     scaleMode: Phaser.ScaleManager.SHOW_ALL,
   };
 
-  const app: Phaser.Game = new App(gameConfig);
+  new App(gameConfig);
 }
 
 window.addEventListener("load", () => {

@@ -15,7 +15,7 @@ module.exports = {
   resolve: {
     plugins: [
       new TsconfigPathsPlugin({
-        configFile: path.join(__dirname, "tsconfig.json")
+        configFile: path.join(__dirname, "tsconfig.json"),
       })
     ],
     extensions: [".ts", ".js"],
@@ -45,12 +45,29 @@ module.exports = {
   ],
   module: {
     rules: [
-      { test: /\.ts$/, enforce: "pre", loader: "tslint-loader" },
-      { test: /assets(\/|\\)/, loader: "file-loader?name=assets/[hash].[ext]" },
-      { test: /pixi\.js$/, loader: "expose-loader?PIXI" },
-      { test: /phaser-split\.js$/, loader: "expose-loader?Phaser" },
-      { test: /p2\.js$/, loader: "expose-loader?p2" },
-      { test: /\.ts$/, loader: "ts-loader", exclude: "/node_modules/" }
+      { test: /\.ts$/,
+        enforce: "pre",
+        loader: "tslint-loader",
+        options: {
+          typeCheck: true,
+        },
+      },
+      { test: /assets(\/|\\)/,
+        loader: "file-loader?name=assets/[hash].[ext]",
+      },
+      { test: /pixi\.js$/,
+        loader: "expose-loader?PIXI",
+      },
+      { test: /phaser-split\.js$/,
+        loader: "expose-loader?Phaser",
+      },
+      { test: /p2\.js$/,
+        loader: "expose-loader?p2",
+      },
+      { test: /\.ts$/,
+        loader: "ts-loader",
+        exclude: "/node_modules/",
+      },
     ]
   },
   devtool: "source-map"

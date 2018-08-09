@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { TargetType, determineTarget } from "src/shared/game/target";
+import { determineTarget } from "src/shared/game/target";
 import { Action, ActionSpec, determineSpec, fmap } from "src/shared/game/action";
 import { Target } from "src/shared/game/target";
 import { GameState } from "src/shared/game/state";

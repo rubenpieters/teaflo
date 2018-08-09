@@ -10,7 +10,7 @@
   "author": "rubenpieters",
   "scripts": {
     "setup": "npm install -g npx@9.7.1 && npm install",
-    "tslint": "npx tslint -c tslint.json -p tsconfig.json",
+    "tslint": "npx tslint -c ./tslint.json --project ./tsconfig.json --format stylish",
     "webpack:dev": "npx webpack --watch --config webpack.dev.config.js",
     "webpack:prod": "npx webpack --config webpack.production.config.js",
     "dev:test": "npx ts-node -r tsconfig-paths/register test/main.ts",
@@ -43,9 +43,10 @@
     "ts-node": "^5.0.1",
     "tsconfig-paths": "^3.3.1",
     "tsconfig-paths-webpack-plugin": "^3.0.4",
-    "tslint": "^5.9.1",
+    "tslint": "^5.11.0",
     "tslint-loader": "^3.5.3",
     "typescript": "^2.8.1",
+    "typestrict": "0.0.9",
     "webpack": "^3.11.0",
     "webpack-bundle-analyzer": "^2.12.0"
   }

@@ -12,25 +12,37 @@ function goldenTest(
   testResult: string,
   options?: {
     acceptNew?: boolean,
+    errorOnCreate?: boolean,
   },
 ): TestResult {
   const acceptNew = options !== undefined && options.acceptNew !== undefined ? options.acceptNew : false;
+  const errorOnCreate = options !== undefined && options.errorOnCreate !== undefined ? options.errorOnCreate : false;
   let goldenFileCreated;
   let testSucceeded;
 
-  if (! acceptNew && fs.existsSync(path.resolve(__dirname, goldenFile))) {
+  if (fs.existsSync(path.resolve(__dirname, goldenFile))) {
     goldenFileCreated = false;
 
-    const goldenContents = fs.readFileSync(path.resolve(__dirname, goldenFile), { encoding: "utf8" });
-    if (goldenContents === testResult) {
+    if (acceptNew) {
+      fs.writeFileSync(path.resolve(__dirname, goldenFile), testResult, { encoding: "utf8" });
       testSucceeded = true;
     } else {
-      testSucceeded = false;
+      const goldenContents = fs.readFileSync(path.resolve(__dirname, goldenFile), { encoding: "utf8" });
+      if (goldenContents === testResult) {
+        testSucceeded = true;
+      } else {
+        testSucceeded = false;
+      }
     }
   } else {
-    fs.writeFileSync(path.resolve(__dirname, goldenFile), testResult, { encoding: "utf8" });
-    testSucceeded = true;
-    goldenFileCreated = true;
+    if (errorOnCreate) {
+      testSucceeded = false;
+      goldenFileCreated = false;
+    } else {
+      fs.writeFileSync(path.resolve(__dirname, goldenFile), testResult, { encoding: "utf8" });
+      testSucceeded = true;
+      goldenFileCreated = true;
+    }
   }
 
   return { goldenFileCreated, testSucceeded };

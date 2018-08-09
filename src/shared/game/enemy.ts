@@ -1,8 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
+import { GameState, IdEnemy } from "src/shared/game/state";
 import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, indexOfId } from "src/shared/game/target";
 import { showAction } from "src/shared/game/log";
 import { Trigger, showTrigger } from "src/shared/game/trigger";
 import { HasNext } from "src/shared/game/next";
@@ -64,7 +63,7 @@ export function heal<E extends Enemy>(
   if (e.hp + amount > e.maxHp) {
     return focus(e, set(x => x.hp, e.maxHp));
   }
-  return focus(e, over(x => x.hp, x => e.hp + amount));
+  return focus(e, set(x => x.hp, e.hp + amount));
 }
 
 const enemyAtk012R10: Enemy = {
