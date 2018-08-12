@@ -3,6 +3,8 @@ import { Card, Rest, Event } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
 import { abilityToAction } from "src/shared/game/ability";
 import { actionShort } from "../shared/game/log";
+import { ActionTarget } from "../shared/game/action";
+import { showTrigger } from "../shared/game/trigger";
 
 export type Limit = {
   limit: number,
@@ -29,6 +31,7 @@ type BoardGraphics = {
   availableCardsGfx: AvailableCardGfx[],
   solutionGfx: Phaser.Graphics[],
   stateGfx: Phaser.Graphics[],
+  infoTexts: Phaser.Text[],
 };
 
 export function newBoard(
@@ -44,6 +47,7 @@ export function newBoard(
       availableCardsGfx: [],
       solutionGfx: [],
       stateGfx: [],
+      infoTexts: [],
     },
     game,
     group,
@@ -173,6 +177,7 @@ function popLeftMenu(
       effect.tint = 0xFFFFFF;
       effect.inputEnabled = true;
       effect.events.onInputDown.add(() => console.log(`id: ${card.id} index ${i}`));
+      effect.events.onInputOver.add(() => showAction(board, action));
       effects.push(effect);
       
       const fontSize = Math.round(Math.min(21, nameBoxWidth / actionShort(action).length) * .70);
@@ -453,4 +458,72 @@ function mkState(
   }
 
   board.graphics.stateGfx = sprites;
+}
+
+function showAction(
+  board: Board,
+  action: ActionTarget,
+) {
+  // clear old
+  for (const text of board.graphics.infoTexts) {
+    text.destroy();
+  }
+
+  const x = 620;
+  let y = 50;
+  const infoTexts: Phaser.Text[] = [];
+
+  switch (action.tag) {
+    case "AddEnemy": {
+      const hpBoxWidth = 100;
+      const hpTextContent = `HP ${action.enemy.hp}/${action.enemy.maxHp}`;
+      const fontSize = Math.round(Math.min(21, hpBoxWidth / hpTextContent.length) * .70);
+      const hpText: Phaser.Text = board.game.add.text(0, 0, hpTextContent, {
+        font: "Arial",
+        fontSize: fontSize,
+        fill: "#222222",
+        boundsAlignH: "center",
+        boundsAlignV: "middle",
+      }, board.group);
+      hpText.setTextBounds(x, y, hpBoxWidth, 22);
+      infoTexts.push(hpText);
+
+      y += 30;
+
+      const enemyActionWidth = 180;
+      for (const enemyAction of action.enemy.actions) {        
+        const fontSize = 15; // Math.round(Math.min(21, enemyActionWidth / actionShort(enemyAction).length));
+        const enemyActionText: Phaser.Text = board.game.add.text(0, 0, actionShort(enemyAction), {
+          font: "Arial",
+          fontSize: fontSize,
+          fill: "#222222",
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }, board.group);
+        enemyActionText.setTextBounds(x, y, enemyActionWidth, 22);
+        infoTexts.push(enemyActionText);
+  
+        y += 25;
+      }
+
+      y += 60;
+
+      for (const enemyTrigger of action.enemy.triggers) {        
+        const fontSize = 15; // Math.round(Math.min(21, enemyActionWidth / showTrigger(enemyTrigger).length));
+        const enemyTriggerText: Phaser.Text = board.game.add.text(0, 0, showTrigger(enemyTrigger), {
+          font: "Arial",
+          fontSize: fontSize,
+          fill: "#222222",
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }, board.group);
+        enemyTriggerText.setTextBounds(x, y, enemyActionWidth, 22);
+        infoTexts.push(enemyTriggerText);
+  
+        y += 25;
+      }
+    }
+  }
+
+  board.graphics.infoTexts = infoTexts;
 }
