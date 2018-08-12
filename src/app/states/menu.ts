@@ -65,7 +65,9 @@ export default class Menu extends Phaser.State {
       }, menuGroup);
       levelBtn.setTextBounds(75, 30 + i * 30, 75, 50);
       levelBtn.inputEnabled = true;
-      levelBtn.events.onInputDown.add(() => { getBoard(<any>undefined, board, `${i}`); });
+      levelBtn.events.onInputDown.add(() => {
+        getBoard(<any>undefined, board, `${i}`);
+      });
     }
 
     // callbacks

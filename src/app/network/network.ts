@@ -1,5 +1,5 @@
 import { changeConnected } from "src/app/appstate";
-import { Board, chAvailableCards, LimitedCard } from "src/app/gamestate";
+import { Board, chAvailableCards, LimitedCard, resetSolution } from "src/app/gamestate";
 import { allCards } from "src/shared/game/card";
 import { ServerMessage } from "src/shared/network/serverMessage";
 
@@ -63,7 +63,7 @@ export function getBoard(_serverConn: ServerConnection, board: Board, seed: stri
     throw "unexpected seed: " + seed;
   }
   chAvailableCards(board, cards);
-  // chSolution(board, ..);
+  resetSolution(board);
 }
 
 function onServerMessage(event: MessageEvent): void {

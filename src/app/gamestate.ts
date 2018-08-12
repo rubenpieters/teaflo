@@ -118,6 +118,13 @@ export function chAvailableCards(
   board.graphics.availableCardsGfx = popLeftMenu(board);
 }
 
+export function resetSolution(
+  board: Board,
+) {
+  board.solution = { paths: [] };
+  mkSolution(board);
+}
+
 function popLeftMenu(
   board: Board,
 ): AvailableCardGfx[] {
