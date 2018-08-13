@@ -274,7 +274,9 @@ const armorOnSelfHeal: Crew = {
   ],
   ranged: false,
   actions: [
-
+    {
+      tag: "Noop",
+    }
   ],
   abilities: [
     {
@@ -310,7 +312,9 @@ const regenOnDamageAlly: Crew = {
   ],
   ranged: false,
   actions: [
-
+    {
+      tag: "Noop",
+    }
   ],
   abilities: [
     {

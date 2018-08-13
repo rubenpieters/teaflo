@@ -2,9 +2,10 @@ import { Solution, runSolutionAll } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
 import { abilityToAction } from "src/shared/game/ability";
-import { actionShort } from "../shared/game/log";
-import { ActionTarget } from "../shared/game/action";
-import { showTrigger } from "../shared/game/trigger";
+import { actionShort } from "src/shared/game/log";
+import { ActionTarget } from "src/shared/game/action";
+import { showTrigger } from "src/shared/game/trigger";
+import { HasStatus, allStatus, showStatus } from "src/shared/game/status";
 
 export type Limit = {
   limit: number,
@@ -442,6 +443,14 @@ function mkState(
       sprites.push(sprite);
     }
 
+    const statusSprite: Phaser.Graphics = board.game.add.graphics(x, y + 95, board.group);
+    statusSprite.beginFill(0x994499);
+    statusSprite.drawRect(0, 0, 20, 10);
+    statusSprite.endFill();
+    statusSprite.inputEnabled = true;
+    statusSprite.events.onInputOver.add(() => showEntityStatus(board, ally));
+    sprites.push(statusSprite);
+
     x -= 25;
     allyId += 1;
   }
@@ -498,7 +507,7 @@ function showAction(
       y += 30;
 
       const enemyActionWidth = 180;
-      for (const enemyAction of action.enemy.actions) {        
+      for (const enemyAction of action.enemy.actions) {
         const fontSize = 15; // Math.round(Math.min(21, enemyActionWidth / actionShort(enemyAction).length));
         const enemyActionText: Phaser.Text = board.game.add.text(0, 0, actionShort(enemyAction), {
           font: "Arial",
@@ -515,7 +524,7 @@ function showAction(
 
       y += 60;
 
-      for (const enemyTrigger of action.enemy.triggers) {        
+      for (const enemyTrigger of action.enemy.triggers) {
         const fontSize = 15; // Math.round(Math.min(21, enemyActionWidth / showTrigger(enemyTrigger).length));
         const enemyTriggerText: Phaser.Text = board.game.add.text(0, 0, showTrigger(enemyTrigger), {
           font: "Arial",
@@ -526,11 +535,44 @@ function showAction(
         }, board.group);
         enemyTriggerText.setTextBounds(x, y, enemyActionWidth, 22);
         infoTexts.push(enemyTriggerText);
-  
+
         y += 25;
       }
     }
   }
 
+  board.graphics.infoTexts = infoTexts;
+}
+
+function showEntityStatus (
+  board: Board,
+  hasStatus: HasStatus,
+) {
+  // clear old
+  for (const text of board.graphics.infoTexts) {
+    text.destroy();
+  }
+
+  const x = 620;
+  let y = 50;
+  const infoTexts: Phaser.Text[] = [];
+
+  for (const statusType of allStatus) {
+    const status = hasStatus[statusType];
+    if (status !== undefined) {
+      const fontSize = 15;
+      const enemyActionText: Phaser.Text = board.game.add.text(0, 0, showStatus(status), {
+        font: "Arial",
+        fontSize: fontSize,
+        fill: "#222222",
+        boundsAlignH: "center",
+        boundsAlignV: "middle",
+      }, board.group);
+      enemyActionText.setTextBounds(x, y, 180, 22);
+      infoTexts.push(enemyActionText);
+    }
+
+    y += 25;
+  }
   board.graphics.infoTexts = infoTexts;
 }
