@@ -149,12 +149,18 @@ export type CombinedSpec<T> = {
   actions: Spec<T>[],
 };
 
+export type ArmorBash<T> = {
+  tag: "ArmorBash",
+  target: T,
+};
+
 export type Spec<T>
   = Action<T>
   | ApDamage<T>
   | ConditionAction<T>
   | DeathSelf
   | CombinedSpec<T>
+  | ArmorBash<T>
   ;
 
 export function determineSpec(
@@ -196,8 +202,20 @@ export function determineSpec(
         actions: action.actions.map(x => determineSpec(x, state, selfId, selfType)),
       };
     }
+    case "ArmorBash": {
+      const self = typeColl(state, selfType)[selfId];
+      if (self.tag === "item") {
+        throw "item cant armor bash";
+      } else {
+        return {
+          tag: "Damage",
+          target: action.target,
+          value: self.Guard === undefined ? 0 : self.Guard.value,
+        }
+      }
+    }
     case "Damage": {
-      const self = typeColl(state, selfType)[selfId]
+      const self = typeColl(state, selfType)[selfId];
       if (self.tag === "item") {
         return action;
       } else {

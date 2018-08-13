@@ -39,7 +39,7 @@ const cardRest: Card = {
 };
 
 const cardBattleTurn: Card = {
-  id: 0,
+  id: 1,
   name: "Battle",
   actions: [{ tag: "BattleTurn" }],
   tag: "event",
@@ -47,7 +47,7 @@ const cardBattleTurn: Card = {
 };
 
 const cardCrew_0000: Card = {
-  id: 1,
+  id: 1000,
   name: "Fighter",
   actions: [{ tag: "AddCrew", crew: allCrew.stFighter }],
   tag: "event",
@@ -55,7 +55,7 @@ const cardCrew_0000: Card = {
 };
 
 const cardCrew_0001: Card = {
-  id: 2,
+  id: 1001,
   name: "Archer",
   actions: [{ tag: "AddCrew", crew: allCrew.stRanged }],
   tag: "event",
@@ -63,7 +63,7 @@ const cardCrew_0001: Card = {
 };
 
 const cardCrew_0002: Card = {
-  id: 13,
+  id: 1002,
   name: "Healer",
   actions: [
     { tag: "AddCrew", crew: allCrew.abilityHeal },
@@ -72,8 +72,28 @@ const cardCrew_0002: Card = {
   subtag: "crew",
 };
 
+const cardCrew_0003: Card = {
+  id: 1003,
+  name: "ArmorSelf",
+  actions: [
+    { tag: "AddCrew", crew: allCrew.armorOnSelfHeal },
+  ],
+  tag: "event",
+  subtag: "crew",
+};
+
+const cardCrew_0004: Card = {
+  id: 1004,
+  name: "RegenDmg",
+  actions: [
+    { tag: "AddCrew", crew: allCrew.regenOnDamageAlly },
+  ],
+  tag: "event",
+  subtag: "crew",
+};
+
 const cardItem_0000: Card = {
-  id: 3,
+  id: 2000,
   name: "Shield",
   actions: [
     { tag: "PayGold", pay: 5 },
@@ -84,7 +104,7 @@ const cardItem_0000: Card = {
 };
 
 const cardBattle_0000: Card = {
-  id: 4,
+  id: 3000,
   name: "Enemy0",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemyAtk012 },
@@ -95,7 +115,7 @@ const cardBattle_0000: Card = {
 };
 
 const cardBattle_0001: Card = {
-  id: 5,
+  id: 3001,
   name: "Enemy1",
   actions: [
     // TODO: { tag: "AddEnemy", enemy: allEnemies.enemyHeal2R14 },
@@ -106,7 +126,7 @@ const cardBattle_0001: Card = {
 };
 
 const cardBattle_0002: Card = {
-  id: 6,
+  id: 3002,
   name: "Enemy2",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemyRegenApMinR20 },
@@ -116,7 +136,7 @@ const cardBattle_0002: Card = {
 };
 
 const cardBattle_0003: Card = {
-  id: 7,
+  id: 3003,
   name: "Enemy3",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy8HpAtk2 },
@@ -126,7 +146,7 @@ const cardBattle_0003: Card = {
 };
 
 const cardBattle_0004: Card = {
-  id: 8,
+  id: 3004,
   name: "Enemy4",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy15hpAtk1AllHeal2 },
@@ -136,7 +156,7 @@ const cardBattle_0004: Card = {
 };
 
 const cardBattle_0005: Card = {
-  id: 9,
+  id: 3005,
   name: "Enemy5",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy14hpApMin },
@@ -146,7 +166,7 @@ const cardBattle_0005: Card = {
 };
 
 const cardBattle_0006: Card = {
-  id: 10,
+  id: 3006,
   name: "Enemy6",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy5HpAtkInFront },
@@ -159,7 +179,7 @@ const cardBattle_0006: Card = {
 };
 
 const cardBattle_0007: Card = {
-  id: 11,
+  id: 3007,
   name: "Enemy7",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemy20HpDoom },
@@ -169,7 +189,7 @@ const cardBattle_0007: Card = {
 };
 
 const cardBattle_0008: Card = {
-  id: 12,
+  id: 3008,
   name: "Enemy8",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemyAtk2Hp15 },
@@ -179,7 +199,7 @@ const cardBattle_0008: Card = {
 };
 
 const cardBattle_0009: Card = {
-  id: 12,
+  id: 3009,
   name: "Enemy9",
   actions: [
     { tag: "AddEnemy", enemy: allEnemies.enemyBoss1 },
@@ -195,6 +215,8 @@ export const allCards = {
   cardCrew_0000: cardCrew_0000,
   cardCrew_0001: cardCrew_0001,
   cardCrew_0002: cardCrew_0002,
+  cardCrew_0003: cardCrew_0003,
+  cardCrew_0004: cardCrew_0004,
 
   cardItem_0000: cardItem_0000,
 

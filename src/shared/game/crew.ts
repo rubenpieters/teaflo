@@ -248,10 +248,89 @@ const abilityHeal: Crew = {
   ],
 };
 
+const armorOnSelfHeal: Crew = {
+  ap: 1,
+  hp: 5,
+  maxHp: 5,
+  triggers: [
+    {
+      onTag: "Heal",
+      type: "before",
+      action: {
+        tag: "AddStatus",
+        target: { tag: "Self" },
+        status: {
+          tag: "Guard",
+          value: 1,
+          guard: 1,
+        },
+      },
+      conditions: [
+        {
+          tag: "OwnId",
+        }
+      ],
+    }
+  ],
+  ranged: false,
+  actions: [
+
+  ],
+  abilities: [
+    {
+      tag: "ArmorBash",
+      target: { tag: "Positions", type: "enemy", positions: [0] },
+    }
+  ],
+}
+
+const regenOnDamageAlly: Crew = {
+  ap: 1,
+  hp: 6,
+  maxHp: 6,
+  triggers: [
+    {
+      onTag: "Damage",
+      type: "before",
+      action: {
+        tag: "AddStatus",
+        target: { tag: "All", type: "ally", },
+        status: {
+          tag: "Regen",
+          value: 1,
+        },
+      },
+      conditions: [
+        {
+          tag: "TypeCondition",
+          type: "ally",
+        }
+      ],
+    }
+  ],
+  ranged: false,
+  actions: [
+
+  ],
+  abilities: [
+    {
+      tag: "AddStatus",
+      target: { tag: "All", type: "ally", },
+      status: {
+        tag: "Guard",
+        value: 1,
+        guard: 5,
+      }
+    }
+  ],
+}
+
 export const allCrew = {
   stFighter: stFighter,
   stRanged: stRanged,
   recruitGrow1: recruitGrow1,
   recruitGainAPWhenHP: recruitGainAPWhenHP,
   abilityHeal: abilityHeal,
+  armorOnSelfHeal: armorOnSelfHeal,
+  regenOnDamageAlly: regenOnDamageAlly,
 };

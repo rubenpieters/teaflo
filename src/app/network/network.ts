@@ -30,32 +30,32 @@ export function getBoard(_serverConn: ServerConnection, board: Board, seed: stri
   let cards: LimitedCard[];
   if (seed === "1") {
     cards = [
-      {...allCards.cardBattleTurn, ...{ limit: Infinity }},
-      {...allCards.cardCrew_0000, ...{ limit: 5 } },
-      {...allCards.cardCrew_0001, ...{ limit: 5 } },
-      {...allCards.cardItem_0000, ...{ limit: 5 } },
-      {...allCards.cardBattle_0009, ...{ limit: 1 } },
+      {...allCards.cardBattleTurn, limit: Infinity },
+      {...allCards.cardRest, limit: Infinity },
+      {...allCards.cardCrew_0003, limit: 2 },
+      {...allCards.cardCrew_0004, limit: 2 },
+      {...allCards.cardBattle_0009, limit: 1 },
     ];
   } else if (seed === "2") {
     cards = [
-      {...allCards.cardBattleTurn, ...{ limit: Infinity }},
-      {...allCards.cardRest, ...{ limit: Infinity }},
-      {...allCards.cardCrew_0000, ...{ limit: 5 } },
-      {...allCards.cardCrew_0001, ...{ limit: 5 } },
-      {...allCards.cardBattle_0003, ...{ limit: 1 } },
-      {...allCards.cardBattle_0004, ...{ limit: 1 } },
-      {...allCards.cardBattle_0005, ...{ limit: 1 } },
-      {...allCards.cardBattle_0006, ...{ limit: 1 } },
-      {...allCards.cardBattle_0007, ...{ limit: 1 } },
-      {...allCards.cardItem_0000, ...{ limit: 1 } },
+      {...allCards.cardBattleTurn, limit: Infinity },
+      {...allCards.cardRest, limit: Infinity },
+      {...allCards.cardCrew_0000, limit: 5 },
+      {...allCards.cardCrew_0001, limit: 5 },
+      {...allCards.cardBattle_0003, limit: 1 },
+      {...allCards.cardBattle_0004, limit: 1 },
+      {...allCards.cardBattle_0005, limit: 1 },
+      {...allCards.cardBattle_0006, limit: 1 },
+      {...allCards.cardBattle_0007, limit: 1 },
+      {...allCards.cardItem_0000, limit: 1 },
     ];
   } else if (seed === "3") {
     cards = [
-      {...allCards.cardBattleTurn, ...{ limit: Infinity }},
-      {...allCards.cardRest, ...{ limit: Infinity }},
-      {...allCards.cardCrew_0000, ...{ limit: 2 } },
-      {...allCards.cardCrew_0002, ...{ limit: 1 } },
-      {...allCards.cardBattle_0008, ...{ limit: 1 } },
+      {...allCards.cardBattleTurn, limit: Infinity },
+      {...allCards.cardRest, limit: Infinity },
+      {...allCards.cardCrew_0000, limit: 2 },
+      {...allCards.cardCrew_0002, limit: 1 },
+      {...allCards.cardBattle_0008, limit: 1 },
     ];
   } else {
     throw "unexpected seed: " + seed;

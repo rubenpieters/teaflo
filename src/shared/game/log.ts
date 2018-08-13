@@ -92,6 +92,9 @@ export function actionShort<T extends TargetSpec | Target>(action: Spec<T>): str
     case "DeathSelf": {
       return "DeathSelf";
     }
+    case "ArmorBash": {
+      return "ArmorBash";
+    }
   }
 }
 
@@ -159,6 +162,9 @@ export function showAction<T extends TargetSpec | Target>(action: Spec<T>): stri
     }
     case "DeathSelf": {
       return "DeathSelf";
+    }
+    case "ArmorBash": {
+      return "ArmorBash";
     }
   }
 }

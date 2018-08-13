@@ -339,7 +339,7 @@ const enemyAtk2Hp15: Enemy = {
   ],
 };
 
-export const enemyBoss1: Enemy = {
+const enemyBoss1: Enemy = {
   hp: 40,
   maxHp: 40,
   actions: [
