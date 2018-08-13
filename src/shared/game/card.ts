@@ -168,7 +168,6 @@ const cardBattle_0007: Card = {
   subtag: "enemy",
 };
 
-
 const cardBattle_0008: Card = {
   id: 12,
   name: "Enemy8",
@@ -179,7 +178,15 @@ const cardBattle_0008: Card = {
   subtag: "enemy",
 };
 
-
+const cardBattle_0009: Card = {
+  id: 12,
+  name: "Enemy9",
+  actions: [
+    { tag: "AddEnemy", enemy: allEnemies.enemyBoss1 },
+  ],
+  tag: "event",
+  subtag: "enemy",
+};
 
 export const allCards = {
   cardBattleTurn: cardBattleTurn,
@@ -200,4 +207,5 @@ export const allCards = {
   cardBattle_0006: cardBattle_0006,
   cardBattle_0007: cardBattle_0007,
   cardBattle_0008: cardBattle_0008,
+  cardBattle_0009: cardBattle_0009,
 };

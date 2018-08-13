@@ -23,14 +23,26 @@ export type Doom = {
   value: number,
 };
 
+export type Blind = {
+  tag: "Blind",
+  value: number,
+};
+
+export type Silence = {
+  tag: "Silence",
+  value: number,
+};
+
 export type Status
   = Poison
   | Regen
   | Guard
   | Doom
+  | Blind
+  | Silence
   ;
 
-export function showStatus(status: Status) {
+export function showStatus(status: Status): string {
   switch (status.tag) {
     case "Poison": {
       return `Poison ${status.value} T`;
@@ -44,10 +56,16 @@ export function showStatus(status: Status) {
     case "Doom": {
       return `Doom ${status.value} T`;
     }
+    case "Blind": {
+      return `Blind ${status.value} T`;
+    }
+    case "Silence": {
+      return `Silence ${status.value} T`;
+    }
   }
 }
 
-export const allStatus: Status["tag"][] = ["Poison", "Regen", "Guard", "Doom"];
+export const allStatus: Status["tag"][] = ["Poison", "Regen", "Guard", "Doom", "Blind", "Silence"];
 
 // conditional types
 type StatusType<A> =
@@ -55,6 +73,8 @@ type StatusType<A> =
   A extends "Regen" ? Regen :
   A extends "Guard" ? Guard :
   A extends "Doom" ? Doom :
+  A extends "Blind" ? Blind :
+  A extends "Silence" ? Silence :
   never;
 
 export type HasStatus = {
@@ -131,6 +151,12 @@ export function statusToAction(
       } else {
         return { tag: "Noop" };
       }
+    }
+    case "Blind": {
+      return { tag: "Noop" };
+    }
+    case "Silence": {
+      return { tag: "Noop" };
     }
   }
 }

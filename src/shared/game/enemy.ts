@@ -339,6 +339,79 @@ const enemyAtk2Hp15: Enemy = {
   ],
 };
 
+export const enemyBoss1: Enemy = {
+  hp: 40,
+  maxHp: 40,
+  actions: [
+    {
+      tag: "AddStatus",
+      target: { tag: "All", type: "ally" },
+      status: {
+        tag: "Poison",
+        value: 4,
+      },
+      next: { tag: "NextId" },
+    },
+    {
+      tag: "AddStatus",
+      target: { tag: "All", type: "ally" },
+      status: {
+        tag: "Blind",
+        value: 4,
+      },
+      next: { tag: "NextId" },
+    },
+    {
+      tag: "AddStatus",
+      target: { tag: "All", type: "ally" },
+      status: {
+        tag: "Silence",
+        value: 3,
+      },
+      next: { tag: "NextId" },
+    },
+    {
+      tag: "CombinedAction",
+      actions: [
+        {
+          tag: "Damage",
+          target: { tag: "Positions", type: "ally", positions: [0] },
+          value: 10,
+        },
+        {
+          tag: "Damage",
+          target: { tag: "Positions", type: "ally", positions: [1] },
+          value: 5,
+        },
+        {
+          tag: "Damage",
+          target: { tag: "Positions", type: "ally", positions: [2] },
+          value: 2,
+        },
+        {
+          tag: "Damage",
+          target: { tag: "Positions", type: "ally", positions: [3] },
+          value: 1,
+        },
+      ],
+      next: { tag: "NextId" },
+    },
+  ],
+  triggers: [
+    {
+      onTag: "Death",
+      type: "before",
+      action: {
+        tag: "GainGold",
+        gain: 1,
+      },
+      conditions: [
+        { tag: "OwnId" },
+      ],
+    },
+  ],
+};
+
 export const allEnemies = {
   enemyAtk012: enemyAtk012R10,
   enemyRegenApMinR20: enemyRegenApMinR20,
@@ -349,4 +422,5 @@ export const allEnemies = {
   enemy5HpAtkInFront: enemy5HpAtkInFront,
   enemy20HpDoom: enemy20HpDoom,
   enemyAtk2Hp15: enemyAtk2Hp15,
+  enemyBoss1: enemyBoss1,
 };

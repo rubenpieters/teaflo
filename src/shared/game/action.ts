@@ -196,6 +196,18 @@ export function determineSpec(
         actions: action.actions.map(x => determineSpec(x, state, selfId, selfType)),
       };
     }
+    case "Damage": {
+      const self = typeColl(state, selfType)[selfId]
+      if (self.tag === "item") {
+        return action;
+      } else {
+        if (self.Blind !== undefined) {
+          return { tag: "Noop" };
+        } else {
+          return action;
+        }
+      }
+    }
     default: return action;
   }
 }

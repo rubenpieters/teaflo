@@ -34,9 +34,7 @@ export function getBoard(_serverConn: ServerConnection, board: Board, seed: stri
       {...allCards.cardCrew_0000, ...{ limit: 5 } },
       {...allCards.cardCrew_0001, ...{ limit: 5 } },
       {...allCards.cardItem_0000, ...{ limit: 5 } },
-      {...allCards.cardBattle_0000, ...{ limit: 5 } },
-      {...allCards.cardBattle_0001, ...{ limit: 5 } },
-      {...allCards.cardBattle_0002, ...{ limit: 1 } },
+      {...allCards.cardBattle_0009, ...{ limit: 1 } },
     ];
   } else if (seed === "2") {
     cards = [

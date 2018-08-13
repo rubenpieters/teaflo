@@ -21,5 +21,5 @@ export function set<S, A>(
   get: (s: S) => A,
   a: A,
 ): GetMod<S> {
-  return e => e({ get, modify: x => a });
+  return e => e({ get, modify: _ => a });
 }
