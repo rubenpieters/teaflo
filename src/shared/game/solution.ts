@@ -113,20 +113,20 @@ function solutionStep(
       state = afterEnemyStatus.state;
     }
 
-    const afterEnemy = enemyTurn(state, log, idGen);
-    log = afterEnemy.log;
-    if (afterEnemy.state === "invalid") {
-      return { result: "invalid", log: { action, loggedEffects: log } };
-    } else {
-      state = afterEnemy.state;
-    }
-
     const afterCrewStatus = checkStatusCrew(state, log, idGen);
     log = afterCrewStatus.log;
     if (afterCrewStatus.state === "invalid") {
       return { result: "invalid", log: { action, loggedEffects: log } };
     } else {
       state = afterCrewStatus.state;
+    }
+
+    const afterEnemy = enemyTurn(state, log, idGen);
+    log = afterEnemy.log;
+    if (afterEnemy.state === "invalid") {
+      return { result: "invalid", log: { action, loggedEffects: log } };
+    } else {
+      state = afterEnemy.state;
     }
   }
   const actionResult = applyActionAndTriggers(action, state, log, idGen, "noOrigin");
