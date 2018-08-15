@@ -82,6 +82,12 @@ export type Death = {
   type: TargetType,
 };
 
+export type QueueStatus<T> = {
+  tag: "QueueStatus",
+  target: T,
+  status: Status,
+};
+
 export type AddStatus<T> = {
   tag: "AddStatus",
   target: T,
@@ -124,6 +130,7 @@ export type Action<T>
   | PayGold
   | BattleTurn
   | Death
+  | QueueStatus<T>
   | AddStatus<T>
   | Noop
   | Swap
@@ -279,6 +286,7 @@ export function fmap<A, B>(
     case "PayGold": return action;
     case "BattleTurn": return action;
     case "Death": return action;
+    case "QueueStatus": return {...action, target: f(action.target)};
     case "AddStatus": return {...action, target: f(action.target)};
     case "Noop": return action;
     case "Swap": return action;
@@ -561,6 +569,14 @@ function applyAction(
       }
       break;
     }
+    case "QueueStatus": {
+      const newAction: ActionTarget = {...action, tag: "AddStatus"}
+      state = focus(state,
+        // TODO: pass correct origin
+        over(x => x.actionQueue, x => x.concat({ action: newAction, origin: <any>undefined })),
+      );
+      break;
+    }
     case "AddStatus": {
       state = onTarget(action.target, state,
         ally => _Status.addStatus(ally, action.status),
@@ -684,25 +700,42 @@ export function checkStatusCrew(
   log: ActionTarget[],
   idGen: Generator,
 ): { state: GameState | "invalid", log: ActionTarget[] } {
-  let i = 0;
-  for (const ally of state.crew) {
-    for (const statusTag of _Status.allStatus) {
-      const status = ally[statusTag];
-      if (status !== undefined) {
-        const action = _Status.statusToAction(status, ally.id, "ally");
-        state = focus(state,
-          set(x => x.crew[i], _Status.applyStatus(i, ally, statusTag)),
-        );
-        const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, ally.id, "ally", "noOrigin");
-        if (afterApply.state === "invalid") {
-          return afterApply;
+  for (let i = 0; i <= state.crew.length; i++) {
+    const ally: IdCrew | undefined = state.crew[i];
+    if (ally !== undefined) {
+      for (const statusTag of _Status.allStatus) {
+        const status = ally[statusTag];
+        if (status !== undefined) {
+          const action = _Status.statusToAction(status, ally.id, "ally");
+          state = focus(state,
+            set(x => x.crew[i], _Status.applyStatus(i, ally, statusTag)),
+          );
+          const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, ally.id, "ally", "noOrigin");
+          if (afterApply.state === "invalid") {
+            return afterApply;
+          }
+          state = afterApply.state;
+          log = afterApply.log;
         }
-        state = afterApply.state;
-        log = afterApply.log;
       }
     }
-    i += 1;
   }
 
+  return { state, log };
+}
+
+export function applyActionQueue(
+  state: GameState,
+  log: ActionTarget[],
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionTarget[] } {
+  for (const { action, origin } of state.actionQueue) {
+    const afterApply = applyActionAndTriggers(action, state, log, idGen, origin);
+    log = afterApply.log;
+    if (afterApply.state === "invalid") {
+      return { state: "invalid", log };
+    }
+    state = afterApply.state;
+  }
   return { state, log };
 }

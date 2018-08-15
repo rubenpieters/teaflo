@@ -39,7 +39,7 @@ function basicBattleTest() {
       { actions: [{ tag: "AddCrew", crew: allCrew.stRanged }], id: 0, name: "", tag: "event", subtag: "general" },
       { actions: [{ tag: "AddEnemy", enemy: { hp: 10, maxHp: 10, actions: [
         {
-          tag: "AddStatus",
+          tag: "QueueStatus",
           target: { tag: "Self" },
           status: {
             tag: "Regen",
@@ -103,7 +103,7 @@ function basicStatusTest() {
     eventCards: [
       { actions: [
         { tag: "AddCrew", crew: allCrew.stFighter },
-        { tag: "AddStatus", status: { tag: "Poison" , value: 3 }, target: { tag: "Target", type: "ally", positions: [0] } },
+        { tag: "QueueStatus", status: { tag: "Poison" , value: 3 }, target: { tag: "Target", type: "ally", positions: [0] } },
       ], id: 0, name: "", tag: "event", subtag: "general" },
       { actions: [
         { tag: "Rest" },

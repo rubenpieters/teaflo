@@ -71,6 +71,9 @@ export function actionShort<T extends TargetSpec | Target>(action: Spec<T>): str
     case "Death": {
       return `Death ${action.type} ${action.id}`;
     }
+    case "QueueStatus": {
+      return `QueueStatus to ${showTarget(action.target)}`;
+    }
     case "AddStatus": {
       return `AddStatus to ${showTarget(action.target)}`;
     }
@@ -147,6 +150,9 @@ export function showAction<T extends TargetSpec | Target>(action: Spec<T>): stri
     }
     case "Death": {
       return `Death ${action.type} ${action.id}`;
+    }
+    case "QueueStatus": {
+      return `QueueStatus ${showStatus(action.status)} to ${showTarget(action.target)}`;
     }
     case "AddStatus": {
       return `AddStatus ${showStatus(action.status)} to ${showTarget(action.target)}`;

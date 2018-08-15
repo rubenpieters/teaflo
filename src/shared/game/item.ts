@@ -44,7 +44,7 @@ const guard1StartCombat: Item = {
       onTag: "AddEnemy",
       type: "before",
       action: {
-        tag: "AddStatus",
+        tag: "QueueStatus",
         target: { tag: "All", type: "ally" },
         status: {
           tag: "Guard",

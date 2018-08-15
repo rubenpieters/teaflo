@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Card, Rest, Event } from "src/shared/game/card";
-import { Action, ActionTarget, applyActionAndTriggers, enemyTurn, checkDeaths, checkStatusCrew, checkStatusEnemy } from "src/shared/game/action";
+import { Action, ActionTarget, applyActionAndTriggers, enemyTurn, checkDeaths, checkStatusCrew, checkStatusEnemy, applyActionQueue } from "src/shared/game/action";
 import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Target } from "src/shared/game/target";
@@ -104,49 +104,57 @@ function solutionStep(
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
   const action = nextAction(index, solution);
   let log: ActionTarget[] = [];
-  if (index.action === 0) {
-    const afterEnemyStatus = checkStatusEnemy(state, log, idGen);
-    log = afterEnemyStatus.log;
-    if (afterEnemyStatus.state === "invalid") {
-      return { result: "invalid", log: { action, loggedEffects: log } };
-    } else {
-      state = afterEnemyStatus.state;
-    }
 
-    const afterCrewStatus = checkStatusCrew(state, log, idGen);
-    log = afterCrewStatus.log;
-    if (afterCrewStatus.state === "invalid") {
-      return { result: "invalid", log: { action, loggedEffects: log } };
-    } else {
-      state = afterCrewStatus.state;
-    }
-
-    const afterEnemy = enemyTurn(state, log, idGen);
-    log = afterEnemy.log;
-    if (afterEnemy.state === "invalid") {
-      return { result: "invalid", log: { action, loggedEffects: log } };
-    } else {
-      state = afterEnemy.state;
-    }
+  const afterCrewStatus = checkStatusCrew(state, log, idGen);
+  log = afterCrewStatus.log;
+  if (afterCrewStatus.state === "invalid") {
+    return { result: "invalid", log: { action, loggedEffects: log } };
   }
-  const actionResult = applyActionAndTriggers(action, state, log, idGen, "noOrigin");
-  const actionLog: ActionLog = {
-    action: action,
-    loggedEffects: actionResult.log,
-  };
+  state = afterCrewStatus.state;
 
+  const actionResult = applyActionAndTriggers(action, state, log, idGen, "noOrigin");
+  log = actionResult.log;
   if (actionResult.state === "invalid") {
-    return { result: "invalid", log: actionLog };
+    return { result: "invalid", log: { action, loggedEffects: log } };
   }
   state = actionResult.state;
-  log = actionResult.log;
+
+  // TODO: deaths and addcrew/enemy in action queue
+  const afterQueue1 = applyActionQueue(state, log, idGen);
+  log = afterQueue1.log;
+  if (afterQueue1.state === "invalid") {
+    return { result: "invalid", log: { action, loggedEffects: log } };
+  }
+  state = afterQueue1.state;
+
+  const afterEnemyStatus = checkStatusEnemy(state, log, idGen);
+  log = afterEnemyStatus.log;
+  if (afterEnemyStatus.state === "invalid") {
+    return { result: "invalid", log: { action, loggedEffects: log } };
+  }
+  state = afterEnemyStatus.state;
+
+  const afterEnemy = enemyTurn(state, log, idGen);
+  log = afterEnemy.log;
+  if (afterEnemy.state === "invalid") {
+    return { result: "invalid", log: { action, loggedEffects: log } };
+  }
+  state = afterEnemy.state;
+
+  // TODO: deaths and addcrew/enemy in action queue
+  const afterQueue2 = applyActionQueue(state, log, idGen);
+  log = afterQueue2.log;
+  if (afterQueue2.state === "invalid") {
+    return { result: "invalid", log: { action, loggedEffects: log } };
+  }
+  state = afterQueue2.state;
 
   const afterDeaths = checkDeaths(state, log, idGen);
+  log = afterDeaths.log;
   if (afterDeaths.state === "invalid") {
-    return { result: "invalid", log: actionLog };
+    return { result: "invalid", log: { action, loggedEffects: log } };
   }
   state = afterDeaths.state;
-  log = afterDeaths.log;
 
   const newIndex = nextIndex(index, solution);
 

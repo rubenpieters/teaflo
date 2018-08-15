@@ -112,7 +112,7 @@ const enemyRegenApMinR20: Enemy = {
   maxHp: 20,
   actions: [
     {
-      tag: "AddStatus",
+      tag: "QueueStatus",
       target: { tag: "Self" },
       status: {
         tag: "Regen",
@@ -285,7 +285,7 @@ const enemy20HpDoom: Enemy = {
   maxHp: 20,
   actions: [
     {
-      tag: "AddStatus",
+      tag: "QueueStatus",
       target: { tag: "All", type: "ally" },
       status: {
         tag: "Doom",
@@ -344,7 +344,7 @@ const enemyBoss1: Enemy = {
   maxHp: 40,
   actions: [
     {
-      tag: "AddStatus",
+      tag: "QueueStatus",
       target: { tag: "All", type: "ally" },
       status: {
         tag: "Poison",
@@ -353,7 +353,7 @@ const enemyBoss1: Enemy = {
       next: { tag: "NextId" },
     },
     {
-      tag: "AddStatus",
+      tag: "QueueStatus",
       target: { tag: "All", type: "ally" },
       status: {
         tag: "Blind",
@@ -362,7 +362,7 @@ const enemyBoss1: Enemy = {
       next: { tag: "NextId" },
     },
     {
-      tag: "AddStatus",
+      tag: "QueueStatus",
       target: { tag: "All", type: "ally" },
       status: {
         tag: "Silence",

@@ -257,7 +257,7 @@ const armorOnSelfHeal: Crew = {
       onTag: "Heal",
       type: "before",
       action: {
-        tag: "AddStatus",
+        tag: "QueueStatus",
         target: { tag: "Self" },
         status: {
           tag: "Guard",
@@ -295,7 +295,7 @@ const regenOnDamageAlly: Crew = {
       onTag: "Damage",
       type: "before",
       action: {
-        tag: "AddStatus",
+        tag: "QueueStatus",
         target: { tag: "All", type: "ally", },
         status: {
           tag: "Regen",
@@ -318,7 +318,7 @@ const regenOnDamageAlly: Crew = {
   ],
   abilities: [
     {
-      tag: "AddStatus",
+      tag: "QueueStatus",
       target: { tag: "All", type: "ally", },
       status: {
         tag: "Guard",

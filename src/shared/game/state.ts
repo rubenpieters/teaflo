@@ -2,6 +2,8 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import { Item } from "src/shared/game/item";
 import { Enemy } from "src/shared/game/enemy";
+import { Origin } from "src/shared/game/target";
+import { ActionTarget } from "src/shared/game/action";
 import { HasStatus } from "src/shared/game/status";
 
 export type Id = {
@@ -22,6 +24,7 @@ export type GameState = {
   items: IdItem[],
   gold: number,
   crewLimit: number,
+  actionQueue: { action: ActionTarget, origin: Origin }[],
 };
 
 export const initialState: GameState = {
@@ -30,4 +33,5 @@ export const initialState: GameState = {
   items: [],
   gold: 0,
   crewLimit: 4,
+  actionQueue: [],
 };
