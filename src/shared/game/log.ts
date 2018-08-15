@@ -95,6 +95,12 @@ export function actionShort<T extends TargetSpec | Target>(action: Spec<T>): str
     case "ArmorBash": {
       return "ArmorBash";
     }
+    case "ClearStatus": {
+      return `Clear ${action.status}`;
+    }
+    case "ClearAllStatus": {
+      return `Clear all status`;
+    }
   }
 }
 
@@ -165,6 +171,12 @@ export function showAction<T extends TargetSpec | Target>(action: Spec<T>): stri
     }
     case "ArmorBash": {
       return "ArmorBash";
+    }
+    case "ClearStatus": {
+      return `Clear ${action.status}`;
+    }
+    case "ClearAllStatus": {
+      return `Clear all status`;
     }
   }
 }

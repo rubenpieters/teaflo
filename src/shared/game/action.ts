@@ -104,6 +104,12 @@ export type CombinedAction<T> = {
   actions: Action<T>[],
 };
 
+export type ClearStatus<T> = {
+  tag: "ClearStatus",
+  target: T,
+  status: Status["tag"],
+};
+
 export type Action<T>
   = Damage<T>
   | Heal<T>
@@ -122,6 +128,7 @@ export type Action<T>
   | Noop
   | Swap
   | CombinedAction<T>
+  | ClearStatus<T>
   ;
 
 // Spec
@@ -154,6 +161,11 @@ export type ArmorBash<T> = {
   target: T,
 };
 
+export type ClearAllStatus<T> = {
+  tag: "ClearAllStatus",
+  target: T,
+};
+
 export type Spec<T>
   = Action<T>
   | ApDamage<T>
@@ -161,6 +173,7 @@ export type Spec<T>
   | DeathSelf
   | CombinedSpec<T>
   | ArmorBash<T>
+  | ClearAllStatus<T>
   ;
 
 export function determineSpec(
@@ -214,6 +227,20 @@ export function determineSpec(
         }
       }
     }
+    case "ClearAllStatus": {
+      const actions: Action<TargetSpec>[] = _Status.allStatus.map(statusTag => {
+        const clearStatus: Action<TargetSpec> = {
+          tag: "ClearStatus",
+          status: statusTag,
+          target: action.target,
+        };
+        return clearStatus;
+      });
+      return {
+        tag: "CombinedAction",
+        actions
+      };
+    }
     case "Damage": {
       const self = typeColl(state, selfType)[selfId];
       if (self.tag === "item") {
@@ -256,6 +283,7 @@ export function fmap<A, B>(
     case "Noop": return action;
     case "Swap": return action;
     case "CombinedAction": return {...action, actions: action.actions.map(x => fmap(f, x))};
+    case "ClearStatus": return {...action, target: f(action.target)};
   }
 }
 
@@ -575,6 +603,15 @@ function applyAction(
         }
         state = result.state;
       }
+      break;
+    }
+    case "ClearStatus": {
+      state = onTarget(action.target, state,
+        ally => _Status.clearStatus(ally, action.status),
+        enemy => _Status.clearStatus(enemy, action.status),
+        _ => { throw `wrong target type for '${action.tag}`; },
+      );
+      break;
     }
   }
 

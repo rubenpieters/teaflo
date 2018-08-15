@@ -94,6 +94,13 @@ export function addStatus<E extends HasStatus>(
   }
 }
 
+export function clearStatus<E extends HasStatus>(
+  e: E,
+  statusTag: Status["tag"],
+) {
+  return focus(e, set(x => x[statusTag], undefined));
+}
+
 export function applyStatus<E extends HasStatus>(
   _index: number,
   e: E,
@@ -107,7 +114,7 @@ export function applyStatus<E extends HasStatus>(
       );
     } else {
       e = focus(e,
-        over(x => (<Status>x[tag]).value, x => x - 1),
+        over(x => x[tag]!.value, x => x - 1),
       );
     }
   }
