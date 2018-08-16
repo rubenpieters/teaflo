@@ -1,7 +1,7 @@
 import { Solution, runSolutionAll } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
-import { abilityToAction } from "src/shared/game/ability";
+import { abilityToAction, createCard } from "src/shared/game/ability";
 import { actionShort } from "src/shared/game/log";
 import { ActionTarget } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
@@ -430,15 +430,7 @@ function mkState(
       sprite.endFill();
       sprite.inputEnabled = true;
 
-      const abilityCard: Card = {
-        id: "created",
-        name: "-- created --",
-        actions: [
-          abilityToAction(ability, board.lastState!, allyId),
-        ],
-        tag: "event",
-        subtag: "general",
-      };
+      const abilityCard: Card = createCard(abilityToAction(ability, board.lastState!, allyId));
       sprite.events.onInputDown.add(() => addToSolution(board, abilityCard));
       sprites.push(sprite);
     }

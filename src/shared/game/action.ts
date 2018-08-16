@@ -737,5 +737,6 @@ export function applyActionQueue(
     }
     state = afterApply.state;
   }
+  state = focus(state, set(x => x.actionQueue, []));
   return { state, log };
 }

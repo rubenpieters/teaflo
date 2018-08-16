@@ -3,6 +3,7 @@ import { determineTarget } from "src/shared/game/target";
 import { Action, ActionSpec, determineSpec, fmap } from "src/shared/game/action";
 import { Target } from "src/shared/game/target";
 import { GameState } from "src/shared/game/state";
+import { Card } from "src/shared/game/card";
 
 export type SwapSelf = {
   tag: "SwapSelf",
@@ -33,4 +34,27 @@ export function abilityToAction(
       return actionTarget;
     }
   }
+}
+
+export function abilityIdToAction(
+  abilityId: number,
+  state: GameState,
+  selfId: number,
+): Action<Target> {
+  const ability = state.crew[selfId].abilities[abilityId];
+  return abilityToAction(ability, state, selfId);
+}
+
+export function createCard(
+  action: Action<Target>,
+): Card {
+  return {
+    id: "created",
+    name: "-- created --",
+    actions: [
+      action,
+    ],
+    tag: "event",
+    subtag: "general",
+  };
 }
