@@ -1,6 +1,6 @@
 import { ActionTarget, Spec } from "src/shared/game/action";
 import { Target, TargetSpec, showTarget } from "src/shared/game/target";
-import { showStatus } from "src/shared/game/status";
+import { showStatus, Status } from "src/shared/game/status";
 import { showCondition } from "src/shared/game/trigger";
 
 export type SolutionLog = {
@@ -19,25 +19,31 @@ export function showSolutionLog(solutionLog: SolutionLog): string {
 
 export type ActionLog = {
   action: ActionTarget,
-  crewStatus: ActionTarget[],
+  crewStatus: StatusLog[],
   crewAction: ActionTarget[],
   queue1: ActionTarget[],
-  enemyStatus: ActionTarget[],
+  enemyStatus: StatusLog[],
   enemyAction: ActionTarget[],
   queue2: ActionTarget[],
   deaths: ActionTarget[], // TODO: incorporate into queue2
 };
 
+export type StatusLog = {
+  id: number,
+  status: Status["tag"],
+  actionLog: ActionTarget[],
+}
+
 function showActionLog(actionLog: ActionLog): string {
   return "** " + showAction(actionLog.action) + " **\n"
     + "crew status\n"
-    + actionLog.crewStatus.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + showStatusLog(actionLog.crewStatus) + "\n"
     + "crew action\n"
     + actionLog.crewAction.map(a => " - " + showAction(a)).join("\n") + "\n"
     + "queue1\n"
     + actionLog.queue1.map(a => " - " + showAction(a)).join("\n") + "\n"
     + "enemy status\n"
-    + actionLog.enemyStatus.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + showStatusLog(actionLog.enemyStatus) + "\n"
     + "enemy action\n"
     + actionLog.enemyAction.map(a => " - " + showAction(a)).join("\n") + "\n"
     + "queue2\n"
@@ -47,6 +53,14 @@ function showActionLog(actionLog: ActionLog): string {
     ;
 }
 
+function showStatusLog(statusLog: StatusLog[]): string {
+  let result: string = "";
+  for (const { id, status, actionLog } of statusLog) {
+    result += `  + ${status} + ${id}\n`;
+    result += actionLog.map(a => "   - " + showAction(a)).join("\n") + "\n";
+  }
+  return result;
+}
 
 export function actionShort<T extends TargetSpec | Target>(action: Spec<T>): string {
   switch (action.tag) {

@@ -10,6 +10,7 @@ import { Item } from "src/shared/game/item";
 import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 import { Condition, checkConditions } from "src/shared/game/trigger";
+import { StatusLog } from "./log";
 
 // Action
 
@@ -669,9 +670,9 @@ export function checkDeaths(
 
 export function checkStatusEnemy(
   state: GameState,
-  log: ActionTarget[],
   idGen: Generator,
-): { state: GameState | "invalid", log: ActionTarget[] } {
+): { state: GameState | "invalid", log: StatusLog[] } {
+  let log: StatusLog[] = [];
   let i = 0;
   for (const enemy of state.enemies) {
     for (const statusTag of _Status.allStatus) {
@@ -681,12 +682,12 @@ export function checkStatusEnemy(
         state = focus(state,
           over(x => x.enemies[i], x => _Status.applyStatus(i, x, statusTag)),
         );
-        const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, enemy.id, "enemy", "noOrigin");
+        const afterApply = determineAndApplyActionAndTriggers(action, state, [], idGen, enemy.id, "enemy", "noOrigin");
+        log.push({ id: i, status: statusTag, actionLog: afterApply.log });
         if (afterApply.state === "invalid") {
-          return afterApply;
+          return { state: "invalid", log };
         }
         state = afterApply.state;
-        log = afterApply.log;
       }
     }
     i += 1;
@@ -697,9 +698,9 @@ export function checkStatusEnemy(
 
 export function checkStatusCrew(
   state: GameState,
-  log: ActionTarget[],
   idGen: Generator,
-): { state: GameState | "invalid", log: ActionTarget[] } {
+): { state: GameState | "invalid", log: StatusLog[] } {
+  let log: StatusLog[] = [];
   for (let i = 0; i <= state.crew.length; i++) {
     const ally: IdCrew | undefined = state.crew[i];
     if (ally !== undefined) {
@@ -710,12 +711,12 @@ export function checkStatusCrew(
           state = focus(state,
             set(x => x.crew[i], _Status.applyStatus(i, ally, statusTag)),
           );
-          const afterApply = determineAndApplyActionAndTriggers(action, state, log, idGen, ally.id, "ally", "noOrigin");
+          const afterApply = determineAndApplyActionAndTriggers(action, state, [], idGen, ally.id, "ally", "noOrigin");
+          log.push({ id: i, status: statusTag, actionLog: afterApply.log });
           if (afterApply.state === "invalid") {
-            return afterApply;
+            return { state: "invalid", log };
           }
           state = afterApply.state;
-          log = afterApply.log;
         }
       }
     }

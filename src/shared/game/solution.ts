@@ -105,7 +105,7 @@ function solutionStep(
   const action = nextAction(index, solution);
   let log: ActionLog = { action, crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: [] };
 
-  const afterCrewStatus = checkStatusCrew(state, [], idGen);
+  const afterCrewStatus = checkStatusCrew(state, idGen);
   log = focus(log, set(x => x.crewStatus, afterCrewStatus.log));
   if (afterCrewStatus.state === "invalid") {
     return { result: "invalid", log };
@@ -127,7 +127,7 @@ function solutionStep(
   }
   state = afterQueue1.state;
 
-  const afterEnemyStatus = checkStatusEnemy(state, [], idGen);
+  const afterEnemyStatus = checkStatusEnemy(state, idGen);
   log = focus(log, set(x => x.enemyStatus, afterEnemyStatus.log));
   if (afterEnemyStatus.state === "invalid") {
     return { result: "invalid", log };
