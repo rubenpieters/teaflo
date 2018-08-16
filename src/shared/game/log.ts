@@ -19,11 +19,32 @@ export function showSolutionLog(solutionLog: SolutionLog): string {
 
 export type ActionLog = {
   action: ActionTarget,
-  loggedEffects: ActionTarget[],
+  crewStatus: ActionTarget[],
+  crewAction: ActionTarget[],
+  queue1: ActionTarget[],
+  enemyStatus: ActionTarget[],
+  enemyAction: ActionTarget[],
+  queue2: ActionTarget[],
+  deaths: ActionTarget[], // TODO: incorporate into queue2
 };
 
 function showActionLog(actionLog: ActionLog): string {
-  return showAction(actionLog.action) + "\n" + actionLog.loggedEffects.map(a => " - " + showAction(a)).join("\n");
+  return "** " + showAction(actionLog.action) + " **\n"
+    + "crew status\n"
+    + actionLog.crewStatus.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + "crew action\n"
+    + actionLog.crewAction.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + "queue1\n"
+    + actionLog.queue1.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + "enemy status\n"
+    + actionLog.enemyStatus.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + "enemy action\n"
+    + actionLog.enemyAction.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + "queue2\n"
+    + actionLog.queue2.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + "deaths\n"
+    + actionLog.deaths.map(a => " - " + showAction(a)).join("\n")
+    ;
 }
 
 
