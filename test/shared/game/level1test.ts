@@ -68,7 +68,7 @@ function test1() {
     console.log("invalid");
   } else {
     const { state, log } = sol;
-    console.log(JSON.stringify(state, undefined, 2));
+    //console.log(JSON.stringify(state, undefined, 2));
     console.log(showSolutionLog(log));
   }
 }

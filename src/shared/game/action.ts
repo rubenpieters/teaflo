@@ -254,6 +254,7 @@ export function determineSpec(
       if (self.tag === "item") {
         return action;
       } else {
+        // TODO: if self blinded then self damage from poison becomes Noop
         if (self.Blind !== undefined) {
           return { tag: "Noop" };
         } else {
@@ -673,9 +674,10 @@ export function checkStatusEnemy(
   idGen: Generator,
 ): { state: GameState | "invalid", log: StatusLog[] } {
   let log: StatusLog[] = [];
-  let i = 0;
-  for (const enemy of state.enemies) {
+  let enemy: IdEnemy;
+  for (let i = 0; i < state.enemies.length; i++) {
     for (const statusTag of _Status.allStatus) {
+      enemy = state.enemies[i];
       const status = enemy[statusTag];
       if (status !== undefined) {
         const action = _Status.statusToAction(status, enemy.id, "enemy");
@@ -690,7 +692,6 @@ export function checkStatusEnemy(
         state = afterApply.state;
       }
     }
-    i += 1;
   }
 
   return { state, log };
@@ -701,23 +702,22 @@ export function checkStatusCrew(
   idGen: Generator,
 ): { state: GameState | "invalid", log: StatusLog[] } {
   let log: StatusLog[] = [];
-  for (let i = 0; i <= state.crew.length; i++) {
-    const ally: IdCrew | undefined = state.crew[i];
-    if (ally !== undefined) {
-      for (const statusTag of _Status.allStatus) {
-        const status = ally[statusTag];
-        if (status !== undefined) {
-          const action = _Status.statusToAction(status, ally.id, "ally");
-          state = focus(state,
-            set(x => x.crew[i], _Status.applyStatus(i, ally, statusTag)),
-          );
-          const afterApply = determineAndApplyActionAndTriggers(action, state, [], idGen, ally.id, "ally", "noOrigin");
-          log.push({ id: i, status: statusTag, actionLog: afterApply.log });
-          if (afterApply.state === "invalid") {
-            return { state: "invalid", log };
-          }
-          state = afterApply.state;
+  let ally: IdCrew;
+  for (let i = 0; i < state.crew.length; i++) {
+    for (const statusTag of _Status.allStatus) {
+      ally = state.crew[i];
+      const status = ally[statusTag];
+      if (status !== undefined) {
+        const action = _Status.statusToAction(status, ally.id, "ally");
+        state = focus(state,
+          set(x => x.crew[i], _Status.applyStatus(i, ally, statusTag)),
+        );
+        const afterApply = determineAndApplyActionAndTriggers(action, state, [], idGen, ally.id, "ally", "noOrigin");
+        log.push({ id: i, status: statusTag, actionLog: afterApply.log });
+        if (afterApply.state === "invalid") {
+          return { state: "invalid", log };
         }
+        state = afterApply.state;
       }
     }
   }

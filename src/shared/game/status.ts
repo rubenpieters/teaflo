@@ -65,7 +65,7 @@ export function showStatus(status: Status): string {
   }
 }
 
-export const allStatus: Status["tag"][] = ["Poison", "Regen", "Guard", "Doom", "Blind", "Silence"];
+export const allStatus: Status["tag"][] = ["Regen", "Poison", "Doom", "Guard", "Blind", "Silence"];
 
 // conditional types
 type StatusType<A> =
