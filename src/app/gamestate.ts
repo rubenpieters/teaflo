@@ -430,7 +430,7 @@ function mkState(
       sprite.endFill();
       sprite.inputEnabled = true;
 
-      const abilityCard: Card = createCard(abilityToAction(ability, board.lastState!, allyId));
+      const abilityCard: Card = createCard(abilityToAction(ability, board.lastState!, allyId, "ally"), allyId, "ally");
       sprite.events.onInputDown.add(() => addToSolution(board, abilityCard));
       sprites.push(sprite);
     }

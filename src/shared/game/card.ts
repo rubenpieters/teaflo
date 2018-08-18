@@ -1,5 +1,5 @@
 import { Action } from "src/shared/game/action";
-import { Target } from "src/shared/game/target";
+import { Target, Origin } from "src/shared/game/target";
 import { allCrew } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { allEnemies } from "src/shared/game/enemy";
@@ -15,6 +15,7 @@ export type Event = {
   subtag: "crew" | "enemy" | "item" | "general" | "rest",
   id: number | "created",
   actions: Action<Target>[],
+  origin?: Origin,
 };
 
 export type Rest = {

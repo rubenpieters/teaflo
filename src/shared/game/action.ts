@@ -189,6 +189,7 @@ export function determineSpec(
   state: GameState,
   selfId: number,
   selfType: TargetType,
+  origin: Origin,
 ): Action<TargetSpec> {
   switch (action.tag) {
     case "ApDamage": {
@@ -205,9 +206,9 @@ export function determineSpec(
     case "ConditionAction": {
       // TODO: there is no sensible action to pass for checkConditions
       if (checkConditions(action.conditions, <any>undefined, state, selfId, selfType)) {
-        return determineSpec(action.trueAction, state, selfId, selfType);
+        return determineSpec(action.trueAction, state, selfId, selfType, origin);
       } else {
-        return determineSpec(action.falseAction, state, selfId, selfType);
+        return determineSpec(action.falseAction, state, selfId, selfType, origin);
       }
     }
     case "DeathSelf": {
@@ -220,7 +221,7 @@ export function determineSpec(
     case "CombinedSpec": {
       return {...action,
         tag: "CombinedAction",
-        actions: action.actions.map(x => determineSpec(x, state, selfId, selfType)),
+        actions: action.actions.map(x => determineSpec(x, state, selfId, selfType, origin)),
       };
     }
     case "ArmorBash": {
@@ -254,8 +255,12 @@ export function determineSpec(
       if (self.tag === "item") {
         return action;
       } else {
-        // TODO: if self blinded then self damage from poison becomes Noop
-        if (self.Blind !== undefined) {
+        if (
+          self.Blind !== undefined &&
+          origin !== "noOrigin" &&
+          origin.type === selfType &&
+          origin.id === selfId
+        ) {
           return { tag: "Noop" };
         } else {
           return action;
@@ -339,7 +344,7 @@ export function determineAndApplyActionAndTriggersAt(
   selfType: TargetType,
   origin: Origin,
 ): { state: GameState | "invalid", log: ActionTarget[] }  {
-  const actionSpec = determineSpec(action, state, selfId, selfType);
+  const actionSpec = determineSpec(action, state, selfId, selfType, origin);
   const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType, origin), actionSpec);
   return applyActionAndTriggersAt(actionTarget, state, log, from, idGen, origin);
 }

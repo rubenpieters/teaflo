@@ -1,9 +1,9 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Card, Rest, Event } from "src/shared/game/card";
-import { Action, ActionTarget, applyActionAndTriggers, enemyTurn, checkDeaths, checkStatusCrew, checkStatusEnemy, applyActionQueue } from "src/shared/game/action";
+import { ActionTarget, applyActionAndTriggers, enemyTurn, checkDeaths, checkStatusCrew, checkStatusEnemy, applyActionQueue } from "src/shared/game/action";
 import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
-import { Target } from "src/shared/game/target";
+import { Origin } from "src/shared/game/target";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
 
 export type Path = {
@@ -30,23 +30,23 @@ export const initialIndex: SolutionIndex = {
 function nextAction(
   index: SolutionIndex,
   solution: Solution
-): ActionTarget {
+): { action: ActionTarget, origin: Origin } {
   const path: Path | undefined = solution.paths[index.path];
   if (path === undefined) {
     throw ("invalid index: " + JSON.stringify(index));
   }
   if (index.card === "rest") {
-    return path.restCard.actions[index.action];
+    return { action: path.restCard.actions[index.action], origin: "noOrigin" };
   }
   const card: Card | undefined = path.eventCards[index.card];
   if (card === undefined) {
     throw ("invalid index: " + JSON.stringify(index));
   }
-  const action: Action<Target> | undefined = card.actions[index.action];
+  const action: ActionTarget | undefined = card.actions[index.action];
   if (action === undefined) {
     throw ("invalid index " + JSON.stringify(index));
   }
-  return action;
+  return { action, origin: card.origin ? card.origin : "noOrigin" };
 }
 
 export function nextIndex(
@@ -102,7 +102,7 @@ function solutionStep(
   solution: Solution,
   idGen: Generator,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
-  const action = nextAction(index, solution);
+  const { action, origin } = nextAction(index, solution);
   let log: ActionLog = { action, crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: [] };
 
   const afterCrewStatus = checkStatusCrew(state, idGen);
@@ -112,7 +112,9 @@ function solutionStep(
   }
   state = afterCrewStatus.state;
 
-  const actionResult = applyActionAndTriggers(action, state, [], idGen, "noOrigin");
+  // TODO: add crew auto-actions?
+
+  const actionResult = applyActionAndTriggers(action, state, [], idGen, origin);
   log = focus(log, set(x => x.crewAction, actionResult.log));
   if (actionResult.state === "invalid") {
     return { result: "invalid", log };
