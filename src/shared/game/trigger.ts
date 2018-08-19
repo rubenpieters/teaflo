@@ -1,4 +1,4 @@
-import { ActionSpec, ActionTarget } from "src/shared/game/action";
+import { ActionSpec, Action } from "src/shared/game/action";
 import { TargetType, typeColl } from "src/shared/game/target";
 import { GameState } from "src/shared/game/state";
 import { showAction } from "src/shared/game/log";
@@ -6,8 +6,7 @@ import { showAction } from "src/shared/game/log";
 export type Trigger = {
   onTag: string,
   type: "before", // | "after" | "on"
-  action: ActionSpec,
-  conditions: Condition[],
+  action: (a: Action) => ActionSpec,
 };
 
 export type OwnId = {
@@ -34,7 +33,8 @@ export type Condition
 export function showTrigger(
   trigger: Trigger,
 ) {
-  return trigger.type + " " + trigger.onTag + " (if " + trigger.conditions.map(showCondition).join(" & ") + " ):\n " + showAction(trigger.action);
+  return trigger.type + " " + trigger.onTag;
+  // " (if " + trigger.conditions.map(showCondition).join(" & ") + " ):\n " + showAction(trigger.action);
 }
 
 export function showCondition(
@@ -55,7 +55,7 @@ export function showCondition(
 
 export function checkConditions(
   conditions: Condition[],
-  action: ActionTarget,
+  action: Action,
   state: GameState,
   selfId: number,
   selfType: TargetType,
@@ -71,7 +71,7 @@ export function checkConditions(
 
 export function checkCondition(
   condition: Condition,
-  action: ActionTarget,
+  action: Action,
   state: GameState,
   selfId: number,
   selfType: TargetType,
@@ -117,7 +117,7 @@ function hasType(a: {}): a is { type: TargetType } {
   return (<Object>a).hasOwnProperty("type");
 }
 
-function findIndex<A>(
+export function findIndex<A>(
   predicate: (a: A) => boolean,
   as: A[],
 ): number | "notFound" {

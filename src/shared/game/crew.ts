@@ -1,20 +1,20 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Trigger, showTrigger } from "src/shared/game/trigger";
+import { Trigger, showTrigger, findIndex } from "src/shared/game/trigger";
 import { GameState, IdCrew } from "src/shared/game/state";
-import { ActionTarget, ActionSpec, determineAndApplyActionAndTriggers } from "src/shared/game/action";
+import { Action, ActionSpec, applyActionAndTriggers, Heal, Damage } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { HasStatus, Guard } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 import { showAction } from "src/shared/game/log";
-import { Ability } from "src/shared/game/ability";
+import { TargetType, typeColl } from "./target";
 
-export function showCrew(
+/*export function showCrew(
   crew: Crew
 ) {
   return {...crew,
     actions: crew.actions.map(showAction),
     triggers: crew.triggers.map(showTrigger) };
-}
+}*/
 
 export type Crew = {
   ap: number,
@@ -23,7 +23,7 @@ export type Crew = {
   ranged: boolean,
   actions: ActionSpec[],
   triggers: Trigger[],
-  abilities: Ability[],
+  abilities: ((inputs: any[]) => ActionSpec)[],
 };
 
 export function damage<E extends Crew & HasStatus>(
@@ -92,10 +92,10 @@ export function getAP<C extends Crew>(
 export function act(
   crew: IdCrew,
   state: GameState,
-  log: ActionTarget[],
+  log: Action[],
   idGen: Generator,
   index: number,
-): { state: GameState | "invalid", log: ActionTarget[] }  {
+): { state: GameState | "invalid", log: Action[] }  {
   const action = crew.actions[crew.actionIndex];
   state = focus(state,
     over(x => x.crew[index].actionIndex, x => {
@@ -103,23 +103,26 @@ export function act(
       return newX >= crew.actions.length ? 0 : newX;
     }),
   );
-  return determineAndApplyActionAndTriggers(action, state, log, idGen, crew.id, "ally", { id: crew.id, type: "ally" });
+  return applyActionAndTriggers(action(state, crew.id, "ally"), state, log, idGen, { id: crew.id, type: "ally" });
 }
-
+/*
 const stFighter: Crew = {
   ap: 5,
   hp: 5,
   maxHp: 5,
   triggers: [],
   ranged: false,
-  actions: [{
-    tag: "Damage",
-    target: { tag: "Positions", type: "enemy", positions: [0] },
-    value: 5,
-  }],
+  actions: [
+    (state: GameState, id: number, type: TargetType) => { return {
+      tag: "Damage",
+      target: { tag: "Target", type: "enemy", positions: [0] },
+      value: 5,
+    }},
+  ],
   abilities: [
     {
       tag: "SwapSelf",
+      inputs: [{ tag: "TargetInput" }],
     }
   ],
 };
@@ -130,11 +133,13 @@ const stRanged: Crew = {
   maxHp: 1,
   triggers: [],
   ranged: true,
-  actions: [{
-    tag: "Damage",
-    target: { tag: "Positions", type: "enemy", positions: [0] },
-    value: 1,
-  }],
+  actions: [
+    (state: GameState, id: number, type: TargetType) => { return {
+      tag: "Damage",
+      target: { tag: "Target", type: "enemy", positions: [0] },
+      value: 1,
+    }},
+  ],
   abilities: [],
 };
 
@@ -165,11 +170,13 @@ const recruitGrow1: Crew = {
     },
   ],
   ranged: false,
-  actions: [{
-    tag: "Damage",
-    target: { tag: "Positions", type: "enemy", positions: [0] },
-    value: 1,
-  }],
+  actions: [
+    (state: GameState, id: number, type: TargetType) => { return {
+      tag: "Damage",
+      target: { tag: "Target", type: "enemy", positions: [0] },
+      value: 1,
+    }},
+  ],
   abilities: [],
 };
 
@@ -190,11 +197,13 @@ const recruitGainAPWhenHP: Crew = {
     },
   ],
   ranged: false,
-  actions: [{
-    tag: "Damage",
-    target: { tag: "Positions", type: "enemy", positions: [0] },
-    value: 1,
-  }],
+  actions: [
+    (state: GameState, id: number, type: TargetType) => { return {
+      tag: "Damage",
+      target: { tag: "Target", type: "enemy", positions: [0] },
+      value: 1,
+    }},
+  ],
   abilities: [],
 };
 
@@ -205,10 +214,10 @@ const recruitKillLast: Crew = {
   triggers: [],
   ranged: false,
   actions: [
-    /*{
+    {
       tag: "Death",
       target: { tag: "Last", type: "ally" }
-    },*/
+    },
     {
       tag: "Damage",
       target: { tag: "Positions", type: "enemy", positions: [0] },
@@ -328,13 +337,120 @@ const regenOnDamageAlly: Crew = {
     }
   ],
 }
+*/
+
+const armorOnSelfHeal: Crew = {
+  ap: 1,
+  hp: 5,
+  maxHp: 5,
+  triggers: [
+    {
+      onTag: "Heal",
+      type: "before",
+      action: (action: Action) => { return (state: GameState, id: number, type: TargetType) => {
+        const index = findIndex(x => x.id === id, typeColl(state, type));
+        if (index === "notFound") {
+          throw `not found ${id}`;
+        }
+        const actionS = <Heal>action;
+        const result = actionS.target.positions.find(x => x === index);
+        if (result === undefined) {
+          return { tag: "Noop" };
+        } else {
+          return {
+            tag: "QueueStatus",
+            target: { tag: "Target", type, positions: [], },
+            status: {
+              tag: "Guard",
+              value: 1,
+              guard: 1,
+            },
+          };
+        }
+      }},
+    }
+  ],
+  ranged: false,
+  actions: [
+    (state: GameState, id: number, type: TargetType) => { return {
+      tag: "Noop",
+    }},
+  ],
+  abilities: [
+    (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      const targetPos: number = inputs[0];
+      const guard = state.crew[id].Guard;
+      let value = 0;
+      if (guard !== undefined) {
+        value = guard.value;
+      }
+      return {
+        tag: "Damage",
+        target: { tag: "Target", type: "enemy", positions: [targetPos] },
+        value,
+      };
+    }},
+  ],
+}
+
+
+const regenOnDamageAlly: Crew = {
+  ap: 1,
+  hp: 6,
+  maxHp: 6,
+  triggers: [
+    {
+      onTag: "Damage",
+      type: "before",
+      action: (action: Action) => { return (state: GameState, id: number, type: TargetType) => {
+        const index = findIndex(x => x.id === id, typeColl(state, type));
+        if (index === "notFound") {
+          throw `not found ${id}`;
+        }
+        const actionS = <Damage>action;
+        if (actionS.target.type !== "ally") {
+          return { tag: "Noop" };
+        } else {
+          return {
+            tag: "QueueStatus",
+            target: { tag: "Target", type: "ally", positions: [id] },
+            status: {
+              tag: "Regen",
+              value: 1,
+            },
+          };
+        }
+      }},
+    }
+  ],
+  ranged: false,
+  actions: [
+    (state: GameState, id: number, type: TargetType) => { return {
+      tag: "Noop",
+    }},
+  ],
+  abilities: [
+    (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      return {
+        tag: "QueueStatus",
+        // TODO: correct target all
+        target: { tag: "Target", type: "ally", positions: [0, 1, 2, 3], },
+        status: {
+          tag: "Guard",
+          value: 1,
+          guard: 5,
+        }
+      };
+    }},
+  ],
+}
 
 export const allCrew = {
-  stFighter: stFighter,
+  /*stFighter: stFighter,
   stRanged: stRanged,
   recruitGrow1: recruitGrow1,
   recruitGainAPWhenHP: recruitGainAPWhenHP,
-  abilityHeal: abilityHeal,
+  abilityHeal: abilityHeal,*/
   armorOnSelfHeal: armorOnSelfHeal,
   regenOnDamageAlly: regenOnDamageAlly,
 };

@@ -1,4 +1,4 @@
-import { ActionTarget, Spec } from "src/shared/game/action";
+import { Action } from "src/shared/game/action";
 import { Target, TargetSpec, showTarget } from "src/shared/game/target";
 import { showStatus, Status } from "src/shared/game/status";
 import { showCondition } from "src/shared/game/trigger";
@@ -18,20 +18,20 @@ export function showSolutionLog(solutionLog: SolutionLog): string {
 }
 
 export type ActionLog = {
-  action: ActionTarget,
+  action: Action,
   crewStatus: StatusLog[],
-  crewAction: ActionTarget[],
-  queue1: ActionTarget[],
+  crewAction: Action[],
+  queue1: Action[],
   enemyStatus: StatusLog[],
-  enemyAction: ActionTarget[],
-  queue2: ActionTarget[],
-  deaths: ActionTarget[], // TODO: incorporate into queue2
+  enemyAction: Action[],
+  queue2: Action[],
+  deaths: Action[], // TODO: incorporate into queue2
 };
 
 export type StatusLog = {
   id: number,
   status: Status["tag"],
-  actionLog: ActionTarget[],
+  actionLog: Action[],
 }
 
 function showActionLog(actionLog: ActionLog): string {
@@ -62,7 +62,7 @@ function showStatusLog(statusLog: StatusLog[]): string {
   return result;
 }
 
-export function actionShort<T extends TargetSpec | Target>(action: Spec<T>): string {
+export function actionShort(action: Action): string {
   switch (action.tag) {
     case "AddEnemy": {
       return "AddEnemy";
@@ -79,9 +79,6 @@ export function actionShort<T extends TargetSpec | Target>(action: Spec<T>): str
     case "Damage": {
       return "Damage";
     }
-    case "ApDamage": {
-      return "Damage";
-    }
     case "Heal": {
       return "Heal";
     }
@@ -90,9 +87,6 @@ export function actionShort<T extends TargetSpec | Target>(action: Spec<T>): str
     }
     case "GainAP": {
       return `Gain ${action.value} AP (${showTarget(action.target)})`;
-    }
-    case "DamageAP": {
-      return `DamageAP ${action.value} to ${showTarget(action.target)}`;
     }
     case "GainGold": {
       return `GainGold ${action.gain}`;
@@ -115,34 +109,19 @@ export function actionShort<T extends TargetSpec | Target>(action: Spec<T>): str
     case "Noop": {
       return "Noop";
     }
-    case "ConditionAction": {
-      return "ConditionAction";
-    }
     case "Swap": {
       return `Swap ${action.type} ${action.from} ${action.to}`;
     }
     case "CombinedAction": {
       return `Combined ${action.actions.length}`;
     }
-    case "CombinedSpec": {
-      return `CombinedSpec ${action.actions.length}`;
-    }
-    case "DeathSelf": {
-      return "DeathSelf";
-    }
-    case "ArmorBash": {
-      return "ArmorBash";
-    }
     case "ClearStatus": {
       return `Clear ${action.status}`;
-    }
-    case "ClearAllStatus": {
-      return `Clear all status`;
     }
   }
 }
 
-export function showAction<T extends TargetSpec | Target>(action: Spec<T>): string {
+export function showAction(action: Action): string {
   switch (action.tag) {
     case "AddEnemy": {
       return "AddEnemy";
@@ -159,9 +138,6 @@ export function showAction<T extends TargetSpec | Target>(action: Spec<T>): stri
     case "Damage": {
       return `Damage ${action.value} to ${showTarget(action.target)}`;
     }
-    case "ApDamage": {
-      return `Damage ${action.multiplier} * (AP) to ${showTarget(action.target)}`;
-    }
     case "Heal": {
       return `Heal ${action.value} to ${showTarget(action.target)}`;
     }
@@ -170,9 +146,6 @@ export function showAction<T extends TargetSpec | Target>(action: Spec<T>): stri
     }
     case "GainAP": {
       return `Gain ${action.value} AP (${showTarget(action.target)})`;
-    }
-    case "DamageAP": {
-      return `DamageAP ${action.value} to ${showTarget(action.target)}`;
     }
     case "GainGold": {
       return `GainGold ${action.gain}`;
@@ -195,29 +168,14 @@ export function showAction<T extends TargetSpec | Target>(action: Spec<T>): stri
     case "Noop": {
       return "Noop";
     }
-    case "ConditionAction": {
-      return `if ${action.conditions.map(showCondition).join(" & ")} then ${showAction(action.trueAction)} else ${showAction(action.falseAction)}`;
-    }
     case "Swap": {
       return `Swap ${action.type} ${action.from} ${action.to}`;
     }
     case "CombinedAction": {
       return `Combined ${action.actions.length}`;
     }
-    case "CombinedSpec": {
-      return `CombinedSpec ${action.actions.length}`;
-    }
-    case "DeathSelf": {
-      return "DeathSelf";
-    }
-    case "ArmorBash": {
-      return "ArmorBash";
-    }
     case "ClearStatus": {
       return `Clear ${action.status}`;
-    }
-    case "ClearAllStatus": {
-      return `Clear all status`;
     }
   }
 }

@@ -14,7 +14,7 @@ export type Event = {
   name: string,
   subtag: "crew" | "enemy" | "item" | "general" | "rest",
   id: number | "created",
-  actions: Action<Target>[],
+  actions: Action[],
   origin?: Origin,
 };
 
@@ -23,7 +23,7 @@ export type Rest = {
   name: string,
   subtag: "crew" | "enemy" | "item" | "general" | "rest",
   id: number | "created",
-  actions: Action<Target>[],
+  actions: Action[],
 };
 
 export type Card
@@ -47,6 +47,7 @@ const cardBattleTurn: Card = {
   subtag: "general",
 };
 
+/*
 const cardCrew_0000: Card = {
   id: 1000,
   name: "Fighter",
@@ -72,6 +73,7 @@ const cardCrew_0002: Card = {
   tag: "event",
   subtag: "crew",
 };
+*/
 
 const cardCrew_0003: Card = {
   id: 1003,
@@ -104,6 +106,7 @@ const cardItem_0000: Card = {
   subtag: "item",
 };
 
+/*
 const cardBattle_0000: Card = {
   id: 3000,
   name: "Enemy0",
@@ -197,7 +200,7 @@ const cardBattle_0008: Card = {
   ],
   tag: "event",
   subtag: "enemy",
-};
+};*/
 
 const cardBattle_0009: Card = {
   id: 3009,
@@ -213,15 +216,15 @@ export const allCards = {
   cardBattleTurn: cardBattleTurn,
   cardRest: cardRest,
 
-  cardCrew_0000: cardCrew_0000,
+  /*cardCrew_0000: cardCrew_0000,
   cardCrew_0001: cardCrew_0001,
-  cardCrew_0002: cardCrew_0002,
+  cardCrew_0002: cardCrew_0002,*/
   cardCrew_0003: cardCrew_0003,
   cardCrew_0004: cardCrew_0004,
 
   cardItem_0000: cardItem_0000,
 
-  cardBattle_0000: cardBattle_0000,
+  /*cardBattle_0000: cardBattle_0000,
   cardBattle_0001: cardBattle_0001,
   cardBattle_0002: cardBattle_0002,
   cardBattle_0003: cardBattle_0003,
@@ -229,6 +232,6 @@ export const allCards = {
   cardBattle_0005: cardBattle_0005,
   cardBattle_0006: cardBattle_0006,
   cardBattle_0007: cardBattle_0007,
-  cardBattle_0008: cardBattle_0008,
+  cardBattle_0008: cardBattle_0008,*/
   cardBattle_0009: cardBattle_0009,
 };

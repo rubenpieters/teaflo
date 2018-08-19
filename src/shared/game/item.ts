@@ -2,12 +2,12 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Trigger } from "src/shared/game/trigger";
 import { showAction } from "src/shared/game/log";
 
-export function showItem(
+/*export function showItem(
   item: Item
 ) {
   return {...item,
     triggers: item.triggers.map(t => { return {...t, action: showAction(t.action)}; }) };
-}
+}*/
 
 export type Item = {
   triggers: Trigger[],
@@ -15,7 +15,7 @@ export type Item = {
 
 const plus11StartCombat: Item = {
   triggers: [
-    {
+    /*{
       onTag: "AddEnemy",
       type: "before",
       action: {
@@ -23,7 +23,6 @@ const plus11StartCombat: Item = {
         target: { tag: "All", type: "ally" },
         value: 1,
       },
-      conditions: [],
     },
     {
       onTag: "AddEnemy",
@@ -34,13 +33,13 @@ const plus11StartCombat: Item = {
         value: 1,
       },
       conditions: [],
-    },
+    },*/
   ],
 };
 
 const guard1StartCombat: Item = {
   triggers: [
-    {
+    /*{
       onTag: "AddEnemy",
       type: "before",
       action: {
@@ -52,8 +51,7 @@ const guard1StartCombat: Item = {
           guard: 1,
         },
       },
-      conditions: [],
-    },
+    },*/
   ],
 };
 

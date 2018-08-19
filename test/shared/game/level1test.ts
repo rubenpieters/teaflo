@@ -1,10 +1,33 @@
 import expect from "expect";
 import { Solution, Path, runSolution } from "src/shared/game/solution";
-import { allCards } from "src/shared/game/card";
+import { allCards, Card } from "src/shared/game/card";
 import { showSolutionLog } from "src/shared/game/log";
-import { abilityIdToAction, createCard } from "src/shared/game/ability";
+import { createCard } from "src/shared/game/ability";
 
 function test1() {
+  const guardAction: Card = 
+  {
+    actions: [
+      {
+        tag: "QueueStatus",
+        target: { 
+          tag: "Target",
+          type: "ally",
+          positions: [0, 1, 2, 3],
+        },
+        status: {
+          tag: "Guard",
+          value: 1,
+          guard: 5,
+        },
+      }
+    ],
+    id: 0,
+    name: "",
+    tag: "event",
+    subtag: "general"
+  };
+
   const path1: Path = {
     restCard: allCards.cardRest,
     eventCards: [
@@ -14,48 +37,9 @@ function test1() {
       allCards.cardCrew_0004,
       allCards.cardBattle_0009,
       //createCard(abilityIdToAction(0, board.lastState!, 2)),
-      {
-        actions: [
-          {
-            tag: "QueueStatus",
-            target: { 
-              tag: "Target",
-              type: "ally",
-              positions: [0, 1, 2, 3],
-            },
-            status: {
-              tag: "Guard",
-              value: 1,
-              guard: 5,
-            },
-          }
-        ],
-        id: 0,
-        name: "",
-        tag: "event",
-        subtag: "general"
-      },
-      {
-        actions: [
-          {
-            tag: "QueueStatus",
-            target: { 
-              tag: "Target",
-              type: "ally",
-              positions: [0, 1, 2, 3],
-            },
-            status: {
-              tag: "Guard",
-              value: 1,
-              guard: 5,
-            },
-          }
-        ],
-        id: 0,
-        name: "",
-        tag: "event",
-        subtag: "general"
-      },
+      guardAction,
+      guardAction,
+      guardAction,
     ]
   }
   const solution: Solution = {

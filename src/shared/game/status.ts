@@ -1,6 +1,8 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { ActionSpec } from "src/shared/game/action";
-import { TargetType } from "src/shared/game/target";
+import { ActionSpec, Action } from "src/shared/game/action";
+import { TargetType, typeColl } from "src/shared/game/target";
+import { findIndex } from "./trigger";
+import { GameState } from "./state";
 
 export type Poison = {
   tag: "Poison",
@@ -123,15 +125,22 @@ export function applyStatus<E extends HasStatus>(
 
 export function statusToAction(
   status: Status,
+  state: GameState,
   selfId: number,
   selfType: TargetType,
-): ActionSpec {
+): Action {
+  const selfIndex = findIndex(x => x.id === selfId, typeColl(state, selfType));
+  if (selfIndex === "notFound") {
+    throw `not found ${selfId} ${selfType}`
+  }
   switch (status.tag) {
     case "Poison": {
       return {
         tag: "Damage",
         target: {
-          tag: "Self",
+          tag: "Target",
+          positions: [selfIndex],
+          type: selfType,
         },
         value: status.value,
       };
@@ -140,7 +149,9 @@ export function statusToAction(
       return {
         tag: "Heal",
         target: {
-          tag: "Self",
+          tag: "Target",
+          positions: [selfIndex],
+          type: selfType,
         },
         value: status.value,
       };

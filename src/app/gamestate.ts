@@ -1,11 +1,19 @@
 import { Solution, runSolutionAll } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
-import { abilityToAction, createCard } from "src/shared/game/ability";
+import { abilityToAction, createCard, Ability } from "src/shared/game/ability";
 import { actionShort } from "src/shared/game/log";
 import { ActionTarget } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
 import { HasStatus, allStatus, showStatus } from "src/shared/game/status";
+import { TargetType } from "../shared/game/target";
+
+type AbilityInfo = {
+  ability: Ability,
+  state: GameState,
+  selfId: number,
+  type: TargetType,
+}
 
 export type Limit = {
   limit: number,
@@ -430,8 +438,15 @@ function mkState(
       sprite.endFill();
       sprite.inputEnabled = true;
 
-      const abilityCard: Card = createCard(abilityToAction(ability, board.lastState!, allyId, "ally"), allyId, "ally");
-      sprite.events.onInputDown.add(() => addToSolution(board, abilityCard));
+      const abilityInfo: AbilityInfo = {
+        ability,
+        state: board.lastState!,
+        selfId: allyId,
+        type: "ally",
+      };
+      //const abilityCard: Card = createCard(abilityToAction(ability, board.lastState!, allyId, "ally"), allyId, "ally");
+      
+      sprite.events.onInputDown.add(() => addToSolution(board, createCard(ability([0])(board.lastState!, allyId, "ally"), allyId, "ally")));
       sprites.push(sprite);
     }
 
@@ -467,6 +482,10 @@ function mkState(
 
   board.graphics.stateGfx = sprites;
 }
+
+function onAbilityClick(
+
+)
 
 function showAction(
   board: Board,

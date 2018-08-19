@@ -9,20 +9,42 @@ import { Target, TargetSpec, Origin, onTarget, determineTarget, TargetType, inde
 import { Item } from "src/shared/game/item";
 import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
-import { Condition, checkConditions } from "src/shared/game/trigger";
+import { Condition, checkConditions, findIndex } from "src/shared/game/trigger";
 import { StatusLog } from "./log";
 
-// Action
+export type ActionSpec = (state: GameState, selfId: number, selfType: TargetType) => Action;
 
-export type Damage<T> = {
+export type Action
+  = Damage
+  | Heal
+  | Death
+  | AddEnemy
+  | AddCrew
+  | AddItem
+  | GainHP
+  | GainAP
+  | Rest
+  | GainGold
+  | PayGold
+  | BattleTurn
+  | Death
+  | QueueStatus
+  | AddStatus
+  | Noop
+  | Swap
+  | CombinedAction
+  | ClearStatus
+  ;
+
+export type Damage = {
   tag: "Damage",
-  target: T,
+  target: Target,
   value: number,
 };
 
-export type Heal<T> = {
+export type Heal = {
   tag: "Heal",
-  target: T,
+  target: Target,
   value: number,
 };
 
@@ -41,21 +63,15 @@ export type AddItem = {
   item: Item,
 };
 
-export type GainHP<T> = {
+export type GainHP = {
   tag: "GainHP",
-  target: T,
+  target: Target,
   value: number,
 };
 
-export type GainAP<T> = {
+export type GainAP = {
   tag: "GainAP",
-  target: T,
-  value: number,
-};
-
-export type DamageAP<T> = {
-  tag: "DamageAP",
-  target: T,
+  target: Target,
   value: number,
 };
 
@@ -83,15 +99,15 @@ export type Death = {
   type: TargetType,
 };
 
-export type QueueStatus<T> = {
+export type QueueStatus = {
   tag: "QueueStatus",
-  target: T,
+  target: Target,
   status: Status,
 };
 
-export type AddStatus<T> = {
+export type AddStatus = {
   tag: "AddStatus",
-  target: T,
+  target: Target,
   status: Status,
 };
 
@@ -106,207 +122,23 @@ export type Swap = {
   to: number,
 };
 
-export type CombinedAction<T> = {
+export type CombinedAction = {
   tag: "CombinedAction",
-  actions: Action<T>[],
+  actions: Action[],
 };
 
-export type ClearStatus<T> = {
+export type ClearStatus = {
   tag: "ClearStatus",
-  target: T,
+  target: Target,
   status: Status["tag"],
 };
 
-export type Action<T>
-  = Damage<T>
-  | Heal<T>
-  | AddEnemy
-  | AddCrew
-  | AddItem
-  | GainHP<T>
-  | GainAP<T>
-  | DamageAP<T>
-  | Rest
-  | GainGold
-  | PayGold
-  | BattleTurn
-  | Death
-  | QueueStatus<T>
-  | AddStatus<T>
-  | Noop
-  | Swap
-  | CombinedAction<T>
-  | ClearStatus<T>
-  ;
-
-// Spec
-
-
-export type ApDamage<T> = {
-  tag: "ApDamage",
-  target: T,
-  multiplier: number,
-};
-
-export type ConditionAction<T> = {
-  tag: "ConditionAction",
-  conditions: Condition[],
-  trueAction: Spec<T>,
-  falseAction: Spec<T>,
-};
-
-export type DeathSelf = {
-  tag: "DeathSelf",
-};
-
-export type CombinedSpec<T> = {
-  tag: "CombinedSpec",
-  actions: Spec<T>[],
-};
-
-export type ArmorBash<T> = {
-  tag: "ArmorBash",
-  target: T,
-};
-
-export type ClearAllStatus<T> = {
-  tag: "ClearAllStatus",
-  target: T,
-};
-
-export type Spec<T>
-  = Action<T>
-  | ApDamage<T>
-  | ConditionAction<T>
-  | DeathSelf
-  | CombinedSpec<T>
-  | ArmorBash<T>
-  | ClearAllStatus<T>
-  ;
-
-export function determineSpec(
-  action: ActionSpec,
-  state: GameState,
-  selfId: number,
-  selfType: TargetType,
-  origin: Origin,
-): Action<TargetSpec> {
-  switch (action.tag) {
-    case "ApDamage": {
-      if (selfType !== "ally") {
-        throw "Wrong self type for action " + action.tag + ", was: " + selfType;
-      }
-      const self: Crew = state.crew[selfId];
-      return {
-        tag: "Damage",
-        target: action.target,
-        value: action.multiplier * self.ap,
-      };
-    }
-    case "ConditionAction": {
-      // TODO: there is no sensible action to pass for checkConditions
-      if (checkConditions(action.conditions, <any>undefined, state, selfId, selfType)) {
-        return determineSpec(action.trueAction, state, selfId, selfType, origin);
-      } else {
-        return determineSpec(action.falseAction, state, selfId, selfType, origin);
-      }
-    }
-    case "DeathSelf": {
-      return {
-        tag: "Death",
-        id: selfId,
-        type: selfType,
-      };
-    }
-    case "CombinedSpec": {
-      return {...action,
-        tag: "CombinedAction",
-        actions: action.actions.map(x => determineSpec(x, state, selfId, selfType, origin)),
-      };
-    }
-    case "ArmorBash": {
-      const self = typeColl(state, selfType)[selfId];
-      if (self.tag === "item") {
-        throw "item cant armor bash";
-      } else {
-        return {
-          tag: "Damage",
-          target: action.target,
-          value: self.Guard === undefined ? 0 : self.Guard.value,
-        }
-      }
-    }
-    case "ClearAllStatus": {
-      const actions: Action<TargetSpec>[] = _Status.allStatus.map(statusTag => {
-        const clearStatus: Action<TargetSpec> = {
-          tag: "ClearStatus",
-          status: statusTag,
-          target: action.target,
-        };
-        return clearStatus;
-      });
-      return {
-        tag: "CombinedAction",
-        actions
-      };
-    }
-    case "Damage": {
-      const self = typeColl(state, selfType)[selfId];
-      if (self.tag === "item") {
-        return action;
-      } else {
-        if (
-          self.Blind !== undefined &&
-          origin !== "noOrigin" &&
-          origin.type === selfType &&
-          origin.id === selfId
-        ) {
-          return { tag: "Noop" };
-        } else {
-          return action;
-        }
-      }
-    }
-    default: return action;
-  }
-}
-
-export type ActionTarget = Action<Target>;
-
-export type ActionSpec = Spec<TargetSpec>;
-
-export function fmap<A, B>(
-  f: (a: A) => B,
-  action: Action<A>,
-): Action<B> {
-  switch (action.tag) {
-    case "Damage": return {...action, target: f(action.target)};
-    case "Heal": return {...action, target: f(action.target)};
-    case "AddEnemy": return action;
-    case "AddCrew": return action;
-    case "AddItem": return action;
-    case "GainHP": return {...action, target: f(action.target)};
-    case "GainAP": return {...action, target: f(action.target)};
-    case "DamageAP": return {...action, target: f(action.target)};
-    case "Rest": return action;
-    case "GainGold": return action;
-    case "PayGold": return action;
-    case "BattleTurn": return action;
-    case "Death": return action;
-    case "QueueStatus": return {...action, target: f(action.target)};
-    case "AddStatus": return {...action, target: f(action.target)};
-    case "Noop": return action;
-    case "Swap": return action;
-    case "CombinedAction": return {...action, actions: action.actions.map(x => fmap(f, x))};
-    case "ClearStatus": return {...action, target: f(action.target)};
-  }
-}
 
 export function enemyTurn(
   state: GameState,
-  log: ActionTarget[],
+  log: Action[],
   idGen: Generator,
-): { state: GameState | "invalid", log: ActionTarget[] }  {
+): { state: GameState | "invalid", log: Action[] }  {
   let acc: GameState | "invalid" = state;
   let i = 0;
   for (const enemy of state.enemies) {
@@ -322,58 +154,31 @@ export function enemyTurn(
   return { state: acc, log };
 }
 
-export function determineAndApplyActionAndTriggers(
-  action: ActionSpec,
-  state: GameState,
-  log: ActionTarget[],
-  idGen: Generator,
-  selfId: number,
-  selfType: TargetType,
-  origin: Origin,
-): { state: GameState | "invalid", log: ActionTarget[] }  {
-  return determineAndApplyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen, selfId, selfType, origin);
-}
-
-export function determineAndApplyActionAndTriggersAt(
-  action: ActionSpec,
-  state: GameState,
-  log: ActionTarget[],
-  from: { id: number, type: "item" | "crew" | "enemy" },
-  idGen: Generator,
-  selfId: number,
-  selfType: TargetType,
-  origin: Origin,
-): { state: GameState | "invalid", log: ActionTarget[] }  {
-  const actionSpec = determineSpec(action, state, selfId, selfType, origin);
-  const actionTarget = fmap(x => determineTarget(x, state, selfId, selfType, origin), actionSpec);
-  return applyActionAndTriggersAt(actionTarget, state, log, from, idGen, origin);
-}
-
 export function applyActionAndTriggers(
-  action: ActionTarget,
+  action: Action,
   state: GameState,
-  log: ActionTarget[],
+  log: Action[],
   idGen: Generator,
   origin: Origin,
-): { state: GameState | "invalid", log: ActionTarget[] } {
+): { state: GameState | "invalid", log: Action[] } {
   return applyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen, origin);
 }
 
 function applyActionAndTriggersAt(
-  action: ActionTarget,
+  action: Action,
   state: GameState,
-  log: ActionTarget[],
+  log: Action[],
   from: { id: number, type: "item" | "crew" | "enemy" },
   idGen: Generator,
   origin: Origin,
-): { state: GameState | "invalid", log: ActionTarget[] } {
+): { state: GameState | "invalid", log: Action[] } {
   // enemy interactions with effects
   if (from.type === "enemy") {
     for (const enemy of state.enemies.slice(from.id)) {
       for (const trigger of enemy.triggers) {
-        if (trigger.onTag === action.tag && trigger.type === "before" && checkConditions(trigger.conditions, action, state, enemy.id, "enemy")) {
-          const afterTrigger = determineAndApplyActionAndTriggersAt(
-            trigger.action, state, log, { id: from.id + 1, type: "enemy" }, idGen, enemy.id, "enemy", origin);
+        if (trigger.onTag === action.tag && trigger.type === "before") {
+          const afterTrigger = applyActionAndTriggersAt(
+            trigger.action(action)(state, enemy.id, "enemy"), state, log, { id: from.id + 1, type: "enemy" }, idGen, origin);
           if (afterTrigger.state === "invalid") {
             return afterTrigger;
           }
@@ -389,9 +194,9 @@ function applyActionAndTriggersAt(
     const startId = from.type === "item" ? from.id : 0;
     for (const item of state.items.slice(startId)) {
       for (const trigger of item.triggers) {
-        if (trigger.onTag === action.tag && trigger.type === "before" && checkConditions(trigger.conditions, action, state, item.id, "item")) {
-          const afterTrigger = determineAndApplyActionAndTriggersAt(
-            trigger.action, state, log, { id: from.id + 1, type: "item" }, idGen, item.id, "item", origin);
+        if (trigger.onTag === action.tag && trigger.type === "before") {
+          const afterTrigger = applyActionAndTriggersAt(
+            trigger.action(action)(state, item.id, "item"), state, log, { id: from.id + 1, type: "item" }, idGen, origin);
           if (afterTrigger.state === "invalid") {
             return afterTrigger;
           }
@@ -406,9 +211,9 @@ function applyActionAndTriggersAt(
   // crew interactions with effects
   for (const ally of state.crew.slice(fromCrew)) {
     for (const trigger of ally.triggers) {
-      if (trigger.onTag === action.tag && trigger.type === "before" && checkConditions(trigger.conditions, action, state, ally.id, "ally")) {
-        const afterTrigger = determineAndApplyActionAndTriggersAt(
-          trigger.action, state, log, { id: from.id + 1, type: "crew" }, idGen, ally.id, "ally", origin);
+      if (trigger.onTag === action.tag && trigger.type === "before") {
+        const afterTrigger = applyActionAndTriggersAt(
+          trigger.action(action)(state, ally.id, "ally"), state, log, { id: from.id + 1, type: "crew" }, idGen, origin);
         if (afterTrigger.state === "invalid") {
           return afterTrigger;
         }
@@ -425,11 +230,11 @@ function applyActionAndTriggersAt(
 
 // applies the results of this action to the state
 function applyAction(
-  action: ActionTarget,
+  action: Action,
   state: GameState,
-  log: ActionTarget[],
+  log: Action[],
   idGen: Generator,
-): { state: GameState | "invalid", log: ActionTarget[] } {
+): { state: GameState | "invalid", log: Action[] } {
   log = log.concat(action);
 
   switch (action.tag) {
@@ -479,22 +284,6 @@ function applyAction(
     case "GainHP": {
       state = onTarget(action.target, state,
         ally => _Crew.addHP(ally, action.value),
-        _ => { throw `wrong target type for '${action.tag}`; },
-        _ => { throw `wrong target type for '${action.tag}`; },
-      );
-      break;
-    }
-    case "DamageAP": {
-      state = onTarget(action.target, state,
-        ally => _Crew.damageAP(ally, action.value),
-        _ => { throw `wrong target type for '${action.tag}`; },
-        _ => { throw `wrong target type for '${action.tag}`; },
-      );
-      break;
-    }
-    case "DamageAP": {
-      state = onTarget(action.target, state,
-        ally => _Crew.addAP(ally, action.value),
         _ => { throw `wrong target type for '${action.tag}`; },
         _ => { throw `wrong target type for '${action.tag}`; },
       );
@@ -577,7 +366,7 @@ function applyAction(
       break;
     }
     case "QueueStatus": {
-      const newAction: ActionTarget = {...action, tag: "AddStatus"}
+      const newAction: Action = {...action, tag: "AddStatus"}
       state = focus(state,
         // TODO: pass correct origin
         over(x => x.actionQueue, x => x.concat({ action: newAction, origin: <any>undefined })),
@@ -643,13 +432,13 @@ function applyAction(
 
 export function checkDeaths(
   state: GameState,
-  log: ActionTarget[],
+  log: Action[],
   idGen: Generator,
-): { state: GameState | "invalid", log: ActionTarget[] } {
+): { state: GameState | "invalid", log: Action[] } {
 
   for (const ally of state.crew) {
     if (ally.hp <= 0) {
-      const deathAction: ActionTarget = { tag: "Death", type: "ally", id: ally.id };
+      const deathAction: Action = { tag: "Death", type: "ally", id: ally.id };
       const afterDeath = applyActionAndTriggers(deathAction, state, log, idGen, "noOrigin");
       if (afterDeath.state === "invalid") {
         return afterDeath;
@@ -661,7 +450,7 @@ export function checkDeaths(
 
   for (const enemy of state.enemies) {
     if (enemy.hp <= 0) {
-      const deathAction: ActionTarget = { tag: "Death", type: "enemy", id: enemy.id };
+      const deathAction: Action = { tag: "Death", type: "enemy", id: enemy.id };
       const afterDeath = applyActionAndTriggers(deathAction, state, log, idGen, "noOrigin");
       if (afterDeath.state === "invalid") {
         return afterDeath;
@@ -685,11 +474,11 @@ export function checkStatusEnemy(
       enemy = state.enemies[i];
       const status = enemy[statusTag];
       if (status !== undefined) {
-        const action = _Status.statusToAction(status, enemy.id, "enemy");
+        const action = _Status.statusToAction(status, state, enemy.id, "enemy");
         state = focus(state,
           over(x => x.enemies[i], x => _Status.applyStatus(i, x, statusTag)),
         );
-        const afterApply = determineAndApplyActionAndTriggers(action, state, [], idGen, enemy.id, "enemy", "noOrigin");
+        const afterApply = applyActionAndTriggers(action, state, [], idGen, "noOrigin");
         log.push({ id: i, status: statusTag, actionLog: afterApply.log });
         if (afterApply.state === "invalid") {
           return { state: "invalid", log };
@@ -713,11 +502,11 @@ export function checkStatusCrew(
       ally = state.crew[i];
       const status = ally[statusTag];
       if (status !== undefined) {
-        const action = _Status.statusToAction(status, ally.id, "ally");
+        const action = _Status.statusToAction(status, state, ally.id, "ally");
         state = focus(state,
           set(x => x.crew[i], _Status.applyStatus(i, ally, statusTag)),
         );
-        const afterApply = determineAndApplyActionAndTriggers(action, state, [], idGen, ally.id, "ally", "noOrigin");
+        const afterApply = applyActionAndTriggers(action, state, [], idGen, "noOrigin");
         log.push({ id: i, status: statusTag, actionLog: afterApply.log });
         if (afterApply.state === "invalid") {
           return { state: "invalid", log };
@@ -732,9 +521,9 @@ export function checkStatusCrew(
 
 export function applyActionQueue(
   state: GameState,
-  log: ActionTarget[],
+  log: Action[],
   idGen: Generator,
-): { state: GameState | "invalid", log: ActionTarget[] } {
+): { state: GameState | "invalid", log: Action[] } {
   for (const { action, origin } of state.actionQueue) {
     const afterApply = applyActionAndTriggers(action, state, log, idGen, origin);
     log = afterApply.log;
