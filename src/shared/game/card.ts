@@ -1,12 +1,13 @@
-import { Action } from "src/shared/game/action";
-import { Target, Origin } from "src/shared/game/target";
-import { allCrew } from "src/shared/game/crew";
+import { Action, ActionSpec } from "src/shared/game/action";
+import { Target, Origin, TargetType } from "src/shared/game/target";
+import { allCrew, Ability } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { allEnemies } from "src/shared/game/enemy";
 import { showAction } from "src/shared/game/log";
+import { GameState } from "./state";
 
 export function showCard(card: Card) {
-  return { ...card, actions: card.actions.map(showAction) };
+  //return { ...card, actions: card.actions.map(showAction) };
 }
 
 export type Event = {
@@ -14,7 +15,7 @@ export type Event = {
   name: string,
   subtag: "crew" | "enemy" | "item" | "general" | "rest",
   id: number | "created",
-  actions: Action[],
+  actions: Ability[],
   origin?: Origin,
 };
 
@@ -23,7 +24,7 @@ export type Rest = {
   name: string,
   subtag: "crew" | "enemy" | "item" | "general" | "rest",
   id: number | "created",
-  actions: Action[],
+  actions: Ability[],
 };
 
 export type Card
@@ -34,7 +35,13 @@ export type Card
 const cardRest: Card = {
   id: 0,
   name: "Rest",
-  actions: [{ tag: "Rest" }],
+  actions: [
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      return { tag: "Rest" }
+      }},
+      inputs: [],
+    },
+  ],
   tag: "rest",
   subtag: "rest",
 };
@@ -42,7 +49,13 @@ const cardRest: Card = {
 const cardBattleTurn: Card = {
   id: 1,
   name: "Battle",
-  actions: [{ tag: "BattleTurn" }],
+  actions: [
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      return { tag: "BattleTurn" }
+      }},
+      inputs: [],
+    },
+  ],
   tag: "event",
   subtag: "general",
 };
@@ -79,7 +92,11 @@ const cardCrew_0003: Card = {
   id: 1003,
   name: "ArmorSelf",
   actions: [
-    { tag: "AddCrew", crew: allCrew.armorOnSelfHeal },
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      return { tag: "AddCrew", crew: allCrew.armorOnSelfHeal };
+      }},
+      inputs: [],
+    },
   ],
   tag: "event",
   subtag: "crew",
@@ -89,7 +106,11 @@ const cardCrew_0004: Card = {
   id: 1004,
   name: "RegenDmg",
   actions: [
-    { tag: "AddCrew", crew: allCrew.regenOnDamageAlly },
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      return { tag: "AddCrew", crew: allCrew.regenOnDamageAlly };
+      }},
+      inputs: [],
+    },
   ],
   tag: "event",
   subtag: "crew",
@@ -99,8 +120,16 @@ const cardItem_0000: Card = {
   id: 2000,
   name: "Shield",
   actions: [
-    { tag: "PayGold", pay: 5 },
-    { tag: "AddItem", item: allItems.guard1StartCombat },
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      return { tag: "PayGold", pay: 5 };
+      }},
+      inputs: [],
+    },
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      return { tag: "AddItem", item: allItems.guard1StartCombat };
+      }},
+      inputs: [],
+    },
   ],
   tag: "event",
   subtag: "item",
@@ -206,7 +235,11 @@ const cardBattle_0009: Card = {
   id: 3009,
   name: "Enemy9",
   actions: [
-    { tag: "AddEnemy", enemy: allEnemies.enemyBoss1 },
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      return { tag: "AddEnemy", enemy: allEnemies.enemyBoss1 };
+      }},
+      inputs: [],
+    },
   ],
   tag: "event",
   subtag: "enemy",

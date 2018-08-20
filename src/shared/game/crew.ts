@@ -360,13 +360,12 @@ const armorOnSelfHeal: Crew = {
           throw `not found ${id}`;
         }
         const actionS = <Heal>action;
-        const result = actionS.target.positions.find(x => x === index);
-        if (result === undefined) {
+        if (actionS.target.position !== id) {
           return { tag: "Noop" };
         } else {
           return {
             tag: "QueueStatus",
-            target: { tag: "Target", type, positions: [], },
+            target: { tag: "Target", type, position: index, },
             status: {
               tag: "Guard",
               value: 1,
@@ -393,7 +392,7 @@ const armorOnSelfHeal: Crew = {
         }
         return {
           tag: "Damage",
-          target: { tag: "Target", type: "enemy", positions: [targetPos] },
+          target: { tag: "Target", type: "enemy", position: targetPos },
           value,
         };
       }},
@@ -422,7 +421,7 @@ const regenOnDamageAlly: Crew = {
         } else {
           return {
             tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", positions: actionS.target.positions },
+            target: { tag: "Target", type: "ally", position: actionS.target.position },
             status: {
               tag: "Regen",
               value: 1,
@@ -440,20 +439,36 @@ const regenOnDamageAlly: Crew = {
   ],
   abilities: [
     { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
-        return {
-          tag: "QueueStatus",
-          // TODO: correct target all
-          target: { tag: "Target", type: "ally", positions: [0, 1, 2, 3], },
-          status: {
-            tag: "Guard",
-            value: 1,
-            guard: 5,
-          }
-        };
+      return onAllAlly(
+        state,
+        (_: IdCrew, id: number) => {
+          return {
+            tag: "QueueStatus",
+            // TODO: correct target all
+            target: { tag: "Target", type: "ally", position: id, },
+            status: {
+              tag: "Guard",
+              value: 1,
+              guard: 5,
+            }
+          };
+        }
+      )
       }},
       inputs: [],
     }
   ],
+}
+
+export function onAllAlly(
+  state: GameState,
+  f: (ally: IdCrew, id: number) => Action,
+): Action {
+  const actions = state.crew.map(f);
+  return {
+    tag: "CombinedAction",
+    actions,
+  }
 }
 
 export const allCrew = {

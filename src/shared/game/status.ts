@@ -139,7 +139,7 @@ export function statusToAction(
         tag: "Damage",
         target: {
           tag: "Target",
-          positions: [selfIndex],
+          position: selfIndex,
           type: selfType,
         },
         value: status.value,
@@ -150,7 +150,7 @@ export function statusToAction(
         tag: "Heal",
         target: {
           tag: "Target",
-          positions: [selfIndex],
+          position: selfIndex,
           type: selfType,
         },
         value: status.value,

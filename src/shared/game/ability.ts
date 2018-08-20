@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { determineTarget, TargetType } from "src/shared/game/target";
+import { TargetType } from "src/shared/game/target";
 import { Action } from "src/shared/game/action";
 import { Target } from "src/shared/game/target";
 import { GameState } from "src/shared/game/state";
@@ -16,7 +16,11 @@ export function createCard(
     id: "created",
     name: "-- created --",
     actions: [
-      action,
+      { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+        return action;
+        }},
+        inputs: [],
+      },
     ],
     tag: "event",
     subtag: "general",

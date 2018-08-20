@@ -1,26 +1,37 @@
-import expect from "expect";
-import { Solution, Path, runSolution } from "src/shared/game/solution";
-import { allCards, Card } from "src/shared/game/card";
+import { Solution, Path, runSolution, SolCard, SolEvent, SolRest } from "src/shared/game/solution";
+import { allCards, Card, Event, Rest } from "src/shared/game/card";
 import { showSolutionLog } from "src/shared/game/log";
 import { createCard } from "src/shared/game/ability";
+import { IdCrew, GameState } from "src/shared/game/state";
+import { onAllAlly } from "src/shared/game/crew";
+import { TargetType } from "src/shared/game/target";
 
 function test1() {
   const guardAction: Card = 
   {
+      
     actions: [
-      {
-        tag: "QueueStatus",
-        target: { 
-          tag: "Target",
-          type: "ally",
-          positions: [0, 1, 2, 3],
-        },
-        status: {
-          tag: "Guard",
-          value: 1,
-          guard: 5,
-        },
-      }
+      { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+        return onAllAlly(
+          state,
+          (_: IdCrew, id: number) => { return {
+              tag: "QueueStatus",
+              target: { 
+                tag: "Target",
+                type: "ally",
+                position: id,
+              },
+              status: {
+                tag: "Guard",
+                value: 1,
+                guard: 5,
+              },
+            }
+          }
+        )
+        }},
+        inputs: [],
+      },
     ],
     id: 0,
     name: "",
@@ -29,17 +40,16 @@ function test1() {
   };
 
   const path1: Path = {
-    restCard: allCards.cardRest,
+    restCard: passNoInputsR(allCards.cardRest),
     eventCards: [
-      allCards.cardCrew_0003,
-      allCards.cardCrew_0003,
-      allCards.cardCrew_0004,
-      allCards.cardCrew_0004,
-      allCards.cardBattle_0009,
-      //createCard(abilityIdToAction(0, board.lastState!, 2)),
-      guardAction,
-      guardAction,
-      guardAction,
+      passNoInputsE(allCards.cardCrew_0003),
+      passNoInputsE(allCards.cardCrew_0003),
+      passNoInputsE(allCards.cardCrew_0004),
+      passNoInputsE(allCards.cardCrew_0004),
+      passNoInputsE(allCards.cardBattle_0009),
+      passNoInputsE(guardAction),
+      passNoInputsE(guardAction),
+      passNoInputsE(guardAction),
     ]
   }
   const solution: Solution = {
@@ -54,6 +64,20 @@ function test1() {
     const { state, log } = sol;
     //console.log(JSON.stringify(state, undefined, 2));
     console.log(showSolutionLog(log));
+  }
+}
+
+function passNoInputsE(card: Event): SolEvent {
+  return {
+    ...card,
+    actions: card.actions.map(x => x.f([])),
+  }
+}
+
+function passNoInputsR(card: Rest): SolRest {
+  return {
+    ...card,
+    actions: card.actions.map(x => x.f([])),
   }
 }
 

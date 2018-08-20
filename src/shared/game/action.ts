@@ -5,11 +5,10 @@ import { GameState, IdCrew, IdEnemy, IdItem } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, TargetSpec, Origin, onTarget, determineTarget, TargetType, indexOfId, typeColl } from "src/shared/game/target";
+import { Target, Origin, onTarget, TargetType, indexOfId, typeColl } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
 import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
-import { Condition, checkConditions, findIndex } from "src/shared/game/trigger";
 import { StatusLog } from "./log";
 
 export type ActionSpec = (state: GameState, selfId: number, selfType: TargetType) => Action;
@@ -261,8 +260,8 @@ function applyAction(
       break;
     }
     case "Damage": {
-      // if not all positions exists, then invalid solution
-      if (Math.max(...action.target.positions) >= typeColl(state, action.target.type).length) {
+      // if position does not exist, then invalid solution
+      if (action.target.position >= typeColl(state, action.target.type).length) {
         return { state: "invalid", log };
       }
       // apply damage

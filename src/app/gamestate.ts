@@ -1,4 +1,4 @@
-import { Solution, runSolutionAll } from "src/shared/game/solution";
+import { Solution, runSolutionAll, SolCard, SolRest, SolEvent } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
 import { createCard } from "src/shared/game/ability";
@@ -188,10 +188,10 @@ function popLeftMenu(
       effect.tint = 0xFFFFFF;
       effect.inputEnabled = true;
       effect.events.onInputDown.add(() => console.log(`id: ${card.id} index ${i}`));
-      effect.events.onInputOver.add(() => showAction(board, action));
+      //effect.events.onInputOver.add(() => showAction(board, action));
       effects.push(effect);
       
-      const fontSize = Math.round(Math.min(21, nameBoxWidth / actionShort(action).length) * .70);
+      /*const fontSize = Math.round(Math.min(21, nameBoxWidth / actionShort(action).length) * .70);
       const effectText: Phaser.Text = board.game.add.text(0, 0, actionShort(action), {
         font: "Arial",
         fontSize: fontSize,
@@ -200,7 +200,7 @@ function popLeftMenu(
         boundsAlignV: "middle",
       }, board.group);
       effectText.setTextBounds(x, y, nameBoxWidth, 22);
-      effectTexts.push(effectText);
+      effectTexts.push(effectText);*/
 
       y += 25;
       i += 1;
@@ -222,17 +222,24 @@ function addToSolution(
     }
     board.availableCards[index].limit -= 1;
   }
-  switch (card.tag) {
+  // add user input to card
+  // TODO: correctly add user input
+  const afterUserInput: SolCard = {
+    ...card,
+    actions: card.actions.map((x: Ability) => x.f([])),
+  }
+
+  switch (afterUserInput.tag) {
     case "event": {
       if (board.solution.paths.length === 0) {
         return "noPaths";
       } else {
-        board.solution.paths[board.solution.paths.length - 1].eventCards.push(card);
+        board.solution.paths[board.solution.paths.length - 1].eventCards.push(afterUserInput);
       }
       break;
     }
     case "rest": {
-      board.solution.paths.push({ restCard: card, eventCards: [] });
+      board.solution.paths.push({ restCard: afterUserInput, eventCards: [] });
       break;
     }
   }
@@ -244,7 +251,7 @@ function addToSolution(
 
 function removeEventFromSolution(
   board: Board,
-  card: Card,
+  card: SolCard,
   pathIndex: number,
   eventIndex: number,
 ) {
@@ -262,7 +269,7 @@ function removeEventFromSolution(
 
 function removeRestFromSolution(
   board: Board,
-  card: Card,
+  card: SolCard,
   pathIndex: number,
 ) {
   for (const card of board.solution.paths[pathIndex].eventCards) {
@@ -361,7 +368,7 @@ function mkSolution(
 
 function onSolutionRestCardClick(
   board: Board,
-  card: Rest,
+  card: SolRest,
   pathIndex: number,
 ) {
   return function(
@@ -378,7 +385,7 @@ function onSolutionRestCardClick(
 
 function onSolutionEventCardClick(
   board: Board,
-  card: Event,
+  card: SolEvent,
   pathIndex: number,
   eventIndex: number,
 ) {

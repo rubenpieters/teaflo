@@ -53,58 +53,6 @@ export function showCondition(
   }
 }
 
-export function checkConditions(
-  conditions: Condition[],
-  action: Action,
-  state: GameState,
-  selfId: number,
-  selfType: TargetType,
-) {
-  return conditions.reduce((acc, cond) => {
-    if (acc) {
-      return checkCondition(cond, action, state, selfId, selfType);
-    } else {
-      return false;
-    }
-  }, true);
-}
-
-export function checkCondition(
-  condition: Condition,
-  action: Action,
-  state: GameState,
-  selfId: number,
-  selfType: TargetType,
-): boolean {
-  switch (condition.tag) {
-    case "OwnId": {
-      if (hasTarget(action)) {
-        return findIndex(x => x === selfId, action.target.positions) !== "notFound";
-      } else if (hasId(action)) {
-        return action.id === selfId;
-      } else {
-        throw `action ${action.tag} does not have a target!`;
-      }
-    }
-    case "TypeCondition": {
-      if (hasTarget(action)) {
-        return action.target.type === condition.type;
-      } else if (hasType(action)) {
-        return action.type === condition.type;
-      } else {
-        throw `action ${action.tag} does not have a target type!`;
-      }
-    }
-    case "InPosition": {
-      const index = findIndex(x => x.id === selfId, typeColl(state, selfType));
-      if (index === "notFound") {
-        throw `can not find id ${selfId} of type ${selfType}`;
-      }
-      return index === condition.position;
-    }
-  }
-}
-
 function hasTarget<T>(a: {}): a is { target: T } {
   return (<Object>a).hasOwnProperty("target");
 }

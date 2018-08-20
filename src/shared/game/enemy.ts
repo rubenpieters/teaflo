@@ -332,37 +332,49 @@ const enemyBoss1: Enemy = {
   maxHp: 40,
   actions: [
     (state: GameState, id: number, type: TargetType) => {
-      return {
-        tag: "QueueStatus",
-        target: { tag: "Target", type: "ally", positions: [0, 1, 2, 3] },
-        status: {
-          tag: "Poison",
-          value: 4,
-        },
-        next: { tag: "NextId" },
-      };
+      return {...onAllAllyPositions(
+          state,
+          (id: number) => { return {
+            tag: "QueueStatus",
+            target: { tag: "Target", type: "ally", position: id },
+            status: {
+              tag: "Poison",
+              value: 4,
+            }
+          }},
+      ),
+      next: { tag: "NextId" },
+      }
     },
     (state: GameState, id: number, type: TargetType) => {
-      return {
-        tag: "QueueStatus",
-        target: { tag: "Target", type: "ally", positions: [0, 1, 2, 3] },
-        status: {
-          tag: "Blind",
-          value: 4,
-        },
+      return {...onAllAllyPositions(
+          state,
+          (id: number) => { return {
+            tag: "QueueStatus",
+            target: { tag: "Target", type: "ally", position: id },
+            status: {
+              tag: "Blind",
+              value: 4,
+            }
+          }},
+        ),
         next: { tag: "NextId" },
-      };
+      }
     },
     (state: GameState, id: number, type: TargetType) => {
-      return {
-        tag: "QueueStatus",
-        target: { tag: "Target", type: "ally", positions: [0, 1, 2, 3] },
-        status: {
-          tag: "Silence",
-          value: 3,
-        },
+      return {...onAllAllyPositions(
+          state,
+          (id: number) => { return {
+            tag: "QueueStatus",
+            target: { tag: "Target", type: "ally", position: id },
+            status: {
+              tag: "Silence",
+              value: 3,
+            }
+          }},
+        ),
         next: { tag: "NextId" },
-      };
+      }
     },
     (state: GameState, id: number, type: TargetType) => {
       return {
@@ -370,22 +382,22 @@ const enemyBoss1: Enemy = {
         actions: [
           {
             tag: "Damage",
-            target: { tag: "Target", type: "ally", positions: [0] },
+            target: { tag: "Target", type: "ally", position: 0 },
             value: 10,
           },
           {
             tag: "Damage",
-            target: { tag: "Target", type: "ally", positions: [1] },
+            target: { tag: "Target", type: "ally", position: 1 },
             value: 5,
           },
           {
             tag: "Damage",
-            target: { tag: "Target", type: "ally", positions: [2] },
+            target: { tag: "Target", type: "ally", position: 2 },
             value: 2,
           },
           {
             tag: "Damage",
-            target: { tag: "Target", type: "ally", positions: [3] },
+            target: { tag: "Target", type: "ally", position: 3 },
             value: 1,
           },
         ],
@@ -396,6 +408,19 @@ const enemyBoss1: Enemy = {
   triggers: [
   ],
 };
+
+
+export function onAllAllyPositions(
+  state: GameState,
+  f: (id: number) => Action,
+): Action {
+  const indices = [...Array(state.crew.length).keys()]
+  const actions = indices.map(f);
+  return {
+    tag: "CombinedAction",
+    actions,
+  }
+}
 
 export const allEnemies = {
   /*enemyAtk012: enemyAtk012R10,

@@ -1,5 +1,5 @@
 import { Action } from "src/shared/game/action";
-import { Target, TargetSpec, showTarget } from "src/shared/game/target";
+import { Target, showTarget } from "src/shared/game/target";
 import { showStatus, Status } from "src/shared/game/status";
 import { showCondition } from "src/shared/game/trigger";
 

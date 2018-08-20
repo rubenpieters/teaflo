@@ -6,108 +6,6 @@ export type Origin = {
   type: TargetType,
 } | "noOrigin";
 
-export type Self = {
-  tag: "Self",
-};
-
-export type All = {
-  tag: "All",
-  type: TargetType,
-};
-
-export type AllCrewPos = {
-  tag: "AllCrewPos",
-};
-
-export type Last = {
-  tag: "Last",
-  type: TargetType,
-};
-
-export type Positions = {
-  tag: "Positions",
-  type: TargetType,
-  positions: number[],
-};
-
-export type OriginTarget = {
-  tag: "OriginTarget",
-};
-
-export type TargetSpec
-  = Self
-  | All
-  | AllCrewPos
-  | Last
-  | Positions
-  | OriginTarget
-  ;
-
-export function determineTarget(
-  target: TargetSpec,
-  state: GameState,
-  selfId: number,
-  selfType: TargetType,
-  origin: Origin,
-): Target {
-  switch (target.tag) {
-    case "Self": {
-      const coll = typeColl(state, selfType);
-      const index = indexOfId(selfId, coll);
-      if (index === "notFound") {
-        throw ("index " + index + " not found");
-      } else {
-        return {
-          tag: "Target",
-          type: selfType,
-          positions: [index],
-        };
-      }
-    }
-    case "All": {
-      const coll = typeColl(state, target.type);
-      return {
-        tag: "Target",
-        type: target.type,
-        positions: coll.map((_v, i) => i),
-      };
-    }
-    case "AllCrewPos": {
-      return {
-        tag: "Target",
-        type: "ally",
-        positions: [...Array(state.crewLimit).keys()],
-      };
-    }
-    case "Last": {
-      const coll = typeColl(state, selfType);
-      return {
-        tag: "Target",
-        type: target.type,
-        positions: [coll.length - 1],
-      };
-    }
-    case "Positions": {
-      return {
-        tag: "Target",
-        type: target.type,
-        positions: target.positions,
-      };
-    }
-    case "OriginTarget": {
-      if (origin === "noOrigin") {
-        throw "No origin!";
-      } else {
-        return {
-          tag: "Target",
-          type: origin.type,
-          positions: [origin.id],
-        };
-      }
-    }
-  }
-}
-
 export function typeColl(
   state: GameState,
   type: TargetType
@@ -149,7 +47,7 @@ function findIndex<A>(
 export type Target = {
   tag: "Target",
   type: TargetType;
-  positions: number[],
+  position: number,
 };
 
 export type TargetType = "ally" | "enemy" | "item";
@@ -164,62 +62,26 @@ export function onTarget(
   switch (target.type) {
     case "ally": {
       return focus(state,
-        over(x => x.crew, x => x.map((a, i) => {
-          if (target.positions.indexOf(i) === -1) {
-            return a;
-          } else {
-            return allyF(a);
-          }
-        })),
+        over(x => x.crew[target.position], allyF),
       );
     }
     case "enemy": {
       return focus(state,
-        over(x => x.enemies, x => x.map((a, i) => {
-          if (target.positions.indexOf(i) === -1) {
-            return a;
-          } else {
-            return enemyF(a);
-          }
-        })),
+        over(x => x.enemies[target.position], enemyF),
       );
     }
     case "item": {
       return focus(state,
-        over(x => x.items, x => x.map((a, i) => {
-          if (target.positions.indexOf(i) === -1) {
-            return a;
-          } else {
-            return itemF(a);
-          }
-        })),
+        over(x => x.items[target.position], itemF),
       );
     }
   }
 }
 
-export function showTarget(target: Target | TargetSpec): string {
+export function showTarget(target: Target): string {
   switch (target.tag) {
     case "Target": {
-      return `${target.positions} ${target.type}`;
-    }
-    case "Self": {
-      return "self";
-    }
-    case "All": {
-      return `all ${target.type}`;
-    }
-    case "AllCrewPos": {
-      return "all crew pos";
-    }
-    case "Last": {
-      return `last ${target.type}`;
-    }
-    case "Positions": {
-      return `${target.positions} ${target.type}`;
-    }
-    case "OriginTarget": {
-      return "origin";
+      return `${target.position} ${target.type}`;
     }
   }
 }
