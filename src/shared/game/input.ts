@@ -17,5 +17,3 @@ export type InputType
   = TargetInput
   | NumberInput
   ;
-
-export type InputActionSpec = (inputs: any[]) => ActionSpec;

@@ -6,7 +6,8 @@ import { Generator } from "src/shared/handler/id/generator";
 import { HasStatus, Guard } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 import { showAction } from "src/shared/game/log";
-import { TargetType, typeColl } from "./target";
+import { TargetType, typeColl } from "src/shared/game/target";
+import { InputType } from "src/shared/game/input";
 
 /*export function showCrew(
   crew: Crew
@@ -16,6 +17,12 @@ import { TargetType, typeColl } from "./target";
     triggers: crew.triggers.map(showTrigger) };
 }*/
 
+
+export type Ability = {
+  f: (inputs: any[]) => ActionSpec,
+  inputs: InputType[],
+};
+
 export type Crew = {
   ap: number,
   hp: number,
@@ -23,7 +30,7 @@ export type Crew = {
   ranged: boolean,
   actions: ActionSpec[],
   triggers: Trigger[],
-  abilities: ((inputs: any[]) => ActionSpec)[],
+  abilities: Ability[],
 };
 
 export function damage<E extends Crew & HasStatus>(
@@ -377,19 +384,21 @@ const armorOnSelfHeal: Crew = {
     }},
   ],
   abilities: [
-    (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
-      const targetPos: number = inputs[0];
-      const guard = state.crew[id].Guard;
-      let value = 0;
-      if (guard !== undefined) {
-        value = guard.value;
-      }
-      return {
-        tag: "Damage",
-        target: { tag: "Target", type: "enemy", positions: [targetPos] },
-        value,
-      };
-    }},
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+        const targetPos: number = inputs[0];
+        const guard = state.crew[id].Guard;
+        let value = 0;
+        if (guard !== undefined) {
+          value = guard.value;
+        }
+        return {
+          tag: "Damage",
+          target: { tag: "Target", type: "enemy", positions: [targetPos] },
+          value,
+        };
+      }},
+      inputs: [{ tag: "NumberInput" }],
+    },
   ],
 }
 
@@ -413,7 +422,7 @@ const regenOnDamageAlly: Crew = {
         } else {
           return {
             tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", positions: [id] },
+            target: { tag: "Target", type: "ally", positions: actionS.target.positions },
             status: {
               tag: "Regen",
               value: 1,
@@ -430,18 +439,20 @@ const regenOnDamageAlly: Crew = {
     }},
   ],
   abilities: [
-    (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
-      return {
-        tag: "QueueStatus",
-        // TODO: correct target all
-        target: { tag: "Target", type: "ally", positions: [0, 1, 2, 3], },
-        status: {
-          tag: "Guard",
-          value: 1,
-          guard: 5,
-        }
-      };
-    }},
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+        return {
+          tag: "QueueStatus",
+          // TODO: correct target all
+          target: { tag: "Target", type: "ally", positions: [0, 1, 2, 3], },
+          status: {
+            tag: "Guard",
+            value: 1,
+            guard: 5,
+          }
+        };
+      }},
+      inputs: [],
+    }
   ],
 }
 

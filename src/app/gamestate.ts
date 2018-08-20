@@ -1,19 +1,14 @@
 import { Solution, runSolutionAll } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
-import { abilityToAction, createCard, Ability } from "src/shared/game/ability";
+import { createCard } from "src/shared/game/ability";
 import { actionShort } from "src/shared/game/log";
-import { ActionTarget } from "src/shared/game/action";
+import { Action } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
 import { HasStatus, allStatus, showStatus } from "src/shared/game/status";
-import { TargetType } from "../shared/game/target";
-
-type AbilityInfo = {
-  ability: Ability,
-  state: GameState,
-  selfId: number,
-  type: TargetType,
-}
+import { TargetType } from "src/shared/game/target";
+import { Ability } from "src/shared/game/crew";
+import { InputType } from "../shared/game/input";
 
 export type Limit = {
   limit: number,
@@ -438,15 +433,7 @@ function mkState(
       sprite.endFill();
       sprite.inputEnabled = true;
 
-      const abilityInfo: AbilityInfo = {
-        ability,
-        state: board.lastState!,
-        selfId: allyId,
-        type: "ally",
-      };
-      //const abilityCard: Card = createCard(abilityToAction(ability, board.lastState!, allyId, "ally"), allyId, "ally");
-      
-      sprite.events.onInputDown.add(() => addToSolution(board, createCard(ability([0])(board.lastState!, allyId, "ally"), allyId, "ally")));
+      sprite.events.onInputDown.add(onAbilityClick(board, ability, allyId, ability.inputs, []));
       sprites.push(sprite);
     }
 
@@ -484,12 +471,38 @@ function mkState(
 }
 
 function onAbilityClick(
-
-)
+  board: Board,
+  ability: Ability,
+  allyId: number,
+  toHandleInputs: InputType[],
+  currentInputs: any[],
+) {
+  return function() {
+    if (toHandleInputs.length === 0) {
+      addToSolution(board, createCard(ability.f(currentInputs)(board.lastState!, allyId, "ally"), allyId, "ally"));
+    } else {
+      const currentInputType = toHandleInputs[0];
+      const tail = toHandleInputs.slice(1, toHandleInputs.length);
+      switch (currentInputType.tag) {
+        case "TargetInput": {
+          throw "TODO";
+        }
+        case "NumberInput": {
+          let input = prompt("Enter Number");
+          if (input === null) {
+            input = "0";
+          }
+          const inputParsed = parseInt(input);
+          onAbilityClick(board, ability, allyId, tail, currentInputs.concat(inputParsed));
+        }
+      }
+    }
+  }
+}
 
 function showAction(
   board: Board,
-  action: ActionTarget,
+  action: Action,
 ) {
   // clear old
   for (const text of board.graphics.infoTexts) {
@@ -519,7 +532,7 @@ function showAction(
 
       const enemyActionWidth = 180;
       for (const enemyAction of action.enemy.actions) {
-        const fontSize = 15; // Math.round(Math.min(21, enemyActionWidth / actionShort(enemyAction).length));
+        /*const fontSize = 15; // Math.round(Math.min(21, enemyActionWidth / actionShort(enemyAction).length));
         const enemyActionText: Phaser.Text = board.game.add.text(0, 0, actionShort(enemyAction), {
           font: "Arial",
           fontSize: fontSize,
@@ -528,7 +541,7 @@ function showAction(
           boundsAlignV: "middle",
         }, board.group);
         enemyActionText.setTextBounds(x, y, enemyActionWidth, 22);
-        infoTexts.push(enemyActionText);
+        infoTexts.push(enemyActionText);*/
   
         y += 25;
       }

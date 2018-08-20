@@ -5,6 +5,7 @@ import { allEnemies } from "src/shared/game/enemy";
 import { allItems } from "src/shared/game/item";
 import { showSolutionLog } from "src/shared/game/log";
 
+/*
 function basicCrewTest() {
   const path1: Path = {
     restCard: { actions: [{ tag: "Rest" }], id: 0, name: "", tag: "rest", subtag: "general" },
