@@ -1,6 +1,6 @@
 import { Solution, runSolutionAll, SolCard, SolRest, SolEvent } from "src/shared/game/solution";
 import { Card, Rest, Event } from "src/shared/game/card";
-import { GameState } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
 import { createCard } from "src/shared/game/ability";
 import { actionShort } from "src/shared/game/log";
 import { Action } from "src/shared/game/action";
@@ -424,6 +424,8 @@ function mkState(
     sprite.beginFill(0x4477CC);
     sprite.drawRect(0, 0, 20, 40);
     sprite.endFill();
+    sprite.inputEnabled = true;
+    sprite.events.onInputOver.add(() => showAlly(board, ally));
     sprites.push(sprite);
 
     const hpRatio = ally.hp / ally.maxHp;
@@ -462,6 +464,8 @@ function mkState(
     sprite.beginFill(0xCC7744);
     sprite.drawRect(0, 0, 20, 40);
     sprite.endFill();
+    sprite.inputEnabled = true;
+    sprite.events.onInputOver.add(() => showEnemy(board, enemy));
     sprites.push(sprite);
 
     const hpRatio = enemy.hp / enemy.maxHp;
@@ -576,7 +580,7 @@ function showAction(
   board.graphics.infoTexts = infoTexts;
 }
 
-function showEntityStatus (
+function showEntityStatus(
   board: Board,
   hasStatus: HasStatus,
 ) {
@@ -606,5 +610,59 @@ function showEntityStatus (
 
     y += 25;
   }
+  board.graphics.infoTexts = infoTexts;
+}
+
+function showAlly(
+  board: Board,
+  ally: IdCrew,
+) {
+  // clear old
+  for (const text of board.graphics.infoTexts) {
+    text.destroy();
+  }
+
+  const x = 620;
+  let y = 50;
+  const infoTexts: Phaser.Text[] = [];
+
+  const fontSize = 15;
+  const enemyActionText: Phaser.Text = board.game.add.text(0, 0, `HP: ${ally.hp}/${ally.maxHp}`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  enemyActionText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(enemyActionText);
+
+  board.graphics.infoTexts = infoTexts;
+}
+
+function showEnemy(
+  board: Board,
+  enemy: IdEnemy,
+) {
+  // clear old
+  for (const text of board.graphics.infoTexts) {
+    text.destroy();
+  }
+
+  const x = 620;
+  let y = 50;
+  const infoTexts: Phaser.Text[] = [];
+
+  const fontSize = 15;
+  const enemyActionText: Phaser.Text = board.game.add.text(0, 0, `HP: ${enemy.hp}/${enemy.maxHp}`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  enemyActionText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(enemyActionText);
+
   board.graphics.infoTexts = infoTexts;
 }
