@@ -36,7 +36,7 @@ const cardRest: Card = {
   id: 0,
   name: "Rest",
   actions: [
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "Rest" }
       }},
       inputs: [],
@@ -50,7 +50,7 @@ const cardBattleTurn: Card = {
   id: 1,
   name: "Battle",
   actions: [
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "BattleTurn" }
       }},
       inputs: [],
@@ -92,7 +92,7 @@ const cardCrew_0003: Card = {
   id: 1003,
   name: "ArmorSelf",
   actions: [
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddCrew", crew: allCrew.armorOnSelfHeal };
       }},
       inputs: [],
@@ -106,7 +106,7 @@ const cardCrew_0004: Card = {
   id: 1004,
   name: "RegenDmg",
   actions: [
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddCrew", crew: allCrew.regenOnDamageAlly };
       }},
       inputs: [],
@@ -120,12 +120,12 @@ const cardItem_0000: Card = {
   id: 2000,
   name: "Shield",
   actions: [
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "PayGold", pay: 5 };
       }},
       inputs: [],
     },
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddItem", item: allItems.guard1StartCombat };
       }},
       inputs: [],
@@ -235,7 +235,7 @@ const cardBattle_0009: Card = {
   id: 3009,
   name: "Enemy9",
   actions: [
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddEnemy", enemy: allEnemies.enemyBoss1 };
       }},
       inputs: [],

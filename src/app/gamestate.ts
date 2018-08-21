@@ -489,18 +489,19 @@ function onAbilityClick(
       addToSolution(board, createCard(ability.f(currentInputs)(board.lastState!, allyId, "ally"), allyId, "ally"));
     } else {
       const currentInputType = toHandleInputs[0];
-      const tail = toHandleInputs.slice(1, toHandleInputs.length);
+      const tail = toHandleInputs.slice(1);
       switch (currentInputType.tag) {
         case "TargetInput": {
           throw "TODO";
         }
         case "NumberInput": {
           let input = prompt("Enter Number");
+          console.log("GIVEN INPUT: " + input);
           if (input === null) {
             input = "0";
           }
           const inputParsed = parseInt(input);
-          onAbilityClick(board, ability, allyId, tail, currentInputs.concat(inputParsed));
+          onAbilityClick(board, ability, allyId, tail, currentInputs.concat(inputParsed))();
         }
       }
     }
