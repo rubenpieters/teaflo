@@ -8,6 +8,10 @@ export type Poison = {
   tag: "Poison",
   value: number,
 };
+export type PiercingPoison = {
+  tag: "PiercingPoison",
+  value: number,
+};
 
 export type Regen = {
   tag: "Regen",
@@ -37,6 +41,7 @@ export type Silence = {
 
 export type Status
   = Poison
+  | PiercingPoison
   | Regen
   | Guard
   | Doom
@@ -48,6 +53,9 @@ export function showStatus(status: Status): string {
   switch (status.tag) {
     case "Poison": {
       return `Poison ${status.value} T`;
+    }
+    case "PiercingPoison": {
+      return `PiercingPoison ${status.value} T`;
     }
     case "Regen": {
       return `Regen ${status.value} T`;
@@ -67,11 +75,12 @@ export function showStatus(status: Status): string {
   }
 }
 
-export const allStatus: Status["tag"][] = ["Regen", "Poison", "Doom", "Guard", "Blind", "Silence"];
+export const allStatus: Status["tag"][] = ["Regen", "PiercingPoison", "Poison", "Doom", "Guard", "Blind", "Silence"];
 
 // conditional types
 type StatusType<A> =
   A extends "Poison" ? Poison :
+  A extends "PiercingPoison" ? Poison :
   A extends "Regen" ? Regen :
   A extends "Guard" ? Guard :
   A extends "Doom" ? Doom :
@@ -143,6 +152,19 @@ export function statusToAction(
           type: selfType,
         },
         value: status.value,
+        piercing: false,
+      };
+    }
+    case "PiercingPoison": {
+      return {
+        tag: "Damage",
+        target: {
+          tag: "Target",
+          position: selfIndex,
+          type: selfType,
+        },
+        value: status.value,
+        piercing: true,
       };
     }
     case "Regen": {

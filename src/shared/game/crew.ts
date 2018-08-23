@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Trigger, showTrigger, findIndex } from "src/shared/game/trigger";
 import { GameState, IdCrew } from "src/shared/game/state";
-import { Action, ActionSpec, applyActionAndTriggers, Heal, Damage } from "src/shared/game/action";
+import { Action, ActionSpec, applyActionAndTriggers, Heal, Damage, AddStatus } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { HasStatus, Guard } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
@@ -36,8 +36,9 @@ export type Crew = {
 export function damage<E extends Crew & HasStatus>(
   crew: E,
   damage: number,
+  piercing: boolean,
 ) {
-  if (crew.Guard === undefined) {
+  if (piercing || crew.Guard === undefined) {
     return focus(crew, over(x => x.hp, x => x - damage));
   } else {
     if (damage <= crew.Guard.guard) {
@@ -374,6 +375,22 @@ const armorOnSelfHeal: Crew = {
           };
         }
       }},
+    },
+    {
+      onTag: "AddStatus",
+      type: "instead",
+      action: (action: Action) => { return (state: GameState, id: number, type: TargetType) => {
+        const index = findIndex(x => x.id === id, typeColl(state, type));
+        if (index === "notFound") {
+          throw `not found ${id}`;
+        }
+        const actionS = <AddStatus>action;
+        if (actionS.target.position === id && actionS.status.tag === "Poison") {
+          return focus(actionS, set(x => x.status.tag, "PiercingPoison"));
+        } else {
+          return actionS;
+        }
+      }},
     }
   ],
   ranged: false,
@@ -394,6 +411,7 @@ const armorOnSelfHeal: Crew = {
           tag: "Damage",
           target: { tag: "Target", type: "enemy", position: targetPos },
           value,
+          piercing: false,
         };
       }},
       inputs: [{ tag: "NumberInput" }],

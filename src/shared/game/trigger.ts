@@ -5,7 +5,7 @@ import { showAction } from "src/shared/game/log";
 
 export type Trigger = {
   onTag: string,
-  type: "before", // | "after" | "on"
+  type: "before" | "instead",
   action: (a: Action) => ActionSpec,
 };
 

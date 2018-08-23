@@ -39,6 +39,7 @@ export type Damage = {
   tag: "Damage",
   target: Target,
   value: number,
+  piercing: boolean,
 };
 
 export type Heal = {
@@ -163,6 +164,8 @@ export function applyActionAndTriggers(
   return applyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen, origin);
 }
 
+// TODO: checking tags can be done in triggers themselves?
+
 function applyActionAndTriggersAt(
   action: Action,
   state: GameState,
@@ -183,6 +186,8 @@ function applyActionAndTriggersAt(
           }
           state = afterTrigger.state;
           log = afterTrigger.log;
+        } else if (trigger.onTag === action.tag && trigger.type === "instead") {
+          action = trigger.action(action)(state, enemy.id, "enemy");
         }
       }
     }
@@ -201,6 +206,8 @@ function applyActionAndTriggersAt(
           }
           state = afterTrigger.state;
           log = afterTrigger.log;
+        } else if (trigger.onTag === action.tag && trigger.type === "instead") {
+          action = trigger.action(action)(state, item.id, "item");
         }
       }
     }
@@ -218,6 +225,8 @@ function applyActionAndTriggersAt(
         }
         state = afterTrigger.state;
         log = afterTrigger.log;
+      } else if (trigger.onTag === action.tag && trigger.type === "instead") {
+        action = trigger.action(action)(state, ally.id, "ally");
       }
     }
   }
@@ -266,8 +275,8 @@ function applyAction(
       }
       // apply damage
       state = onTarget(action.target, state,
-        ally => _Crew.damage(ally, action.value),
-        enemy => _Enemy.damage(enemy, action.value),
+        ally => _Crew.damage(ally, action.value, action.piercing),
+        enemy => _Enemy.damage(enemy, action.value, action.piercing),
         _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;

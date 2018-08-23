@@ -26,6 +26,7 @@ export type Enemy = {
 export function damage<E extends Enemy>(
   enemy: E,
   damage: number,
+  _piercing: boolean,
 ): E {
   return focus(enemy,
     over(x => x.hp, x => x - damage),
@@ -339,7 +340,7 @@ const enemyBoss1: Enemy = {
             target: { tag: "Target", type: "ally", position: id },
             status: {
               tag: "Poison",
-              value: 4,
+              value: 3,
             }
           }},
       ),
@@ -384,21 +385,25 @@ const enemyBoss1: Enemy = {
             tag: "Damage",
             target: { tag: "Target", type: "ally", position: 0 },
             value: 10,
+            piercing: false,
           },
           {
             tag: "Damage",
             target: { tag: "Target", type: "ally", position: 1 },
             value: 5,
+            piercing: false,
           },
           {
             tag: "Damage",
             target: { tag: "Target", type: "ally", position: 2 },
             value: 2,
+            piercing: false,
           },
           {
             tag: "Damage",
             target: { tag: "Target", type: "ally", position: 3 },
             value: 1,
+            piercing: false,
           },
         ],
         next: { tag: "NextId" },
