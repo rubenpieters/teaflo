@@ -99,6 +99,12 @@ export function addStatus<E extends HasStatus>(
 ): E {
   if (e[status.tag] === undefined) {
     return focus(e, set(x => x[status.tag], status));
+  } else if (status.tag === "Guard") {
+    // cast to prevent 'undefined' warning
+    return focus(e,
+      over(x => (<Guard>x[status.tag]).value, x => x + status.value),
+      over(x => (<Guard>x[status.tag]).guard, x => x + status.guard),
+    );
   } else {
     // cast to prevent 'undefined' warning
     return focus(e, over(x => (<Status>x[status.tag]).value, x => x + status.value));
