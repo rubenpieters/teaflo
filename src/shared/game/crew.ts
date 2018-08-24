@@ -405,7 +405,7 @@ const armorOnSelfHeal: Crew = {
         const guard = state.crew[id].Guard;
         let value = 0;
         if (guard !== undefined) {
-          value = guard.value;
+          value = guard.guard;
         }
         return {
           tag: "Damage",
