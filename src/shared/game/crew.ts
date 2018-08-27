@@ -375,6 +375,7 @@ const armorOnSelfHeal: Crew = {
           };
         }
       }},
+      charges: Infinity,
     },
     {
       onTag: "AddStatus",
@@ -391,6 +392,7 @@ const armorOnSelfHeal: Crew = {
           return actionS;
         }
       }},
+      charges: Infinity,
     }
   ],
   ranged: false,
@@ -447,6 +449,7 @@ const regenOnDamageAlly: Crew = {
           };
         }
       }},
+      charges: Infinity,
     }
   ],
   ranged: false,
@@ -489,6 +492,23 @@ export function onAllAlly(
   }
 }
 
+
+const tank1: Crew = {
+  ap: 1,
+  hp: 20,
+  maxHp: 20,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    (state: GameState, id: number, type: TargetType) => { return {
+      tag: "Noop",
+    }},
+  ],
+  abilities: [
+  ],
+}
+
 export const allCrew = {
   /*stFighter: stFighter,
   stRanged: stRanged,
@@ -497,4 +517,5 @@ export const allCrew = {
   abilityHeal: abilityHeal,*/
   armorOnSelfHeal: armorOnSelfHeal,
   regenOnDamageAlly: regenOnDamageAlly,
+  tank1: tank1,
 };

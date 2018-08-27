@@ -116,6 +116,20 @@ const cardCrew_0004: Card = {
   subtag: "crew",
 };
 
+const cardCrew_0005: Card = {
+  id: 1005,
+  name: "Tank1",
+  actions: [
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+      return { tag: "AddCrew", crew: allCrew.tank1 };
+      }},
+      inputs: [],
+    },
+  ],
+  tag: "event",
+  subtag: "crew",
+};
+
 const cardItem_0000: Card = {
   id: 2000,
   name: "Shield",
@@ -245,6 +259,20 @@ const cardBattle_0009: Card = {
   subtag: "enemy",
 };
 
+const cardBattle_0010: Card = {
+  id: 3010,
+  name: "Enemy10",
+  actions: [
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+      return { tag: "AddEnemy", enemy: allEnemies.enemyBoss2 };
+      }},
+      inputs: [],
+    },
+  ],
+  tag: "event",
+  subtag: "enemy",
+};
+
 export const allCards = {
   cardBattleTurn: cardBattleTurn,
   cardRest: cardRest,
@@ -254,6 +282,7 @@ export const allCards = {
   cardCrew_0002: cardCrew_0002,*/
   cardCrew_0003: cardCrew_0003,
   cardCrew_0004: cardCrew_0004,
+  cardCrew_0005: cardCrew_0005,
 
   cardItem_0000: cardItem_0000,
 
@@ -267,4 +296,5 @@ export const allCards = {
   cardBattle_0007: cardBattle_0007,
   cardBattle_0008: cardBattle_0008,*/
   cardBattle_0009: cardBattle_0009,
+  cardBattle_0010: cardBattle_0010,
 };

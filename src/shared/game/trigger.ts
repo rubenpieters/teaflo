@@ -7,6 +7,7 @@ export type Trigger = {
   onTag: string,
   type: "before" | "instead",
   action: (a: Action) => ActionSpec,
+  charges: number,
 };
 
 export type OwnId = {

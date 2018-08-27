@@ -40,6 +40,8 @@ export function getBoard(_serverConn: ServerConnection, board: Board, seed: stri
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
       {...allCards.cardRest, limit: Infinity },
+      {...allCards.cardCrew_0005, limit: 5 },
+      {...allCards.cardBattle_0010, limit: 1 },
       /*{...allCards.cardCrew_0000, limit: 5 },
       {...allCards.cardCrew_0001, limit: 5 },
       {...allCards.cardBattle_0003, limit: 1 },

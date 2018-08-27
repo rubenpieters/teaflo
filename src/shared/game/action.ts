@@ -10,6 +10,7 @@ import { Item } from "src/shared/game/item";
 import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 import { StatusLog } from "./log";
+import { Trigger } from "./trigger";
 
 export type ActionSpec = (state: GameState, selfId: number, selfType: TargetType) => Action;
 
@@ -174,6 +175,8 @@ function applyActionAndTriggersAt(
   idGen: Generator,
   origin: Origin,
 ): { state: GameState | "invalid", log: Action[] } {
+  // TODO: reduce trigger charges
+
   // enemy interactions with effects
   if (from.type === "enemy") {
     for (const enemy of state.enemies.slice(from.id)) {

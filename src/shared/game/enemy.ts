@@ -427,6 +427,51 @@ export function onAllAllyPositions(
   }
 }
 
+const enemyBoss2: Enemy = {
+  hp: 40,
+  maxHp: 40,
+  actions: [
+    (state: GameState, id: number, type: TargetType) => {
+      return {
+        tag: "Damage",
+        target: { tag: "Target", type: "ally", position: 0 },
+        value: 10,
+        piercing: false,
+        next: { tag: "NextId" },
+      }
+    },
+    (state: GameState, id: number, type: TargetType) => {
+      return {
+        tag: "Damage",
+        target: { tag: "Target", type: "ally", position: 1 },
+        value: 10,
+        piercing: false,
+        next: { tag: "NextId" },
+      }
+    },
+    (state: GameState, id: number, type: TargetType) => {
+      return {
+        tag: "Damage",
+        target: { tag: "Target", type: "ally", position: 2 },
+        value: 10,
+        piercing: false,
+        next: { tag: "NextId" },
+      }
+    },
+    (state: GameState, id: number, type: TargetType) => {
+      return {
+        tag: "Damage",
+        target: { tag: "Target", type: "ally", position: 3 },
+        value: 10,
+        piercing: false,
+        next: { tag: "NextId" },
+      }
+    },
+  ],
+  triggers: [
+  ],
+};
+
 export const allEnemies = {
   /*enemyAtk012: enemyAtk012R10,
   enemyRegenApMinR20: enemyRegenApMinR20,
@@ -437,4 +482,5 @@ export const allEnemies = {
   enemy20HpDoom: enemy20HpDoom,
   enemyAtk2Hp15: enemyAtk2Hp15,*/
   enemyBoss1: enemyBoss1,
+  enemyBoss2: enemyBoss2,
 };
