@@ -25,6 +25,7 @@ function test1() {
                 tag: "Guard",
                 value: 1,
                 guard: 5,
+                fragment: 0,
               },
             }
           }

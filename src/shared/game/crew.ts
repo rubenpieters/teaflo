@@ -372,6 +372,7 @@ const armorOnSelfHeal: Crew = {
                 tag: "Guard",
                 value: 1,
                 guard: 1,
+                fragment: 0,
               },
             },
             charges: 1,
@@ -449,6 +450,7 @@ const regenOnDamageAlly: Crew = {
               status: {
                 tag: "Regen",
                 value: 1,
+                fragment: 0,
               },
             },
             charges: 1,
@@ -477,6 +479,7 @@ const regenOnDamageAlly: Crew = {
               tag: "Guard",
               value: 1,
               guard: 5,
+              fragment: 0,
             }
           };
         }

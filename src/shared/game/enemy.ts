@@ -341,6 +341,7 @@ const enemyBoss1: Enemy = {
             status: {
               tag: "Poison",
               value: 3,
+              fragment: 0,
             }
           }},
       ),
@@ -356,6 +357,7 @@ const enemyBoss1: Enemy = {
             status: {
               tag: "Blind",
               value: 4,
+              fragment: 0,
             }
           }},
         ),
@@ -371,6 +373,7 @@ const enemyBoss1: Enemy = {
             status: {
               tag: "Silence",
               value: 3,
+              fragment: 0,
             }
           }},
         ),
