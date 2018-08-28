@@ -130,6 +130,20 @@ const cardCrew_0005: Card = {
   subtag: "crew",
 };
 
+const cardCrew_0006: Card = {
+  id: 1006,
+  name: "Dmg1",
+  actions: [
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+      return { tag: "AddCrew", crew: allCrew.dmg1 };
+      }},
+      inputs: [],
+    },
+  ],
+  tag: "event",
+  subtag: "crew",
+};
+
 const cardItem_0000: Card = {
   id: 2000,
   name: "Shield",
@@ -283,6 +297,7 @@ export const allCards = {
   cardCrew_0003: cardCrew_0003,
   cardCrew_0004: cardCrew_0004,
   cardCrew_0005: cardCrew_0005,
+  cardCrew_0006: cardCrew_0006,
 
   cardItem_0000: cardItem_0000,
 

@@ -175,63 +175,104 @@ function applyActionAndTriggersAt(
   idGen: Generator,
   origin: Origin,
 ): { state: GameState | "invalid", log: Action[] } {
-  // TODO: reduce trigger charges
-
   // enemy interactions with effects
   if (from.type === "enemy") {
+    let indexEnemy = 0;
     for (const enemy of state.enemies.slice(from.id)) {
+      let indexTrigger = 0;
       for (const trigger of enemy.triggers) {
-        if (trigger.onTag === action.tag && trigger.type === "before") {
+        if (trigger.charges > 0 && trigger.onTag === action.tag && trigger.type === "before") {
+          const triggerResult = trigger.action(action)(state, enemy.id, "enemy");
+          state = focus(state,
+            over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.charges),
+          );
           const afterTrigger = applyActionAndTriggersAt(
-            trigger.action(action)(state, enemy.id, "enemy"), state, log, { id: from.id + 1, type: "enemy" }, idGen, origin);
+            triggerResult.action, state, log, { id: from.id + 1, type: "enemy" }, idGen, origin);
           if (afterTrigger.state === "invalid") {
             return afterTrigger;
           }
           state = afterTrigger.state;
           log = afterTrigger.log;
         } else if (trigger.onTag === action.tag && trigger.type === "instead") {
-          action = trigger.action(action)(state, enemy.id, "enemy");
+          const triggerResult = trigger.action(action)(state, enemy.id, "enemy");
+          state = focus(state,
+            over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.charges),
+          );
+          action = triggerResult.action;
         }
+        indexTrigger += 1;
       }
+      state = focus(state,
+        set(x => x.enemies[indexEnemy].triggers, state.enemies[indexEnemy].triggers.filter(v => v.charges > 0)),
+      );
+      indexEnemy += 1;
     }
   }
 
   // item interactions with effects
   if (from.type === "item" || from.type === "enemy") {
     const startId = from.type === "item" ? from.id : 0;
+    let indexItem = startId;
     for (const item of state.items.slice(startId)) {
+      let indexTrigger = 0;
       for (const trigger of item.triggers) {
-        if (trigger.onTag === action.tag && trigger.type === "before") {
+        if (trigger.charges > 0 && trigger.onTag === action.tag && trigger.type === "before") {
+          const triggerResult = trigger.action(action)(state, item.id, "item");
+          state = focus(state,
+            over(x => x.items[indexItem].triggers[indexTrigger].charges, x => x - triggerResult.charges),
+          );
           const afterTrigger = applyActionAndTriggersAt(
-            trigger.action(action)(state, item.id, "item"), state, log, { id: from.id + 1, type: "item" }, idGen, origin);
+            triggerResult.action, state, log, { id: from.id + 1, type: "item" }, idGen, origin);
           if (afterTrigger.state === "invalid") {
             return afterTrigger;
           }
           state = afterTrigger.state;
           log = afterTrigger.log;
         } else if (trigger.onTag === action.tag && trigger.type === "instead") {
-          action = trigger.action(action)(state, item.id, "item");
+          const triggerResult = trigger.action(action)(state, item.id, "item");
+          state = focus(state,
+            over(x => x.items[indexItem].triggers[indexTrigger].charges, x => x - triggerResult.charges),
+          );
+          action = triggerResult.action;
         }
       }
+      state = focus(state,
+        set(x => x.items[indexItem].triggers, state.items[indexItem].triggers.filter(v => v.charges > 0)),
+      );
+      indexItem += 1;
     }
   }
 
   const fromCrew = from.type === "crew" ? from.id : 0;
   // crew interactions with effects
+  let indexAlly = fromCrew;
   for (const ally of state.crew.slice(fromCrew)) {
+    let indexTrigger = 0;
     for (const trigger of ally.triggers) {
-      if (trigger.onTag === action.tag && trigger.type === "before") {
+      if (trigger.charges > 0 && trigger.onTag === action.tag && trigger.type === "before") {
+        const triggerResult = trigger.action(action)(state, ally.id, "ally");
+        state = focus(state,
+          over(x => x.crew[indexAlly].triggers[indexTrigger].charges, x => x - triggerResult.charges),
+        );
         const afterTrigger = applyActionAndTriggersAt(
-          trigger.action(action)(state, ally.id, "ally"), state, log, { id: from.id + 1, type: "crew" }, idGen, origin);
+          triggerResult.action, state, log, { id: from.id + 1, type: "crew" }, idGen, origin);
         if (afterTrigger.state === "invalid") {
           return afterTrigger;
         }
         state = afterTrigger.state;
         log = afterTrigger.log;
       } else if (trigger.onTag === action.tag && trigger.type === "instead") {
-        action = trigger.action(action)(state, ally.id, "ally");
+        const triggerResult = trigger.action(action)(state, ally.id, "ally");
+        state = focus(state,
+          over(x => x.crew[indexAlly].triggers[indexTrigger].charges, x => x - triggerResult.charges),
+        );
+        action = triggerResult.action;
       }
     }
+    state = focus(state,
+      set(x => x.crew[indexAlly].triggers, state.crew[indexAlly].triggers.filter(v => v.charges > 0)),
+    );
+    indexAlly += 1;
   }
 
   const afterApply = applyAction(action, state, log, idGen);

@@ -362,16 +362,19 @@ const armorOnSelfHeal: Crew = {
         }
         const actionS = <Heal>action;
         if (actionS.target.position !== id) {
-          return { tag: "Noop" };
+          return { action: { tag: "Noop" }, charges: 0 };
         } else {
           return {
-            tag: "QueueStatus",
-            target: { tag: "Target", type, position: index, },
-            status: {
-              tag: "Guard",
-              value: 1,
-              guard: 1,
+            action: {
+              tag: "QueueStatus",
+              target: { tag: "Target", type, position: index, },
+              status: {
+                tag: "Guard",
+                value: 1,
+                guard: 1,
+              },
             },
+            charges: 1,
           };
         }
       }},
@@ -387,9 +390,9 @@ const armorOnSelfHeal: Crew = {
         }
         const actionS = <AddStatus>action;
         if (actionS.target.position === id && actionS.status.tag === "Poison") {
-          return focus(actionS, set(x => x.status.tag, "PiercingPoison"));
+          return { action: focus(actionS, set(x => x.status.tag, "PiercingPoison")), charges: 1 };
         } else {
-          return actionS;
+          return { action: actionS, charges: 0 };
         }
       }},
       charges: Infinity,
@@ -437,16 +440,19 @@ const regenOnDamageAlly: Crew = {
         }
         const actionS = <Damage>action;
         if (actionS.target.type !== "ally") {
-          return { tag: "Noop" };
+          return { action: { tag: "Noop" }, charges: 0 };
         } else {
           return {
-            tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", position: actionS.target.position },
-            status: {
-              tag: "Regen",
-              value: 1,
+            action: {
+              tag: "QueueStatus",
+              target: { tag: "Target", type: "ally", position: actionS.target.position },
+              status: {
+                tag: "Regen",
+                value: 1,
+              },
             },
-          };
+            charges: 1,
+          }
         }
       }},
       charges: Infinity,
@@ -498,6 +504,29 @@ const tank1: Crew = {
   hp: 20,
   maxHp: 20,
   triggers: [
+    {
+      onTag: "Damage",
+      type: "instead",
+      action: (action: Action) => { return (state: GameState, id: number, type: TargetType) => {
+        const index = findIndex(x => x.id === id, typeColl(state, type));
+        if (index === "notFound") {
+          throw `not found ${id}`;
+        }
+        const actionS = <Damage>action;
+        if (actionS.target.type !== "ally" || (actionS.target.type === "ally" && actionS.target.position === index)) {
+          return { action, charges: 0 };
+        } else {
+          return {
+            action: {
+              ...action,
+              target: { tag: "Target", type: "ally", position: index },
+            },
+            charges: 1,
+          }
+        }
+      }},
+      charges: 1,
+    }
   ],
   ranged: false,
   actions: [
@@ -506,6 +535,33 @@ const tank1: Crew = {
     }},
   ],
   abilities: [
+  ],
+}
+
+const dmg1: Crew = {
+  ap: 1,
+  hp: 15,
+  maxHp: 15,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    (state: GameState, id: number, type: TargetType) => { return {
+      tag: "Noop",
+    }},
+  ],
+  abilities: [
+    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      const targetPos: number = inputs[0];
+      return {
+        tag: "Damage",
+        target: { tag: "Target", type: "enemy", position: targetPos },
+        value: 15,
+        piercing: false,
+      };
+    }},
+    inputs: [{ tag: "NumberInput" }],
+  },
   ],
 }
 
@@ -518,4 +574,5 @@ export const allCrew = {
   armorOnSelfHeal: armorOnSelfHeal,
   regenOnDamageAlly: regenOnDamageAlly,
   tank1: tank1,
+  dmg1: dmg1,
 };

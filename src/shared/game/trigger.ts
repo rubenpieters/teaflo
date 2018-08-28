@@ -6,7 +6,7 @@ import { showAction } from "src/shared/game/log";
 export type Trigger = {
   onTag: string,
   type: "before" | "instead",
-  action: (a: Action) => ActionSpec,
+  action: (a: Action) => (state: GameState, selfId: number, selfType: TargetType) => { action: Action, charges: number },
   charges: number,
 };
 
