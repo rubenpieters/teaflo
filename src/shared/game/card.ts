@@ -1,10 +1,10 @@
 import { Action, ActionSpec } from "src/shared/game/action";
 import { Target, Origin, TargetType } from "src/shared/game/target";
-import { allCrew, Ability } from "src/shared/game/crew";
+import { allCrew, Ability, onAllAlly } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { allEnemies } from "src/shared/game/enemy";
 import { showAction } from "src/shared/game/log";
-import { GameState } from "./state";
+import { GameState, IdCrew } from "./state";
 
 export function showCard(card: Card) {
   //return { ...card, actions: card.actions.map(showAction) };
@@ -134,6 +134,37 @@ const cardCrew_0006: Card = {
   id: 1006,
   name: "Dmg1",
   actions: [
+    { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+      return { tag: "AddCrew", crew: allCrew.dmg1 };
+      }},
+      inputs: [],
+    },
+  ],
+  tag: "event",
+  subtag: "crew",
+};
+
+const cardCrew_0007: Card = {
+  id: 1007,
+  name: "Dmg2",
+  actions: [
+    { f: (_inputs: any[]) => { return (state: GameState, _id: number, _type: TargetType) => {
+      return onAllAlly(state, 
+        (ally: IdCrew, id: number) => {
+          return {
+            tag: "QueueStatus",
+            target: { tag: "Target", type: "ally", position: id, },
+            status: {
+              tag: "Doom",
+              value: 0,
+              fragment: 50,
+            }
+          };
+        }
+      );
+      }},
+      inputs: [],
+    },
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddCrew", crew: allCrew.dmg1 };
       }},
@@ -298,6 +329,7 @@ export const allCards = {
   cardCrew_0004: cardCrew_0004,
   cardCrew_0005: cardCrew_0005,
   cardCrew_0006: cardCrew_0006,
+  cardCrew_0007: cardCrew_0007,
 
   cardItem_0000: cardItem_0000,
 

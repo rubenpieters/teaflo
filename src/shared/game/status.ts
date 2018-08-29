@@ -123,7 +123,7 @@ export function addStatus<E extends HasStatus>(
   }
 
   if (result[status.tag]!.fragment > 99) {
-    const toAdd = Math.floor(status.fragment / 100);
+    const toAdd = Math.floor(result[status.tag]!.fragment / 100);
     result = focus(result,
       over(x => x[status.tag]!.value, x => x + toAdd),
       over(x => x[status.tag]!.fragment, x => x - toAdd * 100),
