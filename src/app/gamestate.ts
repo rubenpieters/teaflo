@@ -1,5 +1,5 @@
 import { Solution, runSolutionAll, SolCard, SolRest, SolEvent } from "src/shared/game/solution";
-import { Card, Rest, Event } from "src/shared/game/card";
+import { Card, Rest, Event, PlayerOrigin } from "src/shared/game/card";
 import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
 import { createCard } from "src/shared/game/ability";
 import { actionShort } from "src/shared/game/log";
@@ -142,7 +142,7 @@ function popLeftMenu(
   }
 
   const filteredCards = board.availableCards
-    .filter((card) => card.subtag === board.selectedLeftMenu);
+    .filter((card) => card.tag === board.selectedLeftMenu);
 
   const x = 5;
   let y = 80;
@@ -180,14 +180,14 @@ function popLeftMenu(
     const effects: Phaser.Graphics[] = [];
     const effectTexts: Phaser.Text[] = [];
     let i = 0;
-    for (const action of card.actions) {
+    for (const action of card.effects) {
       const effect: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
       effect.beginFill(0x66BB88);
       effect.drawRect(0, 0, 165, 20);
       effect.endFill();
       effect.tint = 0xFFFFFF;
       effect.inputEnabled = true;
-      effect.events.onInputDown.add(() => console.log(`id: ${card.id} index ${i}`));
+      effect.events.onInputDown.add(() => console.log(`id: ${JSON.stringify(card.origin)} index ${i}`));
       //effect.events.onInputOver.add(() => showAction(board, action));
       effects.push(effect);
       
@@ -215,8 +215,9 @@ function addToSolution(
   board: Board,
   card: Card,
 ) {
-  if (card.id !== "created") {
-    const index = board.availableCards.findIndex(c => c.id === card.id);
+  if (card.origin.tag !== "EntityOrigin") {
+    const index = board.availableCards.findIndex(c =>
+      (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
     if (board.availableCards[index].limit <= 0) {
       return "noUses";
     }
@@ -226,11 +227,14 @@ function addToSolution(
   // TODO: correctly add user input
   const afterUserInput: SolCard = {
     ...card,
-    actions: card.actions.map((x: Ability) => x.f([])),
+    effects: card.effects.map((x: Ability) => x.f([])),
   }
 
   switch (afterUserInput.tag) {
-    case "event": {
+    case "crew":
+    case "enemy":
+    case "item":
+    case "general": {
       if (board.solution.paths.length === 0) {
         return "noPaths";
       } else {
@@ -259,8 +263,9 @@ function removeEventFromSolution(
     board.solution.paths[pathIndex].eventCards.slice(0, eventIndex).concat(
       board.solution.paths[pathIndex].eventCards.slice(eventIndex + 1, board.solution.paths[pathIndex].eventCards.length)
     );
-  if (card.id !== "created") {
-    const index = board.availableCards.findIndex(c => c.id === card.id);
+  if (card.origin.tag !== "EntityOrigin") {
+    const index = board.availableCards.findIndex(c =>
+      (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
     board.availableCards[index].limit += 1;
   }
   chLeftMenuTab(board, board.selectedLeftMenu);
@@ -273,8 +278,9 @@ function removeRestFromSolution(
   pathIndex: number,
 ) {
   for (const card of board.solution.paths[pathIndex].eventCards) {
-    if (card.id !== "created") {
-      const index = board.availableCards.findIndex(c => c.id === card.id);
+    if (card.origin.tag !== "EntityOrigin") {
+      const index = board.availableCards.findIndex(c =>
+        (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
       board.availableCards[index].limit += 1;
     }
   }
@@ -282,7 +288,9 @@ function removeRestFromSolution(
     board.solution.paths.slice(0, pathIndex).concat(
       board.solution.paths.slice(pathIndex + 1, board.solution.paths.length)
     );
-  const index = board.availableCards.findIndex(c => c.id === card.id);
+  // TODO: support rests with entity origin?
+  const index = board.availableCards.findIndex(c =>
+    (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
   board.availableCards[index].limit += 1;
   chLeftMenuTab(board, board.selectedLeftMenu);
   mkSolution(board);

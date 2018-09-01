@@ -10,32 +10,42 @@ export function showCard(card: Card) {
   //return { ...card, actions: card.actions.map(showAction) };
 }
 
+export type PlayerOrigin = {
+  tag: "PlayerOrigin",
+  cardId: number,
+};
+
+export type EntityOrigin = {
+  tag: "EntityOrigin",
+  entityId: number,
+  entityType: TargetType,
+};
+
+export type CardOrigin
+  = PlayerOrigin
+  | EntityOrigin
+  ;
+
 export type Event = {
-  tag: "event",
+  tag: "crew" | "enemy" | "item" | "general",
   name: string,
-  subtag: "crew" | "enemy" | "item" | "general" | "rest",
-  id: number | "created",
-  actions: Ability[],
-  origin?: Origin,
+  origin: CardOrigin,
+  effects: Ability[],
 };
 
 export type Rest = {
   tag: "rest",
   name: string,
-  subtag: "crew" | "enemy" | "item" | "general" | "rest",
-  id: number | "created",
-  actions: Ability[],
+  origin: CardOrigin,
+  effects: Ability[],
 };
 
-export type Card
-  = Event
-  | Rest
-  ;
+export type Card = Event | Rest;
 
 const cardRest: Card = {
-  id: 0,
+  origin: { tag: "PlayerOrigin", cardId: 0 },
   name: "Rest",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "Rest" }
       }},
@@ -43,21 +53,19 @@ const cardRest: Card = {
     },
   ],
   tag: "rest",
-  subtag: "rest",
 };
 
 const cardBattleTurn: Card = {
-  id: 1,
+  origin: { tag: "PlayerOrigin", cardId: 1 },
   name: "Battle",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "BattleTurn" }
       }},
       inputs: [],
     },
   ],
-  tag: "event",
-  subtag: "general",
+  tag: "general",
 };
 
 /*
@@ -89,65 +97,61 @@ const cardCrew_0002: Card = {
 */
 
 const cardCrew_0003: Card = {
-  id: 1003,
+  origin: { tag: "PlayerOrigin", cardId: 1003 },
   name: "ArmorSelf",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddCrew", crew: allCrew.armorOnSelfHeal };
       }},
       inputs: [],
     },
   ],
-  tag: "event",
-  subtag: "crew",
+  tag: "crew",
 };
 
 const cardCrew_0004: Card = {
-  id: 1004,
+  origin: { tag: "PlayerOrigin", cardId: 1004 },
   name: "RegenDmg",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddCrew", crew: allCrew.regenOnDamageAlly };
       }},
       inputs: [],
     },
   ],
-  tag: "event",
-  subtag: "crew",
+  tag: "crew",
 };
 
 const cardCrew_0005: Card = {
-  id: 1005,
+  origin: { tag: "PlayerOrigin", cardId: 1005 },
   name: "Tank1",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddCrew", crew: allCrew.tank1 };
       }},
       inputs: [],
     },
   ],
-  tag: "event",
-  subtag: "crew",
+  tag: "crew",
 };
 
 const cardCrew_0006: Card = {
-  id: 1006,
+  origin: { tag: "PlayerOrigin", cardId: 1006 },
   name: "Dmg1",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddCrew", crew: allCrew.dmg1 };
       }},
       inputs: [],
     },
   ],
-  tag: "event",
-  subtag: "crew",
+  tag: "crew",
 };
 
 const cardCrew_0007: Card = {
-  id: 1007,
+  origin: { tag: "PlayerOrigin", cardId: 1007 },
   name: "Dmg2",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (state: GameState, _id: number, _type: TargetType) => {
       return onAllAlly(state, 
         (ally: IdCrew, id: number) => {
@@ -171,14 +175,13 @@ const cardCrew_0007: Card = {
       inputs: [],
     },
   ],
-  tag: "event",
-  subtag: "crew",
+  tag: "crew",
 };
 
 const cardItem_0000: Card = {
-  id: 2000,
+  origin: { tag: "PlayerOrigin", cardId: 2000 },
   name: "Shield",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "PayGold", pay: 5 };
       }},
@@ -190,8 +193,7 @@ const cardItem_0000: Card = {
       inputs: [],
     },
   ],
-  tag: "event",
-  subtag: "item",
+  tag: "item",
 };
 
 /*
@@ -291,31 +293,29 @@ const cardBattle_0008: Card = {
 };*/
 
 const cardBattle_0009: Card = {
-  id: 3009,
+  origin: { tag: "PlayerOrigin", cardId: 3009 },
   name: "Enemy9",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddEnemy", enemy: allEnemies.enemyBoss1 };
       }},
       inputs: [],
     },
   ],
-  tag: "event",
-  subtag: "enemy",
+  tag: "enemy",
 };
 
 const cardBattle_0010: Card = {
-  id: 3010,
+  origin: { tag: "PlayerOrigin", cardId: 3010 },
   name: "Enemy10",
-  actions: [
+  effects: [
     { f: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
       return { tag: "AddEnemy", enemy: allEnemies.enemyBoss2 };
       }},
       inputs: [],
     },
   ],
-  tag: "event",
-  subtag: "enemy",
+  tag: "enemy",
 };
 
 export const allCards = {

@@ -3,23 +3,23 @@ import { Solution, Path, SolutionIndex, nextIndex, initialIndex } from "src/shar
 
 function basicTest() {
   const path1: Path = {
-    restCard: { actions: [<any>undefined, <any>undefined], id: 0, name: "", tag: "rest", subtag: "general" },
+    restCard: { effects: [<any>undefined, <any>undefined], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "rest" },
     eventCards: [
-      { actions: [
+      { effects: [
         <any>undefined,
         <any>undefined,
-      ], id: 0, tag: "event", name: "", subtag: "general" },
-      { actions: [{ tag: "Rest" }], id: 0, name: "", tag: "event", subtag: "general" },
+      ], origin: { tag: "PlayerOrigin", cardId: 0 }, tag: "general", name: "" },
+      { effects: [{ tag: "Rest" }], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "general" },
     ]
   }
   const path2: Path = {
-    restCard: { actions: [<any>undefined], id: 0, name: "", tag: "rest", subtag: "general" },
+    restCard: { effects: [<any>undefined], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "rest" },
     eventCards: [
-      { actions: [
+      { effects: [
         <any>undefined,
         <any>undefined,
-      ], id: 0, name: "", tag: "event", subtag: "general" },
-      { actions: [{ tag: "Rest" }], id: 0, name: "", tag: "event", subtag: "general" },
+      ], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "general" },
+      { effects: [{ tag: "Rest" }], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "general" },
     ]
   }
   const solution: Solution = {

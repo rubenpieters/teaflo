@@ -13,20 +13,19 @@ export function createCard(
   selfType: TargetType,
 ): Card {
   return {
-    id: "created",
     name: "-- created --",
-    actions: [
+    effects: [
       { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
         return action;
         }},
         inputs: [],
       },
     ],
-    tag: "event",
-    subtag: "general",
+    tag: "general",
     origin: {
-      id: selfId,
-      type: selfType,
+      tag: "EntityOrigin", 
+      entityId: selfId,
+      entityType: selfType,
     }
   };
 }

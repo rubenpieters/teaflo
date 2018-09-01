@@ -10,7 +10,7 @@ function test1() {
   const guardAction: Card = 
   {
       
-    actions: [
+    effects: [
       { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
         return onAllAlly(
           state,
@@ -34,10 +34,9 @@ function test1() {
         inputs: [],
       },
     ],
-    id: 0,
+    origin: { tag: "EntityOrigin", entityId: 2, entityType: "ally" },
     name: "",
-    tag: "event",
-    subtag: "general"
+    tag: "general",
   };
 
   const path1: Path = {
@@ -71,14 +70,14 @@ function test1() {
 function passNoInputsE(card: Event): SolEvent {
   return {
     ...card,
-    actions: card.actions.map(x => x.f([])),
+    effects: card.effects.map(x => x.f([])),
   }
 }
 
 function passNoInputsR(card: Rest): SolRest {
   return {
     ...card,
-    actions: card.actions.map(x => x.f([])),
+    effects: card.effects.map(x => x.f([])),
   }
 }
 

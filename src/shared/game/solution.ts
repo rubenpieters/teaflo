@@ -1,32 +1,25 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Card, Rest, Event } from "src/shared/game/card";
+import { Card, Rest, Event, CardOrigin } from "src/shared/game/card";
 import { Action, applyActionAndTriggers, enemyTurn, checkDeaths, checkStatusCrew, checkStatusEnemy, applyActionQueue, ActionSpec } from "src/shared/game/action";
 import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
-import { Origin } from "src/shared/game/target";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
 
 export type SolEvent = {
-  tag: "event",
+  tag: "crew" | "enemy" | "item" | "general",
   name: string,
-  subtag: "crew" | "enemy" | "item" | "general" | "rest",
-  id: number | "created",
-  actions: ActionSpec[],
-  origin?: Origin,
+  origin: CardOrigin,
+  effects: ActionSpec[],
 };
 
 export type SolRest = {
   tag: "rest",
   name: string,
-  subtag: "crew" | "enemy" | "item" | "general" | "rest",
-  id: number | "created",
-  actions: ActionSpec[],
+  origin: CardOrigin,
+  effects: ActionSpec[],
 };
 
-export type SolCard
-  = SolEvent
-  | SolRest
-  ;
+export type SolCard = SolEvent | SolRest;
 
 export type Path = {
   restCard: SolRest,
@@ -52,23 +45,23 @@ export const initialIndex: SolutionIndex = {
 function nextAction(
   index: SolutionIndex,
   solution: Solution
-): { action: ActionSpec, origin: Origin } {
+): { action: ActionSpec, origin: CardOrigin } {
   const path: Path | undefined = solution.paths[index.path];
   if (path === undefined) {
     throw ("invalid index: " + JSON.stringify(index));
   }
   if (index.card === "rest") {
-    return { action: path.restCard.actions[index.action], origin: "noOrigin" };
+    return { action: path.restCard.effects[index.action], origin: path.restCard.origin };
   }
   const card: SolCard | undefined = path.eventCards[index.card];
   if (card === undefined) {
     throw ("invalid index: " + JSON.stringify(index));
   }
-  const action: ActionSpec | undefined = card.actions[index.action];
+  const action: ActionSpec | undefined = card.effects[index.action];
   if (action === undefined) {
     throw ("invalid index " + JSON.stringify(index));
   }
-  return { action, origin: card.origin ? card.origin : "noOrigin" };
+  return { action, origin: card.origin };
 }
 
 export function nextIndex(
@@ -82,7 +75,7 @@ export function nextIndex(
   newAction += 1;
 
   if (newCard === "rest") {
-    if (newAction < solution.paths[newPath].restCard.actions.length) {
+    if (newAction < solution.paths[newPath].restCard.effects.length) {
       return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
     } else {
       newCard = 0;
@@ -92,7 +85,7 @@ export function nextIndex(
 
   if (
     newCard < solution.paths[newPath].eventCards.length &&
-    newAction < solution.paths[newPath].eventCards[newCard].actions.length
+    newAction < solution.paths[newPath].eventCards[newCard].effects.length
   ) {
     return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
   }
@@ -102,7 +95,7 @@ export function nextIndex(
 
   if (
     newCard < solution.paths[newPath].eventCards.length &&
-    newAction < solution.paths[newPath].eventCards[newCard].actions.length
+    newAction < solution.paths[newPath].eventCards[newCard].effects.length
   ) {
     return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
   }
@@ -136,8 +129,21 @@ function solutionStep(
 
   // TODO: add crew auto-actions?
 
-  // TODO: sol cards should not take selfId/selfType as input
-  const actionResult = applyActionAndTriggers(action(state, <any>undefined, <any>undefined), state, [], idGen, origin);
+  let actionResult: { state: GameState | "invalid", log: Action[] } = <any>undefined;
+  switch (origin.tag) {
+    case "EntityOrigin": {
+      actionResult = applyActionAndTriggers(action(state, origin.entityId, origin.entityType),
+        state, [], idGen, { type: origin.entityType, id: origin.entityId });
+      break;
+    }
+    case "PlayerOrigin": {
+      // TODO: player origin cards should not take selfId/selfType as input
+      actionResult = applyActionAndTriggers(action(state, <any>undefined, <any>undefined),
+      state, [], idGen, "noOrigin");
+      break;
+    }
+  }
+  
   log = focus(log, set(x => x.crewAction, actionResult.log));
   if (actionResult.state === "invalid") {
     return { result: "invalid", log };
