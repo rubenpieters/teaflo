@@ -1,6 +1,6 @@
 import { Action, ActionSpec } from "src/shared/game/action";
 import { Target, Origin, TargetType } from "src/shared/game/target";
-import { allCrew, Ability, onAllAlly } from "src/shared/game/crew";
+import { allCrew, onAllAlly, Ability } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { allEnemies } from "src/shared/game/enemy";
 import { showAction } from "src/shared/game/log";

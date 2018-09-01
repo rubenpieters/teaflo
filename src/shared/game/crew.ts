@@ -8,6 +8,7 @@ import * as _Status from "src/shared/game/status";
 import { showAction } from "src/shared/game/log";
 import { TargetType, typeColl } from "src/shared/game/target";
 import { InputType } from "src/shared/game/input";
+import { allAbilities, InputEntityEffect } from "./ability";
 
 /*export function showCrew(
   crew: Crew
@@ -30,7 +31,7 @@ export type Crew = {
   ranged: boolean,
   actions: ActionSpec[],
   triggers: Trigger[],
-  abilities: Ability[],
+  abilities: InputEntityEffect[],
 };
 
 export function damage<E extends Crew & HasStatus>(
@@ -406,22 +407,7 @@ const armorOnSelfHeal: Crew = {
     }},
   ],
   abilities: [
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
-        const targetPos: number = inputs[0];
-        const guard = state.crew[id].Guard;
-        let value = 0;
-        if (guard !== undefined) {
-          value = guard.guard;
-        }
-        return {
-          tag: "Damage",
-          target: { tag: "Target", type: "enemy", position: targetPos },
-          value,
-          piercing: false,
-        };
-      }},
-      inputs: [{ tag: "NumberInput" }],
-    },
+    allAbilities.armorDamageToTarget,
   ],
 }
 
@@ -467,26 +453,7 @@ const regenOnDamageAlly: Crew = {
     }},
   ],
   abilities: [
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
-      return onAllAlly(
-        state,
-        (_: IdCrew, id: number) => {
-          return {
-            tag: "QueueStatus",
-            // TODO: correct target all
-            target: { tag: "Target", type: "ally", position: id, },
-            status: {
-              tag: "Guard",
-              value: 1,
-              guard: 5,
-              fragment: 0,
-            }
-          };
-        }
-      )
-      }},
-      inputs: [],
-    }
+    allAbilities.armorAllAlly_5_1_0,
   ],
 }
 
@@ -554,17 +521,7 @@ const dmg1: Crew = {
     }},
   ],
   abilities: [
-    { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
-      const targetPos: number = inputs[0];
-      return {
-        tag: "Damage",
-        target: { tag: "Target", type: "enemy", position: targetPos },
-        value: 15,
-        piercing: false,
-      };
-    }},
-    inputs: [{ tag: "NumberInput" }],
-  },
+    allAbilities.dmg15,
   ],
 }
 

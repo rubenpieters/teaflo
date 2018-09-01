@@ -1,7 +1,7 @@
 import { Solution, runSolutionAll, SolCard, SolRest, SolEvent } from "src/shared/game/solution";
 import { Card, Rest, Event, PlayerOrigin } from "src/shared/game/card";
 import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
-import { createCard } from "src/shared/game/ability";
+import { createCard, InputEntityEffect } from "src/shared/game/ability";
 import { actionShort } from "src/shared/game/log";
 import { Action } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
@@ -449,7 +449,7 @@ function mkState(
       sprite.drawRect(0, 0, 20, 15);
       sprite.endFill();
       sprite.inputEnabled = true;
-
+      sprite.events.onInputOver.add(() => showAbility(board, ability));
       sprite.events.onInputDown.add(onAbilityClick(board, ability, allyId, ability.inputs, []));
       sprites.push(sprite);
     }
@@ -491,14 +491,14 @@ function mkState(
 
 function onAbilityClick(
   board: Board,
-  ability: Ability,
+  ability: InputEntityEffect,
   allyId: number,
   toHandleInputs: InputType[],
   currentInputs: any[],
 ) {
   return function() {
     if (toHandleInputs.length === 0) {
-      addToSolution(board, createCard(ability.f(currentInputs)(board.lastState!, allyId, "ally"), allyId, "ally"));
+      addToSolution(board, createCard(ability.effect(currentInputs)(board.lastState!, allyId, "ally"), allyId, "ally"));
     } else {
       const currentInputType = toHandleInputs[0];
       const tail = toHandleInputs.slice(1);
@@ -663,6 +663,33 @@ function showEnemy(
 
   const fontSize = 15;
   const enemyActionText: Phaser.Text = board.game.add.text(0, 0, `HP: ${enemy.hp}/${enemy.maxHp}`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  enemyActionText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(enemyActionText);
+
+  board.graphics.infoTexts = infoTexts;
+}
+
+function showAbility(
+  board: Board,
+  ability: InputEntityEffect,
+) {
+  // clear old
+  for (const text of board.graphics.infoTexts) {
+    text.destroy();
+  }
+
+  const x = 620;
+  let y = 50;
+  const infoTexts: Phaser.Text[] = [];
+
+  const fontSize = 15;
+  const enemyActionText: Phaser.Text = board.game.add.text(0, 0, ability.description, {
     font: "Arial",
     fontSize: fontSize,
     fill: "#222222",
