@@ -635,15 +635,50 @@ function showAlly(
   const infoTexts: Phaser.Text[] = [];
 
   const fontSize = 15;
-  const enemyActionText: Phaser.Text = board.game.add.text(0, 0, `HP: ${ally.hp}/${ally.maxHp}`, {
+  const hpText: Phaser.Text = board.game.add.text(0, 0, `HP: ${ally.hp}/${ally.maxHp}`, {
     font: "Arial",
     fontSize: fontSize,
     fill: "#222222",
     boundsAlignH: "center",
     boundsAlignV: "middle",
   }, board.group);
-  enemyActionText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(enemyActionText);
+  hpText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(hpText);
+
+  y += 40;
+  const actionText: Phaser.Text = board.game.add.text(0, 0, `Actions`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  actionText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(actionText);
+
+  for (const action of ally.actions) {
+    y += 30;
+    const actionDescText: Phaser.Text = board.game.add.text(0, 0, action.description, {
+      font: "Arial",
+      fontSize: fontSize,
+      fill: "#222222",
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    }, board.group);
+    actionDescText.setTextBounds(x, y, 180, 22);
+    infoTexts.push(actionDescText);
+  }
+
+  y += 40;
+  const triggerText: Phaser.Text = board.game.add.text(0, 0, `Triggers`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  triggerText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(triggerText);
 
   board.graphics.infoTexts = infoTexts;
 }

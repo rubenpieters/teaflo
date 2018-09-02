@@ -8,7 +8,7 @@ import * as _Status from "src/shared/game/status";
 import { showAction } from "src/shared/game/log";
 import { TargetType, typeColl } from "src/shared/game/target";
 import { InputType } from "src/shared/game/input";
-import { allAbilities, InputEntityEffect } from "./ability";
+import { allAbilities, InputEntityEffect, EntityEffect } from "./ability";
 
 /*export function showCrew(
   crew: Crew
@@ -29,7 +29,7 @@ export type Crew = {
   hp: number,
   maxHp: number,
   ranged: boolean,
-  actions: ActionSpec[],
+  actions: EntityEffect[],
   triggers: Trigger[],
   abilities: InputEntityEffect[],
 };
@@ -112,7 +112,7 @@ export function act(
       return newX >= crew.actions.length ? 0 : newX;
     }),
   );
-  return applyActionAndTriggers(action(state, crew.id, "ally"), state, log, idGen, { id: crew.id, type: "ally" });
+  return applyActionAndTriggers(action.effect(state, crew.id, "ally"), state, log, idGen, { id: crew.id, type: "ally" });
 }
 /*
 const stFighter: Crew = {
@@ -402,9 +402,7 @@ const armorOnSelfHeal: Crew = {
   ],
   ranged: false,
   actions: [
-    (state: GameState, id: number, type: TargetType) => { return {
-      tag: "Noop",
-    }},
+    allAbilities.noop,
   ],
   abilities: [
     allAbilities.armorDamageToTarget,
@@ -448,9 +446,7 @@ const regenOnDamageAlly: Crew = {
   ],
   ranged: false,
   actions: [
-    (state: GameState, id: number, type: TargetType) => { return {
-      tag: "Noop",
-    }},
+    allAbilities.noop,
   ],
   abilities: [
     allAbilities.armorAllAlly_5_1_0,
@@ -500,9 +496,7 @@ const tank1: Crew = {
   ],
   ranged: false,
   actions: [
-    (state: GameState, id: number, type: TargetType) => { return {
-      tag: "Noop",
-    }},
+    allAbilities.noop,
   ],
   abilities: [
   ],
@@ -516,9 +510,7 @@ const dmg1: Crew = {
   ],
   ranged: false,
   actions: [
-    (state: GameState, id: number, type: TargetType) => { return {
-      tag: "Noop",
-    }},
+    allAbilities.noop,
   ],
   abilities: [
     allAbilities.dmg15,

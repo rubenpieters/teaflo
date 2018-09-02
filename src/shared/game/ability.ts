@@ -47,6 +47,14 @@ export type InputEntityEffect = {
   inputs: InputType[],
 }
 
+const noop: EntityEffect = {
+  effect: (state: GameState, id: number, type: TargetType) => {
+    return { tag: "Noop" };
+  },
+  description: "Noop",
+  inputs: [],
+}
+
 const damageToTarget = {
   effect: (position: number, type: TargetType, value: number) => { 
     const action: Action = {
@@ -142,6 +150,7 @@ const dmg15: InputEntityEffect = {
 };
 
 export const allAbilities = {
+  noop: noop,
   armorDamageToTarget: armorDamageToTarget,
   armorAllAlly_5_1_0: armorAllAlly_5_1_0,
   dmg15: dmg15,
