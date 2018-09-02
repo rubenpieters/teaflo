@@ -181,10 +181,10 @@ function applyActionAndTriggersAt(
     for (const enemy of state.enemies.slice(from.id)) {
       let indexTrigger = 0;
       for (const trigger of enemy.triggers) {
-        if (trigger.charges > 0 && trigger.onTag === action.tag && trigger.type === "before") {
-          const triggerResult = trigger.action(action)(state, enemy.id, "enemy");
+        if (trigger.charges > 0 && trigger.type === "before") {
+          const triggerResult = trigger.effect(action)(state, enemy.id, "enemy");
           state = focus(state,
-            over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.charges),
+            over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
           );
           const afterTrigger = applyActionAndTriggersAt(
             triggerResult.action, state, log, { id: from.id + 1, type: "enemy" }, idGen, origin);
@@ -193,10 +193,10 @@ function applyActionAndTriggersAt(
           }
           state = afterTrigger.state;
           log = afterTrigger.log;
-        } else if (trigger.charges > 0 && trigger.onTag === action.tag && trigger.type === "instead") {
-          const triggerResult = trigger.action(action)(state, enemy.id, "enemy");
+        } else if (trigger.charges > 0 && trigger.type === "instead") {
+          const triggerResult = trigger.effect(action)(state, enemy.id, "enemy");
           state = focus(state,
-            over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.charges),
+            over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
           );
           action = triggerResult.action;
         }

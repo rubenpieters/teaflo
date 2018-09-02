@@ -552,8 +552,8 @@ function showAction(
 
       const enemyActionWidth = 180;
       for (const enemyAction of action.enemy.actions) {
-        /*const fontSize = 15; // Math.round(Math.min(21, enemyActionWidth / actionShort(enemyAction).length));
-        const enemyActionText: Phaser.Text = board.game.add.text(0, 0, actionShort(enemyAction), {
+        const fontSize = 15; // Math.round(Math.min(21, enemyActionWidth / actionShort(enemyAction).length));
+        const enemyActionText: Phaser.Text = board.game.add.text(0, 0, enemyAction.description, {
           font: "Arial",
           fontSize: fontSize,
           fill: "#222222",
@@ -561,7 +561,7 @@ function showAction(
           boundsAlignV: "middle",
         }, board.group);
         enemyActionText.setTextBounds(x, y, enemyActionWidth, 22);
-        infoTexts.push(enemyActionText);*/
+        infoTexts.push(enemyActionText);
   
         y += 25;
       }
@@ -570,7 +570,7 @@ function showAction(
 
       for (const enemyTrigger of action.enemy.triggers) {
         const fontSize = 15; // Math.round(Math.min(21, enemyActionWidth / showTrigger(enemyTrigger).length));
-        const enemyTriggerText: Phaser.Text = board.game.add.text(0, 0, showTrigger(enemyTrigger), {
+        const enemyTriggerText: Phaser.Text = board.game.add.text(0, 0, enemyTrigger.description, {
           font: "Arial",
           fontSize: fontSize,
           fill: "#222222",
@@ -719,6 +719,33 @@ function showEnemy(
   }, board.group);
   enemyActionText.setTextBounds(x, y, 180, 22);
   infoTexts.push(enemyActionText);
+
+  y += 40;
+  const actionText: Phaser.Text = board.game.add.text(0, 0, `Actions`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  actionText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(actionText);
+
+  let i = 0;
+  for (const action of enemy.actions) {
+    y += 30;
+    const actionDesc = i === enemy.actionIndex ? `> ${action.description}` : action.description;
+    const actionDescText: Phaser.Text = board.game.add.text(0, 0, actionDesc, {
+      font: "Arial",
+      fontSize: fontSize,
+      fill: "#222222",
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    }, board.group);
+    actionDescText.setTextBounds(x, y, 180, 22);
+    infoTexts.push(actionDescText);
+    i += 1;
+  }
 
   board.graphics.infoTexts = infoTexts;
 }

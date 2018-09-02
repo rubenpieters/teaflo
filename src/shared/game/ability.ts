@@ -6,6 +6,8 @@ import { GameState, IdCrew } from "src/shared/game/state";
 import { Card } from "src/shared/game/card";
 import { InputType } from "src/shared/game/input";
 import { findIndex } from "./trigger";
+import { Next } from "./next";
+import { Status } from "./status";
 
 
 export function createCard(
@@ -40,6 +42,11 @@ export type EntityEffect = {
   effect: (state: GameState, id: number, type: TargetType) => Action,
   description: string,
   inputs: InputType[],
+}
+
+export type EnemyEffect = {
+  effect: (state: GameState, id: number, type: TargetType) => { action: Action, next: Next },
+  description: string,
 }
 
 export type InputEntityEffect = {
@@ -191,7 +198,7 @@ const armorOnHeal: TriggerEntityEffect = {
           chargeUse: 0,
         }
       }
-    }
+    };
   },
   description: "gain armor on heal",
   charges: Infinity,
@@ -210,7 +217,7 @@ const poisonToPiercing: TriggerEntityEffect = {
       } else {
         return { action, chargeUse: 0 };
       }
-    }
+    };
   },
   description: "convert poison to piercing poison",
   charges: Infinity,
@@ -240,7 +247,7 @@ const regenOnDamage: TriggerEntityEffect = {
       } else {
         return { action: { tag: "Noop" }, chargeUse: 0 };
       }
-    }
+    };
   },
   description: "ally gains regen when damaged",
   charges: Infinity,
@@ -267,7 +274,7 @@ const interceptAllyDamage: TriggerEntityEffect = {
       } else {
         return { action, chargeUse: 0 };
       }
-    }
+    };
   },
   description: "intercept damage on other allies",
   charges: 1,
@@ -279,4 +286,61 @@ export const allTriggers = {
   poisonToPiercing: poisonToPiercing,
   regenOnDamage: regenOnDamage,
   interceptAllyDamage: interceptAllyDamage,
+}
+
+
+export function damageXAtPos(value: number, position: number): EnemyEffect {
+  return {
+    effect: (_state: GameState, _id: number, _type: TargetType) => {
+      return {
+        action: {
+          tag: "Damage",
+          target: { tag: "Target", type: "ally", position },
+          value,
+          piercing: false,
+        },
+        next: { tag: "NextId" },
+      };
+    },
+    description: `deal ${value} to [${position}]`,
+  };
+}
+
+export function queueStatus(status: Status): EnemyEffect {
+  return {
+    effect: (state: GameState, _id: number, _type: TargetType) => {
+      return {
+        action: onAllAllyPositions(
+          state,
+          (id: number) => { return {
+            tag: "QueueStatus",
+            target: { tag: "Target", type: "ally", position: id },
+            status
+          }},
+        ),
+      next: { tag: "NextId" },
+      }
+    },
+    description: `${JSON.stringify(status)} on all ally positions`,
+  };
+}
+
+function onAllAllyPositions(
+  state: GameState,
+  f: (id: number) => Action,
+): Action {
+  const indices = [...Array(state.crew.length).keys()]
+  const actions = indices.map(f);
+  return {
+    tag: "CombinedAction",
+    actions,
+  }
+}
+
+
+export const enemyAbilities = {
+  damage_10_0: damageXAtPos(10, 0),
+  damage_10_1: damageXAtPos(10, 1),
+  damage_10_2: damageXAtPos(10, 2),
+  damage_10_3: damageXAtPos(10, 3),
 }

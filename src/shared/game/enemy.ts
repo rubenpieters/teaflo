@@ -6,6 +6,7 @@ import { showAction } from "src/shared/game/log";
 import { Trigger, showTrigger } from "src/shared/game/trigger";
 import { HasNext } from "src/shared/game/next";
 import { TargetType } from "./target";
+import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus } from "./ability";
 
 /*export function showEnemy(
   enemy: Enemy
@@ -19,8 +20,8 @@ import { TargetType } from "./target";
 export type Enemy = {
   hp: number,
   maxHp: number,
-  actions: ((state: GameState, selfId: number, selfType: TargetType) => Action & HasNext)[],
-  triggers: Trigger[],
+  actions: EnemyEffect[],
+  triggers: TriggerEntityEffect[],
 };
 
 export function damage<E extends Enemy>(
@@ -40,10 +41,9 @@ export function act(
   idGen: Generator,
   index: number,
 ): { state: GameState | "invalid", log: Action[] }  {
-  const action = enemy.actions[enemy.actionIndex](state, enemy.id, "enemy");
+  const { action, next } = enemy.actions[enemy.actionIndex].effect(state, enemy.id, "enemy");
   state = focus(state,
     over(x => x.enemies[index].actionIndex, x => {
-      const next = action.next;
       switch (next.tag) {
         case "NextId": {
           const newX = x + 1;
@@ -332,86 +332,58 @@ const enemyBoss1: Enemy = {
   hp: 40,
   maxHp: 40,
   actions: [
-    (state: GameState, id: number, type: TargetType) => {
-      return {...onAllAllyPositions(
-          state,
-          (id: number) => { return {
-            tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", position: id },
-            status: {
-              tag: "Poison",
-              value: 3,
-              fragment: 0,
-            }
-          }},
-      ),
-      next: { tag: "NextId" },
-      }
-    },
-    (state: GameState, id: number, type: TargetType) => {
-      return {...onAllAllyPositions(
-          state,
-          (id: number) => { return {
-            tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", position: id },
-            status: {
-              tag: "Blind",
-              value: 4,
-              fragment: 0,
-            }
-          }},
-        ),
-        next: { tag: "NextId" },
-      }
-    },
-    (state: GameState, id: number, type: TargetType) => {
-      return {...onAllAllyPositions(
-          state,
-          (id: number) => { return {
-            tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", position: id },
-            status: {
-              tag: "Silence",
-              value: 3,
-              fragment: 0,
-            }
-          }},
-        ),
-        next: { tag: "NextId" },
-      }
-    },
-    (state: GameState, id: number, type: TargetType) => {
-      return {
-        tag: "CombinedAction",
-        actions: [
-          {
-            tag: "Damage",
-            target: { tag: "Target", type: "ally", position: 0 },
-            value: 10,
-            piercing: false,
+    queueStatus({
+      tag: "Poison",
+      value: 3,
+      fragment: 0,
+    }),
+    queueStatus({
+      tag: "Blind",
+      value: 4,
+      fragment: 0,
+    }),
+    queueStatus({
+      tag: "Silence",
+      value: 3,
+      fragment: 0,
+    }),
+    {
+      effect: (state: GameState, id: number, type: TargetType) => {
+        return {
+          action: {
+            tag: "CombinedAction",
+            actions: [
+              {
+                tag: "Damage",
+                target: { tag: "Target", type: "ally", position: 0 },
+                value: 10,
+                piercing: false,
+              },
+              {
+                tag: "Damage",
+                target: { tag: "Target", type: "ally", position: 1 },
+                value: 5,
+                piercing: false,
+              },
+              {
+                tag: "Damage",
+                target: { tag: "Target", type: "ally", position: 2 },
+                value: 2,
+                piercing: false,
+              },
+              {
+                tag: "Damage",
+                target: { tag: "Target", type: "ally", position: 3 },
+                value: 1,
+                piercing: false,
+              },
+            ],
           },
-          {
-            tag: "Damage",
-            target: { tag: "Target", type: "ally", position: 1 },
-            value: 5,
-            piercing: false,
-          },
-          {
-            tag: "Damage",
-            target: { tag: "Target", type: "ally", position: 2 },
-            value: 2,
-            piercing: false,
-          },
-          {
-            tag: "Damage",
-            target: { tag: "Target", type: "ally", position: 3 },
-            value: 1,
-            piercing: false,
-          },
-        ],
-        next: { tag: "NextId" },
-      };
-    },
+          next: { tag: "NextId" },
+        };
+      },
+      description: "1 | 2 | 5 | 10 dmg",
+    }
   ],
   triggers: [
   ],
@@ -434,42 +406,10 @@ const enemyBoss2: Enemy = {
   hp: 40,
   maxHp: 40,
   actions: [
-    (state: GameState, id: number, type: TargetType) => {
-      return {
-        tag: "Damage",
-        target: { tag: "Target", type: "ally", position: 0 },
-        value: 10,
-        piercing: false,
-        next: { tag: "NextId" },
-      }
-    },
-    (state: GameState, id: number, type: TargetType) => {
-      return {
-        tag: "Damage",
-        target: { tag: "Target", type: "ally", position: 1 },
-        value: 10,
-        piercing: false,
-        next: { tag: "NextId" },
-      }
-    },
-    (state: GameState, id: number, type: TargetType) => {
-      return {
-        tag: "Damage",
-        target: { tag: "Target", type: "ally", position: 2 },
-        value: 10,
-        piercing: false,
-        next: { tag: "NextId" },
-      }
-    },
-    (state: GameState, id: number, type: TargetType) => {
-      return {
-        tag: "Damage",
-        target: { tag: "Target", type: "ally", position: 3 },
-        value: 10,
-        piercing: false,
-        next: { tag: "NextId" },
-      }
-    },
+    damageXAtPos(10, 0),
+    damageXAtPos(10, 1),
+    damageXAtPos(10, 2),
+    damageXAtPos(10, 3),
   ],
   triggers: [
   ],
