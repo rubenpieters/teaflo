@@ -4,19 +4,20 @@ import { Action, applyActionAndTriggers, enemyTurn, checkDeaths, checkStatusCrew
 import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
+import { EntityEffect } from "./ability";
 
 export type SolEvent = {
   tag: "crew" | "enemy" | "item" | "general",
   name: string,
   origin: CardOrigin,
-  effects: ActionSpec[],
+  effects: EntityEffect[],
 };
 
 export type SolRest = {
   tag: "rest",
   name: string,
   origin: CardOrigin,
-  effects: ActionSpec[],
+  effects: EntityEffect[],
 };
 
 export type SolCard = SolEvent | SolRest;
@@ -45,7 +46,7 @@ export const initialIndex: SolutionIndex = {
 function nextAction(
   index: SolutionIndex,
   solution: Solution
-): { action: ActionSpec, origin: CardOrigin } {
+): { action: EntityEffect, origin: CardOrigin } {
   const path: Path | undefined = solution.paths[index.path];
   if (path === undefined) {
     throw ("invalid index: " + JSON.stringify(index));
@@ -57,7 +58,7 @@ function nextAction(
   if (card === undefined) {
     throw ("invalid index: " + JSON.stringify(index));
   }
-  const action: ActionSpec | undefined = card.effects[index.action];
+  const action: EntityEffect | undefined = card.effects[index.action];
   if (action === undefined) {
     throw ("invalid index " + JSON.stringify(index));
   }
@@ -118,7 +119,7 @@ function solutionStep(
   idGen: Generator,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
   const { action, origin } = nextAction(index, solution);
-  let log: ActionLog = { action: action(state, <any>undefined, <any>undefined), crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: [] };
+  let log: ActionLog = { action: action.effect(state, <any>undefined, <any>undefined), crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: [] };
 
   const afterCrewStatus = checkStatusCrew(state, idGen);
   log = focus(log, set(x => x.crewStatus, afterCrewStatus.log));
@@ -132,13 +133,13 @@ function solutionStep(
   let actionResult: { state: GameState | "invalid", log: Action[] } = <any>undefined;
   switch (origin.tag) {
     case "EntityOrigin": {
-      actionResult = applyActionAndTriggers(action(state, origin.entityId, origin.entityType),
+      actionResult = applyActionAndTriggers(action.effect(state, origin.entityId, origin.entityType),
         state, [], idGen, { type: origin.entityType, id: origin.entityId });
       break;
     }
     case "PlayerOrigin": {
       // TODO: player origin cards should not take selfId/selfType as input
-      actionResult = applyActionAndTriggers(action(state, <any>undefined, <any>undefined),
+      actionResult = applyActionAndTriggers(action.effect(state, <any>undefined, <any>undefined),
       state, [], idGen, "noOrigin");
       break;
     }

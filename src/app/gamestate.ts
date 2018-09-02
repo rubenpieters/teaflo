@@ -1,7 +1,7 @@
 import { Solution, runSolutionAll, SolCard, SolRest, SolEvent } from "src/shared/game/solution";
 import { Card, Rest, Event, PlayerOrigin } from "src/shared/game/card";
 import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
-import { createCard, InputEntityEffect } from "src/shared/game/ability";
+import { createCard, InputEntityEffect, EntityEffect } from "src/shared/game/ability";
 import { actionShort } from "src/shared/game/log";
 import { Action } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
@@ -191,8 +191,8 @@ function popLeftMenu(
       //effect.events.onInputOver.add(() => showAction(board, action));
       effects.push(effect);
       
-      /*const fontSize = Math.round(Math.min(21, nameBoxWidth / actionShort(action).length) * .70);
-      const effectText: Phaser.Text = board.game.add.text(0, 0, actionShort(action), {
+      const fontSize = Math.round(Math.min(21, nameBoxWidth / action.description.length) * .70);
+      const effectText: Phaser.Text = board.game.add.text(0, 0, action.description, {
         font: "Arial",
         fontSize: fontSize,
         fill: "#222222",
@@ -200,7 +200,7 @@ function popLeftMenu(
         boundsAlignV: "middle",
       }, board.group);
       effectText.setTextBounds(x, y, nameBoxWidth, 22);
-      effectTexts.push(effectText);*/
+      effectTexts.push(effectText);
 
       y += 25;
       i += 1;
@@ -224,11 +224,21 @@ function addToSolution(
     board.availableCards[index].limit -= 1;
   }
   // add user input to card
-  // TODO: correctly add user input
-  const afterUserInput: SolCard = {
-    ...card,
-    effects: card.effects.map((x: Ability) => x.f([])),
+  const afterInputEffects: EntityEffect[] = [];
+  for (const effect of card.effects) {
+    const cb = (inputs: any[]) => {
+     return effect.effect(inputs); 
+    }
+    const afterInputEffect: EntityEffect = {
+      ...effect,
+      effect: onAbilityClick(board, effect.inputs, [], cb)(),
+    };
+    afterInputEffects.push(afterInputEffect);
   }
+  const afterUserInput = {
+    ...card,
+    effects: afterInputEffects,
+  };
 
   switch (afterUserInput.tag) {
     case "crew":
@@ -450,7 +460,10 @@ function mkState(
       sprite.endFill();
       sprite.inputEnabled = true;
       sprite.events.onInputOver.add(() => showAbility(board, ability));
-      sprite.events.onInputDown.add(onAbilityClick(board, ability, allyId, ability.inputs, []));
+      const cb = (inputs: any[]) => {
+        return addToSolution(board, createCard(ability.effect(inputs)(board.lastState!, allyId, "ally"), allyId, "ally"));
+      }
+      sprite.events.onInputDown.add(onAbilityClick(board, ability.inputs, [], cb));
       sprites.push(sprite);
     }
 
@@ -489,16 +502,15 @@ function mkState(
   board.graphics.stateGfx = sprites;
 }
 
-function onAbilityClick(
+function onAbilityClick<A>(
   board: Board,
-  ability: InputEntityEffect,
-  allyId: number,
   toHandleInputs: InputType[],
   currentInputs: any[],
-) {
-  return function() {
+  cb: (inputs: any[]) => A,
+): () => A {
+  return function(): A {
     if (toHandleInputs.length === 0) {
-      addToSolution(board, createCard(ability.effect(currentInputs)(board.lastState!, allyId, "ally"), allyId, "ally"));
+      return cb(currentInputs);
     } else {
       const currentInputType = toHandleInputs[0];
       const tail = toHandleInputs.slice(1);
@@ -508,12 +520,14 @@ function onAbilityClick(
         }
         case "NumberInput": {
           let input = prompt("Enter Number");
-          console.log("GIVEN INPUT: " + input);
           if (input === null) {
             input = "0";
           }
           const inputParsed = parseInt(input);
-          onAbilityClick(board, ability, allyId, tail, currentInputs.concat(inputParsed))();
+          return onAbilityClick(board, tail, currentInputs.concat(inputParsed), cb)();
+        }
+        default: {
+          return <never>undefined;
         }
       }
     }

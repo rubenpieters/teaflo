@@ -11,7 +11,7 @@ function test1() {
   {
       
     effects: [
-      { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      { effect: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
         return onAllAlly(
           state,
           (_: IdCrew, id: number) => { return {
@@ -32,6 +32,7 @@ function test1() {
         )
         }},
         inputs: [],
+        description: "",
       },
     ],
     origin: { tag: "EntityOrigin", entityId: 2, entityType: "ally" },
@@ -70,14 +71,14 @@ function test1() {
 function passNoInputsE(card: Event): SolEvent {
   return {
     ...card,
-    effects: card.effects.map(x => x.f([])),
+    effects: card.effects.map(x => { return {...x, effect: x.effect([])}; }),
   }
 }
 
 function passNoInputsR(card: Rest): SolRest {
   return {
     ...card,
-    effects: card.effects.map(x => x.f([])),
+    effects: card.effects.map(x => { return {...x, effect: x.effect([])}; }),
   }
 }
 

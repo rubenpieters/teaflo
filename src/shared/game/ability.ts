@@ -18,10 +18,11 @@ export function createCard(
   return {
     name: "-- created --",
     effects: [
-      { f: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      { effect: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
         return action;
         }},
         inputs: [],
+        description: "-- created --",
       },
     ],
     tag: "general",
@@ -32,6 +33,7 @@ export function createCard(
     }
   };
 }
+
 // + additional user input
 // entity effect = state, id, type -> state
 // player effect = state -> state
@@ -63,7 +65,7 @@ export type TriggerEntityEffect = {
 }
 
 const noop: EntityEffect = {
-  effect: (state: GameState, id: number, type: TargetType) => {
+  effect: (_state: GameState, _id: number, _type: TargetType) => {
     return { tag: "Noop" };
   },
   description: "Noop",
