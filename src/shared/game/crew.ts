@@ -8,7 +8,7 @@ import * as _Status from "src/shared/game/status";
 import { showAction } from "src/shared/game/log";
 import { TargetType, typeColl } from "src/shared/game/target";
 import { InputType } from "src/shared/game/input";
-import { allAbilities, InputEntityEffect, EntityEffect } from "./ability";
+import { allAbilities, InputEntityEffect, EntityEffect, TriggerEntityEffect, allTriggers } from "./ability";
 
 /*export function showCrew(
   crew: Crew
@@ -30,7 +30,7 @@ export type Crew = {
   maxHp: number,
   ranged: boolean,
   actions: EntityEffect[],
-  triggers: Trigger[],
+  triggers: TriggerEntityEffect[],
   abilities: InputEntityEffect[],
 };
 
@@ -353,52 +353,8 @@ const armorOnSelfHeal: Crew = {
   hp: 5,
   maxHp: 5,
   triggers: [
-    {
-      onTag: "Heal",
-      type: "before",
-      action: (action: Action) => { return (state: GameState, id: number, type: TargetType) => {
-        const index = findIndex(x => x.id === id, typeColl(state, type));
-        if (index === "notFound") {
-          throw `not found ${id}`;
-        }
-        const actionS = <Heal>action;
-        if (actionS.target.position !== id) {
-          return { action: { tag: "Noop" }, charges: 0 };
-        } else {
-          return {
-            action: {
-              tag: "QueueStatus",
-              target: { tag: "Target", type, position: index, },
-              status: {
-                tag: "Guard",
-                value: 1,
-                guard: 1,
-                fragment: 0,
-              },
-            },
-            charges: 1,
-          };
-        }
-      }},
-      charges: Infinity,
-    },
-    {
-      onTag: "AddStatus",
-      type: "instead",
-      action: (action: Action) => { return (state: GameState, id: number, type: TargetType) => {
-        const index = findIndex(x => x.id === id, typeColl(state, type));
-        if (index === "notFound") {
-          throw `not found ${id}`;
-        }
-        const actionS = <AddStatus>action;
-        if (actionS.target.position === id && actionS.status.tag === "Poison") {
-          return { action: focus(actionS, set(x => x.status.tag, "PiercingPoison")), charges: 1 };
-        } else {
-          return { action: actionS, charges: 0 };
-        }
-      }},
-      charges: Infinity,
-    }
+    allTriggers.armorOnHeal,
+    allTriggers.poisonToPiercing,
   ],
   ranged: false,
   actions: [
@@ -415,34 +371,7 @@ const regenOnDamageAlly: Crew = {
   hp: 6,
   maxHp: 6,
   triggers: [
-    {
-      onTag: "Damage",
-      type: "before",
-      action: (action: Action) => { return (state: GameState, id: number, type: TargetType) => {
-        const index = findIndex(x => x.id === id, typeColl(state, type));
-        if (index === "notFound") {
-          throw `not found ${id}`;
-        }
-        const actionS = <Damage>action;
-        if (actionS.target.type !== "ally") {
-          return { action: { tag: "Noop" }, charges: 0 };
-        } else {
-          return {
-            action: {
-              tag: "QueueStatus",
-              target: { tag: "Target", type: "ally", position: actionS.target.position },
-              status: {
-                tag: "Regen",
-                value: 1,
-                fragment: 0,
-              },
-            },
-            charges: 1,
-          }
-        }
-      }},
-      charges: Infinity,
-    }
+    allTriggers.regenOnDamage,
   ],
   ranged: false,
   actions: [
@@ -470,29 +399,7 @@ const tank1: Crew = {
   hp: 20,
   maxHp: 20,
   triggers: [
-    {
-      onTag: "Damage",
-      type: "instead",
-      action: (action: Action) => { return (state: GameState, id: number, type: TargetType) => {
-        const index = findIndex(x => x.id === id, typeColl(state, type));
-        if (index === "notFound") {
-          throw `not found ${id}`;
-        }
-        const actionS = <Damage>action;
-        if (actionS.target.type !== "ally" || (actionS.target.type === "ally" && actionS.target.position === index)) {
-          return { action, charges: 0 };
-        } else {
-          return {
-            action: {
-              ...action,
-              target: { tag: "Target", type: "ally", position: index },
-            },
-            charges: 1,
-          }
-        }
-      }},
-      charges: 1,
-    }
+    allTriggers.interceptAllyDamage,
   ],
   ranged: false,
   actions: [

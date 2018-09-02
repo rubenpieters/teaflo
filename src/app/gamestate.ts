@@ -680,6 +680,19 @@ function showAlly(
   triggerText.setTextBounds(x, y, 180, 22);
   infoTexts.push(triggerText);
 
+  for (const trigger of ally.triggers) {
+    y += 30;
+    const triggerDescText: Phaser.Text = board.game.add.text(0, 0, trigger.description, {
+      font: "Arial",
+      fontSize: fontSize,
+      fill: "#222222",
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    }, board.group);
+    triggerDescText.setTextBounds(x, y, 180, 22);
+    infoTexts.push(triggerDescText);
+  }
+
   board.graphics.infoTexts = infoTexts;
 }
 
