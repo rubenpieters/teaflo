@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { TargetType, typeColl } from "src/shared/game/target";
 import { Action, AddStatus } from "src/shared/game/action";
 import { Target } from "src/shared/game/target";
-import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId } from "src/shared/game/state";
+import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId, inCombat } from "src/shared/game/state";
 import { Card } from "src/shared/game/card";
 import { InputType } from "src/shared/game/input";
 import { findIndex } from "./trigger";
@@ -126,11 +126,15 @@ const addArmor = {
 };
 
 const armorSelf: InputEntityEffect = {
-  effect: (inputs: any[]) => {
+  effect: (_inputs: any[]) => {
     return (state: GameState, id: CreatureId) => {
-      const positionId = toPositionId(state, id);
-      const index = positionId.id;
-      return addArmor.effect(index, id.type, 1, 8, 0);
+      if (inCombat(state)) {
+        const positionId = toPositionId(state, id);
+        const index = positionId.id;
+        return addArmor.effect(index, id.type, 1, 8, 0);
+      } else {
+        return { tag: "Invalid" };
+      }
     };
   },
   description: addArmor.description("1T 8", "self"),
@@ -388,6 +392,23 @@ function onAllAllyPositions(
   }
 }
 
+export function healSelf(value: number): EnemyEffect {
+  return {
+    effect: (state: GameState, id: CreatureId) => {
+      const positionId = toPositionId(state, id);
+      const index = positionId.id;
+      return {
+        action: {
+          tag: "Heal",
+          target: { tag: "Target", type: id.type, position: index },
+          value,
+        },
+        next: { tag: "NextId" },
+      };
+    },
+    description: `heal ${value} to [self]`,
+  }
+};
 
 export const enemyAbilities = {
   noopE: noopE,

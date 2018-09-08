@@ -126,7 +126,7 @@ function solutionStep(
   switch (origin.tag) {
     case "EntityOrigin": {
       if (origin.entityType === "item") {
-        // items execute actions with PlayerOrigin
+        // items execute actions as if they have PlayerOrigin
         actionEffect = action.effect(state, <any>undefined);
         actionOrigin = "noOrigin";
       } else {

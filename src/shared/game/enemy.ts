@@ -6,7 +6,7 @@ import { showAction } from "src/shared/game/log";
 import { Trigger, showTrigger } from "src/shared/game/trigger";
 import { HasNext } from "src/shared/game/next";
 import { TargetType } from "./target";
-import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities } from "./ability";
+import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities, healSelf } from "./ability";
 
 /*export function showEnemy(
   enemy: Enemy
@@ -414,6 +414,17 @@ const dummy: Enemy = {
   ],
 };
 
+const basicEnemy1: Enemy = {
+  hp: 15,
+  maxHp: 15,
+  actions: [
+    damageXAtPos(10, 0),
+    healSelf(10),
+  ],
+  triggers: [
+  ],
+};
+
 export const allEnemies = {
   /*enemyAtk012: enemyAtk012R10,
   enemyRegenApMinR20: enemyRegenApMinR20,
@@ -426,4 +437,5 @@ export const allEnemies = {
   enemyBoss1: enemyBoss1,
   enemyBoss2: enemyBoss2,
   dummy: dummy,
+  basicEnemy1: basicEnemy1,
 };

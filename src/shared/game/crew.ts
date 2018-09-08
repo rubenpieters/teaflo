@@ -112,7 +112,7 @@ export function act(
       return newX >= crew.actions.length ? 0 : newX;
     }),
   );
-  return applyActionAndTriggers(action.effect(state, { tag: "GlobalId", id: crew.id, type: "ally"}), state, log, idGen, { id: crew.id, type: "ally" });
+  return applyActionAndTriggers(action.effect(state, { tag: "GlobalId", id: crew.id, type: "ally" }), state, log, idGen, { id: crew.id, type: "ally" });
 }
 /*
 const stFighter: Crew = {
@@ -451,6 +451,7 @@ const basicCrew1: Crew = {
   ],
   abilities: [
     allAbilities.armorSelf,
+    allAbilities.dmg15,
   ],
 };
 

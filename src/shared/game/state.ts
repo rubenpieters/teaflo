@@ -141,3 +141,7 @@ function findI<E extends Id>(coll: E[], id: EntityId): number {
     }
   }
 }
+
+export function inCombat(state: GameState): boolean {
+  return state.enemies.length > 0;
+}

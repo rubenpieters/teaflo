@@ -118,6 +118,9 @@ export function actionShort(action: Action): string {
     case "ClearStatus": {
       return `Clear ${action.status}`;
     }
+    case "Invalid": {
+      return `Invalid`;
+    }
   }
 }
 
@@ -176,6 +179,9 @@ export function showAction(action: Action): string {
     }
     case "ClearStatus": {
       return `Clear ${action.status}`;
+    }
+    case "Invalid": {
+      return `Invalid`;
     }
   }
 }

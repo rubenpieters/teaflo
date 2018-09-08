@@ -34,6 +34,7 @@ export type Action
   | Swap
   | CombinedAction
   | ClearStatus
+  | Invalid
   ;
 
 export type Damage = {
@@ -134,6 +135,9 @@ export type ClearStatus = {
   status: Status["tag"],
 };
 
+export type Invalid = {
+  tag: "Invalid",
+}
 
 export function enemyTurn(
   state: GameState,
@@ -476,6 +480,9 @@ function applyAction(
         _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
+    }
+    case "Invalid": {
+      return { state: "invalid", log };
     }
   }
 

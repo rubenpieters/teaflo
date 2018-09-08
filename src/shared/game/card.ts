@@ -373,6 +373,20 @@ const cardBattle_0011: Card = {
   tag: "enemy",
 };
 
+const cardBattle_0012: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 3012 },
+  name: "BasicEnemy1",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
+      return { tag: "AddEnemy", enemy: allEnemies.basicEnemy1 };
+      }},
+      inputs: [],
+      description: "add BasicEnemy1",
+    },
+  ],
+  tag: "enemy",
+};
+
 export const allCards = {
   cardBattleTurn: cardBattleTurn,
   cardRest: cardRest,
@@ -402,4 +416,5 @@ export const allCards = {
   cardBattle_0009: cardBattle_0009,
   cardBattle_0010: cardBattle_0010,
   cardBattle_0011: cardBattle_0011,
+  cardBattle_0012: cardBattle_0012,
 };
