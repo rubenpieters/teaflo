@@ -455,6 +455,36 @@ const basicCrew1: Crew = {
   ],
 };
 
+const basicCrew2: Crew = {
+  ap: 1,
+  hp: 15,
+  maxHp: 15,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    allAbilities.noop,
+  ],
+  abilities: [
+    allAbilities.addAp,
+  ],
+};
+
+const basicCrew3: Crew = {
+  ap: 1,
+  hp: 15,
+  maxHp: 15,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    allAbilities.noop,
+  ],
+  abilities: [
+    allAbilities.apDmg,
+  ],
+};
+
 export const allCrew = {
   /*stFighter: stFighter,
   stRanged: stRanged,
@@ -467,4 +497,6 @@ export const allCrew = {
   dmg1: dmg1,
   dmgPoison: dmgPoison,
   basicCrew1: basicCrew1,
+  basicCrew2: basicCrew2,
+  basicCrew3: basicCrew3,
 };

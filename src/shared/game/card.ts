@@ -202,7 +202,7 @@ const cardCrew_0008: Card = {
 };
 
 const cardCrew_0009: Card = {
-  origin: { tag: "PlayerOrigin", cardId: 1008 },
+  origin: { tag: "PlayerOrigin", cardId: 1009 },
   name: "BasicCrew1",
   effects: [
     { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
@@ -210,6 +210,34 @@ const cardCrew_0009: Card = {
       }},
       inputs: [],
       description: "add BasicCrew1",
+    },
+  ],
+  tag: "crew",
+};
+
+const cardCrew_0010: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 1010 },
+  name: "BasicCrew2",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
+      return { tag: "AddCrew", crew: allCrew.basicCrew2 };
+      }},
+      inputs: [],
+      description: "add BasicCrew2",
+    },
+  ],
+  tag: "crew",
+};
+
+const cardCrew_0011: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 1011 },
+  name: "BasicCrew3",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
+      return { tag: "AddCrew", crew: allCrew.basicCrew3 };
+      }},
+      inputs: [],
+      description: "add BasicCrew3",
     },
   ],
   tag: "crew",
@@ -387,6 +415,20 @@ const cardBattle_0012: Card = {
   tag: "enemy",
 };
 
+const cardBattle_0013: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 3013 },
+  name: "BasicEnemy2",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
+      return { tag: "AddEnemy", enemy: allEnemies.basicEnemy2 };
+      }},
+      inputs: [],
+      description: "add BasicEnemy2",
+    },
+  ],
+  tag: "enemy",
+};
+
 export const allCards = {
   cardBattleTurn: cardBattleTurn,
   cardRest: cardRest,
@@ -401,6 +443,8 @@ export const allCards = {
   cardCrew_0007: cardCrew_0007,
   cardCrew_0008: cardCrew_0008,
   cardCrew_0009: cardCrew_0009,
+  cardCrew_0010: cardCrew_0010,
+  cardCrew_0011: cardCrew_0011,
 
   cardItem_0000: cardItem_0000,
 
@@ -417,4 +461,5 @@ export const allCards = {
   cardBattle_0010: cardBattle_0010,
   cardBattle_0011: cardBattle_0011,
   cardBattle_0012: cardBattle_0012,
+  cardBattle_0013: cardBattle_0013,
 };

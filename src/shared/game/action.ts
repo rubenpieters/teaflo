@@ -345,6 +345,14 @@ function applyAction(
       );
       break;
     }
+    case "GainAP": {
+      state = onTarget(action.target, state,
+        ally => _Crew.addAP(ally, action.value),
+        _ => { throw `wrong target type for '${action.tag}`; },
+        _ => { throw `wrong target type for '${action.tag}`; },
+      );
+      break;
+    }
     case "Rest": {
       break;
     }

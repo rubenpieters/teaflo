@@ -663,7 +663,7 @@ function showAlly(
   const infoTexts: Phaser.Text[] = [];
 
   const fontSize = 15;
-  const hpText: Phaser.Text = board.game.add.text(0, 0, `HP: ${ally.hp}/${ally.maxHp}`, {
+  const hpText: Phaser.Text = board.game.add.text(0, 0, `HP: ${ally.hp}/${ally.maxHp} AP: ${ally.ap}`, {
     font: "Arial",
     fontSize: fontSize,
     fill: "#222222",

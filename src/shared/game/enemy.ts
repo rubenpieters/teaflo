@@ -19,6 +19,7 @@ import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueSt
 
 export type Enemy = {
   hp: number,
+  ap: number,
   maxHp: number,
   actions: EnemyEffect[],
   triggers: TriggerEntityEffect[],
@@ -329,6 +330,7 @@ const enemyAtk2Hp15: Enemy = {
 */
 
 const enemyBoss1: Enemy = {
+  ap: 1,
   hp: 40,
   maxHp: 40,
   actions: [
@@ -391,6 +393,7 @@ const enemyBoss1: Enemy = {
 
 
 const enemyBoss2: Enemy = {
+  ap: 1,
   hp: 40,
   maxHp: 40,
   actions: [
@@ -405,6 +408,7 @@ const enemyBoss2: Enemy = {
 
 
 const dummy: Enemy = {
+  ap: 1,
   hp: 1000,
   maxHp: 1000,
   actions: [
@@ -415,10 +419,23 @@ const dummy: Enemy = {
 };
 
 const basicEnemy1: Enemy = {
+  ap: 1,
   hp: 15,
   maxHp: 15,
   actions: [
     damageXAtPos(10, 0),
+    healSelf(10),
+  ],
+  triggers: [
+  ],
+};
+
+const basicEnemy2: Enemy = {
+  ap: 1,
+  hp: 20,
+  maxHp: 20,
+  actions: [
+    damageXAtPos(5, 0),
     healSelf(10),
   ],
   triggers: [
@@ -438,4 +455,5 @@ export const allEnemies = {
   enemyBoss2: enemyBoss2,
   dummy: dummy,
   basicEnemy1: basicEnemy1,
+  basicEnemy2: basicEnemy2,
 };

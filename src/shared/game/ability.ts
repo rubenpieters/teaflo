@@ -37,6 +37,14 @@ export function createCard(
   };
 }
 
+function numberToTarget(input: number): Target {
+  if (input >= 0) {
+    return { tag: "Target", type: "enemy", position: input }
+  } else {
+    return { tag: "Target", type: "ally", position: (-input) - 1 }
+  }
+}
+
 // + additional user input
 // entity effect = state, id, type -> state
 // player effect = state -> state
@@ -202,6 +210,39 @@ const dmg15: InputEntityEffect = {
   ],
 };
 
+const addAp: InputEntityEffect = {
+  effect: (inputs: any[]) => {
+    const targetPos: number = inputs[0];
+    return (state: GameState, _id: CreatureId) => {
+      if (inCombat(state)) {
+        return {
+          tag: "GainAP",
+          target: numberToTarget(targetPos),
+          value: 1,
+        }
+      } else {
+        return { tag: "Invalid" };
+      }
+    }},
+  description: "add 1 AP to <Target Choice>",
+  inputs: [
+    { tag: "NumberInput" },
+  ],
+};
+
+const apDmg: InputEntityEffect = {
+  effect: (inputs: any[]) => {
+    const targetPos: number = inputs[0];
+    return (state: GameState, id: CreatureId) => {
+      const e = findEntity(state, id);
+      return damageToTarget.effect(targetPos, "enemy", 5 * e.ap);
+    }},
+  description: "deal 5 * AP to <Target Choice>",
+  inputs: [
+    { tag: "NumberInput" },
+  ],
+};
+
 const dmgPoison: InputEntityEffect = {
   effect: (inputs: any[]) => {
     const targetPos: number = inputs[0];
@@ -227,6 +268,8 @@ export const allAbilities = {
   dmg15: dmg15,
   dmgPoison: dmgPoison,
   armorSelf: armorSelf,
+  addAp: addAp,
+  apDmg: apDmg,
 };
 
 const noopE: EnemyEffect = {
