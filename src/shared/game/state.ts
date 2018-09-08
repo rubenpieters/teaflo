@@ -2,9 +2,10 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import { Item } from "src/shared/game/item";
 import { Enemy } from "src/shared/game/enemy";
-import { Origin } from "src/shared/game/target";
+import { Origin, TargetType, typeColl } from "src/shared/game/target";
 import { Action } from "src/shared/game/action";
 import { HasStatus } from "src/shared/game/status";
+import { findIndex } from "./trigger";
 
 export type Id = {
   id: number,
@@ -35,3 +36,57 @@ export const initialState: GameState = {
   crewLimit: 4,
   actionQueue: [],
 };
+
+export type GlobalId = {
+  tag: "GlobalId",
+  id: number,
+};
+
+export type PositionId = {
+  tag: "PositionId",
+  id: number,
+  type: TargetType,
+};
+
+export type EntityId
+  = GlobalId
+  | PositionId
+  ;
+
+type TargetEntity<A extends TargetType> =
+  A extends "ally" ? IdCrew :
+  A extends "enemy" ? IdEnemy :
+  A extends "item" ? IdItem :
+  never
+  ;
+
+export function findEntity<A extends TargetType>(state: GameState, id: EntityId, type: A): TargetEntity<A> {
+  switch (type) {
+    case "ally": {
+      return <TargetEntity<A>>(findE(state.crew, id));
+    }
+    case "enemy": {
+      return <TargetEntity<A>>(findE(state.enemies, id));
+    }
+    case "item": {
+      return <TargetEntity<A>>(findE(state.items, id));
+    }
+  }
+  // ts compiler does not find exhaustiveness for A
+  return <any>undefined;
+}
+
+function findE<E extends Id>(coll: E[], id: EntityId): E {
+  switch (id.tag) {
+    case "PositionId": {
+      return coll[id.id];
+    }
+    case "GlobalId": {
+      const e: E | undefined = coll.find(x => x.id === id.id);
+      if (e === undefined) {
+        throw `not found ${id}`;
+      }
+      return e;
+    }
+  }
+}
