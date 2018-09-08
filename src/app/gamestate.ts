@@ -461,10 +461,13 @@ function mkState(
       sprite.endFill();
       sprite.inputEnabled = true;
       sprite.events.onInputOver.add(() => showAbility(board, ability));
-      const cb = (inputs: any[]) => {
-        return addToSolution(board, createCard(ability.effect(inputs)(board.lastState!, allyId, "ally"), allyId, "ally"));
-      }
-      sprite.events.onInputDown.add(onAbilityClick(board, ability.inputs, [], cb));
+      const cb = (id: number) => {
+        return (inputs: any[]) => {
+          return addToSolution(board, createCard(ability.effect(inputs)(board.lastState!, id, "ally"), id, "ally"));
+        }
+      };
+      // capture allyId in new scope
+      sprite.events.onInputDown.add(onAbilityClick(board, ability.inputs, [], cb(allyId)));
       sprites.push(sprite);
       i += 1;
     }

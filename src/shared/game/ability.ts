@@ -10,6 +10,8 @@ import { Next } from "./next";
 import { Status } from "./status";
 import { Enemy } from "./enemy";
 
+// TODO: check with gamestate.ts whether given input is self global id or self position index
+// (it seems to be position index)
 
 export function createCard(
   action: Action,
@@ -102,7 +104,7 @@ const statusToTarget = {
   description: (statusDesc: string, targetDesc: string) => {
     return `apply ${statusDesc} to ${targetDesc}`;
   },
-}
+};
 
 const addArmor = {
   effect: (position: number, type: TargetType, value: number, guard: number, fragment: number) => {
@@ -121,6 +123,20 @@ const addArmor = {
   description: (valueDesc: string, targetDesc: string) => {
     return `add ${valueDesc} armor to ${targetDesc}`
   },
+};
+
+const armorSelf = {
+  effect: (inputs: any[]) => {
+    return (state: GameState, id: number, type: TargetType) => {
+      const index = findIndex(x => x.id === id, typeColl(state, type));
+      if (index === "notFound") {
+        throw `not found ${id} ${type}`;
+      }
+      return addArmor.effect(index, type, 1, 8, 0);
+    };
+  },
+  description: addArmor.description("1T 8", "self"),
+  inputs: []
 };
 
 const armorDamageToTarget: InputEntityEffect = {
@@ -207,6 +223,7 @@ export const allAbilities = {
   armorAllAlly_5_1_0: armorAllAlly_5_1_0,
   dmg15: dmg15,
   dmgPoison: dmgPoison,
+  armorSelf: armorSelf,
 };
 
 const noopE: EnemyEffect = {

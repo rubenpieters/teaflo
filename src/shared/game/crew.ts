@@ -439,6 +439,21 @@ const dmgPoison: Crew = {
   ],
 };
 
+const basicCrew1: Crew = {
+  ap: 1,
+  hp: 15,
+  maxHp: 15,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    allAbilities.noop,
+  ],
+  abilities: [
+    allAbilities.armorSelf,
+  ],
+};
+
 export const allCrew = {
   /*stFighter: stFighter,
   stRanged: stRanged,
@@ -450,4 +465,5 @@ export const allCrew = {
   tank1: tank1,
   dmg1: dmg1,
   dmgPoison: dmgPoison,
+  basicCrew1: basicCrew1,
 };
