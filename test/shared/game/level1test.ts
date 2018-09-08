@@ -2,7 +2,7 @@ import { Solution, Path, runSolution, SolCard, SolEvent, SolRest } from "src/sha
 import { allCards, Card, Event, Rest } from "src/shared/game/card";
 import { showSolutionLog } from "src/shared/game/log";
 import { createCard } from "src/shared/game/ability";
-import { IdCrew, GameState } from "src/shared/game/state";
+import { IdCrew, GameState, CreatureId } from "src/shared/game/state";
 import { onAllAlly } from "src/shared/game/crew";
 import { TargetType } from "src/shared/game/target";
 
@@ -11,7 +11,7 @@ function test1() {
   {
       
     effects: [
-      { effect: (inputs: any[]) => { return (state: GameState, id: number, type: TargetType) => {
+      { effect: (_inputs: any[]) => { return (state: GameState, id: CreatureId) => {
         return onAllAlly(
           state,
           (_: IdCrew, id: number) => { return {

@@ -5,6 +5,7 @@ import { GameState, initialState } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
 import { EntityEffect } from "./ability";
+import { Origin } from "./target";
 
 export type SolEvent = {
   tag: "crew" | "enemy" | "item" | "general",
@@ -119,7 +120,33 @@ function solutionStep(
   idGen: Generator,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
   const { action, origin } = nextAction(index, solution);
-  let log: ActionLog = { action: action.effect(state, <any>undefined, <any>undefined), crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: [] };
+
+  let actionEffect: Action = <any>undefined;
+  let actionOrigin: Origin = <any>undefined;
+  switch (origin.tag) {
+    case "EntityOrigin": {
+      if (origin.entityType === "item") {
+        // items execute actions with PlayerOrigin
+        actionEffect = action.effect(state, <any>undefined);
+        actionOrigin = "noOrigin";
+      } else {
+        actionEffect = action.effect(state, { tag: "GlobalId", id: origin.entityId, type: origin.entityType });
+        actionOrigin = {
+          type: origin.entityType,
+          id: origin.entityId,
+        };
+      }
+      break;
+    }
+    case "PlayerOrigin": {
+      // TODO: player origin cards should not take selfId/selfType as input
+      actionEffect = action.effect(state, <any>undefined);
+      actionOrigin = "noOrigin";
+      break;
+    }
+  }
+
+  let log: ActionLog = { action: action.effect(state, <any>undefined), crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: [] };
 
   const afterCrewStatus = checkStatusCrew(state, idGen);
   log = focus(log, set(x => x.crewStatus, afterCrewStatus.log));
@@ -130,20 +157,8 @@ function solutionStep(
 
   // TODO: add crew auto-actions?
 
-  let actionResult: { state: GameState | "invalid", log: Action[] } = <any>undefined;
-  switch (origin.tag) {
-    case "EntityOrigin": {
-      actionResult = applyActionAndTriggers(action.effect(state, origin.entityId, origin.entityType),
-        state, [], idGen, { type: origin.entityType, id: origin.entityId });
-      break;
-    }
-    case "PlayerOrigin": {
-      // TODO: player origin cards should not take selfId/selfType as input
-      actionResult = applyActionAndTriggers(action.effect(state, <any>undefined, <any>undefined),
-      state, [], idGen, "noOrigin");
-      break;
-    }
-  }
+  let actionResult: { state: GameState | "invalid", log: Action[] } =
+    applyActionAndTriggers(actionEffect, state, [], idGen, actionOrigin);
   
   log = focus(log, set(x => x.crewAction, actionResult.log));
   if (actionResult.state === "invalid") {

@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, IdEnemy } from "src/shared/game/state";
+import { GameState, IdEnemy, CreatureId } from "src/shared/game/state";
 import { Action, ActionSpec, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { showAction } from "src/shared/game/log";
@@ -41,7 +41,7 @@ export function act(
   idGen: Generator,
   index: number,
 ): { state: GameState | "invalid", log: Action[] }  {
-  const { action, next } = enemy.actions[enemy.actionIndex].effect(state, enemy.id, "enemy");
+  const { action, next } = enemy.actions[enemy.actionIndex].effect(state, { tag: "GlobalId", id: enemy.id, type: "enemy" });
   state = focus(state,
     over(x => x.enemies[index].actionIndex, x => {
       switch (next.tag) {
@@ -348,7 +348,7 @@ const enemyBoss1: Enemy = {
       fragment: 0,
     }),
     {
-      effect: (state: GameState, id: number, type: TargetType) => {
+      effect: (state: GameState, id: CreatureId) => {
         return {
           action: {
             tag: "CombinedAction",

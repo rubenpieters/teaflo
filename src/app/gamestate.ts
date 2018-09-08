@@ -463,7 +463,7 @@ function mkState(
       sprite.events.onInputOver.add(() => showAbility(board, ability));
       const cb = (id: number) => {
         return (inputs: any[]) => {
-          return addToSolution(board, createCard(ability.effect(inputs)(board.lastState!, id, "ally"), id, "ally"));
+          return addToSolution(board, createCard(ability.effect(inputs)(board.lastState!, { tag: "PositionId", id, type: "ally"}), id, "ally"));
         }
       };
       // capture allyId in new scope

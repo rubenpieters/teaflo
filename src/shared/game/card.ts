@@ -4,7 +4,7 @@ import { allCrew, onAllAlly, Ability } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { allEnemies } from "src/shared/game/enemy";
 import { showAction } from "src/shared/game/log";
-import { GameState, IdCrew } from "./state";
+import { GameState, IdCrew, CreatureId } from "./state";
 import { InputEntityEffect } from "./ability";
 
 export function showCard(card: Card) {
@@ -47,7 +47,7 @@ const cardRest: Card = {
   origin: { tag: "PlayerOrigin", cardId: 0 },
   name: "Rest",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "Rest" }
       }},
       inputs: [],
@@ -61,7 +61,7 @@ const cardBattleTurn: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1 },
   name: "Battle",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "BattleTurn" }
       }},
       inputs: [],
@@ -103,7 +103,7 @@ const cardCrew_0003: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },
   name: "ArmorSelf",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddCrew", crew: allCrew.armorOnSelfHeal };
       }},
       inputs: [],
@@ -117,7 +117,7 @@ const cardCrew_0004: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1004 },
   name: "RegenDmg",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddCrew", crew: allCrew.regenOnDamageAlly };
       }},
       inputs: [],
@@ -131,7 +131,7 @@ const cardCrew_0005: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1005 },
   name: "Tank1",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddCrew", crew: allCrew.tank1 };
       }},
       inputs: [],
@@ -145,7 +145,7 @@ const cardCrew_0006: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1006 },
   name: "Dmg1",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddCrew", crew: allCrew.dmg1 };
       }},
       inputs: [],
@@ -159,7 +159,7 @@ const cardCrew_0007: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1007 },
   name: "Dmg2",
   effects: [
-    { effect: (_inputs: any[]) => { return (state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (state: GameState, _id: CreatureId) => {
       return onAllAlly(state, 
         (_ally: IdCrew, id: number) => {
           return {
@@ -177,7 +177,7 @@ const cardCrew_0007: Card = {
       inputs: [],
       description: "doom 0/50 all allies",
     },
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddCrew", crew: allCrew.dmg1 };
       }},
       inputs: [],
@@ -191,7 +191,7 @@ const cardCrew_0008: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1008 },
   name: "DmgPoison",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddCrew", crew: allCrew.dmgPoison };
       }},
       inputs: [],
@@ -205,7 +205,7 @@ const cardCrew_0009: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1008 },
   name: "BasicCrew1",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddCrew", crew: allCrew.basicCrew1 };
       }},
       inputs: [],
@@ -219,13 +219,13 @@ const cardItem_0000: Card = {
   origin: { tag: "PlayerOrigin", cardId: 2000 },
   name: "Shield",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "PayGold", pay: 5 };
       }},
       inputs: [],
       description: "pay 5",
     },
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddItem", item: allItems.guard1StartCombat };
       }},
       inputs: [],
@@ -335,7 +335,7 @@ const cardBattle_0009: Card = {
   origin: { tag: "PlayerOrigin", cardId: 3009 },
   name: "Enemy9",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddEnemy", enemy: allEnemies.enemyBoss1 };
       }},
       inputs: [],
@@ -349,7 +349,7 @@ const cardBattle_0010: Card = {
   origin: { tag: "PlayerOrigin", cardId: 3010 },
   name: "Enemy10",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddEnemy", enemy: allEnemies.enemyBoss2 };
       }},
       inputs: [],
@@ -363,7 +363,7 @@ const cardBattle_0011: Card = {
   origin: { tag: "PlayerOrigin", cardId: 3011 },
   name: "Dummy",
   effects: [
-    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
       return { tag: "AddEnemy", enemy: allEnemies.dummy };
       }},
       inputs: [],

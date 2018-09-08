@@ -5,7 +5,6 @@ import { Enemy } from "src/shared/game/enemy";
 import { Origin, TargetType, typeColl } from "src/shared/game/target";
 import { Action } from "src/shared/game/action";
 import { HasStatus } from "src/shared/game/status";
-import { findIndex } from "./trigger";
 
 export type Id = {
   id: number,
@@ -37,21 +36,27 @@ export const initialState: GameState = {
   actionQueue: [],
 };
 
-export type GlobalId = {
+export type GlobalIdA<A> = {
   tag: "GlobalId",
   id: number,
+  type: A,
 };
 
-export type PositionId = {
+export type PositionIdA<A> = {
   tag: "PositionId",
   id: number,
-  type: TargetType,
+  type: A,
 };
 
-export type EntityId
-  = GlobalId
-  | PositionId
+type EntityIdA<A>
+  = GlobalIdA<A>
+  | PositionIdA<A>
   ;
+
+
+export type EntityId = EntityIdA<TargetType>;
+
+export type CreatureId = EntityIdA<"ally" | "enemy">
 
 type TargetEntity<A extends TargetType> =
   A extends "ally" ? IdCrew :
@@ -60,8 +65,8 @@ type TargetEntity<A extends TargetType> =
   never
   ;
 
-export function findEntity<A extends TargetType>(state: GameState, id: EntityId, type: A): TargetEntity<A> {
-  switch (type) {
+export function findEntity<A extends TargetType>(state: GameState, id: EntityIdA<A>): TargetEntity<A> {
+  switch (id.type) {
     case "ally": {
       return <TargetEntity<A>>(findE(state.crew, id));
     }
@@ -84,6 +89,52 @@ function findE<E extends Id>(coll: E[], id: EntityId): E {
     case "GlobalId": {
       const e: E | undefined = coll.find(x => x.id === id.id);
       if (e === undefined) {
+        throw `not found ${id}`;
+      }
+      return e;
+    }
+  }
+}
+
+export function toPositionId<A extends TargetType>(state: GameState, id: EntityIdA<A>): PositionIdA<A> {
+  switch (id.tag) {
+    case "PositionId": {
+      return id;
+    }
+    case "GlobalId": {
+      return {
+        tag: "PositionId",
+        id: findIndex(state, id),
+        type: id.type,
+      }
+    }
+  }
+}
+
+export function findIndex<A extends TargetType>(state: GameState, id: EntityIdA<A>): number {
+  switch (id.type) {
+    case "ally": {
+      return findI(state.crew, id);
+    }
+    case "enemy": {
+      return findI(state.enemies, id);
+    }
+    case "item": {
+      return findI(state.items, id);
+    }
+  }
+  // ts compiler does not find exhaustiveness for A
+  return <any>undefined;
+}
+
+function findI<E extends Id>(coll: E[], id: EntityId): number {
+  switch (id.tag) {
+    case "PositionId": {
+      return id.id;
+    }
+    case "GlobalId": {
+      const e: number = coll.findIndex(x => x.id === id.id);
+      if (e === -1) {
         throw `not found ${id}`;
       }
       return e;

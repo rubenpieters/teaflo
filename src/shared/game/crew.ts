@@ -112,7 +112,7 @@ export function act(
       return newX >= crew.actions.length ? 0 : newX;
     }),
   );
-  return applyActionAndTriggers(action.effect(state, crew.id, "ally"), state, log, idGen, { id: crew.id, type: "ally" });
+  return applyActionAndTriggers(action.effect(state, { tag: "GlobalId", id: crew.id, type: "ally"}), state, log, idGen, { id: crew.id, type: "ally" });
 }
 /*
 const stFighter: Crew = {
