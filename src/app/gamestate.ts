@@ -453,8 +453,9 @@ function mkState(
     hpSprite.endFill();
     sprites.push(hpSprite);
 
+    let i = 0;
     for (const ability of ally.abilities) {
-      const sprite: Phaser.Graphics = board.game.add.graphics(x, y + 75, board.group);
+      const sprite: Phaser.Graphics = board.game.add.graphics(x, y + 70 + i * 20, board.group);
       sprite.beginFill(0x449966);
       sprite.drawRect(0, 0, 20, 15);
       sprite.endFill();
@@ -465,9 +466,10 @@ function mkState(
       }
       sprite.events.onInputDown.add(onAbilityClick(board, ability.inputs, [], cb));
       sprites.push(sprite);
+      i += 1;
     }
 
-    const statusSprite: Phaser.Graphics = board.game.add.graphics(x, y + 95, board.group);
+    const statusSprite: Phaser.Graphics = board.game.add.graphics(x, y + 80 + i * 20, board.group);
     statusSprite.beginFill(0x994499);
     statusSprite.drawRect(0, 0, 20, 10);
     statusSprite.endFill();
@@ -495,6 +497,15 @@ function mkState(
     hpSprite.drawRect(0, 0, 20 * hpRatio, 5);
     hpSprite.endFill();
     sprites.push(hpSprite);
+
+    const statusSprite: Phaser.Graphics = board.game.add.graphics(x, y + 75, board.group);
+    statusSprite.beginFill(0x994499);
+    statusSprite.drawRect(0, 0, 20, 10);
+    statusSprite.endFill();
+    statusSprite.inputEnabled = true;
+    statusSprite.events.onInputOver.add(() => showEntityStatus(board, enemy));
+    sprites.push(statusSprite);
+
 
     x += 25;
   }
