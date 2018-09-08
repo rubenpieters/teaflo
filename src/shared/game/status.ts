@@ -1,14 +1,15 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { ActionSpec, Action } from "src/shared/game/action";
 import { TargetType, typeColl } from "src/shared/game/target";
-import { findIndex } from "./trigger";
-import { GameState } from "./state";
+import { findIndex } from "src/shared/game/trigger";
+import { GameState } from "src/shared/game/state";
 
 export type Poison = {
   tag: "Poison",
   value: number,
   fragment: number,
 };
+
 export type PiercingPoison = {
   tag: "PiercingPoison",
   value: number,

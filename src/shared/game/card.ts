@@ -161,7 +161,7 @@ const cardCrew_0007: Card = {
   effects: [
     { effect: (_inputs: any[]) => { return (state: GameState, _id: number, _type: TargetType) => {
       return onAllAlly(state, 
-        (ally: IdCrew, id: number) => {
+        (_ally: IdCrew, id: number) => {
           return {
             tag: "QueueStatus",
             target: { tag: "Target", type: "ally", position: id, },
@@ -182,6 +182,20 @@ const cardCrew_0007: Card = {
       }},
       inputs: [],
       description: "add Dmg1",
+    },
+  ],
+  tag: "crew",
+};
+
+const cardCrew_0008: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 1008 },
+  name: "DmgPoison",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+      return { tag: "AddCrew", crew: allCrew.dmgPoison };
+      }},
+      inputs: [],
+      description: "add DmgPoison",
     },
   ],
   tag: "crew",
@@ -331,6 +345,20 @@ const cardBattle_0010: Card = {
   tag: "enemy",
 };
 
+const cardBattle_0011: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 3011 },
+  name: "Dummy",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: number, _type: TargetType) => {
+      return { tag: "AddEnemy", enemy: allEnemies.dummy };
+      }},
+      inputs: [],
+      description: "add Dummy",
+    },
+  ],
+  tag: "enemy",
+};
+
 export const allCards = {
   cardBattleTurn: cardBattleTurn,
   cardRest: cardRest,
@@ -343,6 +371,7 @@ export const allCards = {
   cardCrew_0005: cardCrew_0005,
   cardCrew_0006: cardCrew_0006,
   cardCrew_0007: cardCrew_0007,
+  cardCrew_0008: cardCrew_0008,
 
   cardItem_0000: cardItem_0000,
 
@@ -357,4 +386,5 @@ export const allCards = {
   cardBattle_0008: cardBattle_0008,*/
   cardBattle_0009: cardBattle_0009,
   cardBattle_0010: cardBattle_0010,
+  cardBattle_0011: cardBattle_0011,
 };

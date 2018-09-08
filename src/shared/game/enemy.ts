@@ -6,7 +6,7 @@ import { showAction } from "src/shared/game/log";
 import { Trigger, showTrigger } from "src/shared/game/trigger";
 import { HasNext } from "src/shared/game/next";
 import { TargetType } from "./target";
-import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus } from "./ability";
+import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities } from "./ability";
 
 /*export function showEnemy(
   enemy: Enemy
@@ -390,18 +390,6 @@ const enemyBoss1: Enemy = {
 };
 
 
-export function onAllAllyPositions(
-  state: GameState,
-  f: (id: number) => Action,
-): Action {
-  const indices = [...Array(state.crew.length).keys()]
-  const actions = indices.map(f);
-  return {
-    tag: "CombinedAction",
-    actions,
-  }
-}
-
 const enemyBoss2: Enemy = {
   hp: 40,
   maxHp: 40,
@@ -410,6 +398,17 @@ const enemyBoss2: Enemy = {
     damageXAtPos(10, 1),
     damageXAtPos(10, 2),
     damageXAtPos(10, 3),
+  ],
+  triggers: [
+  ],
+};
+
+
+const dummy: Enemy = {
+  hp: 1000,
+  maxHp: 1000,
+  actions: [
+    enemyAbilities.noopE,
   ],
   triggers: [
   ],
@@ -426,4 +425,5 @@ export const allEnemies = {
   enemyAtk2Hp15: enemyAtk2Hp15,*/
   enemyBoss1: enemyBoss1,
   enemyBoss2: enemyBoss2,
+  dummy: dummy,
 };

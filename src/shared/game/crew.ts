@@ -363,7 +363,7 @@ const armorOnSelfHeal: Crew = {
   abilities: [
     allAbilities.armorDamageToTarget,
   ],
-}
+};
 
 
 const regenOnDamageAlly: Crew = {
@@ -380,7 +380,7 @@ const regenOnDamageAlly: Crew = {
   abilities: [
     allAbilities.armorAllAlly_5_1_0,
   ],
-}
+};
 
 export function onAllAlly(
   state: GameState,
@@ -407,7 +407,7 @@ const tank1: Crew = {
   ],
   abilities: [
   ],
-}
+};
 
 const dmg1: Crew = {
   ap: 1,
@@ -422,7 +422,22 @@ const dmg1: Crew = {
   abilities: [
     allAbilities.dmg15,
   ],
-}
+};
+
+const dmgPoison: Crew = {
+  ap: 1,
+  hp: 15,
+  maxHp: 15,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    allAbilities.noop,
+  ],
+  abilities: [
+    allAbilities.dmgPoison,
+  ],
+};
 
 export const allCrew = {
   /*stFighter: stFighter,
@@ -434,4 +449,5 @@ export const allCrew = {
   regenOnDamageAlly: regenOnDamageAlly,
   tank1: tank1,
   dmg1: dmg1,
+  dmgPoison: dmgPoison,
 };

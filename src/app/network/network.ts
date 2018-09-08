@@ -63,6 +63,19 @@ export function getBoard(_serverConn: ServerConnection, board: Board, seed: stri
       {...allCards.cardCrew_0002, limit: 1 },
       {...allCards.cardBattle_0008, limit: 1 },*/
     ];
+  } else if (seed === "sandbox") {
+    cards = [
+      {...allCards.cardBattleTurn, limit: Infinity },
+      {...allCards.cardRest, limit: Infinity },
+      {...allCards.cardCrew_0005, limit: 5 },
+      {...allCards.cardCrew_0006, limit: 5 },
+      {...allCards.cardCrew_0007, limit: 5 },
+      {...allCards.cardCrew_0008, limit: 5 },
+      {...allCards.cardBattle_0011, limit: 5 },
+      /*{...allCards.cardCrew_0000, limit: 2 },
+      {...allCards.cardCrew_0002, limit: 1 },
+      {...allCards.cardBattle_0008, limit: 1 },*/
+    ];
   } else {
     throw "unexpected seed: " + seed;
   }

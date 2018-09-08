@@ -8,6 +8,7 @@ import { InputType } from "src/shared/game/input";
 import { findIndex } from "./trigger";
 import { Next } from "./next";
 import { Status } from "./status";
+import { Enemy } from "./enemy";
 
 
 export function createCard(
@@ -70,22 +71,38 @@ const noop: EntityEffect = {
   },
   description: "Noop",
   inputs: [],
-}
+};
 
 const damageToTarget = {
-  effect: (position: number, type: TargetType, value: number) => { 
-    const action: Action = {
+  effect: (position: number, type: TargetType, value: number) => {
+    return <Action>{
       tag: "Damage",
       target: { tag: "Target", type, position, },
       value,
       piercing: false,
-    }
-    return action;
+    };
   },
   description: (valueDesc: string, targetDesc: string) => {
     return `deal ${valueDesc} to ${targetDesc}`;
   },
 };
+
+const statusToTarget = {
+  effect: (position: number, type: TargetType, status: Status["tag"], value: number, fragment: number) => {
+    return <Action>{
+      tag: "QueueStatus",
+      target: { tag: "Target", type, position, },
+      status: <Status>{
+        tag: status,
+        value,
+        fragment,
+      }
+    };
+  },
+  description: (statusDesc: string, targetDesc: string) => {
+    return `apply ${statusDesc} to ${targetDesc}`;
+  },
+}
 
 const addArmor = {
   effect: (position: number, type: TargetType, value: number, guard: number, fragment: number) => {
@@ -166,12 +183,38 @@ const dmg15: InputEntityEffect = {
   ],
 };
 
+const dmgPoison: InputEntityEffect = {
+  effect: (inputs: any[]) => {
+    const targetPos: number = inputs[0];
+    return (_state: GameState, _id: number, _type: TargetType) => {
+      return {
+        tag: "CombinedAction",
+        actions: [
+          damageToTarget.effect(targetPos, "enemy", 10),
+          statusToTarget.effect(targetPos, "enemy", "Poison", 0, 50),
+        ],
+      }
+    }},
+  description: `${damageToTarget.description("15", "<Target Choice>")} and ${statusToTarget.description("Poison 50 F", "<Target Choice>")}`,
+  inputs: [
+    { tag: "NumberInput" },
+  ],
+};
+
 export const allAbilities = {
   noop: noop,
   armorDamageToTarget: armorDamageToTarget,
   armorAllAlly_5_1_0: armorAllAlly_5_1_0,
   dmg15: dmg15,
+  dmgPoison: dmgPoison,
 };
+
+const noopE: EnemyEffect = {
+  effect: (_state: GameState, _id: number, _type: TargetType) => {
+    return { action: { tag: "Noop"}, next: { tag: "NextId" } };
+  },
+  description: "Noop",
+}
 
 const armorOnHeal: TriggerEntityEffect = {
   effect: (action: Action) => {
@@ -341,6 +384,7 @@ function onAllAllyPositions(
 
 
 export const enemyAbilities = {
+  noopE: noopE,
   damage_10_0: damageXAtPos(10, 0),
   damage_10_1: damageXAtPos(10, 1),
   damage_10_2: damageXAtPos(10, 2),

@@ -56,6 +56,18 @@ export default class Menu extends Phaser.State {
 
     const menuGroup = this.game.add.group();
 
+    const sandBoxBtn: Phaser.Text = this.game.add.text(0, 0, `sandbox`, {
+      font: "20px Indie Flower",
+      fill: "#77BFA3",
+      boundsAlignH: "left",
+      boundsAlignV: "middle",
+    }, menuGroup);
+    sandBoxBtn.setTextBounds(75, 60, 75, 50);
+    sandBoxBtn.inputEnabled = true;
+    sandBoxBtn.events.onInputDown.add(() => {
+      getBoard(<any>undefined, board, "sandbox");
+    });
+
     for (const i of [1, 2, 3]) {
       const levelBtn: Phaser.Text = this.game.add.text(0, 0, `level ${i}`, {
         font: "20px Indie Flower",
@@ -63,7 +75,7 @@ export default class Menu extends Phaser.State {
         boundsAlignH: "left",
         boundsAlignV: "middle",
       }, menuGroup);
-      levelBtn.setTextBounds(75, 30 + i * 30, 75, 50);
+      levelBtn.setTextBounds(75, 60 + i * 30, 75, 50);
       levelBtn.inputEnabled = true;
       levelBtn.events.onInputDown.add(() => {
         getBoard(<any>undefined, board, `${i}`);
