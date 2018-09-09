@@ -9,6 +9,7 @@ import { findIndex } from "./trigger";
 import { Next } from "./next";
 import { Status } from "./status";
 import { Enemy } from "./enemy";
+import { SolCard } from "./solution";
 
 // TODO: check with gamestate.ts whether given input is self global id or self position index
 // (it seems to be position index)
@@ -24,6 +25,30 @@ export function createCard(
       { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
         return action;
         }},
+        inputs: [],
+        description: "-- created --",
+      },
+    ],
+    tag: "general",
+    origin: {
+      tag: "EntityOrigin", 
+      entityId: selfId,
+      entityType: selfType,
+    }
+  };
+}
+
+export function createSolCard(
+  action: Action,
+  selfId: number,
+  selfType: TargetType,
+): SolCard {
+  return {
+    name: "-- created --",
+    effects: [
+      { effect: (_state: GameState, _id: CreatureId) => {
+        return action;
+        },
         inputs: [],
         description: "-- created --",
       },

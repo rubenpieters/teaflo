@@ -1,0 +1,120 @@
+** Rest **
+crew status
+
+crew action
+ - Rest
+queue1
+
+enemy status
+
+enemy action
+
+queue2
+
+deaths
+
+** AddCrew **
+crew status
+
+crew action
+ - AddCrew
+queue1
+
+enemy status
+
+enemy action
+
+queue2
+
+deaths
+
+** AddEnemy **
+crew status
+
+crew action
+ - AddEnemy
+queue1
+
+enemy status
+
+enemy action
+ - Damage 10 to 0 ally
+queue2
+
+deaths
+
+** Damage 15 to 0 enemy **
+crew status
+
+crew action
+ - Damage 15 to 0 enemy
+queue1
+
+enemy status
+
+enemy action
+ - Heal 10 to 0 enemy
+queue2
+
+deaths
+
+** QueueStatus Guard 8 1 T 0 F to 0 ally **
+crew status
+
+crew action
+ - QueueStatus Guard 8 1 T 0 F to 0 ally
+queue1
+ - AddStatus Guard 8 1 T 0 F to 0 ally
+enemy status
+
+enemy action
+ - Damage 10 to 0 ally
+queue2
+
+deaths
+
+** Damage 15 to 0 enemy **
+crew status
+
+crew action
+ - Damage 15 to 0 enemy
+queue1
+
+enemy status
+
+enemy action
+ - Heal 10 to 0 enemy
+queue2
+
+deaths
+
+** QueueStatus Guard 8 1 T 0 F to 0 ally **
+crew status
+
+crew action
+ - QueueStatus Guard 8 1 T 0 F to 0 ally
+queue1
+ - AddStatus Guard 8 1 T 0 F to 0 ally
+enemy status
+
+enemy action
+ - Damage 10 to 0 ally
+queue2
+
+deaths
+
+** Damage 15 to 0 enemy **
+crew status
+
+crew action
+ - Damage 15 to 0 enemy
+queue1
+
+enemy status
+
+enemy action
+ - Heal 10 to 0 enemy
+queue2
+
+deaths
+ - Death enemy 1
