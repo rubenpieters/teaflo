@@ -1,7 +1,6 @@
 import { Action } from "src/shared/game/action";
-import { Target, showTarget } from "src/shared/game/target";
+import { showTarget } from "src/shared/game/target";
 import { showStatus, Status } from "src/shared/game/status";
-import { showCondition } from "src/shared/game/trigger";
 
 export type SolutionLog = {
   actionLog: ActionLog[],

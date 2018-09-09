@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import { Item } from "src/shared/game/item";
 import { Enemy } from "src/shared/game/enemy";
-import { Origin, TargetType, typeColl } from "src/shared/game/target";
+import { Origin, TargetType } from "src/shared/game/target";
 import { Action } from "src/shared/game/action";
 import { HasStatus } from "src/shared/game/status";
 

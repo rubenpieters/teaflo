@@ -1,11 +1,9 @@
-import { Action, ActionSpec } from "src/shared/game/action";
-import { Target, Origin, TargetType } from "src/shared/game/target";
-import { allCrew, onAllAlly, Ability } from "src/shared/game/crew";
+import { TargetType } from "src/shared/game/target";
+import { allCrew, onAllAlly } from "src/shared/game/crew";
 import { allItems } from "src/shared/game/item";
 import { allEnemies } from "src/shared/game/enemy";
-import { showAction } from "src/shared/game/log";
-import { GameState, IdCrew, CreatureId } from "./state";
-import { InputEntityEffect } from "./ability";
+import { GameState, IdCrew, CreatureId } from "src/shared/game/state";
+import { InputEntityEffect } from "src/shared/game/ability";
 
 export function showCard(card: Card) {
   //return { ...card, actions: card.actions.map(showAction) };

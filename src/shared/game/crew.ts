@@ -1,14 +1,10 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Trigger, showTrigger, findIndex } from "src/shared/game/trigger";
 import { GameState, IdCrew } from "src/shared/game/state";
-import { Action, ActionSpec, applyActionAndTriggers, Heal, Damage, AddStatus } from "src/shared/game/action";
+import { Action, ActionSpec, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { HasStatus, Guard } from "src/shared/game/status";
-import * as _Status from "src/shared/game/status";
-import { showAction } from "src/shared/game/log";
-import { TargetType, typeColl } from "src/shared/game/target";
 import { InputType } from "src/shared/game/input";
-import { allAbilities, InputEntityEffect, EntityEffect, TriggerEntityEffect, allTriggers } from "./ability";
+import { allAbilities, InputEntityEffect, EntityEffect, TriggerEntityEffect, allTriggers } from "src/shared/game/ability";
 
 /*export function showCrew(
   crew: Crew

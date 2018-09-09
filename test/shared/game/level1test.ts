@@ -5,6 +5,7 @@ import { createCard } from "src/shared/game/ability";
 import { IdCrew, GameState, CreatureId } from "src/shared/game/state";
 import { onAllAlly } from "src/shared/game/crew";
 import { TargetType } from "src/shared/game/target";
+import { passNoInputsR, passNoInputsE } from "./general";
 
 function test1() {
   const guardAction: Card = 
@@ -65,20 +66,6 @@ function test1() {
     const { state, log } = sol;
     //console.log(JSON.stringify(state, undefined, 2));
     console.log(showSolutionLog(log));
-  }
-}
-
-function passNoInputsE(card: Event): SolEvent {
-  return {
-    ...card,
-    effects: card.effects.map(x => { return {...x, effect: x.effect([])}; }),
-  }
-}
-
-function passNoInputsR(card: Rest): SolRest {
-  return {
-    ...card,
-    effects: card.effects.map(x => { return {...x, effect: x.effect([])}; }),
   }
 }
 

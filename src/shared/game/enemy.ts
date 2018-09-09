@@ -1,12 +1,8 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, IdEnemy, CreatureId } from "src/shared/game/state";
-import { Action, ActionSpec, applyActionAndTriggers } from "src/shared/game/action";
+import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
-import { showAction } from "src/shared/game/log";
-import { Trigger, showTrigger } from "src/shared/game/trigger";
-import { HasNext } from "src/shared/game/next";
-import { TargetType } from "./target";
-import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities, healSelf } from "./ability";
+import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities, healSelf } from "src/shared/game/ability";
 
 /*export function showEnemy(
   enemy: Enemy

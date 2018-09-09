@@ -9,8 +9,7 @@ import { Target, Origin, onTarget, TargetType, indexOfId, typeColl } from "src/s
 import { Item } from "src/shared/game/item";
 import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
-import { StatusLog } from "./log";
-import { Trigger } from "./trigger";
+import { StatusLog } from "src/shared/game/log";
 
 export type ActionSpec = (state: GameState, selfId: number, selfType: TargetType) => Action;
 
