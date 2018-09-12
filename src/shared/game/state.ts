@@ -58,27 +58,25 @@ export type EntityId = EntityIdA<TargetType>;
 
 export type CreatureId = EntityIdA<"ally" | "enemy">
 
-type TargetEntity<A extends TargetType> =
-  A extends "ally" ? IdCrew :
-  A extends "enemy" ? IdEnemy :
-  A extends "item" ? IdItem :
-  never
-  ;
+type TargetEntity = {
+  "ally": IdCrew,
+  "enemy": IdEnemy,
+  "item": IdItem,
+}
 
-export function findEntity<A extends TargetType>(state: GameState, id: EntityIdA<A>): TargetEntity<A> {
-  switch (id.type) {
+export function findEntity<A extends TargetType>(state: GameState, id: EntityIdA<A>): TargetEntity[A] {
+  const type: TargetType = id.type;
+  switch (type) {
     case "ally": {
-      return <TargetEntity<A>>(findE(state.crew, id));
+      return findE(state.enemies, id);
     }
     case "enemy": {
-      return <TargetEntity<A>>(findE(state.enemies, id));
+      return findE(state.enemies, id);
     }
     case "item": {
-      return <TargetEntity<A>>(findE(state.items, id));
+      return findE(state.items, id);
     }
   }
-  // ts compiler does not find exhaustiveness for A
-  return <any>undefined;
 }
 
 function findE<E extends Id>(coll: E[], id: EntityId): E {
