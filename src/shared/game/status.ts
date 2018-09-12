@@ -85,20 +85,11 @@ export function showStatus(status: Status): string {
 
 export const allStatus: Status["tag"][] = ["Regen", "PiercingPoison", "Poison", "Doom", "Guard", "Blind", "Silence"];
 
-// conditional types
-type StatusType<A> =
-  A extends "Poison" ? Poison :
-  A extends "PiercingPoison" ? Poison :
-  A extends "Regen" ? Regen :
-  A extends "Guard" ? Guard :
-  A extends "Doom" ? Doom :
-  A extends "Blind" ? Blind :
-  A extends "Silence" ? Silence :
-  never;
+type DiscrStatus<T extends Status["tag"]> = Extract<Status, {tag: T}>
 
 export type HasStatus = {
   // lookup types
-  [key in Status["tag"]]?: StatusType<key>
+  [key in Status["tag"]]?: DiscrStatus<key>
 };
 
 export function addStatus<E extends HasStatus>(
