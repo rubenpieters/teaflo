@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import * as _Crew from "src/shared/game/crew";
-import { GameState, IdCrew, IdEnemy, IdItem } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, toPositionId, toGlobalId } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
@@ -158,6 +158,28 @@ export function enemyTurn(
   return { state: acc, log };
 }
 
+export function highestThreatTarget(
+  enemyId: CreatureId,
+  state: GameState,
+): { target: Crew, position: number } | undefined {
+  let enemyGlobalId = toGlobalId(state, enemyId).id;
+  let highestThreat: { ally: Crew, position: number, threat: number } | undefined = undefined;
+  let i = 0;
+  for (const ally of state.crew) {
+    const threat: number | undefined = ally.threatMap[enemyGlobalId];
+    console.log(`THREAT${i}: ${JSON.stringify(threat)}`);
+    if (highestThreat === undefined) {
+      highestThreat = { ally, position: i, threat: threat === undefined ? 0 : threat };
+    } else if (threat !== undefined && highestThreat.threat < threat) {
+      console.log(`UPDATE ${highestThreat.threat < threat} ${highestThreat.threat} ${threat}`);
+      highestThreat = { ally, position: i, threat }
+    }
+    i += 1;
+  }
+  console.log(`CHOICE: ${JSON.stringify(highestThreat)}`);
+  return highestThreat === undefined ? undefined : { target: highestThreat.ally, position: highestThreat.position };
+}
+
 export function applyActionAndTriggers(
   action: Action,
   state: GameState,
@@ -278,7 +300,7 @@ function applyActionAndTriggersAt(
     indexAlly += 1;
   }
 
-  const afterApply = applyAction(action, state, log, idGen);
+  const afterApply = applyAction(action, state, origin, log, idGen);
 
   return afterApply;
 }
@@ -287,6 +309,7 @@ function applyActionAndTriggersAt(
 function applyAction(
   action: Action,
   state: GameState,
+  origin: Origin,
   log: Action[],
   idGen: Generator,
 ): { state: GameState | "invalid", log: Action[] } {
@@ -326,6 +349,12 @@ function applyAction(
         enemy => _Enemy.damage(enemy, action.value, action.piercing),
         _ => { throw `wrong target type for '${action.tag}`; },
       );
+      // create threat
+      if (origin !== "noOrigin" && origin.type === "ally" && action.target.type === "enemy") {
+        state = focus(state,
+          over(x => x.crew[origin.id], x => _Crew.addThreat(x, action.value, state.enemies[action.target.position].id))
+        );
+      }
       break;
     }
     case "Heal": {
@@ -471,7 +500,7 @@ function applyAction(
     }
     case "CombinedAction": {
       for (const embeddedAction of action.actions) {
-        const result = applyAction(embeddedAction, state, log, idGen);
+        const result = applyAction(embeddedAction, state, origin, log, idGen);
         log = result.log;
         if (result.state === "invalid") {
           return { state: "invalid", log };

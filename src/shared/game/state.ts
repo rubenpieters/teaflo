@@ -109,6 +109,22 @@ export function toPositionId<A extends TargetType>(state: GameState, id: EntityI
   }
 }
 
+export function toGlobalId<A extends TargetType>(state: GameState, id: EntityIdA<A>): GlobalIdA<A> {
+  switch (id.tag) {
+    case "PositionId": {
+      return {
+        tag: "GlobalId",
+        // can be more efficient since we know that we have a position id
+        id: findEntity(state, id).id,
+        type: id.type,
+      }
+    }
+    case "GlobalId": {
+      return id;
+    }
+  }
+}
+
 export function findIndex<A extends TargetType>(state: GameState, id: EntityIdA<A>): number {
   switch (id.type) {
     case "ally": {

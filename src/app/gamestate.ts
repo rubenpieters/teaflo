@@ -674,6 +674,17 @@ function showAlly(
   infoTexts.push(hpText);
 
   y += 40;
+  const threatMapText: Phaser.Text = board.game.add.text(0, 0, `${JSON.stringify(ally.threatMap)}`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  threatMapText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(threatMapText);
+
+  y += 40;
   const actionText: Phaser.Text = board.game.add.text(0, 0, `Actions`, {
     font: "Arial",
     fontSize: fontSize,

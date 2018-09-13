@@ -14,6 +14,7 @@ import { allAbilities, InputEntityEffect, EntityEffect, TriggerEntityEffect, all
     triggers: crew.triggers.map(showTrigger) };
 }*/
 
+type ThreatMap = {[globalId: number]: number};
 
 export type Ability = {
   f: (inputs: any[]) => ActionSpec,
@@ -28,6 +29,7 @@ export type Crew = {
   actions: EntityEffect[],
   triggers: TriggerEntityEffect[],
   abilities: InputEntityEffect[],
+  threatMap: ThreatMap,
 };
 
 export function damage<E extends Crew & HasStatus>(
@@ -46,6 +48,22 @@ export function damage<E extends Crew & HasStatus>(
     return focus(crew,
       set(x => x.Guard, undefined),
       over(x => x.hp, x => x - leftoverDamage),
+    );
+  }
+}
+
+export function addThreat<E extends Crew>(
+  crew: E,
+  damage: number,
+  enemyId: number,
+): E {
+  if (crew.threatMap[enemyId] !== undefined) {
+    return focus(crew,
+      over(x => x.threatMap[enemyId], x => x + damage),
+    );
+  } else {
+    return focus(crew,
+      set(x => x.threatMap[enemyId], damage),
     );
   }
 }
@@ -359,6 +377,7 @@ const armorOnSelfHeal: Crew = {
   abilities: [
     allAbilities.armorDamageToTarget,
   ],
+  threatMap: {},
 };
 
 
@@ -376,6 +395,7 @@ const regenOnDamageAlly: Crew = {
   abilities: [
     allAbilities.armorAllAlly_5_1_0,
   ],
+  threatMap: {},
 };
 
 export function onAllAlly(
@@ -403,6 +423,7 @@ const tank1: Crew = {
   ],
   abilities: [
   ],
+  threatMap: {},
 };
 
 const dmg1: Crew = {
@@ -417,7 +438,9 @@ const dmg1: Crew = {
   ],
   abilities: [
     allAbilities.dmg15,
+    allAbilities.dmg10,
   ],
+  threatMap: {},
 };
 
 const dmgPoison: Crew = {
@@ -433,6 +456,7 @@ const dmgPoison: Crew = {
   abilities: [
     allAbilities.dmgPoison,
   ],
+  threatMap: {},
 };
 
 const basicCrew1: Crew = {
@@ -449,6 +473,7 @@ const basicCrew1: Crew = {
     allAbilities.armorSelf,
     allAbilities.dmg15,
   ],
+  threatMap: {},
 };
 
 const basicCrew2: Crew = {
@@ -464,6 +489,7 @@ const basicCrew2: Crew = {
   abilities: [
     allAbilities.addAp,
   ],
+  threatMap: {},
 };
 
 const basicCrew3: Crew = {
@@ -479,6 +505,7 @@ const basicCrew3: Crew = {
   abilities: [
     allAbilities.apDmg,
   ],
+  threatMap: {},
 };
 
 export const allCrew = {

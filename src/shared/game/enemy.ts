@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, IdEnemy, CreatureId } from "src/shared/game/state";
 import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
-import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities, healSelf } from "src/shared/game/ability";
+import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities, healSelf, damageHighestThreat } from "src/shared/game/ability";
 
 /*export function showEnemy(
   enemy: Enemy
@@ -402,13 +402,12 @@ const enemyBoss2: Enemy = {
   ],
 };
 
-
 const dummy: Enemy = {
   ap: 1,
   hp: 1000,
   maxHp: 1000,
   actions: [
-    enemyAbilities.noopE,
+    damageHighestThreat(1),
   ],
   triggers: [
   ],

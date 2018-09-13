@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { TargetType, typeColl } from "src/shared/game/target";
-import { Action, AddStatus } from "src/shared/game/action";
+import { Action, AddStatus, highestThreatTarget } from "src/shared/game/action";
 import { Target } from "src/shared/game/target";
 import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId, inCombat } from "src/shared/game/state";
 import { Card } from "src/shared/game/card";
@@ -235,6 +235,18 @@ const dmg15: InputEntityEffect = {
   ],
 };
 
+const dmg10: InputEntityEffect = {
+  effect: (inputs: any[]) => {
+    const targetPos: number = inputs[0];
+    return (_state: GameState, _id: CreatureId) => {
+      return damageToTarget.effect(targetPos, "enemy", 10);
+    }},
+  description: damageToTarget.description("10", "<Target Choice>"),
+  inputs: [
+    { tag: "NumberInput" },
+  ],
+};
+
 const addAp: InputEntityEffect = {
   effect: (inputs: any[]) => {
     const targetPos: number = inputs[0];
@@ -291,18 +303,12 @@ export const allAbilities = {
   armorDamageToTarget: armorDamageToTarget,
   armorAllAlly_5_1_0: armorAllAlly_5_1_0,
   dmg15: dmg15,
+  dmg10: dmg10,
   dmgPoison: dmgPoison,
   armorSelf: armorSelf,
   addAp: addAp,
   apDmg: apDmg,
 };
-
-const noopE: EnemyEffect = {
-  effect: (_state: GameState, _id: CreatureId) => {
-    return { action: { tag: "Noop"}, next: { tag: "NextId" } };
-  },
-  description: "Noop",
-}
 
 const armorOnHeal: TriggerEntityEffect = {
   effect: (action: Action) => {
@@ -411,6 +417,31 @@ export const allTriggers = {
   interceptAllyDamage: interceptAllyDamage,
 }
 
+const noopE: EnemyEffect = {
+  effect: (_state: GameState, _id: CreatureId) => {
+    return { action: { tag: "Noop"}, next: { tag: "NextId" } };
+  },
+  description: "Noop",
+};
+
+export function damageHighestThreat(value: number): EnemyEffect {
+  return {
+    effect: (state: GameState, id: CreatureId) => {
+      const targetU = highestThreatTarget(id, state);
+      const position = targetU === undefined ? 0 : targetU.position;
+      return {
+        action: {
+          tag: "Damage",
+          target: { tag: "Target", type: "ally", position },
+          value,
+          piercing: false,
+        },
+        next: { tag: "NextId" },
+      };
+    },
+    description: `deal ${value} to [<highest threat ally>]`,
+  };
+}
 
 export function damageXAtPos(value: number, position: number): EnemyEffect {
   return {
