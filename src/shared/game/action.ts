@@ -34,6 +34,7 @@ export type Action
   | CombinedAction
   | ClearStatus
   | Invalid
+  | ChargeUse
   ;
 
 export type Damage = {
@@ -136,7 +137,13 @@ export type ClearStatus = {
 
 export type Invalid = {
   tag: "Invalid",
-}
+};
+
+export type ChargeUse = {
+  tag: "ChargeUse",
+  target: Target,
+  value: number,
+};
 
 export function enemyTurn(
   state: GameState,
@@ -167,16 +174,13 @@ export function highestThreatTarget(
   let i = 0;
   for (const ally of state.crew) {
     const threat: number | undefined = ally.threatMap[enemyGlobalId];
-    console.log(`THREAT${i}: ${JSON.stringify(threat)}`);
     if (highestThreat === undefined) {
       highestThreat = { ally, position: i, threat: threat === undefined ? 0 : threat };
     } else if (threat !== undefined && highestThreat.threat < threat) {
-      console.log(`UPDATE ${highestThreat.threat < threat} ${highestThreat.threat} ${threat}`);
       highestThreat = { ally, position: i, threat }
     }
     i += 1;
   }
-  console.log(`CHOICE: ${JSON.stringify(highestThreat)}`);
   return highestThreat === undefined ? undefined : { target: highestThreat.ally, position: highestThreat.position };
 }
 
@@ -513,6 +517,20 @@ function applyAction(
       state = onTarget(action.target, state,
         ally => _Status.clearStatus(ally, action.status),
         enemy => _Status.clearStatus(enemy, action.status),
+        _ => { throw `wrong target type for '${action.tag}`; },
+      );
+      break;
+    }
+    case "ChargeUse": {
+      if (action.target.type !== "ally") {
+        throw `wrong target type for ${action.tag}`
+      }
+      if (state.crew[action.target.position].charges < action.value) {
+        return { state: "invalid", log };
+      }
+      state = onTarget(action.target, state,
+        ally => _Crew.useCharge(ally, action.value),
+        _ => { throw `wrong target type for '${action.tag}`; },
         _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;

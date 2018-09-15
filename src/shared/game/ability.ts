@@ -5,11 +5,11 @@ import { Target } from "src/shared/game/target";
 import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId, inCombat } from "src/shared/game/state";
 import { Card } from "src/shared/game/card";
 import { InputType } from "src/shared/game/input";
-import { findIndex } from "./trigger";
-import { Next } from "./next";
-import { Status } from "./status";
-import { Enemy } from "./enemy";
-import { SolCard } from "./solution";
+import { findIndex } from "src/shared/game/trigger";
+import { Next } from "src/shared/game/next";
+import { Status } from "src/shared/game/status";
+import { Enemy } from "src/shared/game/enemy";
+import { SolCard } from "src/shared/game/solution";
 
 // TODO: check with gamestate.ts whether given input is self global id or self position index
 // (it seems to be position index)

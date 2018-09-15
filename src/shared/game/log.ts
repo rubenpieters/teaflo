@@ -117,6 +117,9 @@ export function actionShort(action: Action): string {
     case "ClearStatus": {
       return `Clear ${action.status}`;
     }
+    case "ChargeUse": {
+      return `ChargeUse ${action.value} ${showTarget(action.target)}`;
+    }
     case "Invalid": {
       return `Invalid`;
     }
@@ -178,6 +181,9 @@ export function showAction(action: Action): string {
     }
     case "ClearStatus": {
       return `Clear ${action.status}`;
+    }
+    case "ChargeUse": {
+      return `ChargeUse ${action.value} ${showTarget(action.target)}`;
     }
     case "Invalid": {
       return `Invalid`;

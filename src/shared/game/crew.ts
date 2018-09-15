@@ -30,6 +30,7 @@ export type Crew = {
   triggers: TriggerEntityEffect[],
   abilities: InputEntityEffect[],
   threatMap: ThreatMap,
+  charges: number,
 };
 
 export function damage<E extends Crew & HasStatus>(
@@ -66,6 +67,16 @@ export function addThreat<E extends Crew>(
       set(x => x.threatMap[enemyId], damage),
     );
   }
+}
+
+export function useCharge<E extends Crew>(
+  crew: E,
+  chargeUse: number,
+): E {
+  // assumption: chargeUse < crew.charges
+  return focus(crew,
+    over(x => x.charges, x => x - chargeUse),
+  );
 }
 
 export function heal<E extends Crew>(
@@ -378,6 +389,7 @@ const armorOnSelfHeal: Crew = {
     allAbilities.armorDamageToTarget,
   ],
   threatMap: {},
+  charges: 5,
 };
 
 
@@ -396,6 +408,7 @@ const regenOnDamageAlly: Crew = {
     allAbilities.armorAllAlly_5_1_0,
   ],
   threatMap: {},
+  charges: 5,
 };
 
 export function onAllAlly(
@@ -424,6 +437,7 @@ const tank1: Crew = {
   abilities: [
   ],
   threatMap: {},
+  charges: 5,
 };
 
 const dmg1: Crew = {
@@ -441,6 +455,7 @@ const dmg1: Crew = {
     allAbilities.dmg10,
   ],
   threatMap: {},
+  charges: 5,
 };
 
 const dmgPoison: Crew = {
@@ -457,6 +472,7 @@ const dmgPoison: Crew = {
     allAbilities.dmgPoison,
   ],
   threatMap: {},
+  charges: 5,
 };
 
 const basicCrew1: Crew = {
@@ -474,6 +490,7 @@ const basicCrew1: Crew = {
     allAbilities.dmg15,
   ],
   threatMap: {},
+  charges: 5,
 };
 
 const basicCrew2: Crew = {
@@ -490,6 +507,7 @@ const basicCrew2: Crew = {
     allAbilities.addAp,
   ],
   threatMap: {},
+  charges: 5,
 };
 
 const basicCrew3: Crew = {
@@ -506,6 +524,7 @@ const basicCrew3: Crew = {
     allAbilities.apDmg,
   ],
   threatMap: {},
+  charges: 5,
 };
 
 export const allCrew = {
