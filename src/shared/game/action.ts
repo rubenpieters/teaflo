@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import * as _Crew from "src/shared/game/crew";
-import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, toPositionId, toGlobalId } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, toPositionId, toGlobalId, IdInstance } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
@@ -10,6 +10,7 @@ import { Item } from "src/shared/game/item";
 import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 import { StatusLog } from "src/shared/game/log";
+import { Instance } from "./instance";
 
 export type ActionSpec = (state: GameState, selfId: number, selfType: TargetType) => Action;
 
@@ -35,6 +36,7 @@ export type Action
   | ClearStatus
   | Invalid
   | ChargeUse
+  | AddInstance
   ;
 
 export type Damage = {
@@ -58,6 +60,12 @@ export type AddEnemy = {
 export type AddCrew = {
   tag: "AddCrew",
   crew: Crew,
+};
+
+export type AddInstance = {
+  tag: "AddInstance",
+  instance: Instance,
+  team: "ally" | "enemy",
 };
 
 export type AddItem = {
@@ -333,6 +341,16 @@ function applyAction(
         const id = idGen.newId();
         const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally" } };
         state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
+      }
+      break;
+    }
+    case "AddInstance": {
+      const id = idGen.newId();
+      const addedInstance: IdInstance = {...action.instance, ...{ id } };
+      if (action.team === "ally") {
+        state = focus(state, over(x => x.allyInstances, x => x.concat(addedInstance)));
+      } else if (action.team === "enemy") {
+        state = focus(state, over(x => x.enemyInstances, x => x.concat(addedInstance)));
       }
       break;
     }

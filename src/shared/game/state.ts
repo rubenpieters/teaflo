@@ -5,6 +5,7 @@ import { Enemy } from "src/shared/game/enemy";
 import { Origin, TargetType } from "src/shared/game/target";
 import { Action } from "src/shared/game/action";
 import { HasStatus } from "src/shared/game/status";
+import { Instance } from "./instance";
 
 export type Id = {
   id: number,
@@ -17,10 +18,13 @@ export type ActionIndex = {
 export type IdCrew = Crew & Id & ActionIndex & HasStatus & { tag: "ally" };
 export type IdItem = Item & Id & { tag: "item" };
 export type IdEnemy = Enemy & Id & ActionIndex & HasStatus & { tag: "enemy" };
+export type IdInstance = Instance & Id;
 
 export type GameState = {
   crew: IdCrew[],
+  allyInstances: IdInstance[],
   enemies: IdEnemy[],
+  enemyInstances: IdInstance[],
   items: IdItem[],
   gold: number,
   crewLimit: number,
@@ -29,7 +33,9 @@ export type GameState = {
 
 export const initialState: GameState = {
   crew: [],
+  allyInstances: [],
   enemies: [],
+  enemyInstances: [],
   items: [],
   gold: 0,
   crewLimit: 4,

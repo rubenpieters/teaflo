@@ -99,6 +99,10 @@ export type TriggerEntityEffect = {
   charges: number,
   type: "before" | "instead",
 }
+export type InstanceEffect = {
+  effect: (state: GameState, id: CreatureId) => Action,
+  description: string,
+}
 
 const noop: EntityEffect = {
   effect: (_state: GameState, _id: CreatureId) => {
