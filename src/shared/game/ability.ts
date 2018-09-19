@@ -428,7 +428,7 @@ const noopE: EnemyEffect = {
   description: "Noop",
 };
 
-export function damageHighestThreat(value: number): EnemyEffect {
+export function damageHighestThreat(value: number, nextF: (state: GameState, id: CreatureId) => Next): EnemyEffect {
   return {
     effect: (state: GameState, id: CreatureId) => {
       const targetU = highestThreatTarget(id, state);
@@ -440,7 +440,7 @@ export function damageHighestThreat(value: number): EnemyEffect {
           value,
           piercing: false,
         },
-        next: { tag: "NextId" },
+        next: nextF(state, id),
       };
     },
     description: `deal ${value} to [<highest threat ally>]`,
@@ -483,7 +483,7 @@ export function queueStatus(status: Status): EnemyEffect {
   };
 }
 
-function onAllAllyPositions(
+export function onAllAllyPositions(
   state: GameState,
   f: (id: number) => Action,
 ): Action {

@@ -68,7 +68,7 @@ export default class Menu extends Phaser.State {
       getBoard(<any>undefined, board, "sandbox");
     });
 
-    for (const i of [1, 2, 3, 4]) {
+    for (const i of [1, 2, 3, 4, 5]) {
       const levelBtn: Phaser.Text = this.game.add.text(0, 0, `level ${i}`, {
         font: "20px Indie Flower",
         fill: "#77BFA3",

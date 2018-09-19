@@ -527,6 +527,23 @@ const basicCrew3: Crew = {
   charges: 5,
 };
 
+const tank_01: Crew = {
+  ap: 1,
+  hp: 100,
+  maxHp: 100,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    allAbilities.noop,
+  ],
+  abilities: [
+    allAbilities.dmg15,
+  ],
+  threatMap: {},
+  charges: 5,
+};
+
 export const allCrew = {
   /*stFighter: stFighter,
   stRanged: stRanged,
@@ -541,4 +558,5 @@ export const allCrew = {
   basicCrew1: basicCrew1,
   basicCrew2: basicCrew2,
   basicCrew3: basicCrew3,
+  tank_01: tank_01,
 };

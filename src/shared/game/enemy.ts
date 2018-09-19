@@ -1,8 +1,10 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, IdEnemy, CreatureId } from "src/shared/game/state";
+import { GameState, IdEnemy, CreatureId, toPositionId } from "src/shared/game/state";
 import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
-import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities, healSelf, damageHighestThreat } from "src/shared/game/ability";
+import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities, healSelf, damageHighestThreat, onAllAllyPositions } from "src/shared/game/ability";
+import { State } from "phaser-ce";
+import { Next } from "./next";
 
 /*export function showEnemy(
   enemy: Enemy
@@ -48,6 +50,9 @@ export function act(
         }
         case "Repeat": {
           return x;
+        }
+        case "Goto": {
+          return next.action;
         }
       }
     }),
@@ -387,7 +392,6 @@ const enemyBoss1: Enemy = {
   ],
 };
 
-
 const enemyBoss2: Enemy = {
   ap: 1,
   hp: 40,
@@ -402,12 +406,50 @@ const enemyBoss2: Enemy = {
   ],
 };
 
+const enemyBoss3: Enemy = {
+  ap: 1,
+  hp: 40,
+  maxHp: 40,
+  actions: [
+    {
+      effect: (state: GameState, id: CreatureId) => {
+        const positionId = toPositionId(state, id);
+        const index = positionId.id;
+        let next: Next;
+        if (state.enemies[index].hp / state.enemies[index].maxHp < 0.3) {
+          next = { tag: "Goto", action: 1 };
+        } else {
+          next = { tag: "Goto", action: 0 };
+        }
+        return {
+          action: onAllAllyPositions(state, id => {
+            return {
+              tag: "QueueStatus",
+              target: { tag: "Target", type: "ally", position: id },
+              status: {
+                tag: "Poison",
+                value: 2,
+                fragment: 50,
+              }
+            };
+          }),
+          next,
+        };
+      },
+      description: `poison all allies`,
+    },
+    healSelf(10),
+  ],
+  triggers: [
+  ],
+};
+
 const dummy: Enemy = {
   ap: 1,
   hp: 1000,
   maxHp: 1000,
   actions: [
-    damageHighestThreat(1),
+    damageHighestThreat(1, _ => { return { tag: "NextId" }}),
   ],
   triggers: [
   ],
@@ -448,6 +490,7 @@ export const allEnemies = {
   enemyAtk2Hp15: enemyAtk2Hp15,*/
   enemyBoss1: enemyBoss1,
   enemyBoss2: enemyBoss2,
+  enemyBoss3: enemyBoss3,
   dummy: dummy,
   basicEnemy1: basicEnemy1,
   basicEnemy2: basicEnemy2,

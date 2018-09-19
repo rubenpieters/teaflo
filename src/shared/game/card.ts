@@ -241,6 +241,20 @@ const cardCrew_0011: Card = {
   tag: "crew",
 };
 
+const cardCrew_0012: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 1012 },
+  name: "Tank01",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
+      return { tag: "AddCrew", crew: allCrew.tank_01 };
+      }},
+      inputs: [],
+      description: "add Tank01",
+    },
+  ],
+  tag: "crew",
+};
+
 const cardItem_0000: Card = {
   origin: { tag: "PlayerOrigin", cardId: 2000 },
   name: "Shield",
@@ -427,6 +441,20 @@ const cardBattle_0013: Card = {
   tag: "enemy",
 };
 
+const cardBattle_0014: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 3014 },
+  name: "Boss3",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
+      return { tag: "AddEnemy", enemy: allEnemies.enemyBoss3 };
+      }},
+      inputs: [],
+      description: "add Boss3",
+    },
+  ],
+  tag: "enemy",
+};
+
 export const allCards = {
   cardBattleTurn: cardBattleTurn,
   cardRest: cardRest,
@@ -443,6 +471,7 @@ export const allCards = {
   cardCrew_0009: cardCrew_0009,
   cardCrew_0010: cardCrew_0010,
   cardCrew_0011: cardCrew_0011,
+  cardCrew_0012: cardCrew_0012,
 
   cardItem_0000: cardItem_0000,
 
@@ -460,4 +489,5 @@ export const allCards = {
   cardBattle_0011: cardBattle_0011,
   cardBattle_0012: cardBattle_0012,
   cardBattle_0013: cardBattle_0013,
+  cardBattle_0014: cardBattle_0014,
 };

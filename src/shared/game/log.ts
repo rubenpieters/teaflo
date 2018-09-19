@@ -72,6 +72,9 @@ export function actionShort(action: Action): string {
     case "AddItem": {
       return "AddItem";
     }
+    case "AddInstance": {
+      return "AddInstance";
+    }
     case "Rest": {
       return "Rest";
     }
@@ -136,6 +139,9 @@ export function showAction(action: Action): string {
     }
     case "AddItem": {
       return "AddItem";
+    }
+    case "AddInstance": {
+      return "AddInstance";
     }
     case "Rest": {
       return "Rest";

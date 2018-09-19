@@ -59,6 +59,13 @@ export function getBoard(_serverConn: ServerConnection, board: Board, seed: stri
       {...allCards.cardCrew_0011, limit: 5 },
       {...allCards.cardBattle_0013, limit: 5 },
     ];
+  } else if (seed === "5") {
+    cards = [
+      {...allCards.cardBattleTurn, limit: Infinity },
+      {...allCards.cardRest, limit: Infinity },
+      {...allCards.cardCrew_0012, limit: 5 },
+      {...allCards.cardBattle_0014, limit: 5 },
+    ];
   } else if (seed === "sandbox") {
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
