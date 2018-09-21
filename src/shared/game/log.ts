@@ -123,6 +123,9 @@ export function actionShort(action: Action): string {
     case "ChargeUse": {
       return `ChargeUse ${action.value} ${showTarget(action.target)}`;
     }
+    case "AddThreat": {
+      return `AddThreat ${action.value} ${showTarget(action.target)}`;
+    }
     case "Invalid": {
       return `Invalid`;
     }
@@ -190,6 +193,9 @@ export function showAction(action: Action): string {
     }
     case "ChargeUse": {
       return `ChargeUse ${action.value} ${showTarget(action.target)}`;
+    }
+    case "AddThreat": {
+      return `AddThreat ${action.value} ${showTarget(action.target)}`;
     }
     case "Invalid": {
       return `Invalid`;

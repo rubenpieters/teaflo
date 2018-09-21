@@ -55,16 +55,16 @@ export function damage<E extends Crew & HasStatus>(
 
 export function addThreat<E extends Crew>(
   crew: E,
-  damage: number,
+  threat: number,
   enemyId: number,
 ): E {
   if (crew.threatMap[enemyId] !== undefined) {
     return focus(crew,
-      over(x => x.threatMap[enemyId], x => x + damage),
+      over(x => x.threatMap[enemyId], x => x + threat),
     );
   } else {
     return focus(crew,
-      set(x => x.threatMap[enemyId], damage),
+      set(x => x.threatMap[enemyId], threat),
     );
   }
 }
@@ -532,6 +532,7 @@ const tank_01: Crew = {
   hp: 100,
   maxHp: 100,
   triggers: [
+    allTriggers.addThreatOnDamage,
   ],
   ranged: false,
   actions: [

@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { TargetType, typeColl } from "src/shared/game/target";
 import { Action, AddStatus, highestThreatTarget } from "src/shared/game/action";
 import { Target } from "src/shared/game/target";
-import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId, inCombat } from "src/shared/game/state";
+import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId, inCombat, IdEnemy } from "src/shared/game/state";
 import { Card } from "src/shared/game/card";
 import { InputType } from "src/shared/game/input";
 import { findIndex } from "src/shared/game/trigger";
@@ -216,17 +216,6 @@ const armorAllAlly_5_1_0: InputEntityEffect = {
   inputs: [],
 };
 
-export function onAllAlly(
-  state: GameState,
-  f: (ally: IdCrew, id: number) => Action,
-): Action {
-  const actions = state.crew.map(f);
-  return {
-    tag: "CombinedAction",
-    actions,
-  }
-}
-
 const dmg15: InputEntityEffect = {
   effect: (inputs: any[]) => {
     const targetPos: number = inputs[0];
@@ -414,11 +403,46 @@ const interceptAllyDamage: TriggerEntityEffect = {
   type: "instead",
 };
 
+const addThreatOnDamage: TriggerEntityEffect = {
+  effect: (action: Action) => {
+    return (state: GameState, id: CreatureId) => {
+      const positionId = toPositionId(state, id);
+      const index = positionId.id;
+      if (action.tag === "Damage" && action.target.type === "ally") {
+        return {
+          action: onAllEnemy(state, (enemy: IdEnemy, id: number) => {
+          return {
+            tag: "AddThreat",
+            target: {
+              tag: "Target",
+              type: "ally",
+              position: index,
+            },
+            value: 5,
+            threatTo: {
+              tag: "Target",
+              type: "enemy",
+              position: id,
+            }
+          }}),
+          chargeUse: 1,
+        };
+      } else {
+        return { action: { tag: "Noop" }, chargeUse: 0 };
+      }
+    };
+  },
+  description: "ally gains regen when damaged",
+  charges: Infinity,
+  type: "before",
+};
+
 export const allTriggers = {
   armorOnHeal: armorOnHeal,
   poisonToPiercing: poisonToPiercing,
   regenOnDamage: regenOnDamage,
   interceptAllyDamage: interceptAllyDamage,
+  addThreatOnDamage: addThreatOnDamage,
 }
 
 const noopE: EnemyEffect = {
@@ -489,6 +513,28 @@ export function onAllAllyPositions(
 ): Action {
   const indices = [...Array(state.crew.length).keys()]
   const actions = indices.map(f);
+  return {
+    tag: "CombinedAction",
+    actions,
+  }
+}
+
+export function onAllAlly(
+  state: GameState,
+  f: (ally: IdCrew, id: number) => Action,
+): Action {
+  const actions = state.crew.map(f);
+  return {
+    tag: "CombinedAction",
+    actions,
+  }
+}
+
+export function onAllEnemy(
+  state: GameState,
+  f: (enemy: IdEnemy, id: number) => Action,
+): Action {
+  const actions = state.enemies.map(f);
   return {
     tag: "CombinedAction",
     actions,

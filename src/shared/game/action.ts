@@ -37,6 +37,7 @@ export type Action
   | Invalid
   | ChargeUse
   | AddInstance
+  | AddThreat
   ;
 
 export type Damage = {
@@ -151,6 +152,13 @@ export type ChargeUse = {
   tag: "ChargeUse",
   target: Target,
   value: number,
+};
+
+export type AddThreat = {
+  tag: "AddThreat",
+  target: Target,
+  value: number,
+  threatTo: Target,
 };
 
 export function enemyTurn(
@@ -372,6 +380,7 @@ function applyAction(
         _ => { throw `wrong target type for '${action.tag}`; },
       );
       // create threat
+      // TODO: invoke AddThreat action?
       if (origin !== "noOrigin" && origin.type === "ally" && action.target.type === "enemy") {
         state = focus(state,
           over(x => x.crew[origin.id], x => _Crew.addThreat(x, action.value, state.enemies[action.target.position].id))
@@ -548,6 +557,14 @@ function applyAction(
       }
       state = onTarget(action.target, state,
         ally => _Crew.useCharge(ally, action.value),
+        _ => { throw `wrong target type for '${action.tag}`; },
+        _ => { throw `wrong target type for '${action.tag}`; },
+      );
+      break;
+    }
+    case "AddThreat": {
+      state = onTarget(action.target, state,
+        ally => _Crew.addThreat(ally, action.value, action.threatTo.position),
         _ => { throw `wrong target type for '${action.tag}`; },
         _ => { throw `wrong target type for '${action.tag}`; },
       );
