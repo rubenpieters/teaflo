@@ -37,19 +37,25 @@ export function damage<E extends Crew & HasStatus>(
   crew: E,
   damage: number,
   piercing: boolean,
-) {
-  if (piercing || crew.Guard === undefined) {
+): E {
+  if (piercing || (crew.Guard === undefined && crew.Bubble === undefined)) {
     return focus(crew, over(x => x.hp, x => x - damage));
   } else {
-    if (damage <= crew.Guard.guard) {
-      return focus(crew, over(x => (<Guard>x.Guard).guard, x => x - damage));
+    if (crew.Bubble !== undefined) {
+      return focus(crew,
+        set(x => x.Bubble, undefined),
+      );
+    } else { // crew.Guard !== undefined
+      if (damage <= crew.Guard!.guard) {
+        return focus(crew, over(x => (<Guard>x.Guard).guard, x => x - damage));
+      }
+  
+      const leftoverDamage = damage - crew.Guard!.guard;
+      return focus(crew,
+        set(x => x.Guard, undefined),
+        over(x => x.hp, x => x - leftoverDamage),
+      );
     }
-
-    const leftoverDamage = damage - crew.Guard.guard;
-    return focus(crew,
-      set(x => x.Guard, undefined),
-      over(x => x.hp, x => x - leftoverDamage),
-    );
   }
 }
 

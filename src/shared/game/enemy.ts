@@ -5,6 +5,7 @@ import { Generator } from "src/shared/handler/id/generator";
 import { TriggerEntityEffect, enemyAbilities, EnemyEffect, damageXAtPos, queueStatus, allAbilities, healSelf, damageHighestThreat, onAllAllyPositions } from "src/shared/game/ability";
 import { State } from "phaser-ce";
 import { Next } from "./next";
+import { Guard, HasStatus } from "./status";
 
 /*export function showEnemy(
   enemy: Enemy
@@ -23,14 +24,30 @@ export type Enemy = {
   triggers: TriggerEntityEffect[],
 };
 
-export function damage<E extends Enemy>(
+export function damage<E extends Enemy & HasStatus>(
   enemy: E,
   damage: number,
-  _piercing: boolean,
+  piercing: boolean,
 ): E {
-  return focus(enemy,
-    over(x => x.hp, x => x - damage),
-  );
+  if (piercing || (enemy.Guard === undefined && enemy.Bubble === undefined)) {
+    return focus(enemy, over(x => x.hp, x => x - damage));
+  } else {
+    if (enemy.Bubble !== undefined) {
+      return focus(enemy,
+        set(x => x.Bubble, undefined),
+      );
+    } else { // crew.Guard !== undefined
+      if (damage <= enemy.Guard!.guard) {
+        return focus(enemy, over(x => (<Guard>x.Guard).guard, x => x - damage));
+      }
+  
+      const leftoverDamage = damage - enemy.Guard!.guard;
+      return focus(enemy,
+        set(x => x.Guard, undefined),
+        over(x => x.hp, x => x - leftoverDamage),
+      );
+    }
+  }
 }
 
 export function act(

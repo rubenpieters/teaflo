@@ -47,6 +47,12 @@ export type Silence = {
   fragment: number,
 };
 
+export type Bubble = {
+  tag: "Bubble",
+  value: 1,
+  fragment: 0,
+};
+
 export type Status
   = Poison
   | PiercingPoison
@@ -55,6 +61,7 @@ export type Status
   | Doom
   | Blind
   | Silence
+  | Bubble
   ;
 
 export function showStatus(status: Status): string {
@@ -80,10 +87,13 @@ export function showStatus(status: Status): string {
     case "Silence": {
       return `Silence ${status.value} T ${status.fragment} F`;
     }
+    case "Bubble": {
+      return `Bubble`;
+    }
   }
 }
 
-export const allStatus: Status["tag"][] = ["Regen", "PiercingPoison", "Poison", "Doom", "Guard", "Blind", "Silence"];
+export const allStatus: Status["tag"][] = ["Regen", "PiercingPoison", "Poison", "Doom", "Guard", "Blind", "Silence", "Bubble"];
 
 type DiscrStatus<T extends Status["tag"]> = Extract<Status, {tag: T}>
 
@@ -220,6 +230,9 @@ export function statusToAction(
       return { tag: "Noop" };
     }
     case "Silence": {
+      return { tag: "Noop" };
+    }
+    case "Bubble": {
       return { tag: "Noop" };
     }
   }
