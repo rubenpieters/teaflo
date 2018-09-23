@@ -62,7 +62,7 @@ export function damage<E extends Crew & HasStatus>(
 export function addThreat<E extends Crew>(
   crew: E,
   threat: number,
-  enemyId: number,
+  enemyId: number, // Global Id
 ): E {
   if (crew.threatMap[enemyId] !== undefined) {
     return focus(crew,

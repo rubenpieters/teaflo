@@ -158,7 +158,7 @@ export type AddThreat = {
   tag: "AddThreat",
   target: Target,
   value: number,
-  threatTo: Target,
+  enemyId: number,
 };
 
 export function enemyTurn(
@@ -564,7 +564,7 @@ function applyAction(
     }
     case "AddThreat": {
       state = onTarget(action.target, state,
-        ally => _Crew.addThreat(ally, action.value, action.threatTo.position),
+        ally => _Crew.addThreat(ally, action.value, action.enemyId),
         _ => { throw `wrong target type for '${action.tag}`; },
         _ => { throw `wrong target type for '${action.tag}`; },
       );

@@ -410,7 +410,7 @@ const addThreatOnDamage: TriggerEntityEffect = {
       const index = positionId.id;
       if (action.tag === "Damage" && action.target.type === "ally") {
         return {
-          action: onAllEnemy(state, (enemy: IdEnemy, id: number) => {
+          action: onAllEnemy(state, (enemy: IdEnemy, _id: number) => {
           return {
             tag: "AddThreat",
             target: {
@@ -419,11 +419,7 @@ const addThreatOnDamage: TriggerEntityEffect = {
               position: index,
             },
             value: 5,
-            threatTo: {
-              tag: "Target",
-              type: "enemy",
-              position: id,
-            }
+            enemyId: enemy.id,
           }}),
           chargeUse: 1,
         };
@@ -432,7 +428,7 @@ const addThreatOnDamage: TriggerEntityEffect = {
       }
     };
   },
-  description: "ally gains regen when damaged",
+  description: "gain threat when ally damaged",
   charges: Infinity,
   type: "before",
 };

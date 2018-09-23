@@ -116,6 +116,8 @@ export function addStatus<E extends HasStatus>(
       over(x => (<Guard>x[status.tag]).fragment, x => x + status.fragment),
       over(x => (<Guard>x[status.tag]).guard, x => x + status.guard),
     );
+  } else if (status.tag === "Bubble") {
+    result = e;
   } else {
     // cast to prevent 'undefined' warning
     result = focus(e,
