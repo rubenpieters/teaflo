@@ -2,7 +2,6 @@ import { Solution, runSolutionAll, SolCard, SolRest, SolEvent } from "src/shared
 import { Card, Rest, Event, PlayerOrigin } from "src/shared/game/card";
 import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
 import { createCard, InputEntityEffect, EntityEffect } from "src/shared/game/ability";
-import { actionShort } from "src/shared/game/log";
 import { Action } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
 import { HasStatus, allStatus, showStatus } from "src/shared/game/status";

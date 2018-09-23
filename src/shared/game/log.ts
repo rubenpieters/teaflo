@@ -61,78 +61,7 @@ function showStatusLog(statusLog: StatusLog[]): string {
   return result;
 }
 
-export function actionShort(action: Action): string {
-  switch (action.tag) {
-    case "AddEnemy": {
-      return "AddEnemy";
-    }
-    case "AddCrew": {
-      return "AddCrew";
-    }
-    case "AddItem": {
-      return "AddItem";
-    }
-    case "AddInstance": {
-      return "AddInstance";
-    }
-    case "Rest": {
-      return "Rest";
-    }
-    case "Damage": {
-      return "Damage";
-    }
-    case "Heal": {
-      return "Heal";
-    }
-    case "GainHP": {
-      return `Gain ${action.value} HP (${showTarget(action.target)})`;
-    }
-    case "GainAP": {
-      return `Gain ${action.value} AP (${showTarget(action.target)})`;
-    }
-    case "GainGold": {
-      return `GainGold ${action.gain}`;
-    }
-    case "PayGold": {
-      return `PayGold ${action.pay}`;
-    }
-    case "BattleTurn": {
-      return "BattleTurn";
-    }
-    case "Death": {
-      return `Death ${action.type} ${action.id}`;
-    }
-    case "QueueStatus": {
-      return `QueueStatus to ${showTarget(action.target)}`;
-    }
-    case "AddStatus": {
-      return `AddStatus to ${showTarget(action.target)}`;
-    }
-    case "Noop": {
-      return "Noop";
-    }
-    case "Swap": {
-      return `Swap ${action.type} ${action.from} ${action.to}`;
-    }
-    case "CombinedAction": {
-      return `Combined ${action.actions.length}`;
-    }
-    case "ClearStatus": {
-      return `Clear ${action.status}`;
-    }
-    case "ChargeUse": {
-      return `ChargeUse ${action.value} ${showTarget(action.target)}`;
-    }
-    case "AddThreat": {
-      return `AddThreat ${action.value} ${showTarget(action.target)}`;
-    }
-    case "Invalid": {
-      return `Invalid`;
-    }
-  }
-}
-
-export function showAction(action: Action): string {
+function showAction(action: Action): string {
   switch (action.tag) {
     case "AddEnemy": {
       return "AddEnemy";

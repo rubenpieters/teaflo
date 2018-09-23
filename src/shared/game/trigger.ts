@@ -1,7 +1,6 @@
 import { ActionSpec, Action } from "src/shared/game/action";
 import { TargetType, typeColl } from "src/shared/game/target";
 import { GameState } from "src/shared/game/state";
-import { showAction } from "src/shared/game/log";
 
 export type Trigger = {
   onTag: string,
