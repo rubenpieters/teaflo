@@ -10,6 +10,7 @@ import { Next } from "src/shared/game/next";
 import { Status } from "src/shared/game/status";
 import { Enemy } from "src/shared/game/enemy";
 import { SolCard } from "src/shared/game/solution";
+import { stat } from "fs";
 
 // TODO: check with gamestate.ts whether given input is self global id or self position index
 // (it seems to be position index)
@@ -291,6 +292,47 @@ const dmgPoison: InputEntityEffect = {
   ],
 };
 
+const dmgAllGainBubble: InputEntityEffect = {
+  effect: (inputs: any[]) => {
+    return (state: GameState, selfId: CreatureId) => {
+      const positionId = toPositionId(state, selfId);
+      const selfPosition = positionId.id;
+      return {
+        tag: "CombinedAction",
+        actions: [
+          onAllAlly(state, (ally: IdCrew, id: number) => {
+            return {
+              tag: "Damage",
+              target: {
+                tag: "Target",
+                position: id,
+                type: "ally",
+              },
+              value: 5,
+              piercing: false,
+            }
+          }),
+          {
+            tag: "QueueStatus",
+            target: {
+              tag: "Target",
+              position: selfPosition,
+              type: "ally",
+            },
+            status: {
+              tag: "Bubble",
+              value: 1,
+              fragment: 0,
+            }
+          },
+        ]
+      }
+    }},
+  description: "dmg all allies, gain bubble",
+  inputs: [
+  ],
+};
+
 export const allAbilities = {
   noop: noop,
   armorDamageToTarget: armorDamageToTarget,
@@ -301,6 +343,7 @@ export const allAbilities = {
   armorSelf: armorSelf,
   addAp: addAp,
   apDmg: apDmg,
+  dmgAllGainBubble: dmgAllGainBubble,
 };
 
 const armorOnHeal: TriggerEntityEffect = {

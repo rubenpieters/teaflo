@@ -545,6 +545,7 @@ const tank_01: Crew = {
     allAbilities.noop,
   ],
   abilities: [
+    allAbilities.dmgAllGainBubble,
     allAbilities.dmg15,
   ],
   threatMap: {},
