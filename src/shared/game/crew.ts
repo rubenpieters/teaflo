@@ -546,7 +546,42 @@ const tank_01: Crew = {
   ],
   abilities: [
     allAbilities.dmgAllGainBubble,
-    allAbilities.dmg15,
+  ],
+  threatMap: {},
+  charges: 5,
+};
+
+const dmg_01: Crew = {
+  ap: 1,
+  hp: 100,
+  maxHp: 100,
+  triggers: [
+    allTriggers.addThreatOnDamage,
+  ],
+  ranged: false,
+  actions: [
+    allAbilities.noop,
+  ],
+  abilities: [
+    allAbilities.dmgHighCd,
+  ],
+  threatMap: {},
+  charges: 5,
+};
+
+const util_01: Crew = {
+  ap: 1,
+  hp: 60,
+  maxHp: 60,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    allAbilities.noop,
+  ],
+  abilities: [
+    allAbilities.dmgSelfHealAllies,
+    allAbilities.armorSelf10_2,
   ],
   threatMap: {},
   charges: 5,
@@ -567,4 +602,6 @@ export const allCrew = {
   basicCrew2: basicCrew2,
   basicCrew3: basicCrew3,
   tank_01: tank_01,
+  dmg_01: dmg_01,
+  util_01: util_01,
 };

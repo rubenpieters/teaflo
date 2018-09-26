@@ -10,7 +10,6 @@ import { Next } from "src/shared/game/next";
 import { Status } from "src/shared/game/status";
 import { Enemy } from "src/shared/game/enemy";
 import { SolCard } from "src/shared/game/solution";
-import { stat } from "fs";
 
 // TODO: check with gamestate.ts whether given input is self global id or self position index
 // (it seems to be position index)
@@ -333,6 +332,86 @@ const dmgAllGainBubble: InputEntityEffect = {
   ],
 };
 
+const dmgSelfHealAllies: InputEntityEffect = {
+  effect: (inputs: any[]) => {
+    return (state: GameState, selfId: CreatureId) => {
+      const positionId = toPositionId(state, selfId);
+      const selfPosition = positionId.id;
+      return {
+        tag: "CombinedAction",
+        actions: [
+          {
+            tag: "Damage",
+            target: {
+              tag: "Target",
+              position: selfPosition,
+              type: "ally",
+            },
+            value: 20,
+            piercing: false,
+          },
+          onAllAlly(state, (ally: IdCrew, id: number) => {
+            if (id === selfPosition) {
+              return { tag: "Noop" };
+            } else {
+              return {
+                tag: "Heal",
+                target: {
+                  tag: "Target",
+                  position: id,
+                  type: "ally",
+                },
+                value: 30,
+                piercing: false,
+              }
+            }
+          }),
+        ]
+      }
+    }},
+  description: "dmg self, heal allies",
+  inputs: [
+  ],
+};
+
+const armorSelf10_2: InputEntityEffect = {
+  effect: (inputs: any[]) => {
+    return (state: GameState, selfId: CreatureId) => {
+      const positionId = toPositionId(state, selfId);
+      const selfPosition = positionId.id;
+      return {
+        tag: "QueueStatus",
+        target: {
+          tag: "Target",
+          position: selfPosition,
+          type: "ally",
+        },
+        status: {
+          tag: "Guard",
+          value: 2,
+          guard: 10,
+          fragment: 0,
+        },
+      }
+    }},
+  description: "armor self 10 2",
+  inputs: [
+  ],
+};
+
+// TODO: add charge use to abilities
+const dmgHighCd: InputEntityEffect = {
+  effect: (inputs: any[]) => {
+    const targetPos: number = inputs[0];
+    return (_state: GameState, _id: CreatureId) => {
+      return damageToTarget.effect(targetPos, "enemy", 10);
+    }},
+  description: damageToTarget.description("25", "<Target Choice>"),
+  inputs: [
+    { tag: "NumberInput" },
+  ],
+};
+
 export const allAbilities = {
   noop: noop,
   armorDamageToTarget: armorDamageToTarget,
@@ -344,6 +423,9 @@ export const allAbilities = {
   addAp: addAp,
   apDmg: apDmg,
   dmgAllGainBubble: dmgAllGainBubble,
+  dmgSelfHealAllies: dmgSelfHealAllies,
+  armorSelf10_2: armorSelf10_2,
+  dmgHighCd: dmgHighCd,
 };
 
 const armorOnHeal: TriggerEntityEffect = {

@@ -255,6 +255,34 @@ const cardCrew_0012: Card = {
   tag: "crew",
 };
 
+const cardCrew_0013: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 1013 },
+  name: "Dmg01",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
+      return { tag: "AddCrew", crew: allCrew.dmg_01 };
+      }},
+      inputs: [],
+      description: "add Dmg01",
+    },
+  ],
+  tag: "crew",
+};
+
+const cardCrew_0014: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 1014 },
+  name: "Util01",
+  effects: [
+    { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
+      return { tag: "AddCrew", crew: allCrew.util_01 };
+      }},
+      inputs: [],
+      description: "add Util01",
+    },
+  ],
+  tag: "crew",
+};
+
 const cardItem_0000: Card = {
   origin: { tag: "PlayerOrigin", cardId: 2000 },
   name: "Shield",
@@ -472,6 +500,8 @@ export const allCards = {
   cardCrew_0010: cardCrew_0010,
   cardCrew_0011: cardCrew_0011,
   cardCrew_0012: cardCrew_0012,
+  cardCrew_0013: cardCrew_0013,
+  cardCrew_0014: cardCrew_0014,
 
   cardItem_0000: cardItem_0000,
 
