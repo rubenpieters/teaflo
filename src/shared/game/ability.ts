@@ -399,12 +399,27 @@ const armorSelf10_2: InputEntityEffect = {
   ],
 };
 
-// TODO: add charge use to abilities
 const dmgHighCd: InputEntityEffect = {
   effect: (inputs: any[]) => {
     const targetPos: number = inputs[0];
-    return (_state: GameState, _id: CreatureId) => {
-      return damageToTarget.effect(targetPos, "enemy", 10);
+    return (state: GameState, selfId: CreatureId) => {
+      const positionId = toPositionId(state, selfId);
+      const selfPosition = positionId.id;
+      return {
+        tag: "CombinedAction",
+        actions: [
+          {
+            tag: "ChargeUse",
+            value: 4,
+            target: {
+              tag: "Target",
+              type: "ally",
+              position: selfPosition, 
+            }
+          },
+          damageToTarget.effect(targetPos, "enemy", 10),
+        ]
+      }
     }},
   description: damageToTarget.description("25", "<Target Choice>"),
   inputs: [
