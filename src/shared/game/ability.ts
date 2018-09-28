@@ -62,11 +62,11 @@ export function createSolCard(
   };
 }
 
-function numberToTarget(input: number): Target {
+function numberToTarget(input: number): CreatureId {
   if (input >= 0) {
-    return { tag: "Target", type: "enemy", position: input }
+    return { tag: "PositionId", type: "enemy", id: input }
   } else {
-    return { tag: "Target", type: "ally", position: (-input) - 1 }
+    return { tag: "PositionId", type: "ally", id: (-input) - 1 }
   }
 }
 
@@ -116,7 +116,7 @@ const damageToTarget = {
   effect: (position: number, type: TargetType, value: number) => {
     return <Action>{
       tag: "Damage",
-      target: { tag: "Target", type, position, },
+      target: { tag: "PositionId", type, id: position, },
       value,
       piercing: false,
     };
@@ -128,10 +128,10 @@ const damageToTarget = {
 
 const statusToTarget = {
   effect: (position: number, type: TargetType, status: Status["tag"], value: number, fragment: number) => {
-    return <Action>{
+    return {
       tag: "QueueStatus",
-      target: { tag: "Target", type, position, },
-      status: <Status>{
+      target: { tag: "PositionId", type, id: position, },
+      status: {
         tag: status,
         value,
         fragment,
@@ -144,10 +144,10 @@ const statusToTarget = {
 };
 
 const addArmor = {
-  effect: (position: number, type: TargetType, value: number, guard: number, fragment: number) => {
+  effect: (position: number, type: "ally" | "enemy", value: number, guard: number, fragment: number) => {
     const action: Action = {
       tag: "QueueStatus",
-      target: { tag: "Target", type, position, },
+      target: { tag: "PositionId", type, id: position, },
       status: {
         tag: "Guard",
         value,
@@ -201,7 +201,7 @@ const armorAllAlly_5_1_0: InputEntityEffect = {
         (_: IdCrew, id: number) => {
           return {
             tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", position: id, },
+            target: { tag: "PositionId", type: "ally", id, },
             status: {
               tag: "Guard",
               value: 1,
@@ -277,7 +277,7 @@ const dmgPoison: InputEntityEffect = {
   effect: (inputs: any[]) => {
     const targetPos: number = inputs[0];
     return (_state: GameState, _id: CreatureId) => {
-      return {
+      return <Action>{
         tag: "CombinedAction",
         actions: [
           damageToTarget.effect(targetPos, "enemy", 10),
@@ -292,10 +292,8 @@ const dmgPoison: InputEntityEffect = {
 };
 
 const dmgAllGainBubble: InputEntityEffect = {
-  effect: (inputs: any[]) => {
+  effect: (_inputs: any[]) => {
     return (state: GameState, selfId: CreatureId) => {
-      const positionId = toPositionId(state, selfId);
-      const selfPosition = positionId.id;
       return {
         tag: "CombinedAction",
         actions: [
@@ -303,8 +301,8 @@ const dmgAllGainBubble: InputEntityEffect = {
             return {
               tag: "Damage",
               target: {
-                tag: "Target",
-                position: id,
+                tag: "PositionId",
+                id,
                 type: "ally",
               },
               value: 5,
@@ -313,11 +311,7 @@ const dmgAllGainBubble: InputEntityEffect = {
           }),
           {
             tag: "QueueStatus",
-            target: {
-              tag: "Target",
-              position: selfPosition,
-              type: "ally",
-            },
+            target: selfId,
             status: {
               tag: "Bubble",
               value: 1,
@@ -342,23 +336,19 @@ const dmgSelfHealAllies: InputEntityEffect = {
         actions: [
           {
             tag: "Damage",
-            target: {
-              tag: "Target",
-              position: selfPosition,
-              type: "ally",
-            },
+            target: selfId,
             value: 20,
             piercing: false,
           },
-          onAllAlly(state, (ally: IdCrew, id: number) => {
+          onAllAlly(state, (_ally: IdCrew, id: number) => {
             if (id === selfPosition) {
               return { tag: "Noop" };
             } else {
               return {
                 tag: "Heal",
                 target: {
-                  tag: "Target",
-                  position: id,
+                  tag: "PositionId",
+                  id,
                   type: "ally",
                 },
                 value: 30,
@@ -375,17 +365,11 @@ const dmgSelfHealAllies: InputEntityEffect = {
 };
 
 const armorSelf10_2: InputEntityEffect = {
-  effect: (inputs: any[]) => {
-    return (state: GameState, selfId: CreatureId) => {
-      const positionId = toPositionId(state, selfId);
-      const selfPosition = positionId.id;
+  effect: (_inputs: any[]) => {
+    return (_state: GameState, selfId: CreatureId) => {
       return {
         tag: "QueueStatus",
-        target: {
-          tag: "Target",
-          position: selfPosition,
-          type: "ally",
-        },
+        target: selfId,
         status: {
           tag: "Guard",
           value: 2,
@@ -402,20 +386,14 @@ const armorSelf10_2: InputEntityEffect = {
 const dmgHighCd: InputEntityEffect = {
   effect: (inputs: any[]) => {
     const targetPos: number = inputs[0];
-    return (state: GameState, selfId: CreatureId) => {
-      const positionId = toPositionId(state, selfId);
-      const selfPosition = positionId.id;
+    return (_state: GameState, selfId: CreatureId) => {
       return {
         tag: "CombinedAction",
         actions: [
           {
             tag: "ChargeUse",
             value: 4,
-            target: {
-              tag: "Target",
-              type: "ally",
-              position: selfPosition, 
-            }
+            target: selfId,
           },
           damageToTarget.effect(targetPos, "enemy", 10),
         ]
@@ -448,25 +426,33 @@ const armorOnHeal: TriggerEntityEffect = {
     return (state: GameState, id: CreatureId) => {
       const positionId = toPositionId(state, id);
       const index = positionId.id;
-      if (action.tag === "Heal" && action.target.position === index) {
-        return {
-          action: {
-            tag: "QueueStatus",
-            target: { tag: "Target", type: id.type, position: index, },
-            status: {
-              tag: "Guard",
-              value: 1,
-              guard: 1,
-              fragment: 0,
+      if (action.tag === "Heal") {
+        const targetPosition = toPositionId(state, action.target).id;
+        if (targetPosition === index) {
+          return {
+            action: {
+              tag: "QueueStatus",
+              target: id,
+              status: {
+                tag: "Guard",
+                value: 1,
+                guard: 1,
+                fragment: 0,
+              },
             },
-          },
-          chargeUse: 1,
-        };
+            chargeUse: 1,
+          };
+        } else {
+          return {
+            action: { tag: "Noop" },
+            chargeUse: 0,
+          };
+        }
       } else {
         return {
           action: { tag: "Noop" },
           chargeUse: 0,
-        }
+        };
       }
     };
   },
@@ -480,8 +466,13 @@ const poisonToPiercing: TriggerEntityEffect = {
     return (state: GameState, id: CreatureId) => {
       const positionId = toPositionId(state, id);
       const index = positionId.id;
-      if (action.tag === "AddStatus" && action.status.tag === "Poison" && action.target.position === index) {
-        return { action: focus(action, set(x => x.status.tag, "PiercingPoison")), chargeUse: 1 };
+      if (action.tag === "AddStatus") {
+        const targetPosition = toPositionId(state, action.target).id;
+        if (action.status.tag === "Poison" && targetPosition === index) {
+          return { action: focus(action, set(x => x.status.tag, "PiercingPoison")), chargeUse: 1 };
+        } else {
+          return { action, chargeUse: 0 };
+        }      
       } else {
         return { action, chargeUse: 0 };
       }
@@ -499,7 +490,7 @@ const regenOnDamage: TriggerEntityEffect = {
         return {
           action: {
             tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", position: action.target.position },
+            target: action.target,
             status: {
               tag: "Regen",
               value: 1,
@@ -523,15 +514,20 @@ const interceptAllyDamage: TriggerEntityEffect = {
     return (state: GameState, id: CreatureId) => {
       const positionId = toPositionId(state, id);
       const index = positionId.id;
-      if (action.tag === "Damage" &&
-          action.target.type === "ally" &&
-          action.target.position !== index) {
-        return {
-          action: {
-            ...action,
-            target: { tag: "Target", type: "ally", position: index },
-          },
-          chargeUse: 1,
+      if (action.tag === "Damage") {
+        // TODO: implement equality of EntityIds and use that
+        const targetPosition = toPositionId(state, action.target).id;
+        if (action.target.type === "ally" &&
+            targetPosition !== index) {
+          return {
+            action: {
+              ...action,
+              target: id,
+            },
+            chargeUse: 1,
+          }
+        } else {
+          return { action, chargeUse: 0 };
         }
       } else {
         return { action, chargeUse: 0 };
@@ -546,18 +542,12 @@ const interceptAllyDamage: TriggerEntityEffect = {
 const addThreatOnDamage: TriggerEntityEffect = {
   effect: (action: Action) => {
     return (state: GameState, id: CreatureId) => {
-      const positionId = toPositionId(state, id);
-      const index = positionId.id;
       if (action.tag === "Damage" && action.target.type === "ally") {
         return {
           action: onAllEnemy(state, (enemy: IdEnemy, _id: number) => {
           return {
             tag: "AddThreat",
-            target: {
-              tag: "Target",
-              type: "ally",
-              position: index,
-            },
+            target: id,
             value: 5,
             enemyId: enemy.id,
           }}),
@@ -596,7 +586,7 @@ export function damageHighestThreat(value: number, nextF: (state: GameState, id:
       return {
         action: {
           tag: "Damage",
-          target: { tag: "Target", type: "ally", position },
+          target: { tag: "PositionId", type: "ally", id: position },
           value,
           piercing: false,
         },
@@ -613,7 +603,7 @@ export function damageXAtPos(value: number, position: number): EnemyEffect {
       return {
         action: {
           tag: "Damage",
-          target: { tag: "Target", type: "ally", position },
+          target: { tag: "PositionId", type: "ally", id: position },
           value,
           piercing: false,
         },
@@ -632,7 +622,7 @@ export function queueStatus(status: Status): EnemyEffect {
           state,
           (id: number) => { return {
             tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", position: id },
+            target: { tag: "PositionId", type: "ally", id },
             status
           }},
         ),
@@ -680,12 +670,10 @@ export function onAllEnemy(
 export function healSelf(value: number): EnemyEffect {
   return {
     effect: (state: GameState, id: CreatureId) => {
-      const positionId = toPositionId(state, id);
-      const index = positionId.id;
       return {
         action: {
           tag: "Heal",
-          target: { tag: "Target", type: id.type, position: index },
+          target: id,
           value,
         },
         next: { tag: "NextId" },

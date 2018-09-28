@@ -59,6 +59,16 @@ type EntityIdA<A>
   | PositionIdA<A>
   ;
 
+export function showId<A extends TargetType>(id: EntityIdA<A>): string {
+  switch (id.tag) {
+    case "PositionId": {
+      return `Pos [${id.id}] ${id.type}`;
+    }
+    case "GlobalId": {
+      return `GID [${id.id}] ${id.type}`;
+    }
+  }
+}
 
 export type EntityId = EntityIdA<TargetType>;
 
@@ -74,7 +84,7 @@ export function findEntity<A extends TargetType>(state: GameState, id: EntityIdA
   const type: TargetType = id.type;
   switch (type) {
     case "ally": {
-      return findE(state.enemies, id);
+      return findE(state.crew, id);
     }
     case "enemy": {
       return findE(state.enemies, id);
@@ -144,7 +154,7 @@ export function findIndex<A extends TargetType>(state: GameState, id: EntityIdA<
     }
   }
   // ts compiler does not find exhaustiveness for A
-  return <any>undefined;
+  throw `findIndex: unknown type ${id.type}`;
 }
 
 function findI<E extends Id>(coll: E[], id: EntityId): number {
@@ -164,4 +174,65 @@ function findI<E extends Id>(coll: E[], id: EntityId): number {
 
 export function inCombat(state: GameState): boolean {
   return state.enemies.length > 0;
+}
+
+export function onCreature(
+  target: CreatureId,
+  state: GameState,
+  allyF: (ally: IdCrew) => IdCrew,
+  enemyF: (enemy: IdEnemy) => IdEnemy,
+) {
+  const position = toPositionId(state, target);
+  switch (target.type) {
+    case "ally": {
+      return focus(state,
+        over(x => x.crew[position.id], allyF),
+      );
+    }
+    case "enemy": {
+      return focus(state,
+        over(x => x.enemies[position.id], enemyF),
+      );
+    }
+  }
+}
+
+export function entityExists<A extends TargetType>(
+  id: EntityIdA<A>,
+  state: GameState,
+) {
+  switch (id.type) {
+    case "ally": {
+      return exists(state.crew, id);
+    }
+    case "enemy": {
+      return exists(state.enemies, id);
+    }
+    case "item": {
+      return exists(state.items, id);
+    }
+  }
+  // ts compiler does not find exhaustiveness for A
+  throw `entityExists: unknown type ${id.type}`;
+}
+
+export function exists<A extends TargetType, E extends Id>(
+  coll: E[],
+  id: EntityIdA<A>,
+) {
+  switch (id.tag) {
+    case "PositionId": {
+      if (id.id >= coll.length) {
+        return false;
+      }
+      return true;
+    }
+    case "GlobalId": {
+      const e: E | undefined = coll.find(x => x.id === id.id);
+      if (e === undefined) {
+        return false;
+      }
+      return true;
+    }
+  }
 }

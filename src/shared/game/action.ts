@@ -1,11 +1,11 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import * as _Crew from "src/shared/game/crew";
-import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, toPositionId, toGlobalId, IdInstance } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, onCreature, toGlobalId, IdInstance, entityExists, toPositionId } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Target, Origin, onTarget, TargetType, indexOfId, typeColl } from "src/shared/game/target";
+import { Origin, TargetType, indexOfId, typeColl } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
 import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
@@ -42,14 +42,14 @@ export type Action
 
 export type Damage = {
   tag: "Damage",
-  target: Target,
+  target: CreatureId,
   value: number,
   piercing: boolean,
 };
 
 export type Heal = {
   tag: "Heal",
-  target: Target,
+  target: CreatureId,
   value: number,
 };
 
@@ -76,13 +76,13 @@ export type AddItem = {
 
 export type GainHP = {
   tag: "GainHP",
-  target: Target,
+  target: CreatureId,
   value: number,
 };
 
 export type GainAP = {
   tag: "GainAP",
-  target: Target,
+  target: CreatureId,
   value: number,
 };
 
@@ -112,13 +112,13 @@ export type Death = {
 
 export type QueueStatus = {
   tag: "QueueStatus",
-  target: Target,
+  target: CreatureId,
   status: Status,
 };
 
 export type AddStatus = {
   tag: "AddStatus",
-  target: Target,
+  target: CreatureId,
   status: Status,
 };
 
@@ -140,7 +140,7 @@ export type CombinedAction = {
 
 export type ClearStatus = {
   tag: "ClearStatus",
-  target: Target,
+  target: CreatureId,
   status: Status["tag"],
 };
 
@@ -150,13 +150,13 @@ export type Invalid = {
 
 export type ChargeUse = {
   tag: "ChargeUse",
-  target: Target,
+  target: CreatureId,
   value: number,
 };
 
 export type AddThreat = {
   tag: "AddThreat",
-  target: Target,
+  target: CreatureId,
   value: number,
   enemyId: number,
 };
@@ -370,44 +370,41 @@ function applyAction(
     }
     case "Damage": {
       // if position does not exist, then invalid solution
-      if (action.target.position >= typeColl(state, action.target.type).length) {
+      if (! entityExists(action.target, state)) {
         return { state: "invalid", log };
       }
       // apply damage
-      state = onTarget(action.target, state,
+      state = onCreature(action.target, state,
         ally => _Crew.damage(ally, action.value, action.piercing),
         enemy => _Enemy.damage(enemy, action.value, action.piercing),
-        _ => { throw `wrong target type for '${action.tag}`; },
       );
       // create threat
       // TODO: invoke AddThreat action?
+      const enemyId = toGlobalId(state, action.target).id;
       if (origin !== "noOrigin" && origin.type === "ally" && action.target.type === "enemy") {
         state = focus(state,
-          over(x => x.crew[origin.id], x => _Crew.addThreat(x, action.value, state.enemies[action.target.position].id))
+          over(x => x.crew[origin.id], x => _Crew.addThreat(x, action.value, enemyId)),
         );
       }
       break;
     }
     case "Heal": {
-      state = onTarget(action.target, state,
+      state = onCreature(action.target, state,
         ally => _Crew.heal(ally, action.value),
         enemy => _Enemy.heal(enemy, action.value),
-        _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
     case "GainHP": {
-      state = onTarget(action.target, state,
+      state = onCreature(action.target, state,
         ally => _Crew.addHP(ally, action.value),
-        _ => { throw `wrong target type for '${action.tag}`; },
         _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
     case "GainAP": {
-      state = onTarget(action.target, state,
+      state = onCreature(action.target, state,
         ally => _Crew.addAP(ally, action.value),
-        _ => { throw `wrong target type for '${action.tag}`; },
         _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
@@ -497,10 +494,9 @@ function applyAction(
       break;
     }
     case "AddStatus": {
-      state = onTarget(action.target, state,
+      state = onCreature(action.target, state,
         ally => _Status.addStatus(ally, action.status),
         enemy => _Status.addStatus(enemy, action.status),
-        _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
@@ -541,10 +537,9 @@ function applyAction(
       break;
     }
     case "ClearStatus": {
-      state = onTarget(action.target, state,
+      state = onCreature(action.target, state,
         ally => _Status.clearStatus(ally, action.status),
         enemy => _Status.clearStatus(enemy, action.status),
-        _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
@@ -552,20 +547,19 @@ function applyAction(
       if (action.target.type !== "ally") {
         throw `wrong target type for ${action.tag}`
       }
-      if (state.crew[action.target.position].charges < action.value) {
+      const targetPosition = toPositionId(state, action.target).id;
+      if (state.crew[targetPosition].charges < action.value) {
         return { state: "invalid", log };
       }
-      state = onTarget(action.target, state,
+      state = onCreature(action.target, state,
         ally => _Crew.useCharge(ally, action.value),
-        _ => { throw `wrong target type for '${action.tag}`; },
         _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;
     }
     case "AddThreat": {
-      state = onTarget(action.target, state,
+      state = onCreature(action.target, state,
         ally => _Crew.addThreat(ally, action.value, action.enemyId),
-        _ => { throw `wrong target type for '${action.tag}`; },
         _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;

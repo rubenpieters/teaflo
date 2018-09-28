@@ -375,25 +375,25 @@ const enemyBoss1: Enemy = {
             actions: [
               {
                 tag: "Damage",
-                target: { tag: "Target", type: "ally", position: 0 },
+                target: { tag: "PositionId", type: "ally", id: 0 },
                 value: 10,
                 piercing: false,
               },
               {
                 tag: "Damage",
-                target: { tag: "Target", type: "ally", position: 1 },
+                target: { tag: "PositionId", type: "ally", id: 1 },
                 value: 5,
                 piercing: false,
               },
               {
                 tag: "Damage",
-                target: { tag: "Target", type: "ally", position: 2 },
+                target: { tag: "PositionId", type: "ally", id: 2 },
                 value: 2,
                 piercing: false,
               },
               {
                 tag: "Damage",
-                target: { tag: "Target", type: "ally", position: 3 },
+                target: { tag: "PositionId", type: "ally", id: 3 },
                 value: 1,
                 piercing: false,
               },
@@ -442,7 +442,7 @@ const enemyBoss3: Enemy = {
           action: onAllAllyPositions(state, id => {
             return {
               tag: "QueueStatus",
-              target: { tag: "Target", type: "ally", position: id },
+              target: { tag: "PositionId", type: "ally", id },
               status: {
                 tag: "Poison",
                 value: 2,

@@ -162,7 +162,7 @@ const cardCrew_0007: Card = {
         (_ally: IdCrew, id: number) => {
           return {
             tag: "QueueStatus",
-            target: { tag: "Target", type: "ally", position: id, },
+            target: { tag: "PositionId", type: "ally", id: id, },
             status: {
               tag: "Doom",
               value: 0,

@@ -27,6 +27,7 @@ export function addToSolution(card: SolCard, solution: Solution): { solution: So
 
 export function fSt(st: GameState | "invalid"): GameState {
   if (st === "invalid") {
+    console.log("WARNING: forced invalid state");
     throw "invalid";
   } else {
     return st;

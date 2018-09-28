@@ -18,9 +18,9 @@ function test1() {
           (_: IdCrew, id: number) => { return {
               tag: "QueueStatus",
               target: { 
-                tag: "Target",
+                tag: "PositionId",
                 type: "ally",
-                position: id,
+                id,
               },
               status: {
                 tag: "Guard",

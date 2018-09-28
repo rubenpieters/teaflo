@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Action } from "src/shared/game/action";
 import { TargetType, typeColl } from "src/shared/game/target";
 import { findIndex } from "src/shared/game/trigger";
-import { GameState } from "src/shared/game/state";
+import { GameState, CreatureId } from "src/shared/game/state";
 
 export type Poison = {
   tag: "Poison",
@@ -172,7 +172,7 @@ export function statusToAction(
   status: Status,
   state: GameState,
   selfId: number,
-  selfType: TargetType,
+  selfType: "ally" | "enemy",
 ): Action {
   const selfIndex = findIndex(x => x.id === selfId, typeColl(state, selfType));
   if (selfIndex === "notFound") {
@@ -183,8 +183,8 @@ export function statusToAction(
       return {
         tag: "Damage",
         target: {
-          tag: "Target",
-          position: selfIndex,
+          tag: "PositionId",
+          id: selfIndex,
           type: selfType,
         },
         value: status.value,
@@ -195,8 +195,8 @@ export function statusToAction(
       return {
         tag: "Damage",
         target: {
-          tag: "Target",
-          position: selfIndex,
+          tag: "PositionId",
+          id: selfIndex,
           type: selfType,
         },
         value: status.value,
@@ -207,8 +207,8 @@ export function statusToAction(
       return {
         tag: "Heal",
         target: {
-          tag: "Target",
-          position: selfIndex,
+          tag: "PositionId",
+          id: selfIndex,
           type: selfType,
         },
         value: status.value,

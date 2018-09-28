@@ -1,6 +1,7 @@
 import { Action } from "src/shared/game/action";
 import { showTarget } from "src/shared/game/target";
 import { showStatus, Status } from "src/shared/game/status";
+import { showId } from "./state";
 
 export type SolutionLog = {
   actionLog: ActionLog[],
@@ -79,16 +80,16 @@ function showAction(action: Action): string {
       return "Rest";
     }
     case "Damage": {
-      return `Damage ${action.value} to ${showTarget(action.target)}`;
+      return `Damage ${action.value} to ${showId(action.target)}`;
     }
     case "Heal": {
-      return `Heal ${action.value} to ${showTarget(action.target)}`;
+      return `Heal ${action.value} to ${showId(action.target)}`;
     }
     case "GainHP": {
-      return `Gain ${action.value} HP (${showTarget(action.target)})`;
+      return `Gain ${action.value} HP (${showId(action.target)})`;
     }
     case "GainAP": {
-      return `Gain ${action.value} AP (${showTarget(action.target)})`;
+      return `Gain ${action.value} AP (${showId(action.target)})`;
     }
     case "GainGold": {
       return `GainGold ${action.gain}`;
@@ -103,10 +104,10 @@ function showAction(action: Action): string {
       return `Death ${action.type} ${action.id}`;
     }
     case "QueueStatus": {
-      return `QueueStatus ${showStatus(action.status)} to ${showTarget(action.target)}`;
+      return `QueueStatus ${showStatus(action.status)} to ${showId(action.target)}`;
     }
     case "AddStatus": {
-      return `AddStatus ${showStatus(action.status)} to ${showTarget(action.target)}`;
+      return `AddStatus ${showStatus(action.status)} to ${showId(action.target)}`;
     }
     case "Noop": {
       return "Noop";
@@ -121,10 +122,10 @@ function showAction(action: Action): string {
       return `Clear ${action.status}`;
     }
     case "ChargeUse": {
-      return `ChargeUse ${action.value} ${showTarget(action.target)}`;
+      return `ChargeUse ${action.value} ${showId(action.target)}`;
     }
     case "AddThreat": {
-      return `AddThreat ${action.value} ${showTarget(action.target)}`;
+      return `AddThreat ${action.value} ${showId(action.target)}`;
     }
     case "Invalid": {
       return `Invalid`;
