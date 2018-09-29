@@ -1,8 +1,8 @@
 import expect from "expect";
 import { Solution, Path, runSolution } from "src/shared/game/solution";
-import { allCrew } from "src/shared/game/crew";
-import { allEnemies } from "src/shared/game/enemy";
-import { allItems } from "src/shared/game/item";
+import * as allCrew from "src/shared/data/crew";
+import * as allEnemies from "src/shared/data/enemy";
+import * as allItems from "src/shared/data/item";
 import { showSolutionLog } from "src/shared/game/log";
 
 /*

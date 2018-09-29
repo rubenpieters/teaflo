@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { allCards} from "src/shared/game/card";
+import * as allCards from "src/shared/data/card";
 import { showSolutionLog } from "src/shared/game/log";
 import { createSolCard } from "src/shared/game/ability";
 import { addToSolution, passNoInputsR, passNoInputsE, fSt } from "./general";

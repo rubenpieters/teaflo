@@ -1,6 +1,6 @@
 import { changeConnected } from "src/app/appstate";
 import { Board, chAvailableCards, LimitedCard, resetSolution } from "src/app/gamestate";
-import { allCards } from "src/shared/game/card";
+import * as allCards from "src/shared/data/card";
 import { ServerMessage } from "src/shared/network/serverMessage";
 
 export type ServerConnection = {
