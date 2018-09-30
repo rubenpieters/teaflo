@@ -15,12 +15,12 @@ function numberToTarget(input: number): CreatureId {
 }
 
 export const noop: EntityEffect = {
-  effect: (_state: GameState, _id: CreatureId) => {
+  effect: (_obj) => {
     return { tag: "Noop" };
   },
   description: "Noop",
-  inputs: [],
 };
+
 
 const damageToTarget = {
   effect: (position: number, type: TargetType, value: number) => {

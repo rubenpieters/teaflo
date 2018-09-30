@@ -2,25 +2,37 @@ import { CreatureId, GameState } from "src/shared/game/state";
 import { Status } from "./status";
 import { Action } from "./action";
 import { InputType } from "./input";
-import { InputEntityEffect, EntityEffect, InputEntityEffect } from "./ability";
+import { InputEntityEffect, EntityEffect } from "./ability";
 import { cursorTo } from "readline";
+
+
+export type InputEntityEffectNoI = {
+  effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId }) => Action,
+  description: string,
+}
 
 type Static<A> = {
   tag: "Static",
   v: A,
 }
 
+export function evStatic<A>(a: A): EffectVar<A> {
+  return {
+    tag: "Static", v: a
+  }
+}
+
 type Self = {
   tag: "Self",
 }
+
+export const evSelf: EffectVar<CreatureId> = { tag: "Self" };
 
 type NumberInput<A> = {
   tag: "NumberInput",
   v: number,
   f: (n: number) => A,
 }
-
-export const evSelf: EffectVar<CreatureId> = { tag: "Self" };
 
 function numberToTarget(input: number): CreatureId {
   if (input >= 0) {
@@ -38,21 +50,19 @@ export function evInput(n: number): EffectVar<CreatureId> {
   }
 }
 
-export function evStatic<A>(a: A): EffectVar<A> {
-  return {
-    tag: "Static", v: a
-  }
+type AllAlly = {
+  tag: "AllAlly",
 }
 
 type EffectVar<A>
-  = Static<A>
-  | Self
+  = EffectVarNoInput<A>
   | NumberInput<A>
   ;
 
 type EffectVarNoInput<A>
   = Static<A>
   | Self
+  | AllAlly
   ;
 
 type EvToFInput<A, EV extends EffectVar<A>>
@@ -97,6 +107,9 @@ function evToF<A, EV extends EffectVar<A>>(
         return f(obj.inputs[v]);
       })
     }
+    case "AllAlly": {
+      throw "internal effect var";
+    }
   }
   throw "evToF: impossible case";
 }
@@ -111,6 +124,9 @@ function showEv<A>(ev: EffectVar<A>): string {
     }
     case "NumberInput": {
       return `<Input${ev.v}>`;
+    }
+    case "AllAlly": {
+      return "<Allies>";
     }
   }
 }
@@ -131,9 +147,37 @@ function evToInput<A>(ev: EffectVar<A>): InputType | undefined {
   }
 }
 
-export function evAnd(
-  ...effs: InputEntityEffect[]
+export function withI(
+  eff: InputEntityEffectNoI,
+  ...inputs: InputType[]
 ): InputEntityEffect {
+  return {
+    effect: eff.effect,
+    description: eff.description,
+    inputs,
+  }
+}
+
+export function evAllAlly(
+  f: (target: EffectVar<CreatureId>) => InputEntityEffectNoI
+): InputEntityEffectNoI {
+  return {
+    effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId } ) => {
+      const actions = obj.state.crew.map((ally, position) =>
+        f(evStatic(<CreatureId>{ tag: "PositionId", type: "ally", id: position })).effect(obj),
+      );
+      return {
+        tag: "CombinedAction",
+        actions,
+      }
+    },
+    description: f({ tag: "AllAlly" }).description,
+  }
+}
+
+export function evAnd(
+  ...effs: InputEntityEffectNoI[]
+): InputEntityEffectNoI {
   return {
     effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId } ) => {
       return {
@@ -142,7 +186,6 @@ export function evAnd(
       };
     },
     description: effs.reduce((prev, curr) => `${prev} and ${curr.description}`, ""),
-    inputs: effs.reduce((prev, curr) => prev.concat(curr.inputs), <InputType[]>[]),
   }
 }
 
@@ -150,12 +193,7 @@ export function damageI(
   target: EffectVar<CreatureId>,
   value: EffectVar<number>,
   piercing: EffectVar<boolean>,
-): InputEntityEffect {
-  const inputs = <InputType[]>[
-    evToInput(target),
-    evToInput(value),
-    evToInput(piercing),
-  ].filter(x => x !== undefined);
+): InputEntityEffectNoI {
   return {
     effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId } ) => {
       return <Action>{
@@ -166,7 +204,6 @@ export function damageI(
       };
     },
     description: `deal ${showEv(value)} to ${showEv(target)}`,
-    inputs,
   }
 }
 
@@ -192,11 +229,7 @@ export function damage(
 export function queueStatusI(
   target: EffectVar<CreatureId>,
   status: EffectVar<Status>,
-): InputEntityEffect {
-  const inputs = <InputType[]>[
-    evToInput(target),
-    evToInput(status),
-  ].filter(x => x !== undefined);
+): InputEntityEffectNoI {
   return {
     effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId } ) => {
       return <Action>{
@@ -206,7 +239,6 @@ export function queueStatusI(
       };
     },
     description: `queue ${showEv(status)} to ${showEv(target)}`,
-    inputs,
   }
 }
 
@@ -223,6 +255,70 @@ export function queueStatus(
       };
     },
     description: `queue ${showEv(status)} to ${showEv(target)}`,
+  }
+}
+
+export function chargeUseI(
+  target: EffectVar<CreatureId>,
+  value: EffectVar<number>,
+): InputEntityEffectNoI {
+  return {
+    effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId } ) => {
+      return <Action>{
+        tag: "ChargeUse",
+        target: evToF(target)(obj),
+        value: evToF(value)(obj),
+      };
+    },
+    description: `${showEv(target)} use ${showEv(value)} charge`,
+  }
+}
+
+export function chargeUse(
+  target: EffectVarNoInput<CreatureId>,
+  value: EffectVarNoInput<number>,
+): EntityEffect {
+  return {
+    effect: (obj: { state: GameState, selfId: CreatureId } ) => {
+      return <Action>{
+        tag: "ChargeUse",
+        target: evToF(target)(obj),
+        value: evToF(value)(obj),
+      };
+    },
+    description: `${showEv(target)} use ${showEv(value)} charge`,
+  }
+}
+
+export function healI(
+  target: EffectVar<CreatureId>,
+  value: EffectVar<number>,
+): InputEntityEffectNoI {
+  return {
+    effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId } ) => {
+      return <Action>{
+        tag: "Heal",
+        target: evToF(target)(obj),
+        value: evToF(value)(obj),
+      };
+    },
+    description: `heal ${showEv(value)} to ${showEv(target)}`,
+  }
+}
+
+export function heal(
+  target: EffectVarNoInput<CreatureId>,
+  value: EffectVarNoInput<number>,
+): EntityEffect {
+  return {
+    effect: (obj: { state: GameState, selfId: CreatureId } ) => {
+      return <Action>{
+        tag: "Heal",
+        target: evToF(target)(obj),
+        value: evToF(value)(obj),
+      };
+    },
+    description: `heal ${showEv(value)} to ${showEv(target)}`,
   }
 }
 

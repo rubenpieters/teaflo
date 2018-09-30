@@ -4,7 +4,8 @@ import { Action } from "src/shared/game/action";
 import { Crew } from "src/shared/game/crew";
 import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
-import { damageI, evInput, evStatic, evAnd } from "../game/effectvar";
+import { damageI, evInput, evStatic, evAnd, queueStatusI, withI, evAllAlly, evSelf, chargeUseI, healI } from "../game/effectvar";
+import { Poison, Guard, Bubble } from "../game/status";
 
 export const armorOnSelfHeal: Crew = {
   ap: 1,
@@ -84,8 +85,8 @@ export const dmg1: Crew = {
     allAbilities.noop,
   ],
   abilities: [
-    damageI(evInput(0), evStatic(15), evStatic(false)),
-    damageI(evInput(0), evStatic(10), evStatic(false)),
+    withI(damageI(evInput(0), evStatic(15), evStatic(false)), { tag: "NumberInput" }),
+    withI(damageI(evInput(0), evStatic(10), evStatic(false)), { tag: "NumberInput" }),
   ],
   threatMap: {},
   charges: 5,
@@ -102,7 +103,15 @@ export const dmgPoison: Crew = {
     allAbilities.noop,
   ],
   abilities: [
-    allAbilities.dmgPoison,
+    withI(evAnd(
+      damageI(evInput(0), evStatic(15), evStatic(false)),
+      queueStatusI(evInput(0), evStatic(<Poison>{
+        tag: "Poison",
+        value: 0,
+        fragment: 50,
+      })),
+    ),
+    { tag: "NumberInput" }),
   ],
   threatMap: {},
   charges: 5,
@@ -119,42 +128,13 @@ export const basicCrew1: Crew = {
     allAbilities.noop,
   ],
   abilities: [
-    allAbilities.armorSelf,
-    allAbilities.dmg15,
-  ],
-  threatMap: {},
-  charges: 5,
-};
-
-export const basicCrew2: Crew = {
-  ap: 1,
-  hp: 15,
-  maxHp: 15,
-  triggers: [
-  ],
-  ranged: false,
-  actions: [
-    allAbilities.noop,
-  ],
-  abilities: [
-    allAbilities.addAp,
-  ],
-  threatMap: {},
-  charges: 5,
-};
-
-export const basicCrew3: Crew = {
-  ap: 1,
-  hp: 15,
-  maxHp: 15,
-  triggers: [
-  ],
-  ranged: false,
-  actions: [
-    allAbilities.noop,
-  ],
-  abilities: [
-    allAbilities.apDmg,
+    withI(queueStatusI(evInput(0), evStatic(<Guard>{
+      tag: "Guard",
+      value: 1,
+      guard: 8,
+      fragment: 0,
+    }))),
+    withI(damageI(evInput(0), evStatic(15), evStatic(false)), { tag: "NumberInput" }),
   ],
   threatMap: {},
   charges: 5,
@@ -172,7 +152,14 @@ export const tank_01: Crew = {
     allAbilities.noop,
   ],
   abilities: [
-    allAbilities.dmgAllGainBubble,
+    withI(evAnd(
+      evAllAlly((ally) => damageI(ally, evStatic(5), evStatic(false))),
+      queueStatusI(evSelf, evStatic(<Bubble>{
+        tag: "Bubble",
+        value: 1,
+        fragment: 0,
+      })),
+    )),
   ],
   threatMap: {},
   charges: 5,
@@ -183,14 +170,17 @@ export const dmg_01: Crew = {
   hp: 100,
   maxHp: 100,
   triggers: [
-    allTriggers.addThreatOnDamage,
   ],
   ranged: false,
   actions: [
     allAbilities.noop,
   ],
   abilities: [
-    allAbilities.dmgHighCd,
+    withI(evAnd(
+      chargeUseI(evSelf, evStatic(4)),
+      damageI(evInput(0), evStatic(20), evStatic(false)),
+    ),
+    { tag: "NumberInput" }),
   ],
   threatMap: {},
   charges: 5,
@@ -207,8 +197,16 @@ export const util_01: Crew = {
     allAbilities.noop,
   ],
   abilities: [
-    allAbilities.dmgSelfHealAllies,
-    allAbilities.armorSelf10_2,
+    withI(queueStatusI(evSelf, evStatic(<Guard>{
+      tag: "Guard",
+      value: 2,
+      guard: 10,
+      fragment: 0,
+    }))),
+    withI(evAnd(
+      damageI(evSelf, evStatic(20), evStatic(false)),
+      evAllAlly((ally) => healI(ally, evStatic(30))),
+    )),
   ],
   threatMap: {},
   charges: 5,
