@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { TargetType, typeColl } from "src/shared/game/target";
-import { Action, highestThreatTarget } from "src/shared/game/action";
-import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId, inCombat, IdEnemy } from "src/shared/game/state";
+import { Action, highestThreatTarget, Damage } from "src/shared/game/action";
+import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId, inCombat, IdEnemy, showId, PositionIdA } from "src/shared/game/state";
 import { Next } from "src/shared/game/next";
 import { Status } from "src/shared/game/status";
 import { InputEntityEffect, EnemyEffect, EntityEffect } from "src/shared/game/ability";
@@ -108,10 +108,10 @@ export const armorAllAlly_5_1_0: InputEntityEffect = {
     return (state: GameState, id: EntityId) => {
       return onAllAlly(
         state,
-        (_: IdCrew, id: number) => {
+        (_ally, id) => {
           return {
             tag: "QueueStatus",
-            target: { tag: "PositionId", type: "ally", id, },
+            target: id,
             status: {
               tag: "Guard",
               value: 1,
@@ -207,14 +207,10 @@ export const dmgAllGainBubble: InputEntityEffect = {
       return {
         tag: "CombinedAction",
         actions: [
-          onAllAlly(state, (ally: IdCrew, id: number) => {
+          onAllAlly(state, (_ally, id) => {
             return {
               tag: "Damage",
-              target: {
-                tag: "PositionId",
-                id,
-                type: "ally",
-              },
+              target: id,
               value: 5,
               piercing: false,
             }
@@ -250,17 +246,13 @@ export const dmgSelfHealAllies: InputEntityEffect = {
             value: 20,
             piercing: false,
           },
-          onAllAlly(state, (_ally: IdCrew, id: number) => {
-            if (id === selfPosition) {
+          onAllAlly(state, (_ally: IdCrew, id) => {
+            if (id.id === selfPosition) {
               return { tag: "Noop" };
             } else {
               return {
                 tag: "Heal",
-                target: {
-                  tag: "PositionId",
-                  id,
-                  type: "ally",
-                },
+                target: id,
                 value: 30,
                 piercing: false,
               }
@@ -391,9 +383,11 @@ export function onAllAllyPositions(
 
 export function onAllAlly(
   state: GameState,
-  f: (ally: IdCrew, id: number) => Action,
+  f: (ally: IdCrew, id: PositionIdA<"ally">) => Action,
 ): Action {
-  const actions = state.crew.map(f);
+  const actions = state.crew.map((ally, id) =>
+    f(ally, { tag: "PositionId", type: "ally", id })
+  );
   return {
     tag: "CombinedAction",
     actions,
