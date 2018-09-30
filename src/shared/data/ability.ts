@@ -350,7 +350,7 @@ export function damageXAtPos(value: number, position: number): EnemyEffect {
   };
 }
 
-export function queueStatus(status: Status): EnemyEffect {
+/*export function queueStatus(status: Status): EnemyEffect {
   return {
     effect: (state: GameState, _id: CreatureId) => {
       return {
@@ -367,7 +367,7 @@ export function queueStatus(status: Status): EnemyEffect {
     },
     description: `${JSON.stringify(status)} on all ally positions`,
   };
-}
+}*/
 
 export function onAllAllyPositions(
   state: GameState,

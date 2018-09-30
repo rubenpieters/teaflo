@@ -4,7 +4,7 @@ import { Action } from "src/shared/game/action";
 import { Crew } from "src/shared/game/crew";
 import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
-import { damageI, evInput, evStatic, evAnd, queueStatusI, withI, evAllAlly, evSelf, chargeUseI, healI } from "../game/effectvar";
+import { damageI, evInput, evStatic, evAnd, queueStatusI, withI, evAllies, evSelf, chargeUseI, healI, target, damage } from "../game/effectvar";
 import { Poison, Guard, Bubble } from "../game/status";
 
 export const armorOnSelfHeal: Crew = {
@@ -85,7 +85,8 @@ export const dmg1: Crew = {
     allAbilities.noop,
   ],
   abilities: [
-    withI(damageI(evInput(0), evStatic(15), evStatic(false)), { tag: "NumberInput" }),
+    // withI(damageI(evInput(0), evStatic(15), evStatic(false)), { tag: "NumberInput" }),
+    target(0, (target0) => damageI(target0, evStatic(15), evStatic(false))),
     withI(damageI(evInput(0), evStatic(10), evStatic(false)), { tag: "NumberInput" }),
   ],
   threatMap: {},
@@ -153,7 +154,7 @@ export const tank_01: Crew = {
   ],
   abilities: [
     withI(evAnd(
-      evAllAlly((ally) => damageI(ally, evStatic(5), evStatic(false))),
+      evAllies((ally) => damageI(ally, evStatic(5), evStatic(false))),
       queueStatusI(evSelf, evStatic(<Bubble>{
         tag: "Bubble",
         value: 1,
@@ -205,7 +206,7 @@ export const util_01: Crew = {
     }))),
     withI(evAnd(
       damageI(evSelf, evStatic(20), evStatic(false)),
-      evAllAlly((ally) => healI(ally, evStatic(30))),
+      evAllies((ally) => healI(ally, evStatic(30))),
     )),
   ],
   threatMap: {},
