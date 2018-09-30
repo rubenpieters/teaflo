@@ -227,7 +227,7 @@ function applyActionAndTriggersAt(
       let indexTrigger = 0;
       for (const trigger of enemy.triggers) {
         if (trigger.charges > 0 && trigger.type === "before") {
-          const triggerResult = trigger.effect(action)(state, { tag: "GlobalId", id: enemy.id, type: "enemy" });
+          const triggerResult = trigger.effect({ action, state, selfId: { tag: "GlobalId", id: enemy.id, type: "enemy" }});
           state = focus(state,
             over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
           );
@@ -239,7 +239,7 @@ function applyActionAndTriggersAt(
           state = afterTrigger.state;
           log = afterTrigger.log;
         } else if (trigger.charges > 0 && trigger.type === "instead") {
-          const triggerResult = trigger.effect(action)(state, { tag: "GlobalId", id: enemy.id, type: "enemy" });
+          const triggerResult = trigger.effect({ action, state, selfId: { tag: "GlobalId", id: enemy.id, type: "enemy" }});
           state = focus(state,
             over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
           );
@@ -295,7 +295,7 @@ function applyActionAndTriggersAt(
     let indexTrigger = 0;
     for (const trigger of ally.triggers) {
       if (trigger.charges > 0 && trigger.type === "before") {
-        const triggerResult = trigger.effect(action)(state, { tag: "PositionId", id: ally.id, type: "ally" });
+        const triggerResult = trigger.effect({ action, state, selfId: { tag: "PositionId", id: ally.id, type: "ally" }});
         state = focus(state,
           over(x => x.crew[indexAlly].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
         );
@@ -307,7 +307,7 @@ function applyActionAndTriggersAt(
         state = afterTrigger.state;
         log = afterTrigger.log;
       } else if (trigger.charges > 0 && trigger.type === "instead") {
-        const triggerResult = trigger.effect(action)(state, { tag: "PositionId", id: ally.id, type: "ally" });
+        const triggerResult = trigger.effect({ action, state, selfId: { tag: "PositionId", id: ally.id, type: "ally" }});
         state = focus(state,
           over(x => x.crew[indexAlly].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
         );

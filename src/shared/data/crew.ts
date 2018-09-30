@@ -4,6 +4,7 @@ import { Action } from "src/shared/game/action";
 import { Crew } from "src/shared/game/crew";
 import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
+import { damageI, evInput, evStatic } from "../game/effectvar";
 
 export const armorOnSelfHeal: Crew = {
   ap: 1,
@@ -83,8 +84,8 @@ export const dmg1: Crew = {
     allAbilities.noop,
   ],
   abilities: [
-    allAbilities.dmg15,
-    allAbilities.dmg10,
+    damageI(evInput(0), evStatic(15), evStatic(false)),
+    damageI(evInput(0), evStatic(10), evStatic(false)),
   ],
   threatMap: {},
   charges: 5,

@@ -18,9 +18,7 @@ export function createCard(
   return {
     name: "-- created --",
     effects: [
-      { effect: (_inputs: any[]) => { return (_state: GameState, _id: CreatureId) => {
-        return action;
-        }},
+      { effect: (_obj) => { return action; },
         inputs: [],
         description: "-- created --",
       },
@@ -42,10 +40,9 @@ export function createSolCard(
   return {
     name: "-- created --",
     effects: [
-      { effect: (_state: GameState, _id: CreatureId) => {
+      { effect: (_obj) => {
         return action;
         },
-        inputs: [],
         description: "-- created --",
       },
     ],
@@ -65,24 +62,23 @@ export function createSolCard(
 // trigger : additional action which triggered
 
 export type EntityEffect = {
-  effect: (state: GameState, id: CreatureId) => Action,
+  effect: (obj: { state: GameState, selfId: CreatureId }) => Action,
   description: string,
-  inputs: InputType[],
 }
 
 export type EnemyEffect = {
-  effect: (state: GameState, id: CreatureId) => { action: Action, next: Next },
+  effect: (obj: { state: GameState, selfId: CreatureId }) => { action: Action, next: Next },
   description: string,
 }
 
 export type InputEntityEffect = {
-  effect: (inputs: any[]) => (state: GameState, id: CreatureId) => Action,
+  effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId }) => Action,
   description: string,
   inputs: InputType[],
 }
 
 export type TriggerEntityEffect = {
-  effect: (action: Action) => (state: GameState, id: CreatureId) => { action: Action, chargeUse: number },
+  effect: (obj: { action: Action, state: GameState, selfId: CreatureId }) => { action: Action, chargeUse: number },
   description: string,
   charges: number,
   type: "before" | "instead",
