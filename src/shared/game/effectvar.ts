@@ -2,7 +2,8 @@ import { CreatureId, GameState } from "src/shared/game/state";
 import { Status } from "./status";
 import { Action } from "./action";
 import { InputType } from "./input";
-import { InputEntityEffect, EntityEffect } from "./ability";
+import { InputEntityEffect, EntityEffect, InputEntityEffect } from "./ability";
+import { cursorTo } from "readline";
 
 type Static<A> = {
   tag: "Static",
@@ -127,6 +128,21 @@ function evToInput<A>(ev: EffectVar<A>): InputType | undefined {
         tag: "NumberInput",
       };
     }
+  }
+}
+
+export function evAnd(
+  ...effs: InputEntityEffect[]
+): InputEntityEffect {
+  return {
+    effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId } ) => {
+      return {
+        tag: "CombinedAction",
+        actions: effs.reduce((prev, curr) => prev.concat(curr.effect(obj)), <Action[]>[]),
+      };
+    },
+    description: effs.reduce((prev, curr) => `${prev} and ${curr.description}`, ""),
+    inputs: effs.reduce((prev, curr) => prev.concat(curr.inputs), <InputType[]>[]),
   }
 }
 

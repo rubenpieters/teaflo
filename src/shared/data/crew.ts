@@ -4,7 +4,7 @@ import { Action } from "src/shared/game/action";
 import { Crew } from "src/shared/game/crew";
 import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
-import { damageI, evInput, evStatic } from "../game/effectvar";
+import { damageI, evInput, evStatic, evAnd } from "../game/effectvar";
 
 export const armorOnSelfHeal: Crew = {
   ap: 1,
