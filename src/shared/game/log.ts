@@ -127,6 +127,9 @@ function showAction(action: Action): string {
     case "AddThreat": {
       return `AddThreat ${action.value} ${showId(action.target)}`;
     }
+    case "StartTurn": {
+      return `StartTurn`;
+    }
     case "Invalid": {
       return `Invalid`;
     }

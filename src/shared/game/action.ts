@@ -38,6 +38,7 @@ export type Action
   | ChargeUse
   | AddInstance
   | AddThreat
+  | StartTurn
   ;
 
 export type Damage = {
@@ -159,6 +160,10 @@ export type AddThreat = {
   target: CreatureId,
   value: number,
   enemyId: CreatureId,
+};
+
+export type StartTurn = {
+  tag: "StartTurn",
 };
 
 export function enemyTurn(
@@ -336,7 +341,7 @@ function applyAction(
   switch (action.tag) {
     case "AddEnemy": {
       const id = idGen.newId();
-      const addedEnemy: IdEnemy = {...action.enemy, ...{ id, actionIndex: 0, tag: "enemy" } };
+      const addedEnemy: IdEnemy = {...action.enemy, ...{ id, actionIndex: 0, tag: "enemy", status: {} } };
       state = focus(state, over(x => x.enemies, x => x.concat(addedEnemy)));
       break;
     }
@@ -345,7 +350,7 @@ function applyAction(
         return { state: "invalid", log };
       } else {
         const id = idGen.newId();
-        const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally" } };
+        const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally", status: {} } };
         state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
       }
       break;
@@ -561,6 +566,9 @@ function applyAction(
       );
       break;
     }
+    case "StartTurn": {
+      break;
+    }
     case "Invalid": {
       return { state: "invalid", log };
     }
@@ -611,7 +619,7 @@ export function checkStatusEnemy(
   for (let i = 0; i < state.enemies.length; i++) {
     for (const statusTag of _Status.allStatus) {
       enemy = state.enemies[i];
-      const status = enemy[statusTag];
+      const status = enemy.status[statusTag];
       if (status !== undefined) {
         const action = _Status.statusToAction(status, state, enemy.id, "enemy");
         state = focus(state,
@@ -639,7 +647,7 @@ export function checkStatusCrew(
   for (let i = 0; i < state.crew.length; i++) {
     for (const statusTag of _Status.allStatus) {
       ally = state.crew[i];
-      const status = ally[statusTag];
+      const status = ally.status[statusTag];
       if (status !== undefined) {
         const action = _Status.statusToAction(status, state, ally.id, "ally");
         state = focus(state,

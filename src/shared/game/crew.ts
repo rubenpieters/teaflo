@@ -38,21 +38,21 @@ export function damage<E extends Crew & HasStatus>(
   damage: number,
   piercing: boolean,
 ): E {
-  if (piercing || (crew.Guard === undefined && crew.Bubble === undefined)) {
+  if (piercing || (crew.status.Guard === undefined && crew.status.Bubble === undefined)) {
     return focus(crew, over(x => x.hp, x => x - damage));
   } else {
-    if (crew.Bubble !== undefined) {
+    if (crew.status.Bubble !== undefined) {
       return focus(crew,
-        set(x => x.Bubble, undefined),
+        set(x => x.status.Bubble, undefined),
       );
     } else { // crew.Guard !== undefined
-      if (damage <= crew.Guard!.guard) {
-        return focus(crew, over(x => (<Guard>x.Guard).guard, x => x - damage));
+      if (damage <= crew.status.Guard!.guard) {
+        return focus(crew, over(x => (<Guard>x.status.Guard).guard, x => x - damage));
       }
   
-      const leftoverDamage = damage - crew.Guard!.guard;
+      const leftoverDamage = damage - crew.status.Guard!.guard;
       return focus(crew,
-        set(x => x.Guard, undefined),
+        set(x => x.status.Guard, undefined),
         over(x => x.hp, x => x - leftoverDamage),
       );
     }
