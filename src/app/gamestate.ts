@@ -211,6 +211,17 @@ function popLeftMenu(
   return gfx;
 }
 
+function cb1(
+  effect: InputEntityEffect
+): (inputs: any[]) => EntityEffect {
+  return (inputs: any[]) => {
+    return {
+      effect: (context: Context) => { return effect.effect({ ...context, inputs })},
+      description: effect.description,
+    };
+  }
+} 
+
 function addToSolution(
   board: Board,
   card: Card,
@@ -226,13 +237,7 @@ function addToSolution(
   // add user input to card
   const afterInputEffects: EntityEffect[] = [];
   for (const effect of card.effects) {
-    const cb = (inputs: any[]) => {
-      return <EntityEffect>{
-        effect: (context: Context) => { effect.effect({ ...context, inputs })},
-        description: effect.description,
-      };
-    }
-    const afterInputEffect: EntityEffect = onAbilityClick(board, effect.inputs, [], cb)();
+    const afterInputEffect: EntityEffect = onAbilityClick(board, effect.inputs, [], cb1(effect))();
     afterInputEffects.push(afterInputEffect);
   }
   const afterUserInput = {
@@ -542,7 +547,7 @@ function onAbilityClick<A>(
           return onAbilityClick(board, tail, currentInputs.concat(inputParsed), cb)();
         }
         default: {
-          return <never>undefined;
+          throw "onAbilityClick: impossible";
         }
       }
     }
