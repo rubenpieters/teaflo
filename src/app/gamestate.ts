@@ -8,6 +8,7 @@ import { HasStatus, allStatus, showStatus } from "src/shared/game/status";
 import { TargetType } from "src/shared/game/target";
 import { Ability } from "src/shared/game/crew";
 import { InputType } from "../shared/game/input";
+import { Context } from "../shared/game/effectvar";
 
 export type Limit = {
   limit: number,
@@ -226,12 +227,12 @@ function addToSolution(
   const afterInputEffects: EntityEffect[] = [];
   for (const effect of card.effects) {
     const cb = (inputs: any[]) => {
-     return effect.effect(inputs); 
+      return <EntityEffect>{
+        effect: (context: Context) => { effect.effect({ ...context, inputs })},
+        description: effect.description,
+      };
     }
-    const afterInputEffect: EntityEffect = {
-      ...effect,
-      effect: onAbilityClick(board, effect.inputs, [], cb)(),
-    };
+    const afterInputEffect: EntityEffect = onAbilityClick(board, effect.inputs, [], cb)();
     afterInputEffects.push(afterInputEffect);
   }
   const afterUserInput = {
@@ -462,7 +463,8 @@ function mkState(
       sprite.events.onInputOver.add(() => showAbility(board, ability));
       const cb = (id: number) => {
         return (inputs: any[]) => {
-          return addToSolution(board, createCard(ability.effect(inputs)(board.lastState!, { tag: "PositionId", id, type: "ally"}), id, "ally"));
+          const card = createCard(ability.effect({ inputs, state: board.lastState!, selfId: { tag: "PositionId", id, type: "ally"}}).action, id, "ally");
+          return addToSolution(board, card);
         }
       };
       // capture allyId in new scope

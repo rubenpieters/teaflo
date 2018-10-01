@@ -3,7 +3,8 @@ import { GameState, IdEnemy } from "src/shared/game/state";
 import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { Guard, HasStatus } from "src/shared/game/status";
-import { EnemyEffect, TriggerEntityEffect } from "src/shared/game/ability";
+import { EnemyEffect, TriggerEntityEffect, EntityEffect } from "src/shared/game/ability";
+import { Eff1, EffT } from "./effectvar";
 
 /*export function showEnemy(
   enemy: Enemy
@@ -55,7 +56,7 @@ export function act(
   idGen: Generator,
   index: number,
 ): { state: GameState | "invalid", log: Action[] }  {
-  const { action, next } = enemy.actions[enemy.actionIndex].effect(state, { tag: "GlobalId", id: enemy.id, type: "enemy" });
+  const { action, next } = enemy.actions[enemy.actionIndex].effect({ state, selfId: { tag: "GlobalId", id: enemy.id, type: "enemy" }});
   state = focus(state,
     over(x => x.enemies[index].actionIndex, x => {
       switch (next.tag) {

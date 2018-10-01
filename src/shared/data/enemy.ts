@@ -1,23 +1,36 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, CreatureId, toPositionId } from "src/shared/game/state";
-import { damageXAtPos, healSelf, damageHighestThreat, onAllAllyPositions } from "src/shared/data/ability";
 import { Next } from "src/shared/game/next";
 import { Enemy } from "src/shared/game/enemy";
-import { queueStatus, evAllyPositions, evStatic } from "src/shared/game/effectvar";
-import { Poison } from "../game/status";
+import { queueStatus, evAllyPositions, evStatic, extra, noop } from "src/shared/game/effectvar";
+import { Poison } from "src/shared/game/status";
 
+
+export const dummy: Enemy = {
+  ap: 1,
+  hp: 1000,
+  maxHp: 1000,
+  actions: [
+    extra(noop(), { next: <Next>{ tag: "NextId" }}),
+    // damageHighestThreat(1, _ => { return { tag: "NextId" }}),
+  ],
+  triggers: [
+  ],
+};
+
+/*
 export const enemyBoss1: Enemy = {
   ap: 1,
   hp: 40,
   maxHp: 40,
   actions: [
-    evAllyPositions((ally) => queueStatus(ally, evStatic(
+    extra(evAllyPositions((ally) => queueStatus(ally, evStatic(
       <Poison>{
         tag: "Poison",
         value: 3,
         fragment: 0,
       }
-    ))),
+    ))), { next: <Next>{ tag: "NextId" }}),
     queueStatus({
       tag: "Poison",
       value: 3,
@@ -127,17 +140,6 @@ export const enemyBoss3: Enemy = {
   ],
 };
 
-export const dummy: Enemy = {
-  ap: 1,
-  hp: 1000,
-  maxHp: 1000,
-  actions: [
-    damageHighestThreat(1, _ => { return { tag: "NextId" }}),
-  ],
-  triggers: [
-  ],
-};
-
 export const basicEnemy1: Enemy = {
   ap: 1,
   hp: 15,
@@ -160,4 +162,4 @@ export const basicEnemy2: Enemy = {
   ],
   triggers: [
   ],
-};
+};*/

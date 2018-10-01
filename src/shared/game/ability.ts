@@ -6,6 +6,7 @@ import { Card } from "src/shared/game/card";
 import { InputType } from "src/shared/game/input";
 import { Next } from "src/shared/game/next";
 import { SolCard } from "src/shared/game/solution";
+import { Context } from "./effectvar";
 
 // TODO: check with gamestate.ts whether given input is self global id or self position index
 // (it seems to be position index)
@@ -18,7 +19,7 @@ export function createCard(
   return {
     name: "-- created --",
     effects: [
-      { effect: (_obj) => { return action; },
+      { effect: (_obj) => { return { action }; },
         inputs: [],
         description: "-- created --",
       },
@@ -40,9 +41,7 @@ export function createSolCard(
   return {
     name: "-- created --",
     effects: [
-      { effect: (_obj) => {
-        return action;
-        },
+      { effect: (_obj) => { return { action }; },
         description: "-- created --",
       },
     ],
@@ -62,28 +61,23 @@ export function createSolCard(
 // trigger : additional action which triggered
 
 export type EntityEffect = {
-  effect: (obj: { state: GameState, selfId: CreatureId }) => Action,
+  effect: (obj: Context) => { action: Action },
   description: string,
 }
 
 export type EnemyEffect = {
-  effect: (obj: { state: GameState, selfId: CreatureId }) => { action: Action, next: Next },
+  effect: (obj: Context) => { action: Action, next: Next },
   description: string,
 }
 
 export type InputEntityEffect = {
-  effect: (obj: { inputs: any[], state: GameState, selfId: CreatureId }) => Action,
+  effect: (obj: Context) => { action: Action },
   description: string,
   inputs: InputType[],
 }
 
 export type TriggerEntityEffect = {
-  effect: (obj: { action: Action, state: GameState, selfId: CreatureId }) => { action: Action, chargeUse: number },
+  effect: (obj: Context) => { action: Action, chargeUse: number },
   description: string,
-  charges: number,
   type: "before" | "instead",
-}
-export type InstanceEffect = {
-  effect: (state: GameState, id: CreatureId) => Action,
-  description: string,
 }

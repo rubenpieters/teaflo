@@ -5,7 +5,9 @@ import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId, inCo
 import { Next } from "src/shared/game/next";
 import { Status } from "src/shared/game/status";
 import { InputEntityEffect, EnemyEffect, EntityEffect } from "src/shared/game/ability";
+import { Eff1 } from "../game/effectvar";
 
+/*
 function numberToTarget(input: number): CreatureId {
   if (input >= 0) {
     return { tag: "PositionId", type: "enemy", id: input }
@@ -13,13 +15,6 @@ function numberToTarget(input: number): CreatureId {
     return { tag: "PositionId", type: "ally", id: (-input) - 1 }
   }
 }
-
-export const noop: EntityEffect = {
-  effect: (_obj) => {
-    return { tag: "Noop" };
-  },
-  description: "Noop",
-};
 
 
 const damageToTarget = {
@@ -350,7 +345,7 @@ export function damageXAtPos(value: number, position: number): EnemyEffect {
   };
 }
 
-/*export function queueStatus(status: Status): EnemyEffect {
+export function queueStatus(status: Status): EnemyEffect {
   return {
     effect: (state: GameState, _id: CreatureId) => {
       return {
@@ -367,7 +362,7 @@ export function damageXAtPos(value: number, position: number): EnemyEffect {
     },
     description: `${JSON.stringify(status)} on all ally positions`,
   };
-}*/
+}
 
 export function onAllAllyPositions(
   state: GameState,
@@ -420,3 +415,4 @@ export function healSelf(value: number): EnemyEffect {
     description: `heal ${value} to [self]`,
   }
 };
+*/

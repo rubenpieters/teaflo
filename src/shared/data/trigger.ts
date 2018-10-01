@@ -2,8 +2,8 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Action } from "src/shared/game/action";
 import { GameState, CreatureId, toPositionId, IdEnemy } from "src/shared/game/state";
 import { TriggerEntityEffect } from "src/shared/game/ability";
-import { onAllEnemy } from "src/shared/data/ability";
 
+/*
 export const armorOnHeal: TriggerEntityEffect = {
   effect: (action: Action) => {
     return (state: GameState, id: CreatureId) => {
@@ -145,3 +145,4 @@ export const addThreatOnDamage: TriggerEntityEffect = {
   charges: Infinity,
   type: "before",
 };
+*/

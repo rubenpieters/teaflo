@@ -127,10 +127,10 @@ function solutionStep(
     case "EntityOrigin": {
       if (origin.entityType === "item") {
         // items execute actions as if they have PlayerOrigin
-        actionEffect = action.effect({ state, selfId: <any>undefined });
+        actionEffect = action.effect({ state }).action;
         actionOrigin = "noOrigin";
       } else {
-        actionEffect = action.effect({ state, selfId: { tag: "GlobalId", id: origin.entityId, type: origin.entityType }});
+        actionEffect = action.effect({ state, selfId: { tag: "GlobalId", id: origin.entityId, type: origin.entityType }}).action;
         actionOrigin = {
           type: origin.entityType,
           id: origin.entityId,
@@ -139,14 +139,13 @@ function solutionStep(
       break;
     }
     case "PlayerOrigin": {
-      // TODO: player origin cards should not take selfId/selfType as input
-      actionEffect = action.effect({ state, selfId: <any>undefined });
+      actionEffect = action.effect({ state }).action;
       actionOrigin = "noOrigin";
       break;
     }
   }
 
-  let log: ActionLog = { action: action.effect({ state, selfId: <any>undefined }), crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: [] };
+  let log: ActionLog = { action: action.effect({ state }).action, crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: [] };
 
   const afterCrewStatus = checkStatusCrew(state, idGen);
   log = focus(log, set(x => x.crewStatus, afterCrewStatus.log));

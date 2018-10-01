@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, IdCrew } from "src/shared/game/state";
+import { GameState, IdCrew, CreatureId, toGlobalId } from "src/shared/game/state";
 import { Action, ActionSpec, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
 import { HasStatus, Guard } from "src/shared/game/status";
@@ -60,17 +60,19 @@ export function damage<E extends Crew & HasStatus>(
 }
 
 export function addThreat<E extends Crew>(
+  state: GameState,
   crew: E,
   threat: number,
-  enemyId: number, // Global Id
+  enemyId: CreatureId,
 ): E {
-  if (crew.threatMap[enemyId] !== undefined) {
+  const enemyGid = toGlobalId(state, enemyId).id;
+  if (crew.threatMap[enemyGid] !== undefined) {
     return focus(crew,
-      over(x => x.threatMap[enemyId], x => x + threat),
+      over(x => x.threatMap[enemyGid], x => x + threat),
     );
   } else {
     return focus(crew,
-      set(x => x.threatMap[enemyId], threat),
+      set(x => x.threatMap[enemyGid], threat),
     );
   }
 }
@@ -143,5 +145,5 @@ export function act(
       return newX >= crew.actions.length ? 0 : newX;
     }),
   );
-  return applyActionAndTriggers(action.effect(state, { tag: "GlobalId", id: crew.id, type: "ally" }), state, log, idGen, { id: crew.id, type: "ally" });
+  return applyActionAndTriggers(action.effect({ state, selfId: { tag: "GlobalId", id: crew.id, type: "ally" }}).action, state, log, idGen, { id: crew.id, type: "ally" });
 }

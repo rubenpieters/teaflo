@@ -158,7 +158,7 @@ export type AddThreat = {
   tag: "AddThreat",
   target: CreatureId,
   value: number,
-  enemyId: number,
+  enemyId: CreatureId,
 };
 
 export function enemyTurn(
@@ -210,8 +210,6 @@ export function applyActionAndTriggers(
   return applyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen, origin);
 }
 
-// TODO: checking tags can be done in triggers themselves?
-
 function applyActionAndTriggersAt(
   action: Action,
   state: GameState,
@@ -221,7 +219,7 @@ function applyActionAndTriggersAt(
   origin: Origin,
 ): { state: GameState | "invalid", log: Action[] } {
   // enemy interactions with effects
-  if (from.type === "enemy") {
+  /*if (from.type === "enemy") {
     let indexEnemy = 0;
     for (const enemy of state.enemies.slice(from.id)) {
       let indexTrigger = 0;
@@ -252,10 +250,10 @@ function applyActionAndTriggersAt(
       );
       indexEnemy += 1;
     }
-  }
+  }*/
 
   // item interactions with effects
-  if (from.type === "item" || from.type === "enemy") {
+  /*if (from.type === "item" || from.type === "enemy") {
     const startId = from.type === "item" ? from.id : 0;
     let indexItem = startId;
     for (const item of state.items.slice(startId)) {
@@ -286,11 +284,11 @@ function applyActionAndTriggersAt(
       );
       indexItem += 1;
     }
-  }
+  }*/
 
   const fromCrew = from.type === "crew" ? from.id : 0;
   // crew interactions with effects
-  let indexAlly = fromCrew;
+  /*let indexAlly = fromCrew;
   for (const ally of state.crew.slice(fromCrew)) {
     let indexTrigger = 0;
     for (const trigger of ally.triggers) {
@@ -318,7 +316,7 @@ function applyActionAndTriggersAt(
       set(x => x.crew[indexAlly].triggers, state.crew[indexAlly].triggers.filter(v => v.charges > 0)),
     );
     indexAlly += 1;
-  }
+  }*/
 
   const afterApply = applyAction(action, state, origin, log, idGen);
 
@@ -380,10 +378,9 @@ function applyAction(
       );
       // create threat
       // TODO: invoke AddThreat action?
-      const enemyId = toGlobalId(state, action.target).id;
       if (origin !== "noOrigin" && origin.type === "ally" && action.target.type === "enemy") {
         state = focus(state,
-          over(x => x.crew[origin.id], x => _Crew.addThreat(x, action.value, enemyId)),
+          over(x => x.crew[origin.id], x => _Crew.addThreat(state, x, action.value, action.target)),
         );
       }
       break;
@@ -559,7 +556,7 @@ function applyAction(
     }
     case "AddThreat": {
       state = onCreature(action.target, state,
-        ally => _Crew.addThreat(ally, action.value, action.enemyId),
+        ally => _Crew.addThreat(state, ally, action.value, action.enemyId),
         _ => { throw `wrong target type for '${action.tag}`; },
       );
       break;

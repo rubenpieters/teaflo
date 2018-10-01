@@ -9,7 +9,7 @@ export const cardRest: Rest = {
   name: "Rest",
   effects: [
     { 
-      effect: (_obj) => { return { tag: "Rest" }},
+      effect: (_obj) => { return { action: { tag: "Rest" }}},
       inputs: [],
       description: "Rest",
     },
@@ -22,7 +22,7 @@ export const cardBattleTurn: Event = {
   name: "Battle",
   effects: [
     { 
-      effect: (_obj) => { return { tag: "BattleTurn" }},
+      effect: (_obj) => { return { action: { tag: "BattleTurn" }}},
       inputs: [],
       description: "BattleTurn",
     },
@@ -30,6 +30,49 @@ export const cardBattleTurn: Event = {
   tag: "general",
 };
 
+export const cardDummy: Event = {
+  origin: { tag: "PlayerOrigin", cardId: 2 },
+  name: "Dummy",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddEnemy", enemy: allEnemies.dummy }};
+      },
+      inputs: [],
+      description: "add Dummy",
+    },
+  ],
+  tag: "enemy",
+};
+
+export const cardCrew_0001: Event = {
+  origin: { tag: "PlayerOrigin", cardId: 1001 },
+  name: "Tank01",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddCrew", crew: allCrew.tank_01 }};
+      },
+      inputs: [],
+      description: "add Tank01",
+    },
+  ],
+  tag: "crew",
+};
+
+export const cardCrew_0002: Event = {
+  origin: { tag: "PlayerOrigin", cardId: 1002 },
+  name: "DmgPoison",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddCrew", crew: allCrew.dmgPoison }};
+      },
+      inputs: [],
+      description: "add DmgPoison",
+    },
+  ],
+  tag: "crew",
+};
+
+/*
 export const cardCrew_0003: Event = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },
   name: "ArmorSelf",
@@ -291,3 +334,4 @@ export const cardBattle_0014: Event = {
   ],
   tag: "enemy",
 };
+*/
