@@ -5,21 +5,21 @@ function basicTest() {
   const path1: Path = {
     restCard: { effects: [<any>undefined, <any>undefined], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "rest" },
     eventCards: [
-      { effects: [
+      { event: { effects: [
         <any>undefined,
         <any>undefined,
-      ], origin: { tag: "PlayerOrigin", cardId: 0 }, tag: "general", name: "" },
-      { effects: [{ tag: "Rest" }], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "general" },
+      ], origin: { tag: "PlayerOrigin", cardId: 0 }, tag: "general", name: "" }, inputs: [] },
+      { event: { effects: [<any>undefined], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "general" }, inputs: [] },
     ]
   }
   const path2: Path = {
     restCard: { effects: [<any>undefined], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "rest" },
     eventCards: [
-      { effects: [
+      { event: { effects: [
         <any>undefined,
         <any>undefined,
-      ], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "general" },
-      { effects: [{ tag: "Rest" }], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "general" },
+      ], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "general" }, inputs: [] },
+      { event: { effects: [<any>undefined], origin: { tag: "PlayerOrigin", cardId: 0 }, name: "", tag: "general" }, inputs: [] },
     ]
   }
   const solution: Solution = {

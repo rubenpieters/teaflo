@@ -145,5 +145,8 @@ export function act(
       return newX >= crew.actions.length ? 0 : newX;
     }),
   );
-  return applyActionAndTriggers(action.effect({ state, selfId: { tag: "GlobalId", id: crew.id, type: "ally" }}).action, state, log, idGen, { id: crew.id, type: "ally" });
+  return applyActionAndTriggers(
+    action.effect({ state, selfId: { tag: "GlobalId", id: crew.id, type: "ally" }}).action,
+    state, log, idGen, { tag: "GlobalId", id: crew.id, type: "ally" }
+  );
 }

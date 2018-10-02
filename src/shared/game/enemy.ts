@@ -73,7 +73,9 @@ export function act(
       }
     }),
   );
-  return applyActionAndTriggers(action, state, log, idGen, { id: enemy.id, type: "enemy" });
+  return applyActionAndTriggers(
+    action, state, log, idGen, { tag: "GlobalId", id: enemy.id, type: "enemy" }
+  );
 }
 
 export function heal<E extends Enemy>(

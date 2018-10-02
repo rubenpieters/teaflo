@@ -235,17 +235,12 @@ function addToSolution(
     board.availableCards[index].limit -= 1;
   }
   // add user input to card
-  const afterInputEffects: EntityEffect[] = [];
+  const inputs: any[] = [];
   for (const effect of card.effects) {
-    const afterInputEffect: EntityEffect = onAbilityClick(board, effect.inputs, [], cb1(effect))();
-    afterInputEffects.push(afterInputEffect);
-  }
-  const afterUserInput = {
-    ...card,
-    effects: afterInputEffects,
-  };
+    getUserInputs(board, effect.inputs, inputs);
+  }  
 
-  switch (afterUserInput.tag) {
+  switch (card.tag) {
     case "crew":
     case "enemy":
     case "item":
@@ -253,12 +248,12 @@ function addToSolution(
       if (board.solution.paths.length === 0) {
         return "noPaths";
       } else {
-        board.solution.paths[board.solution.paths.length - 1].eventCards.push(afterUserInput);
+        board.solution.paths[board.solution.paths.length - 1].eventCards.push({ event: card, inputs });
       }
       break;
     }
     case "rest": {
-      board.solution.paths.push({ restCard: afterUserInput, eventCards: [] });
+      board.solution.paths.push({ restCard: card, eventCards: [] });
       break;
     }
   }
@@ -293,9 +288,9 @@ function removeRestFromSolution(
   pathIndex: number,
 ) {
   for (const card of board.solution.paths[pathIndex].eventCards) {
-    if (card.origin.tag !== "EntityOrigin") {
+    if (card.event.origin.tag !== "EntityOrigin") {
       const index = board.availableCards.findIndex(c =>
-        (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
+        (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.event.origin).cardId);
       board.availableCards[index].limit += 1;
     }
   }
@@ -346,7 +341,7 @@ function mkSolution(
       /*sprite.events.onInputOver.add(() => {
         nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
       });*/
-      sprite.events.onInputDown.add(onSolutionEventCardClick(board, card, pathIndex, cardIndex));
+      sprite.events.onInputDown.add(onSolutionEventCardClick(board, card.event, pathIndex, cardIndex));
       sprites.push(sprite);
 
       y -= 25;
@@ -467,13 +462,12 @@ function mkState(
       sprite.inputEnabled = true;
       sprite.events.onInputOver.add(() => showAbility(board, ability));
       const cb = (id: number) => {
-        return (inputs: any[]) => {
-          const card = createCard(ability.effect({ inputs, state: board.lastState!, selfId: { tag: "PositionId", id, type: "ally"}}).action, id, "ally");
-          return addToSolution(board, card);
-        }
+        const inputs = getUserInputs(board, ability.inputs, []);
+        const card = createCard(ability.effect({ inputs, state: board.lastState!, selfId: { tag: "PositionId", id, type: "ally"}}).action, id, "ally");
+        return addToSolution(board, card);
       };
       // capture allyId in new scope
-      sprite.events.onInputDown.add(onAbilityClick(board, ability.inputs, [], cb(allyId)));
+      sprite.events.onInputDown.add(() => cb(allyId));
       sprites.push(sprite);
       i += 1;
     }
@@ -522,33 +516,30 @@ function mkState(
   board.graphics.stateGfx = sprites;
 }
 
-function onAbilityClick<A>(
+function getUserInputs(
   board: Board,
   toHandleInputs: InputType[],
   currentInputs: any[],
-  cb: (inputs: any[]) => A,
-): () => A {
-  return function(): A {
-    if (toHandleInputs.length === 0) {
-      return cb(currentInputs);
-    } else {
-      const currentInputType = toHandleInputs[0];
-      const tail = toHandleInputs.slice(1);
-      switch (currentInputType.tag) {
-        case "TargetInput": {
-          throw "TODO";
+): any[] {
+  if (toHandleInputs.length === 0) {
+    return currentInputs;
+  } else {
+    const currentInputType = toHandleInputs[0];
+    const tail = toHandleInputs.slice(1);
+    switch (currentInputType.tag) {
+      case "TargetInput": {
+        throw "TODO";
+      }
+      case "NumberInput": {
+        let input = prompt("Enter Number");
+        if (input === null) {
+          input = "0";
         }
-        case "NumberInput": {
-          let input = prompt("Enter Number");
-          if (input === null) {
-            input = "0";
-          }
-          const inputParsed = parseInt(input);
-          return onAbilityClick(board, tail, currentInputs.concat(inputParsed), cb)();
-        }
-        default: {
-          throw "onAbilityClick: impossible";
-        }
+        const inputParsed = parseInt(input);
+        return getUserInputs(board, tail, currentInputs.concat(inputParsed));
+      }
+      default: {
+        throw "onAbilityClick: impossible";
       }
     }
   }
@@ -636,7 +627,7 @@ function showEntityStatus(
   const infoTexts: Phaser.Text[] = [];
 
   for (const statusType of allStatus) {
-    const status = hasStatus[statusType];
+    const status = hasStatus.status[statusType];
     if (status !== undefined) {
       const fontSize = 15;
       const enemyActionText: Phaser.Text = board.game.add.text(0, 0, showStatus(status), {

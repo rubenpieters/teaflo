@@ -3,7 +3,11 @@ import { Solution, runSolution, SolCard, SolEvent, SolRest, SolutionResult } fro
 import { Event, Rest } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
 
-export function addToSolution(card: SolCard, solution: Solution): { solution: Solution, result: SolutionResult } {
+export function addToSolution(
+  card: SolCard, 
+  solution: Solution,
+  inputs: any[],
+): { solution: Solution, result: SolutionResult } {
   switch (card.tag) {
     case "crew":
     case "enemy":
@@ -12,7 +16,7 @@ export function addToSolution(card: SolCard, solution: Solution): { solution: So
       if (solution.paths.length === 0) {
         throw "no paths created yet";
       } else {
-        solution = focus(solution, over(x => x.paths[solution.paths.length - 1].eventCards, x => x.concat(card)));
+        solution = focus(solution, over(x => x.paths[solution.paths.length - 1].eventCards, x => x.concat({ event: card, inputs})));
       }
       break;
     }
@@ -34,6 +38,7 @@ export function fSt(st: GameState | "invalid"): GameState {
   }
 }
 
+/*
 export function passNoInputsE(card: Event): SolEvent {
   return {
     ...card,
@@ -47,3 +52,4 @@ export function passNoInputsR(card: Rest): SolRest {
     effects: card.effects.map(x => { return {...x, effect: x.effect([])}; }),
   }
 }
+*/

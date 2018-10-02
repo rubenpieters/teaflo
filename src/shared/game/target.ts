@@ -1,10 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, Id, IdCrew, IdEnemy, IdItem } from "src/shared/game/state";
+import { GameState, Id, IdCrew, IdEnemy, IdItem, CreatureId } from "src/shared/game/state";
 
-export type Origin = {
-  id: number,
-  type: TargetType,
-} | "noOrigin";
+export type Origin = CreatureId | "noOrigin";
 
 export function typeColl(
   state: GameState,

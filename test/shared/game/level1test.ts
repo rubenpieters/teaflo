@@ -5,9 +5,8 @@ import { showSolutionLog } from "src/shared/game/log";
 import { createCard } from "src/shared/game/ability";
 import { IdCrew, GameState, CreatureId } from "src/shared/game/state";
 import { TargetType } from "src/shared/game/target";
-import { passNoInputsR, passNoInputsE } from "./general";
-import { onAllAlly } from "src/shared/data/crew";
 
+/*
 function test1() {
   const guardAction: Card = 
   {
@@ -70,4 +69,4 @@ function test1() {
   }
 }
 
-test1();
+test1();*/

@@ -383,9 +383,12 @@ function applyAction(
       );
       // create threat
       // TODO: invoke AddThreat action?
+      console.log(`${JSON.stringify(action.target)}`);
+      console.log(`${JSON.stringify(origin)}`);
       if (origin !== "noOrigin" && origin.type === "ally" && action.target.type === "enemy") {
+        const originPosition = toPositionId(state, origin).id;
         state = focus(state,
-          over(x => x.crew[origin.id], x => _Crew.addThreat(state, x, action.value, action.target)),
+          over(x => x.crew[originPosition], x => _Crew.addThreat(state, x, action.value, action.target)),
         );
       }
       break;

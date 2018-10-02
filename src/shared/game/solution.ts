@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { CardOrigin } from "src/shared/game/card";
 import { Action, applyActionAndTriggers, enemyTurn, checkDeaths, checkStatusCrew, checkStatusEnemy, applyActionQueue, ActionSpec } from "src/shared/game/action";
-import { GameState, initialState } from "src/shared/game/state";
+import { GameState, initialState, CreatureId } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
 import { EntityEffect } from "./ability";
@@ -25,7 +25,7 @@ export type SolCard = SolEvent | SolRest;
 
 export type Path = {
   restCard: SolRest,
-  eventCards: SolEvent[],
+  eventCards: { event: SolEvent, inputs: any[] }[],
 };
 
 export type Solution = {
@@ -47,15 +47,15 @@ export const initialIndex: SolutionIndex = {
 function nextAction(
   index: SolutionIndex,
   solution: Solution
-): { action: EntityEffect, origin: CardOrigin } {
+): { action: EntityEffect, origin: CardOrigin, inputs: any[] } {
   const path: Path | undefined = solution.paths[index.path];
   if (path === undefined) {
     throw ("invalid index: " + JSON.stringify(index));
   }
   if (index.card === "rest") {
-    return { action: path.restCard.effects[index.action], origin: path.restCard.origin };
+    return { action: path.restCard.effects[index.action], origin: path.restCard.origin, inputs: [] };
   }
-  const card: SolCard | undefined = path.eventCards[index.card];
+  const card: SolCard | undefined = path.eventCards[index.card].event;
   if (card === undefined) {
     throw ("invalid index: " + JSON.stringify(index));
   }
@@ -63,7 +63,7 @@ function nextAction(
   if (action === undefined) {
     throw ("invalid index " + JSON.stringify(index));
   }
-  return { action, origin: card.origin };
+  return { action, origin: card.origin, inputs: path.eventCards[index.card].inputs };
 }
 
 export function nextIndex(
@@ -87,7 +87,7 @@ export function nextIndex(
 
   if (
     newCard < solution.paths[newPath].eventCards.length &&
-    newAction < solution.paths[newPath].eventCards[newCard].effects.length
+    newAction < solution.paths[newPath].eventCards[newCard].event.effects.length
   ) {
     return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
   }
@@ -97,7 +97,7 @@ export function nextIndex(
 
   if (
     newCard < solution.paths[newPath].eventCards.length &&
-    newAction < solution.paths[newPath].eventCards[newCard].effects.length
+    newAction < solution.paths[newPath].eventCards[newCard].event.effects.length
   ) {
     return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
   }
@@ -119,7 +119,7 @@ function solutionStep(
   solution: Solution,
   idGen: Generator,
 ): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
-  const { action, origin } = nextAction(index, solution);
+  const { action, origin, inputs } = nextAction(index, solution);
 
   let actionEffect: Action = <any>undefined;
   let actionOrigin: Origin = <any>undefined;
@@ -130,11 +130,11 @@ function solutionStep(
         actionEffect = action.effect({ state }).action;
         actionOrigin = "noOrigin";
       } else {
-        actionEffect = action.effect({ state, selfId: { tag: "GlobalId", id: origin.entityId, type: origin.entityType }}).action;
-        actionOrigin = {
-          type: origin.entityType,
-          id: origin.entityId,
-        };
+        const gid: CreatureId = { tag: "GlobalId", id: origin.entityId, type: origin.entityType };
+        actionEffect = action.effect(
+          { state, selfId: gid, inputs}
+        ).action;
+        actionOrigin = gid;
       }
       break;
     }
@@ -145,7 +145,10 @@ function solutionStep(
     }
   }
 
-  let log: ActionLog = { action: action.effect({ state }).action, crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: [] };
+  let log: ActionLog = {
+    action: action.effect({ state }).action,
+    crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: []
+  };
 
   const afterCrewStatus = checkStatusCrew(state, idGen);
   log = focus(log, set(x => x.crewStatus, afterCrewStatus.log));
