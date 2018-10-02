@@ -21,6 +21,7 @@ export type Enemy = {
   maxHp: number,
   actions: EnemyEffect[],
   triggers: TriggerEntityEffect[],
+  charges: number,
 };
 
 export function damage<E extends Enemy & HasStatus>(

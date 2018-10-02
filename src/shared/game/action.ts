@@ -212,7 +212,32 @@ export function applyActionAndTriggers(
   idGen: Generator,
   origin: Origin,
 ): { state: GameState | "invalid", log: Action[] } {
-  return applyActionAndTriggersAt(action, state, log, { id: 0, type: "enemy" }, idGen, origin);
+  let i = 0;
+  for (const enemy of state.enemies) {
+    const afterStatus = _Status.checkStatus(
+      action, enemy, state, { tag: "PositionId", type: "enemy", id: i }, log, idGen, origin
+    );
+    if (afterStatus.state === "invalid") {
+      return afterStatus;
+    }
+    state = afterStatus.state;
+    log = afterStatus.log;
+    i += 1;
+  }
+  i = 0;
+  for (const ally of state.crew) {
+    const afterStatus = _Status.checkStatus(
+      action, ally, state, { tag: "PositionId", type: "ally", id: i }, log, idGen, origin
+    );
+    if (afterStatus.state === "invalid") {
+      return afterStatus;
+    }
+    state = afterStatus.state;
+    log = afterStatus.log;
+    i += 1;
+  }
+  const afterApply = applyAction(action, state, origin, log, idGen);
+  return afterApply;
 }
 
 function applyActionAndTriggersAt(
@@ -383,8 +408,6 @@ function applyAction(
       );
       // create threat
       // TODO: invoke AddThreat action?
-      console.log(`${JSON.stringify(action.target)}`);
-      console.log(`${JSON.stringify(origin)}`);
       if (origin !== "noOrigin" && origin.type === "ally" && action.target.type === "enemy") {
         const originPosition = toPositionId(state, origin).id;
         state = focus(state,
@@ -549,16 +572,22 @@ function applyAction(
       break;
     }
     case "ChargeUse": {
-      if (action.target.type !== "ally") {
-        throw `wrong target type for ${action.tag}`
-      }
-      const targetPosition = toPositionId(state, action.target).id;
-      if (state.crew[targetPosition].charges < action.value) {
-        return { state: "invalid", log };
+      if (action.target.type === "enemy") {
+        const targetPosition = toPositionId(state, action.target).id;
+        if (state.enemies[targetPosition].charges < action.value) {
+          return { state: "invalid", log };
+        }
+      } else if (action.target.type === "ally") {
+        const targetPosition = toPositionId(state, action.target).id;
+        if (state.crew[targetPosition].charges < action.value) {
+          return { state: "invalid", log };
+        }
+      } else {
+        throw `wrong target type (${action.target.type}) for ${action.tag}`
       }
       state = onCreature(action.target, state,
         ally => _Crew.useCharge(ally, action.value),
-        _ => { throw `wrong target type for '${action.tag}`; },
+        enemy => _Crew.useCharge(enemy, action.value),
       );
       break;
     }

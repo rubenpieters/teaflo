@@ -77,7 +77,7 @@ export function addThreat<E extends Crew>(
   }
 }
 
-export function useCharge<E extends Crew>(
+export function useCharge<E extends { charges: number }>(
   crew: E,
   chargeUse: number,
 ): E {

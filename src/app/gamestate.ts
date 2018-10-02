@@ -768,6 +768,17 @@ function showEnemy(
   infoTexts.push(enemyActionText);
 
   y += 40;
+  const chargesText: Phaser.Text = board.game.add.text(0, 0, `Charges: ${enemy.charges}`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  chargesText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(chargesText);
+
+  y += 40;
   const actionText: Phaser.Text = board.game.add.text(0, 0, `Actions`, {
     font: "Arial",
     fontSize: fontSize,

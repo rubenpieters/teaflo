@@ -147,18 +147,10 @@ function solutionStep(
 
   let log: ActionLog = {
     action: action.effect({ state }).action,
-    crewStatus: [], crewAction: [], queue1: [], enemyStatus: [], enemyAction: [], queue2: [], deaths: []
+    startTurn: [], crewAction: [], queue1: [], enemyAction: [], queue2: [], deaths: []
   };
 
-  const afterCrewStatus = checkStatusCrew(state, idGen);
-  log = focus(log, set(x => x.crewStatus, afterCrewStatus.log));
-  if (afterCrewStatus.state === "invalid") {
-    return { result: "invalid", log };
-  }
-  state = afterCrewStatus.state;
-
-  // TODO: add crew auto-actions?
-
+  // Apply Turn Action
   let actionResult: { state: GameState | "invalid", log: Action[] } =
     applyActionAndTriggers(actionEffect, state, [], idGen, actionOrigin);
   
@@ -176,12 +168,16 @@ function solutionStep(
   }
   state = afterQueue1.state;
 
-  const afterEnemyStatus = checkStatusEnemy(state, idGen);
-  log = focus(log, set(x => x.enemyStatus, afterEnemyStatus.log));
-  if (afterEnemyStatus.state === "invalid") {
+  // Apply StartTurn effect
+  let aferStartTurn: { state: GameState | "invalid", log: Action[] } =
+    applyActionAndTriggers({ tag: "StartTurn" }, state, [], idGen, "noOrigin");
+  log = focus(log, set(x => x.startTurn, aferStartTurn.log));
+  if (aferStartTurn.state === "invalid") {
     return { result: "invalid", log };
   }
-  state = afterEnemyStatus.state;
+  state = aferStartTurn.state;
+
+  // TODO: add crew auto-actions?
 
   const afterEnemy = enemyTurn(state, [], idGen);
   log = focus(log, set(x => x.enemyAction, afterEnemy.log));

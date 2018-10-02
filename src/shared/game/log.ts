@@ -19,10 +19,9 @@ export function showSolutionLog(solutionLog: SolutionLog): string {
 
 export type ActionLog = {
   action: Action,
-  crewStatus: StatusLog[],
+  startTurn: Action[],
   crewAction: Action[],
   queue1: Action[],
-  enemyStatus: StatusLog[],
   enemyAction: Action[],
   queue2: Action[],
   deaths: Action[], // TODO: incorporate into queue2
@@ -36,14 +35,12 @@ export type StatusLog = {
 
 function showActionLog(actionLog: ActionLog): string {
   return "** " + showAction(actionLog.action) + " **\n"
-    + "crew status\n"
-    + showStatusLog(actionLog.crewStatus) + "\n"
+    + "start turn\n"
+    + actionLog.startTurn.map(a => " - " + showAction(a)).join("\n") + "\n"
     + "crew action\n"
     + actionLog.crewAction.map(a => " - " + showAction(a)).join("\n") + "\n"
     + "queue1\n"
     + actionLog.queue1.map(a => " - " + showAction(a)).join("\n") + "\n"
-    + "enemy status\n"
-    + showStatusLog(actionLog.enemyStatus) + "\n"
     + "enemy action\n"
     + actionLog.enemyAction.map(a => " - " + showAction(a)).join("\n") + "\n"
     + "queue2\n"

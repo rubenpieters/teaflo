@@ -170,6 +170,7 @@ export function applyStatus<E extends HasStatus>(
   return e;
 }
 
+// TODO: implement difference between before/instead/after triggers
 export function checkStatus<E extends HasStatus & { charges: number }>(
   trigger: Action,
   e: E,
@@ -178,12 +179,15 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
   log: Action[],
   idGen: Generator,
   origin: Origin,
-) {
+): { state: GameState | "invalid", log: Action[] } {
   for (const tag of allStatus) {
-    const status = e.status[tag]
+    const status = e.status[tag];
     if (status !== undefined) {
       const effect = statusToTrigger(status).effect({ state, selfId, trigger });
-      if (effect.chargeUse > e.charges) {
+      if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
+        // skip noop/0 charge to prevent infinite loop
+      } else if (effect.chargeUse <= e.charges) {
+        console.log(`${JSON.stringify(effect)}`);
         const result = applyActionAndTriggers({
           tag: "CombinedAction",
           actions: [
