@@ -39,6 +39,7 @@ export type Action
   | AddInstance
   | AddThreat
   | StartTurn
+  | LoseFragment
   ;
 
 export type Damage = {
@@ -164,6 +165,12 @@ export type AddThreat = {
 
 export type StartTurn = {
   tag: "StartTurn",
+};
+
+export type LoseFragment = {
+  tag: "LoseFragment",
+  target: CreatureId,
+  type: Status["tag"],
 };
 
 export function enemyTurn(
@@ -595,6 +602,13 @@ function applyAction(
       state = onCreature(action.target, state,
         ally => _Crew.addThreat(state, ally, action.value, action.enemyId),
         _ => { throw `wrong target type for '${action.tag}`; },
+      );
+      break;
+    }
+    case "LoseFragment": {
+      state = onCreature(action.target, state,
+        ally => _Status.loseFragments(ally, action.type),
+        enemy => _Status.loseFragments(enemy, action.type),
       );
       break;
     }

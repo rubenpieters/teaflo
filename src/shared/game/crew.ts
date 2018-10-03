@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, IdCrew, CreatureId, toGlobalId } from "src/shared/game/state";
 import { Action, ActionSpec, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
-import { HasStatus, Guard } from "src/shared/game/status";
+import { HasStatus, Guard, Status } from "src/shared/game/status";
 import { InputType } from "src/shared/game/input";
 import { InputEntityEffect, EntityEffect, TriggerEntityEffect } from "src/shared/game/ability";
 
@@ -31,6 +31,7 @@ export type Crew = {
   abilities: InputEntityEffect[],
   threatMap: ThreatMap,
   charges: number,
+  fragmentLoss: { [key in Status["tag"]]?: number },
 };
 
 export function damage<E extends Crew & HasStatus>(

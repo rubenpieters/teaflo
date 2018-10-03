@@ -20,6 +20,7 @@ export function showSolutionLog(solutionLog: SolutionLog): string {
 export type ActionLog = {
   action: Action,
   startTurn: Action[],
+  loseFragment: Action[],
   crewAction: Action[],
   queue1: Action[],
   enemyAction: Action[],
@@ -126,6 +127,9 @@ function showAction(action: Action): string {
     }
     case "StartTurn": {
       return `StartTurn`;
+    }
+    case "LoseFragment": {
+      return `LoseFragment ${action.type} ${showId(action.target)}`;
     }
     case "Invalid": {
       return `Invalid`;

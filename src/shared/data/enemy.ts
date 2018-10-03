@@ -17,6 +17,9 @@ export const dummy: Enemy = {
   triggers: [
   ],
   charges: 20,
+  fragmentLoss: {
+    Poison: 1,
+  },
 };
 
 /*

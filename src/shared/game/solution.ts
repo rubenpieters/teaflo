@@ -6,6 +6,7 @@ import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
 import { EntityEffect } from "./ability";
 import { Origin } from "./target";
+import { applyLoseFragmentPhase } from "./status";
 
 export type SolEvent = {
   tag: "crew" | "enemy" | "item" | "general",
@@ -147,7 +148,7 @@ function solutionStep(
 
   let log: ActionLog = {
     action: action.effect({ state }).action,
-    startTurn: [], crewAction: [], queue1: [], enemyAction: [], queue2: [], deaths: []
+    startTurn: [], loseFragment: [], crewAction: [], queue1: [], enemyAction: [], queue2: [], deaths: []
   };
 
   // Apply Turn Action
@@ -176,6 +177,14 @@ function solutionStep(
     return { result: "invalid", log };
   }
   state = aferStartTurn.state;
+
+  // Lose Fragment Phase
+  const afterLoseFragment = applyLoseFragmentPhase(state, [], idGen, "noOrigin");
+  log = focus(log, set(x => x.loseFragment, afterLoseFragment.log));
+  if (afterLoseFragment.state === "invalid") {
+    return { result: "invalid", log };
+  }
+  state = afterLoseFragment.state;
 
   // TODO: add crew auto-actions?
 

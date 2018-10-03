@@ -29,6 +29,7 @@ export const dmgPoison: Crew = {
   ],
   threatMap: {},
   charges: 5,
+  fragmentLoss: {},
 };
 
 export const tank_01: Crew = {
@@ -60,6 +61,7 @@ export const tank_01: Crew = {
   ],
   threatMap: {},
   charges: 5,
+  fragmentLoss: {},
 };
 
 export const dmg_01: Crew = {
@@ -80,6 +82,7 @@ export const dmg_01: Crew = {
   ],
   threatMap: {},
   charges: 5,
+  fragmentLoss: {},
 };
 
 export const util_01: Crew = {
@@ -106,4 +109,5 @@ export const util_01: Crew = {
   ],
   threatMap: {},
   charges: 5,
+  fragmentLoss: {},
 };

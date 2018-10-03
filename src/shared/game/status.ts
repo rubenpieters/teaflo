@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Origin, TargetType, typeColl } from "src/shared/game/target";
 import { findIndex } from "src/shared/game/trigger";
-import { GameState, CreatureId } from "src/shared/game/state";
+import { GameState, CreatureId, toPositionId, Id } from "src/shared/game/state";
 import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies } from "src/shared/game/effectvar";
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
@@ -102,6 +102,7 @@ type DiscrStatus<T extends Status["tag"]> = Extract<Status, {tag: T}>
 
 export type HasStatus = {
   status: { [key in Status["tag"]]?: DiscrStatus<key> }
+  fragmentLoss: { [key in Status["tag"]]?: number }
 };
 
 export function addStatus<E extends HasStatus>(
@@ -137,6 +138,84 @@ export function addStatus<E extends HasStatus>(
   }
 
   return result;
+}
+
+export function loseFragments<E extends HasStatus & Id>(
+  e: E,
+  tag: Status["tag"],
+): E {
+  const status = e.status[tag];
+  if (status !== undefined) {
+    const loss = e.fragmentLoss[tag] === undefined ? 0 : <number>e.fragmentLoss[tag];
+    const fragmentValue = 100 * status.value + status.fragment;
+    if (fragmentValue > loss) {
+      const newFragmentValue = fragmentValue - loss;
+      const newFragment = newFragmentValue % 100;
+      const newStatus = Math.floor(newFragmentValue / 100);
+      e = focus(e,
+        set(x => x.status[tag]!.value, newStatus),
+        set(x => x.status[tag]!.fragment, newFragment),
+      );
+    } else {
+      e = focus(e,
+        set(x => x.status[tag], undefined),
+      );
+    }
+  }
+  return e;
+}
+
+export function applyLoseFragmentPhase(
+  state: GameState,
+  log: Action[],
+  idGen: Generator,
+  origin: Origin,
+): { state: GameState | "invalid", log: Action[] } {
+  let i = 0;
+  for (const _enemy of state.enemies) {
+    const afterStatus = applyLoseFragments(
+      { tag: "PositionId", type: "enemy", id: i }, state, log, idGen, origin
+    );
+    if (afterStatus.state === "invalid") {
+      return afterStatus;
+    }
+    state = afterStatus.state;
+    log = afterStatus.log;
+    i += 1;
+  }
+  i = 0;
+  for (const _ally of state.crew) {
+    const afterStatus = applyLoseFragments(
+      { tag: "PositionId", type: "ally", id: i }, state, log, idGen, origin
+    );
+    if (afterStatus.state === "invalid") {
+      return afterStatus;
+    }
+    state = afterStatus.state;
+    log = afterStatus.log;
+    i += 1;
+  }
+  return { state, log };
+}
+
+export function applyLoseFragments<E extends HasStatus & Id>(
+  id: CreatureId,
+  state: GameState,
+  log: Action[],
+  idGen: Generator,
+  origin: Origin,
+): { state: GameState | "invalid", log: Action[] } {
+  for (const tag of allStatus) {
+    if (status !== undefined) {
+      const result = applyActionAndTriggers({ tag: "LoseFragment", target: id, type: tag }, state, log, idGen, origin);
+      if (result.state === "invalid") {
+        return { state: "invalid", log: result.log };
+      }
+      state = result.state;
+      log = result.log;
+    }
+  }
+  return { state, log };
 }
 
 export function clearStatus<E extends HasStatus>(
