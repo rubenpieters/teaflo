@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Origin, TargetType, typeColl } from "src/shared/game/target";
 import { findIndex } from "src/shared/game/trigger";
-import { GameState, CreatureId, toPositionId, Id } from "src/shared/game/state";
+import { GameState, CreatureId, toPositionId, Id, findEntity } from "src/shared/game/state";
 import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies } from "src/shared/game/effectvar";
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
@@ -206,7 +206,8 @@ export function applyLoseFragments<E extends HasStatus & Id>(
   origin: Origin,
 ): { state: GameState | "invalid", log: Action[] } {
   for (const tag of allStatus) {
-    if (status !== undefined) {
+    const e = findEntity(state, id);
+    if (e.status[tag] !== undefined) {
       const result = applyActionAndTriggers({ tag: "LoseFragment", target: id, type: tag }, state, log, idGen, origin);
       if (result.state === "invalid") {
         return { state: "invalid", log: result.log };
