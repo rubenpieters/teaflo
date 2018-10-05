@@ -267,7 +267,6 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
       if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
         // skip noop/0 charge to prevent infinite loop
       } else if (effect.chargeUse <= e.charges) {
-        console.log(`${JSON.stringify(effect)}`);
         const result = applyActionAndTriggers({
           tag: "CombinedAction",
           actions: [

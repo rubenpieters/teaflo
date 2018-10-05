@@ -1,7 +1,7 @@
 import { Solution, runSolutionAll, SolCard, SolRest, SolEvent } from "src/shared/game/solution";
 import { Card, Rest, Event, PlayerOrigin } from "src/shared/game/card";
 import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
-import { createCard, InputEntityEffect, EntityEffect } from "src/shared/game/ability";
+import { InputEntityEffect, EntityEffect, solCardFromAbility } from "src/shared/game/ability";
 import { Action } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
 import { HasStatus, allStatus, showStatus } from "src/shared/game/status";
@@ -226,7 +226,7 @@ function addToSolution(
   board: Board,
   card: Card,
 ) {
-  if (card.origin.tag !== "EntityOrigin") {
+  if (card.origin.tag === "PlayerOrigin") {
     const index = board.availableCards.findIndex(c =>
       (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
     if (board.availableCards[index].limit <= 0) {
@@ -235,11 +235,12 @@ function addToSolution(
     board.availableCards[index].limit -= 1;
   }
   // add user input to card
-  const inputs: any[] = [];
+  let inputs: any[] = [];
   for (const effect of card.effects) {
-    getUserInputs(board, effect.inputs, inputs);
-  }  
+    inputs = getUserInputs(board, effect.inputs, inputs);
+  }
 
+  // TODO: unify with function from general.ts
   switch (card.tag) {
     case "crew":
     case "enemy":
@@ -273,7 +274,7 @@ function removeEventFromSolution(
     board.solution.paths[pathIndex].eventCards.slice(0, eventIndex).concat(
       board.solution.paths[pathIndex].eventCards.slice(eventIndex + 1, board.solution.paths[pathIndex].eventCards.length)
     );
-  if (card.origin.tag !== "EntityOrigin") {
+  if (card.origin.tag === "PlayerOrigin") {
     const index = board.availableCards.findIndex(c =>
       (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
     board.availableCards[index].limit += 1;
@@ -288,7 +289,7 @@ function removeRestFromSolution(
   pathIndex: number,
 ) {
   for (const card of board.solution.paths[pathIndex].eventCards) {
-    if (card.event.origin.tag !== "EntityOrigin") {
+    if (card.event.origin.tag === "PlayerOrigin") {
       const index = board.availableCards.findIndex(c =>
         (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.event.origin).cardId);
       board.availableCards[index].limit += 1;
@@ -427,6 +428,18 @@ function clearState(
   }
 }
 
+
+function useAbilityCb(
+  board: Board,
+  ability: InputEntityEffect,
+  id: number,
+) {
+  return function() {
+    const card = solCardFromAbility(ability, { tag: "PositionId", id, type: "ally"});
+    return addToSolution(board, card); 
+  }
+}
+
 function mkState(
   board: Board,
   gs: GameState
@@ -461,13 +474,8 @@ function mkState(
       sprite.endFill();
       sprite.inputEnabled = true;
       sprite.events.onInputOver.add(() => showAbility(board, ability));
-      const cb = (id: number) => {
-        const inputs = getUserInputs(board, ability.inputs, []);
-        const card = createCard(ability.effect({ inputs, state: board.lastState!, selfId: { tag: "PositionId", id, type: "ally"}}).action, id, "ally");
-        return addToSolution(board, card);
-      };
       // capture allyId in new scope
-      sprite.events.onInputDown.add(() => cb(allyId));
+      sprite.events.onInputDown.add(useAbilityCb(board, ability, allyId));
       sprites.push(sprite);
       i += 1;
     }
@@ -539,7 +547,7 @@ function getUserInputs(
         return getUserInputs(board, tail, currentInputs.concat(inputParsed));
       }
       default: {
-        throw "onAbilityClick: impossible";
+        throw "getUserInputs: impossible";
       }
     }
   }

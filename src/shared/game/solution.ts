@@ -125,18 +125,12 @@ function solutionStep(
   let actionEffect: Action = <any>undefined;
   let actionOrigin: Origin = <any>undefined;
   switch (origin.tag) {
-    case "EntityOrigin": {
-      if (origin.entityType === "item") {
-        // items execute actions as if they have PlayerOrigin
-        actionEffect = action.effect({ state }).action;
-        actionOrigin = "noOrigin";
-      } else {
-        const gid: CreatureId = { tag: "GlobalId", id: origin.entityId, type: origin.entityType };
-        actionEffect = action.effect(
-          { state, selfId: gid, inputs}
-        ).action;
-        actionOrigin = gid;
-      }
+    case "PositionId":
+    case "GlobalId": {
+      actionEffect = action.effect(
+        { state, selfId: origin, inputs }
+      ).action;
+      actionOrigin = origin;
       break;
     }
     case "PlayerOrigin": {
@@ -147,7 +141,7 @@ function solutionStep(
   }
 
   let log: ActionLog = {
-    action: action.effect({ state }).action,
+    action: actionEffect,
     startTurn: [], loseFragment: [], crewAction: [], queue1: [], enemyAction: [], queue2: [], deaths: []
   };
 

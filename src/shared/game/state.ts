@@ -103,7 +103,7 @@ function findE<E extends Id>(coll: E[], id: EntityId): E {
     case "GlobalId": {
       const e: E | undefined = coll.find(x => x.id === id.id);
       if (e === undefined) {
-        throw `not found ${id}`;
+        throw `findE: not found ${JSON.stringify(id)}`;
       }
       return e;
     }
@@ -165,7 +165,7 @@ function findI<E extends Id>(coll: E[], id: EntityId): number {
     case "GlobalId": {
       const e: number = coll.findIndex(x => x.id === id.id);
       if (e === -1) {
-        throw `not found ${id}`;
+        throw `findI: not found ${JSON.stringify(id)}`;
       }
       return e;
     }

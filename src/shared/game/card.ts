@@ -1,5 +1,6 @@
 import { TargetType } from "src/shared/game/target";
 import { InputEntityEffect } from "src/shared/game/ability";
+import { CreatureId } from "./state";
 
 export function showCard(card: Card) {
   //return { ...card, actions: card.actions.map(showAction) };
@@ -18,7 +19,7 @@ export type EntityOrigin = {
 
 export type CardOrigin
   = PlayerOrigin
-  | EntityOrigin
+  | CreatureId
   ;
 
 export type Event = {

@@ -2,6 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Solution, runSolution, SolCard, SolEvent, SolRest, SolutionResult } from "src/shared/game/solution";
 import { Event, Rest } from "src/shared/game/card";
 import { GameState } from "src/shared/game/state";
+import { solCardFromAbility } from "src/shared/game/ability";
 
 export function addToSolution(
   card: SolCard, 
@@ -27,6 +28,15 @@ export function addToSolution(
   }
 
   return { solution, result: runSolution(solution) };
+}
+
+export function useAbility(
+  state: GameState | "invalid",
+  allyId: number,
+  abilityId: number,
+) {
+  return solCardFromAbility(
+    fSt(state).crew[allyId].abilities[abilityId], { tag: "PositionId", id: allyId, type: "ally" });
 }
 
 export function fSt(st: GameState | "invalid"): GameState {

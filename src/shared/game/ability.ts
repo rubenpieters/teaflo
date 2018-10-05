@@ -8,49 +8,17 @@ import { Next } from "src/shared/game/next";
 import { SolCard } from "src/shared/game/solution";
 import { Context } from "./effectvar";
 
-// TODO: check with gamestate.ts whether given input is self global id or self position index
-// (it seems to be position index)
-
-export function createCard(
-  action: Action,
-  selfId: number,
-  selfType: TargetType,
+export function solCardFromAbility(
+  effect: InputEntityEffect,
+  id: CreatureId,
 ): Card {
   return {
     name: "-- created --",
     effects: [
-      { effect: (_obj) => { return { action }; },
-        inputs: [],
-        description: "-- created --",
-      },
+      effect
     ],
     tag: "general",
-    origin: {
-      tag: "EntityOrigin", 
-      entityId: selfId,
-      entityType: selfType,
-    }
-  };
-}
-
-export function createSolCard(
-  action: Action,
-  selfId: number,
-  selfType: TargetType,
-): SolCard {
-  return {
-    name: "-- created --",
-    effects: [
-      { effect: (_obj) => { return { action }; },
-        description: "-- created --",
-      },
-    ],
-    tag: "general",
-    origin: {
-      tag: "EntityOrigin", 
-      entityId: selfId,
-      entityType: selfType,
-    }
+    origin: id,
   };
 }
 
