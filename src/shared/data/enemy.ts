@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, CreatureId, toPositionId } from "src/shared/game/state";
 import { Next } from "src/shared/game/next";
 import { Enemy } from "src/shared/game/enemy";
-import { queueStatus, evAllyPositions, evStatic, extra, noop } from "src/shared/game/effectvar";
+import { queueStatus, evAllyPositions, evStatic, extra, noop, damage } from "src/shared/game/effectvar";
 import { Poison } from "src/shared/game/status";
 
 
@@ -12,6 +12,25 @@ export const dummy: Enemy = {
   maxHp: 1000,
   actions: [
     extra(noop(), { next: <Next>{ tag: "NextId" }}),
+    // damageHighestThreat(1, _ => { return { tag: "NextId" }}),
+  ],
+  triggers: [
+  ],
+  charges: 20,
+  fragmentLoss: {
+    Poison: 1,
+  },
+};
+
+export const dummyDmg1: Enemy = {
+  ap: 1,
+  hp: 1000,
+  maxHp: 1000,
+  actions: [
+    extra(
+      damage(evStatic(<CreatureId>{ tag: "PositionId", id: 0, type: "ally"}), evStatic(1), evStatic(false)),
+      { next: <Next>{ tag: "NextId" }}
+    ),
     // damageHighestThreat(1, _ => { return { tag: "NextId" }}),
   ],
   triggers: [

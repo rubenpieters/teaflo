@@ -291,9 +291,18 @@ function statusToTrigger(
   switch (status.tag) {
     case "Poison": {
       return evTrigger(trigger => evCondition(trigger,
-        x => x.tag === "StartTurn",
-        extra(damage(evSelf, evStatic(status.value), evStatic(false)), { chargeUse: 0 }),
-        extra(noop(), { chargeUse: 0 }),
+          x => x.tag === "StartTurn",
+          extra(damage(evSelf, evStatic(status.value), evStatic(false)), { chargeUse: 0 }),
+          extra(noop(), { chargeUse: 0 }),
+        ),
+        "before",
+      );
+    }
+    case "Guard": {
+      return evTrigger(trigger => evCondition(trigger,
+          x => x.tag === "Damage", // and target is self
+          extra(noop(), { chargeUse: 0 }),
+          extra(noop(), { chargeUse: 0 }),
         ),
         "before",
       );

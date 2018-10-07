@@ -64,6 +64,33 @@ export const tank_01: Crew = {
   fragmentLoss: {},
 };
 
+export const tank_02: Crew = {
+  ap: 1,
+  hp: 100,
+  maxHp: 100,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    noop(),
+  ],
+  abilities: [
+    noTarget(evAnd(
+      queueStatus(evSelf, evStatic(<Guard>{
+        tag: "Guard",
+        value: 1,
+        guard: 10,
+        fragment: 0,
+      })),
+      evEnemies(enemy => addThreat(evSelf, evStatic(10), enemy)),
+    )),
+    // ability2: gain barrier
+  ],
+  threatMap: {},
+  charges: 5,
+  fragmentLoss: {},
+};
+
 export const dmg_01: Crew = {
   ap: 1,
   hp: 100,

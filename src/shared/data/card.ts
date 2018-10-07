@@ -44,6 +44,20 @@ export const cardDummy: Event = {
   tag: "enemy",
 };
 
+export const cardDummyDmg1: Event = {
+  origin: { tag: "PlayerOrigin", cardId: 2 },
+  name: "DummyDmg1",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddEnemy", enemy: allEnemies.dummyDmg1 }};
+      },
+      inputs: [],
+      description: "add DummyDmg1",
+    },
+  ],
+  tag: "enemy",
+};
+
 export const cardCrew_0001: Event = {
   origin: { tag: "PlayerOrigin", cardId: 1001 },
   name: "Tank01",
@@ -67,6 +81,20 @@ export const cardCrew_0002: Event = {
       },
       inputs: [],
       description: "add DmgPoison",
+    },
+  ],
+  tag: "crew",
+};
+
+export const cardCrew_0003: Event = {
+  origin: { tag: "PlayerOrigin", cardId: 1002 },
+  name: "Tank02",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddCrew", crew: allCrew.tank_02 }};
+      },
+      inputs: [],
+      description: "add Tank02",
     },
   ],
   tag: "crew",
