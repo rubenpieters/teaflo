@@ -3,7 +3,7 @@ import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Origin, TargetType, typeColl } from "src/shared/game/target";
 import { findIndex } from "src/shared/game/trigger";
 import { GameState, CreatureId, toPositionId, Id, findEntity } from "src/shared/game/state";
-import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies } from "src/shared/game/effectvar";
+import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger } from "src/shared/game/effectvar";
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
 
@@ -143,10 +143,10 @@ export function addStatus<E extends HasStatus>(
 export function loseFragments<E extends HasStatus & Id>(
   e: E,
   tag: Status["tag"],
+  loss: number,
 ): E {
   const status = e.status[tag];
   if (status !== undefined) {
-    const loss = e.fragmentLoss[tag] === undefined ? 0 : <number>e.fragmentLoss[tag];
     const fragmentValue = 100 * status.value + status.fragment;
     if (fragmentValue > loss) {
       const newFragmentValue = fragmentValue - loss;
@@ -208,7 +208,8 @@ export function applyLoseFragments<E extends HasStatus & Id>(
   for (const tag of allStatus) {
     const e = findEntity(state, id);
     if (e.status[tag] !== undefined) {
-      const result = applyActionAndTriggers({ tag: "LoseFragment", target: id, type: tag }, state, log, idGen, origin);
+      const loss = e.fragmentLoss[tag] === undefined ? 0 : <number>e.fragmentLoss[tag];
+      const result = applyActionAndTriggers({ tag: "LoseFragment", target: id, type: tag, value: loss }, state, log, idGen, origin);
       if (result.state === "invalid") {
         return { state: "invalid", log: result.log };
       }
@@ -263,7 +264,7 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
   for (const tag of allStatus) {
     const status = e.status[tag];
     if (status !== undefined) {
-      const effect = statusToTrigger(status).effect({ state, selfId, trigger });
+      const effect = statusToTrigger(status.tag).effect({ state, selfId, trigger, status });
       if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
         // skip noop/0 charge to prevent infinite loop
       } else if (effect.chargeUse <= e.charges) {
@@ -286,26 +287,20 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
 }
 
 function statusToTrigger(
-  status: Status,
+  tag: Status["tag"],
 ): TriggerEntityEffect {
-  switch (status.tag) {
+  switch (tag) {
     case "Poison": {
       return evTrigger(trigger => evCondition(trigger,
           x => x.tag === "StartTurn",
-          extra(damage(evSelf, evStatic(status.value), evStatic(false)), { chargeUse: 0 }),
+          extra(damage(evSelf, evStatusValue, evStatic(false)), { chargeUse: 0 }),
           extra(noop(), { chargeUse: 0 }),
         ),
         "before",
       );
     }
     case "Guard": {
-      return evTrigger(trigger => evCondition(trigger,
-          x => x.tag === "Damage", // and target is self
-          extra(noop(), { chargeUse: 0 }),
-          extra(noop(), { chargeUse: 0 }),
-        ),
-        "before",
-      );
+      return guardTrigger;
     }
     default: throw "unimplemented";
   }

@@ -1,5 +1,5 @@
-import { CreatureId, GameState } from "src/shared/game/state";
-import { Status } from "src/shared/game/status";
+import { CreatureId, GameState, idEqual } from "src/shared/game/state";
+import { Status, Guard } from "src/shared/game/status";
 import { Action } from "src/shared/game/action";
 import { InputType } from "src/shared/game/input";
 
@@ -46,6 +46,10 @@ type Trigger = {
   tag: "Trigger",
 }
 
+export const evGetTrigger: EffectVar<Action> = {
+  tag: "Trigger",
+}
+
 type AllAlly = {
   tag: "AllAlly",
 }
@@ -58,6 +62,14 @@ type AllyPos = {
   tag: "AllyPos",
 }
 
+type StatusValue = {
+  tag: "StatusValue",
+}
+
+export const evStatusValue: EffectVar<number> = {
+  tag: "StatusValue",
+}
+
 type EffectVar<A>
   = Static<A>
   | Self
@@ -66,6 +78,7 @@ type EffectVar<A>
   | AllyPos
   | Input<A>
   | Trigger
+  | StatusValue
   ;
 
 export type Context = {
@@ -73,6 +86,7 @@ export type Context = {
   selfId?: CreatureId,
   trigger?: Action,
   inputs?: any[],
+  status?: Status,
 }
 
 export function addTarget<A>(
@@ -139,6 +153,41 @@ export function evCondition<A, C>(
     },
     description: `${showEv(ev)} ? ${fT.description} : ${fF.description}`,
   }
+}
+
+export const guardTrigger: EffT<{ chargeUse: number }> = {
+  effect: (obj: Context) => {
+    const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
+    const self: CreatureId = evaluate(<EffectVar<CreatureId>>evSelf)(obj);
+    const state: GameState = obj.state;
+    if (action.tag === "Damage" && idEqual(state, self, action.target)) {
+      if (obj.status === undefined || obj.status.tag !== "Guard") {
+        throw `Wrong status: ${JSON.stringify(obj.status)}`;
+      } else {
+        const guard: Guard = obj.status;
+        if (guard.value > action.value) {
+          return {
+            action: loseFragments(evSelf, evStatic(<Status["tag"]>"Guard"), evStatic(action.value))
+            .effect(obj).action,
+            chargeUse: 0,
+          };
+        } else {
+          const newDamage = action.value - guard.value;
+          return {
+            action: evAnd(
+              damage(evSelf, evStatic(newDamage), evStatic(false)),
+              loseFragments(evSelf, evStatic(<Status["tag"]>"Guard"), evStatic(action.value)),
+            ).effect(obj).action,
+            chargeUse: 0
+          };
+        }
+      }
+    } else {
+      return { action: { tag: "Noop" }, chargeUse: 0 };
+    }
+  },
+  description: `on self damage: reduce incoming damage by guard value`,
+  type: "instead",
 }
 
 export function evAllies(
@@ -243,6 +292,14 @@ function evaluate<A>(
           return <A>(<any>context.trigger);
         }
       }
+      case "StatusValue": {
+        if (context.status === undefined) {
+          console.log("Context does not have status");
+          throw "Context does not have status";
+        } else {
+          return <A>(<any>context.status.value);
+        }
+      }
       default: {
         console.log("Internal Effect Var");
         throw "Internal Effect Var";
@@ -273,6 +330,9 @@ function showEv<A>(ev: EffectVar<A>): string {
     }
     case "Trigger": {
       return `<Trigger>`;
+    }
+    case "StatusValue": {
+      return `<Status Value>`;
     }
   }
 }
@@ -362,6 +422,25 @@ export function addThreat(
       return { action };
     },
     description: `add ${showEv(value)} threat for ${showEv(target)} on ${showEv(enemyId)}`,
+  }
+}
+
+export function loseFragments(
+  target: EffectVar<CreatureId>,
+  type: EffectVar<Status["tag"]>,
+  value: EffectVar<number>,
+): Eff1<{}> {
+  return {
+    effect: (obj) => {
+      const action: Action = {
+        tag: "LoseFragment",
+        target: evaluate(target)(obj),
+        type: evaluate(type)(obj),
+        value: evaluate(value)(obj),
+      };
+      return { action };
+    },
+    description: `${showEv(target)} loses ${showEv(value)} ${showEv(type)} fragments`,
   }
 }
 

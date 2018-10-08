@@ -171,6 +171,7 @@ export type LoseFragment = {
   tag: "LoseFragment",
   target: CreatureId,
   type: Status["tag"],
+  value: number,
 };
 
 export function enemyTurn(
@@ -607,8 +608,8 @@ function applyAction(
     }
     case "LoseFragment": {
       state = onCreature(action.target, state,
-        ally => _Status.loseFragments(ally, action.type),
-        enemy => _Status.loseFragments(enemy, action.type),
+        ally => _Status.loseFragments(ally, action.type, action.value),
+        enemy => _Status.loseFragments(enemy, action.type, action.value),
       );
       break;
     }
