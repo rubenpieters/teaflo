@@ -225,7 +225,7 @@ export function applyActionAndTriggers(
     const afterStatus = _Status.checkStatus(
       action, enemy, state, { tag: "PositionId", type: "enemy", id: i }, log, idGen, origin
     );
-    if (afterStatus.state === "invalid") {
+    if (afterStatus.state === "invalid" || afterStatus.abort) {
       return afterStatus;
     }
     state = afterStatus.state;
@@ -237,7 +237,7 @@ export function applyActionAndTriggers(
     const afterStatus = _Status.checkStatus(
       action, ally, state, { tag: "PositionId", type: "ally", id: i }, log, idGen, origin
     );
-    if (afterStatus.state === "invalid") {
+    if (afterStatus.state === "invalid" || afterStatus.abort) {
       return afterStatus;
     }
     state = afterStatus.state;

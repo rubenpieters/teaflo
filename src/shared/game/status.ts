@@ -260,11 +260,12 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
   log: Action[],
   idGen: Generator,
   origin: Origin,
-): { state: GameState | "invalid", log: Action[] } {
+): { state: GameState | "invalid", log: Action[], abort: boolean } {
   for (const tag of allStatus) {
     const status = e.status[tag];
     if (status !== undefined) {
-      const effect = statusToTrigger(status.tag).effect({ state, selfId, trigger, status });
+      const triggerEff = statusToTrigger(status.tag);
+      const effect = triggerEff.effect({ state, selfId, trigger, status });
       if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
         // skip noop/0 charge to prevent infinite loop
       } else if (effect.chargeUse <= e.charges) {
@@ -276,14 +277,17 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
           ]
         }, state, log, idGen, origin);
         if (result.state === "invalid") {
-          return { state: "invalid", log: result.log };
+          return { state: "invalid", log: result.log, abort: true };
         }
         state = result.state;
         log = result.log;
+        if (triggerEff.type === "instead") {
+          return { state, log, abort: true };
+        }
       }
     }
   }
-  return { state, log };
+  return { state, log, abort: false };
 }
 
 function statusToTrigger(

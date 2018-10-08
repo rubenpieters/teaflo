@@ -176,7 +176,8 @@ export const guardTrigger: EffT<{ chargeUse: number }> = {
           return {
             action: evAnd(
               damage(evSelf, evStatic(newDamage), evStatic(false)),
-              loseFragments(evSelf, evStatic(<Status["tag"]>"Guard"), evStatic(action.value)),
+              // TODO: bugged? does this fire correctly?
+              loseFragments(evSelf, evStatic(<Status["tag"]>"Guard"), evStatic(action.value * 100)),
             ).effect(obj).action,
             chargeUse: 0
           };

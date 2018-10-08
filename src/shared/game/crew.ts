@@ -39,7 +39,8 @@ export function damage<E extends Crew & HasStatus>(
   damage: number,
   piercing: boolean,
 ): E {
-  if (piercing || (crew.status.Guard === undefined && crew.status.Bubble === undefined)) {
+  return focus(crew, over(x => x.hp, x => x - damage));
+  /*if (piercing || (crew.status.Guard === undefined && crew.status.Bubble === undefined)) {
     return focus(crew, over(x => x.hp, x => x - damage));
   } else {
     if (crew.status.Bubble !== undefined) {
@@ -57,7 +58,7 @@ export function damage<E extends Crew & HasStatus>(
         over(x => x.hp, x => x - leftoverDamage),
       );
     }
-  }
+  }*/
 }
 
 export function addThreat<E extends Crew>(
