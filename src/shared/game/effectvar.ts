@@ -2,6 +2,7 @@ import { CreatureId, GameState, idEqual } from "src/shared/game/state";
 import { Status, Guard } from "src/shared/game/status";
 import { Action } from "src/shared/game/action";
 import { InputType } from "src/shared/game/input";
+import { Origin } from "./target";
 
 export type Eff1<A> = {
   effect: (obj: Context) => { action: Action } & A,
@@ -50,6 +51,14 @@ export const evGetTrigger: EffectVar<Action> = {
   tag: "Trigger",
 }
 
+type TriggerOrigin = {
+  tag: "TriggerOrigin",
+}
+
+export const evGetTriggerOrigin: EffectVar<Action> = {
+  tag: "TriggerOrigin",
+}
+
 type AllAlly = {
   tag: "AllAlly",
 }
@@ -78,6 +87,7 @@ type EffectVar<A>
   | AllyPos
   | Input<A>
   | Trigger
+  | TriggerOrigin
   | StatusValue
   ;
 
@@ -87,6 +97,7 @@ export type Context = {
   trigger?: Action,
   inputs?: any[],
   status?: Status,
+  triggerOrigin?: Origin,
 }
 
 export function addTarget<A>(
@@ -183,6 +194,26 @@ export const guardTrigger: EffT<{ chargeUse: number }> = {
           };
         }
       }
+    } else {
+      return { action: { tag: "Noop" }, chargeUse: 0 };
+    }
+  },
+  description: `on self damage: reduce incoming damage by guard value`,
+  type: "instead",
+}
+
+export const dmgBarrierTrigger: EffT<{ chargeUse: number }> = {
+  effect: (obj: Context) => {
+    const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
+    const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
+    if (action.tag === "Damage" && origin !== "noOrigin" && origin.type === "enemy") {
+      // TODO: damage should be without origin
+      // TODO: damage value should come from status
+      return {
+        action: damage(evStatic(origin), evStatic(10), evStatic(false))
+        .effect(obj).action,
+        chargeUse: 1,
+      };
     } else {
       return { action: { tag: "Noop" }, chargeUse: 0 };
     }
@@ -293,6 +324,14 @@ function evaluate<A>(
           return <A>(<any>context.trigger);
         }
       }
+      case "TriggerOrigin": {
+        if (context.trigger === undefined) {
+          console.log("Context does not have triggerOrigin");
+          throw "Context does not have triggerOrigin";
+        } else {
+          return <A>(<any>context.triggerOrigin);
+        }
+      }
       case "StatusValue": {
         if (context.status === undefined) {
           console.log("Context does not have status");
@@ -331,6 +370,9 @@ function showEv<A>(ev: EffectVar<A>): string {
     }
     case "Trigger": {
       return `<Trigger>`;
+    }
+    case "TriggerOrigin": {
+      return `<TriggerOrigin>`;
     }
     case "StatusValue": {
       return `<Status Value>`;

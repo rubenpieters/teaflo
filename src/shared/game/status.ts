@@ -265,7 +265,7 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
     const status = e.status[tag];
     if (status !== undefined) {
       const triggerEff = statusToTrigger(status.tag);
-      const effect = triggerEff.effect({ state, selfId, trigger, status });
+      const effect = triggerEff.effect({ state, selfId, trigger, status, triggerOrigin: origin });
       if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
         // skip noop/0 charge to prevent infinite loop
       } else if (effect.chargeUse <= e.charges) {
