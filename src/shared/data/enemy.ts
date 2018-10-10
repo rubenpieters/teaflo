@@ -20,6 +20,7 @@ export const dummy: Enemy = {
   fragmentLoss: {
     Poison: 1,
   },
+  status: [],
 };
 
 export const dummyDmg1: Enemy = {
@@ -39,6 +40,7 @@ export const dummyDmg1: Enemy = {
   fragmentLoss: {
     Poison: 1,
   },
+  status: [],
 };
 
 /*

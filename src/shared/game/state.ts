@@ -15,9 +15,9 @@ export type ActionIndex = {
   actionIndex: number,
 };
 
-export type IdCrew = Crew & Id & ActionIndex & HasStatus & { tag: "ally" };
+export type IdCrew = Crew & Id & ActionIndex & { tag: "ally" };
 export type IdItem = Item & Id & { tag: "item" };
-export type IdEnemy = Enemy & Id & ActionIndex & HasStatus & { tag: "enemy" };
+export type IdEnemy = Enemy & Id & ActionIndex & { tag: "enemy" };
 export type IdInstance = Instance & Id;
 
 export type GameState = {

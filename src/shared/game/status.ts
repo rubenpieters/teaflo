@@ -7,6 +7,8 @@ import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTa
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
 
+export type StatusTag = Status["tag"];
+
 export type Poison = {
   tag: "Poison",
   value: number,
@@ -101,15 +103,41 @@ export const allStatus: Status["tag"][] = ["Regen", "PiercingPoison", "Poison", 
 type DiscrStatus<T extends Status["tag"]> = Extract<Status, {tag: T}>
 
 export type HasStatus = {
-  status: { [key in Status["tag"]]?: DiscrStatus<key> }
+  status: Status[],
   fragmentLoss: { [key in Status["tag"]]?: number }
 };
+
+export function mergeStatus<S extends Status>(
+  status1: S,
+  status2: S,
+): S {
+  throw "TODO";
+}
 
 export function addStatus<E extends HasStatus>(
   e: E,
   status: Status,
 ): E {
-  let result: E;
+  // if (status.tag)
+  // else 
+  // merge statuses
+  const filtered = e.status
+    .map((x, i) => { return { x, i}} )
+    .filter(x => x.x.tag === status.tag);
+  if (filtered.length > 1) {
+    throw "addStatus: length>1 should be impossible";
+  } else if (filtered.length === 1) {
+    const { x, i } = filtered[0];
+    return focus(e,
+      over(x => x.status[i], x => mergeStatus(x, status)),
+    );
+  } else {
+    return focus(e,
+      over(x => x.status, x => x.concat(status)),
+    );
+  }
+
+  /*let result: E;
   if (e.status[status.tag] === undefined) {
     result = focus(e, set(x => x.status[status.tag], status));
   } else if (status.tag === "Guard") {
@@ -137,32 +165,26 @@ export function addStatus<E extends HasStatus>(
     );
   }
 
-  return result;
+  return result;*/
 }
 
 export function loseFragments<E extends HasStatus & Id>(
   e: E,
-  tag: Status["tag"],
+  tag: StatusTag,
   loss: number,
 ): E {
-  const status = e.status[tag];
-  if (status !== undefined) {
-    const fragmentValue = 100 * status.value + status.fragment;
-    if (fragmentValue > loss) {
-      const newFragmentValue = fragmentValue - loss;
-      const newFragment = newFragmentValue % 100;
-      const newStatus = Math.floor(newFragmentValue / 100);
-      e = focus(e,
-        set(x => x.status[tag]!.value, newStatus),
-        set(x => x.status[tag]!.fragment, newFragment),
-      );
-    } else {
-      e = focus(e,
-        set(x => x.status[tag], undefined),
-      );
-    }
+  const filtered = e.status
+    .map((x, i) => { return { x, i}} )
+    .filter(x => x.x.tag === tag);
+  for (const { x, i } of filtered) {
+    const newStatus = applyStatusLoss(x, loss);
+    e = focus(e,
+      set(x => x.status[i], newStatus),
+    );
   }
-  return e;
+  return focus(e,
+    over(x => x.status, x => x.filter(x => x !== undefined)),
+  );
 }
 
 export function applyLoseFragmentPhase(
@@ -198,6 +220,24 @@ export function applyLoseFragmentPhase(
   return { state, log };
 }
 
+function applyStatusLoss(
+  status: Status,
+  loss: number,
+): Status | undefined {
+  const fragmentValue = 100 * status.value + status.fragment;
+  if (fragmentValue > loss) {
+    const newFragmentValue = fragmentValue - loss;
+    const newFragment = newFragmentValue % 100;
+    const newStatus = Math.floor(newFragmentValue / 100);
+    return focus(status,
+      set(x => x.value, newStatus),
+      set(x => x.fragment, newFragment),
+    );
+  } else {
+    return undefined;
+  }
+}
+
 export function applyLoseFragments<E extends HasStatus & Id>(
   id: CreatureId,
   state: GameState,
@@ -205,7 +245,21 @@ export function applyLoseFragments<E extends HasStatus & Id>(
   idGen: Generator,
   origin: Origin,
 ): { state: GameState | "invalid", log: Action[] } {
-  for (const tag of allStatus) {
+  const e = findEntity(state, id);
+  const newStatusList: Status[] = [];
+  for (const status of e.status) {
+    const loss = e.fragmentLoss[status.tag] === undefined ? 0 : <number>e.fragmentLoss[status.tag];
+    const newStatus = applyStatusLoss(status, loss);
+    if (newStatus !== undefined) {
+      newStatusList.push(newStatus);
+    }
+  }
+  const pos = toPositionId(state, id).id;
+  state = focus(state,
+    set(x => x.crew[pos].status, newStatusList),
+  );
+  return { state, log };
+  /*for (const tag of allStatus) {
     const e = findEntity(state, id);
     if (e.status[tag] !== undefined) {
       const loss = e.fragmentLoss[tag] === undefined ? 0 : <number>e.fragmentLoss[tag];
@@ -217,39 +271,15 @@ export function applyLoseFragments<E extends HasStatus & Id>(
       log = result.log;
     }
   }
-  return { state, log };
+  return { state, log };*/
 }
 
-export function clearStatus<E extends HasStatus>(
+/*export function clearStatus<E extends HasStatus>(
   e: E,
   statusTag: Status["tag"],
 ) {
   return focus(e, set(x => x.status[statusTag], undefined));
-}
-
-export function applyStatus<E extends HasStatus>(
-  _index: number,
-  e: E,
-  tag: Status["tag"],
-): E {
-  const status = e.status[tag];
-  if (status !== undefined) {
-    if (status.value === 1 && status.fragment === 0) {
-      e = focus(e,
-        set(x => x.status[tag], undefined),
-      );
-    } else if (status.value <= 1) {
-      e = focus(e,
-        set(x => x.status[tag]!.value, 0),
-      );
-    } else {
-      e = focus(e,
-        over(x => x.status[tag]!.value, x => x - 1),
-      );
-    }
-  }
-  return e;
-}
+}*/
 
 // TODO: implement difference between before/instead/after triggers
 export function checkStatus<E extends HasStatus & { charges: number }>(
@@ -261,29 +291,26 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
   idGen: Generator,
   origin: Origin,
 ): { state: GameState | "invalid", log: Action[], abort: boolean } {
-  for (const tag of allStatus) {
-    const status = e.status[tag];
-    if (status !== undefined) {
-      const triggerEff = statusToTrigger(status.tag);
-      const effect = triggerEff.effect({ state, selfId, trigger, status, triggerOrigin: origin });
-      if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
-        // skip noop/0 charge to prevent infinite loop
-      } else if (effect.chargeUse <= e.charges) {
-        const result = applyActionAndTriggers({
-          tag: "CombinedAction",
-          actions: [
-            { tag: "ChargeUse", target: selfId, value: effect.chargeUse },
-            effect.action
-          ]
-        }, state, log, idGen, origin);
-        if (result.state === "invalid") {
-          return { state: "invalid", log: result.log, abort: true };
-        }
-        state = result.state;
-        log = result.log;
-        if (triggerEff.type === "instead") {
-          return { state, log, abort: true };
-        }
+  for (const status of e.status) {
+    const triggerEff = statusToTrigger(status.tag);
+    const effect = triggerEff.effect({ state, selfId, trigger, status, triggerOrigin: origin });
+    if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
+      // skip noop/0 charge to prevent infinite loop
+    } else if (effect.chargeUse <= e.charges) {
+      const result = applyActionAndTriggers({
+        tag: "CombinedAction",
+        actions: [
+          { tag: "ChargeUse", target: selfId, value: effect.chargeUse },
+          effect.action
+        ]
+      }, state, log, idGen, origin);
+      if (result.state === "invalid") {
+        return { state: "invalid", log: result.log, abort: true };
+      }
+      state = result.state;
+      log = result.log;
+      if (triggerEff.type === "instead") {
+        return { state, log, abort: true };
       }
     }
   }

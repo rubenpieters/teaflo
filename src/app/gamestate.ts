@@ -634,20 +634,17 @@ function showEntityStatus(
   let y = 50;
   const infoTexts: Phaser.Text[] = [];
 
-  for (const statusType of allStatus) {
-    const status = hasStatus.status[statusType];
-    if (status !== undefined) {
-      const fontSize = 15;
-      const enemyActionText: Phaser.Text = board.game.add.text(0, 0, showStatus(status), {
-        font: "Arial",
-        fontSize: fontSize,
-        fill: "#222222",
-        boundsAlignH: "center",
-        boundsAlignV: "middle",
-      }, board.group);
-      enemyActionText.setTextBounds(x, y, 180, 22);
-      infoTexts.push(enemyActionText);
-    }
+  for (const status of hasStatus.status) {
+    const fontSize = 15;
+    const enemyActionText: Phaser.Text = board.game.add.text(0, 0, showStatus(status), {
+      font: "Arial",
+      fontSize: fontSize,
+      fill: "#222222",
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    }, board.group);
+    enemyActionText.setTextBounds(x, y, 180, 22);
+    infoTexts.push(enemyActionText);
 
     y += 25;
   }

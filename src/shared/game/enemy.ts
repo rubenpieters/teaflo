@@ -23,6 +23,7 @@ export type Enemy = {
   triggers: TriggerEntityEffect[],
   charges: number,
   fragmentLoss: { [key in Status["tag"]]?: number },
+  status: Status[],
 };
 
 export function damage<E extends Enemy & HasStatus>(
@@ -30,7 +31,8 @@ export function damage<E extends Enemy & HasStatus>(
   damage: number,
   piercing: boolean,
 ): E {
-  if (piercing || (enemy.status.Guard === undefined && enemy.status.Bubble === undefined)) {
+  return focus(enemy, over(x => x.hp, x => x - damage));
+  /*if (piercing || (enemy.status.Guard === undefined && enemy.status.Bubble === undefined)) {
     return focus(enemy, over(x => x.hp, x => x - damage));
   } else {
     if (enemy.status.Bubble !== undefined) {
@@ -48,7 +50,7 @@ export function damage<E extends Enemy & HasStatus>(
         over(x => x.hp, x => x - leftoverDamage),
       );
     }
-  }
+  }*/
 }
 
 export function act(

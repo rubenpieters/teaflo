@@ -374,7 +374,7 @@ function applyAction(
   switch (action.tag) {
     case "AddEnemy": {
       const id = idGen.newId();
-      const addedEnemy: IdEnemy = {...action.enemy, ...{ id, actionIndex: 0, tag: "enemy", status: {} } };
+      const addedEnemy: IdEnemy = {...action.enemy, ...{ id, actionIndex: 0, tag: "enemy", status: [] } };
       state = focus(state, over(x => x.enemies, x => x.concat(addedEnemy)));
       break;
     }
@@ -383,7 +383,7 @@ function applyAction(
         return { state: "invalid", log };
       } else {
         const id = idGen.newId();
-        const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally", status: {} } };
+        const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally", status: [] } };
         state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
       }
       break;
@@ -573,11 +573,11 @@ function applyAction(
       break;
     }
     case "ClearStatus": {
-      state = onCreature(action.target, state,
+      throw "TODO";
+      /*state = onCreature(action.target, state,
         ally => _Status.clearStatus(ally, action.status),
         enemy => _Status.clearStatus(enemy, action.status),
-      );
-      break;
+      );*/
     }
     case "ChargeUse": {
       if (action.target.type === "enemy") {
@@ -651,62 +651,6 @@ export function checkDeaths(
       }
       state = afterDeath.state;
       log = afterDeath.log;
-    }
-  }
-
-  return { state, log };
-}
-
-export function checkStatusEnemy(
-  state: GameState,
-  idGen: Generator,
-): { state: GameState | "invalid", log: StatusLog[] } {
-  let log: StatusLog[] = [];
-  let enemy: IdEnemy;
-  for (let i = 0; i < state.enemies.length; i++) {
-    for (const statusTag of _Status.allStatus) {
-      enemy = state.enemies[i];
-      const status = enemy.status[statusTag];
-      if (status !== undefined) {
-        const action = _Status.statusToAction(status, state, enemy.id, "enemy");
-        state = focus(state,
-          over(x => x.enemies[i], x => _Status.applyStatus(i, x, statusTag)),
-        );
-        const afterApply = applyActionAndTriggers(action, state, [], idGen, "noOrigin");
-        log.push({ id: i, status: statusTag, actionLog: afterApply.log });
-        if (afterApply.state === "invalid") {
-          return { state: "invalid", log };
-        }
-        state = afterApply.state;
-      }
-    }
-  }
-
-  return { state, log };
-}
-
-export function checkStatusCrew(
-  state: GameState,
-  idGen: Generator,
-): { state: GameState | "invalid", log: StatusLog[] } {
-  let log: StatusLog[] = [];
-  let ally: IdCrew;
-  for (let i = 0; i < state.crew.length; i++) {
-    for (const statusTag of _Status.allStatus) {
-      ally = state.crew[i];
-      const status = ally.status[statusTag];
-      if (status !== undefined) {
-        const action = _Status.statusToAction(status, state, ally.id, "ally");
-        state = focus(state,
-          set(x => x.crew[i], _Status.applyStatus(i, ally, statusTag)),
-        );
-        const afterApply = applyActionAndTriggers(action, state, [], idGen, "noOrigin");
-        log.push({ id: i, status: statusTag, actionLog: afterApply.log });
-        if (afterApply.state === "invalid") {
-          return { state: "invalid", log };
-        }
-        state = afterApply.state;
-      }
     }
   }
 

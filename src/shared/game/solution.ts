@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { CardOrigin } from "src/shared/game/card";
-import { Action, applyActionAndTriggers, enemyTurn, checkDeaths, checkStatusCrew, checkStatusEnemy, applyActionQueue, ActionSpec } from "src/shared/game/action";
+import { Action, applyActionAndTriggers, enemyTurn, checkDeaths, applyActionQueue, ActionSpec } from "src/shared/game/action";
 import { GameState, initialState, CreatureId } from "src/shared/game/state";
 import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";

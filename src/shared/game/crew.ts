@@ -32,6 +32,7 @@ export type Crew = {
   threatMap: ThreatMap,
   charges: number,
   fragmentLoss: { [key in Status["tag"]]?: number },
+  status: Status[],
 };
 
 export function damage<E extends Crew & HasStatus>(
