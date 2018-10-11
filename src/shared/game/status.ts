@@ -271,16 +271,21 @@ export function applyLoseFragments<E extends HasStatus & Id>(
   const newStatusList: Status[] = [];
   for (const status of e.status) {
     const loss = e.fragmentLoss[status.tag] === undefined ? 0 : <number>e.fragmentLoss[status.tag];
-    console.log(`LOSS: ${loss}`);
     const newStatus = applyStatusLoss(status, loss);
     if (newStatus !== undefined) {
       newStatusList.push(newStatus);
     }
   }
   const pos = toPositionId(state, id).id;
-  state = focus(state,
-    set(x => x.crew[pos].status, newStatusList),
-  );
+  if (id.type === "ally") {
+    state = focus(state,
+      set(x => x.crew[pos].status, newStatusList),
+    );
+  } else if (id.type === "enemy") {
+    state = focus(state,
+      set(x => x.enemies[pos].status, newStatusList),
+    );
+  }
   return { state, log };
   /*for (const tag of allStatus) {
     const e = findEntity(state, id);
