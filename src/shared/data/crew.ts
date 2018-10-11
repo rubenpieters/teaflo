@@ -5,7 +5,7 @@ import { Crew } from "src/shared/game/crew";
 import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
 import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies } from "src/shared/game/effectvar";
-import { Poison, Guard, Bubble } from "src/shared/game/status";
+import { Poison, Guard, Bubble, DmgBarrier } from "src/shared/game/status";
 
 export const dmgPoison: Crew = {
   ap: 1,
@@ -86,7 +86,14 @@ export const tank_02: Crew = {
       })),
       evEnemies(enemy => addThreat(evSelf, evStatic(10), enemy)),
     )),
-    // ability2: gain barrier
+    noTarget(
+      queueStatus(evSelf, evStatic(<DmgBarrier>{
+        tag: "DmgBarrier",
+        damage: 3,
+        value: 5,
+        fragment: 0,
+      }))
+    ),
   ],
   threatMap: {},
   charges: 5,

@@ -3,7 +3,7 @@ import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Origin, TargetType, typeColl } from "src/shared/game/target";
 import { findIndex } from "src/shared/game/trigger";
 import { GameState, CreatureId, toPositionId, Id, findEntity } from "src/shared/game/state";
-import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger } from "src/shared/game/effectvar";
+import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger, dmgBarrierTrigger } from "src/shared/game/effectvar";
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
 
@@ -58,6 +58,13 @@ export type Bubble = {
   fragment: 0,
 };
 
+export type DmgBarrier = {
+  tag: "DmgBarrier",
+  damage: number,
+  value: number,
+  fragment: number,
+}
+
 export type Status
   = Poison
   | PiercingPoison
@@ -67,6 +74,7 @@ export type Status
   | Blind
   | Silence
   | Bubble
+  | DmgBarrier
   ;
 
 export function showStatus(status: Status): string {
@@ -94,6 +102,9 @@ export function showStatus(status: Status): string {
     }
     case "Bubble": {
       return `Bubble`;
+    }
+    case "DmgBarrier": {
+      return `DmgBarrier ${status.value} T ${status.fragment} F`;
     }
   }
 }
@@ -143,51 +154,28 @@ export function addStatus<E extends HasStatus>(
   // if (status.tag)
   // else 
   // merge statuses
-  const filtered = e.status
-    .map((x, i) => { return { x, i}} )
-    .filter(x => x.x.tag === status.tag);
-  if (filtered.length > 1) {
-    throw "addStatus: length>1 should be impossible";
-  } else if (filtered.length === 1) {
-    const { x, i } = filtered[0];
-    return focus(e,
-      over(x => x.status[i], x => mergeStatus(x, status)),
-    );
-  } else {
+  if (status.tag === "DmgBarrier") {
     return focus(e,
       over(x => x.status, x => x.concat(status)),
     );
-  }
-
-  /*let result: E;
-  if (e.status[status.tag] === undefined) {
-    result = focus(e, set(x => x.status[status.tag], status));
-  } else if (status.tag === "Guard") {
-    // cast to prevent 'undefined' warning
-    result = focus(e,
-      over(x => (<Guard>x.status[status.tag]).value, x => x + status.value),
-      over(x => (<Guard>x.status[status.tag]).fragment, x => x + status.fragment),
-      over(x => (<Guard>x.status[status.tag]).guard, x => x + status.guard),
-    );
-  } else if (status.tag === "Bubble") {
-    result = e;
   } else {
-    // cast to prevent 'undefined' warning
-    result = focus(e,
-      over(x => (<Status>x.status[status.tag]).value, x => x + status.value),
-      over(x => (<Status>x.status[status.tag]).fragment, x => x + status.fragment),
-    );
+    // merge statuses
+    const filtered = e.status
+      .map((x, i) => { return { x, i}} )
+      .filter(x => x.x.tag === status.tag);
+    if (filtered.length > 1) {
+      throw "addStatus: length>1 should be impossible";
+    } else if (filtered.length === 1) {
+      const { x, i } = filtered[0];
+      return focus(e,
+        over(x => x.status[i], x => mergeStatus(x, status)),
+      );
+    } else {
+      return focus(e,
+        over(x => x.status, x => x.concat(status)),
+      );
+    }
   }
-
-  if (result.status[status.tag]!.fragment > 99) {
-    const toAdd = Math.floor(result.status[status.tag]!.fragment / 100);
-    result = focus(result,
-      over(x => x.status[status.tag]!.value, x => x + toAdd),
-      over(x => x.status[status.tag]!.fragment, x => x - toAdd * 100),
-    );
-  }
-
-  return result;*/
 }
 
 export function loseFragments<E extends HasStatus & Id>(
@@ -287,27 +275,7 @@ export function applyLoseFragments<E extends HasStatus & Id>(
     );
   }
   return { state, log };
-  /*for (const tag of allStatus) {
-    const e = findEntity(state, id);
-    if (e.status[tag] !== undefined) {
-      const loss = e.fragmentLoss[tag] === undefined ? 0 : <number>e.fragmentLoss[tag];
-      const result = applyActionAndTriggers({ tag: "LoseFragment", target: id, type: tag, value: loss }, state, log, idGen, origin);
-      if (result.state === "invalid") {
-        return { state: "invalid", log: result.log };
-      }
-      state = result.state;
-      log = result.log;
-    }
-  }
-  return { state, log };*/
 }
-
-/*export function clearStatus<E extends HasStatus>(
-  e: E,
-  statusTag: Status["tag"],
-) {
-  return focus(e, set(x => x.status[statusTag], undefined));
-}*/
 
 // TODO: implement difference between before/instead/after triggers
 export function checkStatus<E extends HasStatus & { charges: number }>(
@@ -361,78 +329,9 @@ function statusToTrigger(
     case "Guard": {
       return guardTrigger;
     }
+    case "DmgBarrier": {
+      return dmgBarrierTrigger;
+    }
     default: throw "unimplemented";
-  }
-}
-
-export function statusToAction(
-  status: Status,
-  state: GameState,
-  selfId: number,
-  selfType: "ally" | "enemy",
-): Action {
-  const selfIndex = findIndex(x => x.id === selfId, typeColl(state, selfType));
-  if (selfIndex === "notFound") {
-    throw `not found ${selfId} ${selfType}`
-  }
-  switch (status.tag) {
-    case "Poison": {
-      return {
-        tag: "Damage",
-        target: {
-          tag: "PositionId",
-          id: selfIndex,
-          type: selfType,
-        },
-        value: status.value,
-        piercing: false,
-      };
-    }
-    case "PiercingPoison": {
-      return {
-        tag: "Damage",
-        target: {
-          tag: "PositionId",
-          id: selfIndex,
-          type: selfType,
-        },
-        value: status.value,
-        piercing: true,
-      };
-    }
-    case "Regen": {
-      return {
-        tag: "Heal",
-        target: {
-          tag: "PositionId",
-          id: selfIndex,
-          type: selfType,
-        },
-        value: status.value,
-      };
-    }
-    case "Guard": {
-      return { tag: "Noop" };
-    }
-    case "Doom": {
-      if (status.value === 1) {
-        return {
-          tag: "Death",
-          id: selfId,
-          type: selfType,
-        };
-      } else {
-        return { tag: "Noop" };
-      }
-    }
-    case "Blind": {
-      return { tag: "Noop" };
-    }
-    case "Silence": {
-      return { tag: "Noop" };
-    }
-    case "Bubble": {
-      return { tag: "Noop" };
-    }
   }
 }

@@ -1,5 +1,5 @@
 import { CreatureId, GameState, idEqual } from "src/shared/game/state";
-import { Status, Guard } from "src/shared/game/status";
+import { Status, Guard, DmgBarrier } from "src/shared/game/status";
 import { Action } from "src/shared/game/action";
 import { InputType } from "src/shared/game/input";
 import { Origin } from "./target";
@@ -207,19 +207,24 @@ export const dmgBarrierTrigger: EffT<{ chargeUse: number }> = {
     const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
     const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
     if (action.tag === "Damage" && origin !== "noOrigin" && origin.type === "enemy") {
+      if (obj.status === undefined || obj.status.tag !== "DmgBarrier") {
+        throw `Wrong status: ${JSON.stringify(obj.status)}`;
+      } else {
+        const dmgBarrier: DmgBarrier = obj.status;
+        return {
+          action: damage(evStatic(origin), evStatic(dmgBarrier.damage), evStatic(false))
+          .effect(obj).action,
+          chargeUse: 1,
+        };
+      }
       // TODO: damage should be without origin
       // TODO: damage value should come from status
-      return {
-        action: damage(evStatic(origin), evStatic(10), evStatic(false))
-        .effect(obj).action,
-        chargeUse: 1,
-      };
     } else {
       return { action: { tag: "Noop" }, chargeUse: 0 };
     }
   },
   description: `on self damage: reduce incoming damage by guard value`,
-  type: "instead",
+  type: "before",
 }
 
 export function evAllies(
