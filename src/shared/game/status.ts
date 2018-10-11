@@ -107,11 +107,33 @@ export type HasStatus = {
   fragmentLoss: { [key in Status["tag"]]?: number }
 };
 
-export function mergeStatus<S extends Status>(
+function mergeStatus<S extends Status>(
   status1: S,
   status2: S,
 ): S {
-  throw "TODO";
+  switch (status1.tag) {
+    case "Poison": {
+      return collapseStatus(focus(status1,
+        over(x => x.fragment, x => x + status2.fragment),
+        over(x => x.value, x => x + status2.value),
+      ));
+    }
+    default: {
+      throw "TODO";
+    }
+  }
+}
+
+function collapseStatus<S extends Status>(
+  status: S,
+): S {
+  const fragment = status.fragment;
+  const newFragment = fragment % 100;
+  const addValue = Math.floor(fragment / 100);
+  return focus(status,
+    set(x => x.fragment, newFragment),
+    over(x => x.value, x => x + addValue),
+  );
 }
 
 export function addStatus<E extends HasStatus>(
@@ -249,6 +271,7 @@ export function applyLoseFragments<E extends HasStatus & Id>(
   const newStatusList: Status[] = [];
   for (const status of e.status) {
     const loss = e.fragmentLoss[status.tag] === undefined ? 0 : <number>e.fragmentLoss[status.tag];
+    console.log(`LOSS: ${loss}`);
     const newStatus = applyStatusLoss(status, loss);
     if (newStatus !== undefined) {
       newStatusList.push(newStatus);
