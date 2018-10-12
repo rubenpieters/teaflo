@@ -1,4 +1,4 @@
-import { CreatureId, GameState, idEqual } from "src/shared/game/state";
+import { CreatureId, GameState, idEqual, findEntity } from "src/shared/game/state";
 import { Status, Guard, DmgBarrier } from "src/shared/game/status";
 import { Action } from "src/shared/game/action";
 import { InputType } from "src/shared/game/input";
@@ -163,6 +163,25 @@ export function evCondition<A, C>(
       }
     },
     description: `${showEv(ev)} ? ${fT.description} : ${fF.description}`,
+  }
+}
+
+export function hasBubble<A>(
+  ev: EffectVar<CreatureId>,
+  fT: Eff1<A>,
+  fF: Eff1<A>,
+): Eff1<A> {
+  return {
+    effect: (obj) => {
+      const id = evaluate(ev)(obj);
+      const e = findEntity(obj.state, id);
+      if (e.status.filter(x => x.tag === "Bubble").length >= 1) {
+        return fT.effect(obj); 
+      } else {
+        return fF.effect(obj);
+      }
+    },
+    description: `${showEv(ev)} has bubble? ${fT.description} : ${fF.description}`,
   }
 }
 
