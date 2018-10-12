@@ -90,6 +90,16 @@ export function useCharge<E extends { charges: number }>(
   );
 }
 
+export function setHP<E extends { hp: number }>(
+  e: E,
+  value: number,
+): E {
+  // TODO: what to do when hp > max?
+  return focus(e,
+    set(x => x.hp, value),
+  );
+}
+
 export function heal<E extends Crew>(
   crew: E,
   amount: number,

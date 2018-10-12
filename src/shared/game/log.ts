@@ -131,6 +131,9 @@ function showAction(action: Action): string {
     case "LoseFragment": {
       return `LoseFragment ${action.type} ${showId(action.target)}`;
     }
+    case "SetHP": {
+      return `SetHP${action.value} ${showId(action.target)}`;
+    }
     case "Invalid": {
       return `Invalid`;
     }

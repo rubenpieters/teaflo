@@ -40,6 +40,7 @@ export type Action
   | AddThreat
   | StartTurn
   | LoseFragment
+  | SetHP
   ;
 
 export type Damage = {
@@ -171,6 +172,12 @@ export type LoseFragment = {
   tag: "LoseFragment",
   target: CreatureId,
   type: Status["tag"],
+  value: number,
+};
+
+export type SetHP = {
+  tag: "SetHP",
+  target: CreatureId,
   value: number,
 };
 
@@ -610,6 +617,13 @@ function applyAction(
       state = onCreature(action.target, state,
         ally => _Status.loseFragments(ally, action.type, action.value),
         enemy => _Status.loseFragments(enemy, action.type, action.value),
+      );
+      break;
+    }
+    case "SetHP": {
+      state = onCreature(action.target, state,
+        ally => _Crew.setHP(ally, action.value),
+        enemy =>_Crew.setHP(enemy, action.value),
       );
       break;
     }

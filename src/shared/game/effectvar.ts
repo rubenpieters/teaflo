@@ -227,6 +227,29 @@ export const dmgBarrierTrigger: EffT<{ chargeUse: number }> = {
   type: "before",
 }
 
+export const bubbleTrigger: EffT<{ chargeUse: number }> = {
+  effect: (obj: Context) => {
+    const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
+    const self: CreatureId = evaluate(<EffectVar<CreatureId>>evSelf)(obj);
+    const state: GameState = obj.state;
+    if (action.tag === "Damage" && idEqual(state, self, action.target)) {
+      if (obj.status === undefined || obj.status.tag !== "Bubble") {
+        throw `Wrong status: ${JSON.stringify(obj.status)}`;
+      } else {
+        return {
+          action: loseFragments(evSelf, evStatic(<Status["tag"]>"Bubble"), evStatic(100))
+          .effect(obj).action,
+          chargeUse: 1,
+        };
+      }
+    } else {
+      return { action: { tag: "Noop" }, chargeUse: 0 };
+    }
+  },
+  description: `on self damage: reduce incoming damage by guard value`,
+  type: "instead",
+}
+
 export function evAllies(
   f: (target: EffectVar<CreatureId>) => Eff1<{}>,
 ): Eff1<{}> {
@@ -470,6 +493,23 @@ export function addThreat(
       return { action };
     },
     description: `add ${showEv(value)} threat for ${showEv(target)} on ${showEv(enemyId)}`,
+  }
+}
+
+export function setHP(
+  target: EffectVar<CreatureId>,
+  value: EffectVar<number>,
+): Eff1<{}> {
+  return {
+    effect: (obj) => {
+      const action: Action = {
+        tag: "SetHP",
+        target: evaluate(target)(obj),
+        value: evaluate(value)(obj),
+      };
+      return { action };
+    },
+    description: `set hp of ${showEv(target)} to ${showEv(value)}`,
   }
 }
 

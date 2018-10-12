@@ -4,7 +4,7 @@ import { Action } from "src/shared/game/action";
 import { Crew } from "src/shared/game/crew";
 import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
-import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies } from "src/shared/game/effectvar";
+import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, setHP } from "src/shared/game/effectvar";
 import { Poison, Guard, Bubble, DmgBarrier } from "src/shared/game/status";
 
 export const dmgPoison: Crew = {
@@ -93,6 +93,34 @@ export const tank_02: Crew = {
         value: 5,
         fragment: 0,
       }))
+    ),
+  ],
+  threatMap: {},
+  charges: 5,
+  fragmentLoss: {},
+  status: [],
+};
+
+export const tank_03: Crew = {
+  ap: 1,
+  hp: 100,
+  maxHp: 100,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    noop(),
+  ],
+  abilities: [
+    noTarget(
+      evAllies(ally => evAnd(
+        setHP(ally, evStatic(1)),
+        queueStatus(ally, evStatic(<Bubble>{
+          tag: "Bubble",
+          value: 1,
+          fragment: 0,
+        })),
+      )),
     ),
   ],
   threatMap: {},

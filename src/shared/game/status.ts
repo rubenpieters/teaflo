@@ -3,7 +3,7 @@ import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Origin, TargetType, typeColl } from "src/shared/game/target";
 import { findIndex } from "src/shared/game/trigger";
 import { GameState, CreatureId, toPositionId, Id, findEntity } from "src/shared/game/state";
-import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger, dmgBarrierTrigger } from "src/shared/game/effectvar";
+import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger, dmgBarrierTrigger, bubbleTrigger } from "src/shared/game/effectvar";
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
 
@@ -154,7 +154,7 @@ export function addStatus<E extends HasStatus>(
   // if (status.tag)
   // else 
   // merge statuses
-  if (status.tag === "DmgBarrier") {
+  if (status.tag === "DmgBarrier" || status.tag === "Bubble") {
     return focus(e,
       over(x => x.status, x => x.concat(status)),
     );
@@ -331,6 +331,9 @@ function statusToTrigger(
     }
     case "DmgBarrier": {
       return dmgBarrierTrigger;
+    }
+    case "Bubble": {
+      return bubbleTrigger;
     }
     default: throw "unimplemented";
   }
