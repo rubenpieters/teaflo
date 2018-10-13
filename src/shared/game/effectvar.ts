@@ -243,7 +243,7 @@ export const dmgBarrierTrigger: EffT<{ chargeUse: number }> = {
       return { action: { tag: "Noop" }, chargeUse: 0 };
     }
   },
-  description: `on self damage: reduce incoming damage by guard value`,
+  description: `on self damage: retaliate`,
   type: "before",
 }
 
@@ -266,7 +266,35 @@ export const bubbleTrigger: EffT<{ chargeUse: number }> = {
       return { action: { tag: "Noop" }, chargeUse: 0 };
     }
   },
-  description: `on self damage: reduce incoming damage by guard value`,
+  description: `on self damage: absorb`,
+  type: "instead",
+}
+
+export const weakTrigger: EffT<{ chargeUse: number }> = {
+  effect: (obj: Context) => {
+    const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
+    const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
+    const self: CreatureId = evaluate(<EffectVar<CreatureId>>evSelf)(obj);
+    if (action.tag === "Damage" && origin !== "noOrigin" && idEqual(obj.state, origin, self)) {
+      if (obj.status === undefined || obj.status.tag !== "Weak") {
+        throw `Wrong status: ${JSON.stringify(obj.status)}`;
+      } else {
+        const newDamage = action.value - obj.status.value;
+        if (newDamage > 0) {
+          return {
+            action: damage(evStatic(action.target), evStatic(newDamage), evStatic(false))
+            .effect(obj).action,
+            chargeUse: 0,
+          };
+        } else {
+          return { action: { tag: "Abort" }, chargeUse: 0 };
+        }
+      }
+    } else {
+      return { action: { tag: "Noop" }, chargeUse: 0 };
+    }
+  },
+  description: `when dealing damage: reduce by x`,
   type: "instead",
 }
 

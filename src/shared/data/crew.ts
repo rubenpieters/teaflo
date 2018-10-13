@@ -4,9 +4,9 @@ import { Action } from "src/shared/game/action";
 import { Crew } from "src/shared/game/crew";
 import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
+import * as allInstances from "src/shared/data/instance";
 import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, setHP, loseFragments, hasBubble, addInstance } from "src/shared/game/effectvar";
 import { Poison, Guard, Bubble, DmgBarrier } from "src/shared/game/status";
-import { instance_01 } from "./instance";
 
 export const dmgPoison: Crew = {
   ap: 1,
@@ -173,7 +173,11 @@ export const dmg_02: Crew = {
   ],
   abilities: [
     noTarget(addInstance(
-      evStatic(instance_01),
+      evStatic(allInstances.instance_01),
+      evStatic(<"ally">"ally"),
+    )),
+    noTarget(addInstance(
+      evStatic(allInstances.instance_02),
       evStatic(<"ally">"ally"),
     )),
   ],

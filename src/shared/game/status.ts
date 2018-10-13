@@ -3,7 +3,7 @@ import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Origin, TargetType } from "src/shared/game/target";
 import { findIndex } from "src/shared/game/trigger";
 import { GameState, CreatureId, toPositionId, Id, findEntity } from "src/shared/game/state";
-import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger, dmgBarrierTrigger, bubbleTrigger } from "src/shared/game/effectvar";
+import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger, dmgBarrierTrigger, bubbleTrigger, weakTrigger } from "src/shared/game/effectvar";
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
 
@@ -65,6 +65,12 @@ export type DmgBarrier = {
   fragment: number,
 }
 
+export type Weak = {
+  tag: "Weak",
+  value: number,
+  fragment: number,
+};
+
 export type Status
   = Poison
   | PiercingPoison
@@ -75,6 +81,7 @@ export type Status
   | Silence
   | Bubble
   | DmgBarrier
+  | Weak
   ;
 
 export function showStatus(status: Status): string {
@@ -106,6 +113,9 @@ export function showStatus(status: Status): string {
     case "DmgBarrier": {
       return `DmgBarrier ${status.value} T ${status.fragment} F`;
     }
+    case "Weak": {
+      return `Weak ${status.value} T ${status.fragment} F`;
+    }
   }
 }
 
@@ -124,6 +134,12 @@ function mergeStatus<S extends Status>(
 ): S {
   switch (status1.tag) {
     case "Poison": {
+      return collapseStatus(focus(status1,
+        over(x => x.fragment, x => x + status2.fragment),
+        over(x => x.value, x => x + status2.value),
+      ));
+    }
+    case "Weak": {
       return collapseStatus(focus(status1,
         over(x => x.fragment, x => x + status2.fragment),
         over(x => x.value, x => x + status2.value),
@@ -292,6 +308,8 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
     const effect = triggerEff.effect({ state, selfId, trigger, status, triggerOrigin: origin });
     if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
       // skip noop/0 charge to prevent infinite loop
+    } else if (effect.action.tag === "Abort" && effect.chargeUse === 0) {
+      return { state, log, abort: true };
     } else if (effect.chargeUse <= e.charges) {
       const result = applyActionAndTriggers({
         tag: "CombinedAction",
@@ -334,6 +352,9 @@ function statusToTrigger(
     }
     case "Bubble": {
       return bubbleTrigger;
+    }
+    case "Weak": {
+      return weakTrigger;
     }
     default: throw "unimplemented";
   }

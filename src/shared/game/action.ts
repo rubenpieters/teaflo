@@ -41,6 +41,7 @@ export type Action
   | StartTurn
   | LoseFragment
   | SetHP
+  | Abort
   ;
 
 export type Damage = {
@@ -149,6 +150,10 @@ export type ClearStatus = {
 
 export type Invalid = {
   tag: "Invalid",
+};
+
+export type Abort = {
+  tag: "Abort",
 };
 
 export type ChargeUse = {
@@ -632,6 +637,9 @@ function applyAction(
     }
     case "Invalid": {
       return { state: "invalid", log };
+    }
+    case "Abort": {
+      break;
     }
   }
 

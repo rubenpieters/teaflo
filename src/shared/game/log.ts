@@ -139,6 +139,9 @@ function showAction(action: Action): string {
     case "Invalid": {
       return `Invalid`;
     }
+    case "Abort": {
+      return `Abort`;
+    }
   }
 }
 
