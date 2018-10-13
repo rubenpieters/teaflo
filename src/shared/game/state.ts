@@ -78,6 +78,8 @@ type TargetEntity = {
   "ally": IdCrew,
   "enemy": IdEnemy,
   "item": IdItem,
+  "allyInstance": IdInstance,
+  "enemyInstance": IdInstance,
 }
 
 export function findEntity<A extends TargetType>(state: GameState, id: EntityIdA<A>): TargetEntity[A] {
@@ -91,6 +93,12 @@ export function findEntity<A extends TargetType>(state: GameState, id: EntityIdA
     }
     case "item": {
       return findE(state.items, id);
+    }
+    case "allyInstance": {
+      return findE(state.allyInstances, id);
+    }
+    case "enemyInstance": {
+      return findE(state.enemyInstances, id);
     }
   }
 }

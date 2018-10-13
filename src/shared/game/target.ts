@@ -1,8 +1,10 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, Id, IdCrew, IdEnemy, IdItem, CreatureId } from "src/shared/game/state";
+import { Instance } from "./instance";
 
 export type Origin = CreatureId | "noOrigin";
 
+/*
 export function typeColl(
   state: GameState,
   type: TargetType
@@ -19,6 +21,7 @@ export function typeColl(
     }
   }
 }
+*/
 
 export function indexOfId<E extends Id>(
   id: number,
@@ -47,7 +50,9 @@ export type Target = {
   position: number,
 };
 
-export type TargetType = "ally" | "enemy" | "item";
+export type TargetType = "ally" | "enemy" | "item" | "allyInstance" | "enemyInstance";
+
+export type AllyEnemy = "ally" | "enemy";
 
 export function onTarget(
   target: Target,
@@ -55,6 +60,7 @@ export function onTarget(
   allyF: (ally: IdCrew) => IdCrew,
   enemyF: (enemy: IdEnemy) => IdEnemy,
   itemF: (item: IdItem) => IdItem,
+  instanceF: (instance: Instance) => Instance,
 ) {
   switch (target.type) {
     case "ally": {
@@ -70,6 +76,16 @@ export function onTarget(
     case "item": {
       return focus(state,
         over(x => x.items[target.position], itemF),
+      );
+    }
+    case "allyInstance": {
+      return focus(state,
+        over(x => x.allyInstances[target.position], instanceF),
+      );
+    }
+    case "enemyInstance": {
+      return focus(state,
+        over(x => x.enemyInstances[target.position], instanceF),
       );
     }
   }

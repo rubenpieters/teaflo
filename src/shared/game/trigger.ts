@@ -1,5 +1,5 @@
 import { ActionSpec, Action } from "src/shared/game/action";
-import { TargetType, typeColl } from "src/shared/game/target";
+import { TargetType } from "src/shared/game/target";
 import { GameState } from "src/shared/game/state";
 
 export type Trigger = {

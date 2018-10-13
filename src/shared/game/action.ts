@@ -5,7 +5,7 @@ import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, onCreature, toGlobalId,
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
-import { Origin, TargetType, indexOfId, typeColl } from "src/shared/game/target";
+import { Origin, TargetType, indexOfId } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
 import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
