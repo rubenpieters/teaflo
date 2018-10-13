@@ -9,6 +9,7 @@ import { TargetType } from "src/shared/game/target";
 import { Ability } from "src/shared/game/crew";
 import { InputType } from "../shared/game/input";
 import { Context } from "../shared/game/effectvar";
+import { Instance } from "src/shared/game/instance";
 
 export type Limit = {
   limit: number,
@@ -500,7 +501,7 @@ function mkState(
     sprite.drawRect(0, 0, 10, 20);
     sprite.endFill();
     sprite.inputEnabled = true;
-    //sprite.events.onInputOver.add(() => showInstance(board, instance));
+    sprite.events.onInputOver.add(() => showInstance(board, instance));
     sprites.push(sprite);
 
     x -= 15;
@@ -543,7 +544,7 @@ function mkState(
     sprite.drawRect(0, 0, 10, 20);
     sprite.endFill();
     sprite.inputEnabled = true;
-    //sprite.events.onInputOver.add(() => showInstance(board, instance));
+    sprite.events.onInputOver.add(() => showInstance(board, instance));
     sprites.push(sprite);
 
     x += 15;
@@ -864,6 +865,57 @@ function showAbility(
   }, board.group);
   enemyActionText.setTextBounds(x, y, 180, 22);
   infoTexts.push(enemyActionText);
+
+  board.graphics.infoTexts = infoTexts;
+}
+
+function showInstance(
+  board: Board,
+  instance: Instance,
+) {
+  // clear old
+  for (const text of board.graphics.infoTexts) {
+    text.destroy();
+  }
+
+  const x = 620;
+  let y = 50;
+  const infoTexts: Phaser.Text[] = [];
+
+  const fontSize = 15;
+  const hpText: Phaser.Text = board.game.add.text(0, 0, `HP: ${instance.hp}/${instance.maxHp} AP: ${instance.ap}`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  hpText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(hpText);
+
+  y += 40;
+  const actionText: Phaser.Text = board.game.add.text(0, 0, `Actions`, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  actionText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(actionText);
+
+  for (const action of instance.actions) {
+    y += 30;
+    const actionDescText: Phaser.Text = board.game.add.text(0, 0, action.description, {
+      font: "Arial",
+      fontSize: fontSize,
+      fill: "#222222",
+      boundsAlignH: "center",
+      boundsAlignV: "middle",
+    }, board.group);
+    actionDescText.setTextBounds(x, y, 180, 22);
+    infoTexts.push(actionDescText);
+  }
 
   board.graphics.infoTexts = infoTexts;
 }
