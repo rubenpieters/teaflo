@@ -7,7 +7,6 @@ export const instance_01: Instance = {
   ap: 1,
   hp: 30,
   maxHp: 30,
-  actions: [
-    damage(evStatic(<CreatureId>{ tag: "PositionId", type: "enemy", id: 0}), evStatic(1), evStatic(false)),
-  ],
+  action: damage(
+    evStatic(<CreatureId>{ tag: "PositionId", type: "enemy", id: 0}), evStatic(1), evStatic(false))
 }

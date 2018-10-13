@@ -23,8 +23,10 @@ export type ActionLog = {
   loseFragment: Action[],
   crewAction: Action[],
   queue1: Action[],
+  allyInstanceAction: Action[],
   enemyAction: Action[],
   queue2: Action[],
+  enemyInstanceAction: Action[],
   deaths: Action[], // TODO: incorporate into queue2
 };
 

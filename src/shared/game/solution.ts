@@ -142,7 +142,11 @@ function solutionStep(
 
   let log: ActionLog = {
     action: actionEffect,
-    startTurn: [], loseFragment: [], crewAction: [], queue1: [], enemyAction: [], queue2: [], deaths: []
+    startTurn: [], loseFragment: [], crewAction: [], queue1: [],
+    allyInstanceAction: [],
+    enemyAction: [], queue2: [],
+    enemyInstanceAction: [],
+    deaths: [],
   };
 
   // Apply Turn Action
@@ -180,8 +184,18 @@ function solutionStep(
   }
   state = afterLoseFragment.state;
 
-  // TODO: add crew auto-actions?
+  // Ally Instance Action Phase
+  for (const instance of state.allyInstances) {
+    const result = applyActionAndTriggers(
+      instance.action.effect({ state }).action, state, [], idGen, "noOrigin");
+      log = focus(log, over(x => x.allyInstanceAction, x => x.concat(result.log)));
+      if (result.state === "invalid") {
+        return { result: "invalid", log };
+      }
+      state = result.state;
+  }
 
+  // Enemy Action Phase
   const afterEnemy = enemyTurn(state, [], idGen);
   log = focus(log, set(x => x.enemyAction, afterEnemy.log));
   if (afterEnemy.state === "invalid") {
@@ -196,6 +210,17 @@ function solutionStep(
     return { result: "invalid", log };
   }
   state = afterQueue2.state;
+
+  // Enemy Instance Action Phase
+  for (const instance of state.enemyInstances) {
+    const result = applyActionAndTriggers(
+      instance.action.effect({ state }).action, state, [], idGen, "noOrigin");
+      log = focus(log, over(x => x.enemyInstanceAction, x => x.concat(result.log)));
+      if (result.state === "invalid") {
+        return { result: "invalid", log };
+      }
+      state = result.state;
+  }
 
   const afterDeaths = checkDeaths(state, [], idGen);
   log = focus(log, set(x => x.deaths, afterDeaths.log));

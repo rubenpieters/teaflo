@@ -4,6 +4,6 @@ export type Instance = {
   ap: number,
   hp: number,
   maxHp: number,
-  actions: EntityEffect[],
+  action: EntityEffect,
   // triggers: TriggerEntityEffect[],
 };

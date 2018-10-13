@@ -904,18 +904,16 @@ function showInstance(
   actionText.setTextBounds(x, y, 180, 22);
   infoTexts.push(actionText);
 
-  for (const action of instance.actions) {
-    y += 30;
-    const actionDescText: Phaser.Text = board.game.add.text(0, 0, action.description, {
-      font: "Arial",
-      fontSize: fontSize,
-      fill: "#222222",
-      boundsAlignH: "center",
-      boundsAlignV: "middle",
-    }, board.group);
-    actionDescText.setTextBounds(x, y, 180, 22);
-    infoTexts.push(actionDescText);
-  }
+  y += 30;
+  const actionDescText: Phaser.Text = board.game.add.text(0, 0, instance.action.description, {
+    font: "Arial",
+    fontSize: fontSize,
+    fill: "#222222",
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  }, board.group);
+  actionDescText.setTextBounds(x, y, 180, 22);
+  infoTexts.push(actionDescText);
 
   board.graphics.infoTexts = infoTexts;
 }
