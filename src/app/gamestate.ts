@@ -492,6 +492,21 @@ function mkState(
     allyId += 1;
   }
 
+  x = 330;
+
+  for (const instance of gs.allyInstances) {
+    const sprite: Phaser.Graphics = board.game.add.graphics(x, y + 130, board.group);
+    sprite.beginFill(0x4477CC);
+    sprite.drawRect(0, 0, 10, 20);
+    sprite.endFill();
+    sprite.inputEnabled = true;
+    //sprite.events.onInputOver.add(() => showInstance(board, instance));
+    sprites.push(sprite);
+
+    x -= 15;
+  }
+
+
   x = 360;
   for (const enemy of gs.enemies) {
     const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
@@ -519,6 +534,19 @@ function mkState(
 
 
     x += 25;
+  }
+
+  x = 360;
+  for (const instance of gs.enemyInstances) {
+    const sprite: Phaser.Graphics = board.game.add.graphics(x, y + 130, board.group);
+    sprite.beginFill(0xCC7744);
+    sprite.drawRect(0, 0, 10, 20);
+    sprite.endFill();
+    sprite.inputEnabled = true;
+    //sprite.events.onInputOver.add(() => showInstance(board, instance));
+    sprites.push(sprite);
+
+    x += 15;
   }
 
   board.graphics.stateGfx = sprites;

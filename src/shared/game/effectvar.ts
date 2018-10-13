@@ -3,6 +3,7 @@ import { Status, Guard, DmgBarrier } from "src/shared/game/status";
 import { Action } from "src/shared/game/action";
 import { InputType } from "src/shared/game/input";
 import { Origin } from "./target";
+import { Instance } from "./instance";
 
 export type Eff1<A> = {
   effect: (obj: Context) => { action: Action } & A,
@@ -548,6 +549,23 @@ export function loseFragments(
       return { action };
     },
     description: `${showEv(target)} loses ${showEv(value)} ${showEv(type)} fragments`,
+  }
+}
+
+export function addInstance(
+  instance: EffectVar<Instance>,
+  team: EffectVar<"ally" | "enemy">,
+): Eff1<{}> {
+  return {
+    effect: (obj) => {
+      const action: Action = {
+        tag: "AddInstance",
+        instance: evaluate(instance)(obj),
+        team: evaluate(team)(obj),
+      };
+      return { action };
+    },
+    description: `add ${showEv(team)} instance`,
   }
 }
 
