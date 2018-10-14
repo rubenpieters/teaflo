@@ -359,3 +359,19 @@ function statusToTrigger(
     default: throw "unimplemented";
   }
 }
+
+// should be used to find mergeable status
+// throws error when more than 1 status is found
+export function findStatus<E extends HasStatus>(
+  e: E,
+  tag: StatusTag,
+): Status | undefined {
+  const filtered = e.status.filter(x => x.tag === tag);
+  if (filtered.length > 1) {
+    throw `findStatus: unexpected more than 1 status of ${tag}`;
+  } else if (filtered.length === 1) {
+    return filtered[0];
+  } else {
+    return undefined;
+  }
+}

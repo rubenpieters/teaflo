@@ -128,6 +128,20 @@ export const cardCrew_0004: Event = {
   tag: "crew",
 };
 
+export const cardEnemy_0001: Event = {
+  origin: { tag: "PlayerOrigin", cardId: 2001 },
+  name: "Boss01",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddEnemy", enemy: allEnemies.enemyBoss1 }};
+      },
+      inputs: [],
+      description: "add Boss01",
+    },
+  ],
+  tag: "enemy",
+};
+
 /*
 export const cardCrew_0003: Event = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },

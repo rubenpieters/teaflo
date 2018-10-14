@@ -64,6 +64,7 @@ export function getBoard(_serverConn: ServerConnection, board: Board, seed: stri
       {...allCards.cardCrew_0003, limit: Infinity },
       {...allCards.cardCrew_0004, limit: Infinity },
       {...allCards.cardCrew_0005, limit: Infinity },
+      {...allCards.cardEnemy_0001, limit: Infinity },
     ];
   } else {
     throw "unexpected seed: " + seed;

@@ -1,5 +1,5 @@
 import { CreatureId, GameState, idEqual, findEntity } from "src/shared/game/state";
-import { Status, Guard, DmgBarrier } from "src/shared/game/status";
+import { Status, Guard, DmgBarrier, findStatus } from "src/shared/game/status";
 import { Action } from "src/shared/game/action";
 import { InputType } from "src/shared/game/input";
 import { Origin } from "./target";
@@ -607,3 +607,32 @@ export function noop(
     description: "Noop",
   }
 };
+
+export function explode(
+  varId: EffectVar<CreatureId>,
+  varThreshold: EffectVar<number>,
+): Eff1<{}> {
+  return {
+    effect: (obj) => {
+      const id = evaluate(varId)(obj);
+      const e = findEntity(obj.state, id);
+      const status = findStatus(e, "Poison");
+      const threshold = evaluate(varThreshold)(obj);
+      if (status === undefined || status.value < threshold) {
+        const action: Action = {
+          tag: "Noop",
+        };
+        return { action };
+      } else {
+        const action: Action = {
+          tag: "Damage",
+          target: id,
+          value: 2 * status.value,
+          piercing: false,
+        };
+        return { action };
+      }
+    },
+    description: `explode ${showEv(varThreshold)}`,
+  }
+}
