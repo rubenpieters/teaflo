@@ -5,6 +5,7 @@ import { Generator } from "src/shared/handler/id/generator";
 import { Guard, HasStatus, Status } from "src/shared/game/status";
 import { EnemyEffect, TriggerEntityEffect, EntityEffect } from "src/shared/game/ability";
 import { Eff1, EffT } from "./effectvar";
+import { Next } from "./next";
 
 /*export function showEnemy(
   enemy: Enemy
@@ -62,24 +63,38 @@ export function act(
 ): { state: GameState | "invalid", log: Action[] }  {
   const { action, next } = enemy.actions[enemy.actionIndex].effect({ state, selfId: { tag: "GlobalId", id: enemy.id, type: "enemy" }});
   state = focus(state,
-    over(x => x.enemies[index].actionIndex, x => {
-      switch (next.tag) {
-        case "NextId": {
-          const newX = x + 1;
-          return newX >= enemy.actions.length ? 0 : newX;
-        }
-        case "Repeat": {
-          return x;
-        }
-        case "Goto": {
-          return next.action;
-        }
-      }
-    }),
+    over(x => x.enemies[index].actionIndex, x => nextActionId(state, enemy, x, next)),
   );
   return applyActionAndTriggers(
     action, state, log, idGen, { tag: "GlobalId", id: enemy.id, type: "enemy" }
   );
+}
+
+function nextActionId(
+  state: GameState,
+  enemy: Enemy,
+  x: number,
+  next: Next,
+): number {
+  switch (next.tag) {
+    case "NextId": {
+      const newX = x + 1;
+      return newX >= enemy.actions.length ? 0 : newX;
+    }
+    case "Repeat": {
+      return x;
+    }
+    case "Goto": {
+      return next.action;
+    }
+    case "NextCondition": {
+      if (next.condition(state)) {
+        return nextActionId(state, enemy, x, next.ifT);
+      } else {
+        return nextActionId(state, enemy, x, next.ifF);
+      }
+    }
+  }
 }
 
 export function heal<E extends Enemy>(

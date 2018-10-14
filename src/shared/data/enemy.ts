@@ -3,7 +3,7 @@ import { GameState, CreatureId, toPositionId } from "src/shared/game/state";
 import { Next } from "src/shared/game/next";
 import { Enemy } from "src/shared/game/enemy";
 import { queueStatus, evAllyPositions, evStatic, extra, noop, damage, explode } from "src/shared/game/effectvar";
-import { Poison } from "src/shared/game/status";
+import { Poison, findStatus } from "src/shared/game/status";
 
 
 export const dummy: Enemy = {
@@ -54,7 +54,7 @@ export const enemyBoss1: Enemy = {
         value: 2,
         fragment: 50,
       }
-    ))), { next: <Next>{ tag: "NextId" }}),
+    ))), { next: <Next>{ tag: "NextCondition", condition: enemyBoss1Condition1, ifT: { tag: "NextId" }, ifF: { tag: "Repeat" } }}),
     extra(evAllyPositions(ally => explode(ally, evStatic(10))), { next: <Next>{ tag: "NextId" }}),
   ],
   triggers: [
@@ -65,6 +65,15 @@ export const enemyBoss1: Enemy = {
   },
   status: [],
 };
+
+function enemyBoss1Condition1(
+  state: GameState,
+) {
+  return state.crew.filter(x => {
+    const status = findStatus(x, "Poison");
+    return status !== undefined && status.value >= 10;
+  }).length > 0;
+}
 
 /*
 export const enemyBoss1: Enemy = {

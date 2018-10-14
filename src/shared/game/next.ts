@@ -1,3 +1,5 @@
+import { GameState } from "src/shared/game/state";
+
 export type HasNext = {
   next: Next,
 }
@@ -15,7 +17,15 @@ type Goto = {
   action: number,
 }
 
+type NextCondition = {
+  tag: "NextCondition",
+  condition: (state: GameState) => boolean,
+  ifT: Next,
+  ifF: Next,
+}
+
 export type Next
   = NextId
   | Repeat
   | Goto
+  | NextCondition
