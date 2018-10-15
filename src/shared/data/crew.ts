@@ -6,7 +6,7 @@ import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
 import * as allInstances from "src/shared/data/instance";
 import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, setHP, loseFragments, hasBubble, addInstance } from "src/shared/game/effectvar";
-import { Poison, Guard, Bubble, DmgBarrier } from "src/shared/game/status";
+import { Poison, Guard, Bubble, DmgBarrier, Convert } from "src/shared/game/status";
 
 export const dmgPoison: Crew = {
   ap: 1,
@@ -187,6 +187,31 @@ export const dmg_02: Crew = {
   status: [],
 };
 
+export const dmg_03: Crew = {
+  ap: 1,
+  hp: 100,
+  maxHp: 100,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    noop(),
+  ],
+  abilities: [
+    noTarget(
+      evAllies(ally => queueStatus(ally, evStatic(<Convert>{
+        tag: "Convert",
+        value: 1,
+        fragment: 0,
+      })))
+    ),
+  ],
+  threatMap: {},
+  charges: 5,
+  fragmentLoss: {},
+  status: [],
+};
+
 export const util_01: Crew = {
   ap: 1,
   hp: 60,
@@ -206,7 +231,7 @@ export const util_01: Crew = {
     }))),
     noTarget(evAnd(
       damage(evSelf, evStatic(20), evStatic(false)),
-      evAllies((ally) => heal(ally, evStatic(30))),
+      evAllies(ally => heal(ally, evStatic(30))), // TODO: should not heal self?
     )),
   ],
   threatMap: {},

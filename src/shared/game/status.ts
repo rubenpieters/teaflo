@@ -3,7 +3,7 @@ import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Origin, TargetType } from "src/shared/game/target";
 import { findIndex } from "src/shared/game/trigger";
 import { GameState, CreatureId, toPositionId, Id, findEntity } from "src/shared/game/state";
-import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger, dmgBarrierTrigger, bubbleTrigger, weakTrigger } from "src/shared/game/effectvar";
+import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger, dmgBarrierTrigger, bubbleTrigger, weakTrigger, convertTrigger } from "src/shared/game/effectvar";
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
 
@@ -71,6 +71,12 @@ export type Weak = {
   fragment: number,
 };
 
+export type Convert = {
+  tag: "Convert",
+  value: 1,
+  fragment: 0,
+};
+
 export type Status
   = Poison
   | PiercingPoison
@@ -82,6 +88,7 @@ export type Status
   | Bubble
   | DmgBarrier
   | Weak
+  | Convert
   ;
 
 export function showStatus(status: Status): string {
@@ -115,6 +122,9 @@ export function showStatus(status: Status): string {
     }
     case "Weak": {
       return `Weak ${status.value} T ${status.fragment} F`;
+    }
+    case "Convert": {
+      return `Convert ${status.value} T ${status.fragment} F`;
     }
   }
 }
@@ -355,6 +365,9 @@ function statusToTrigger(
     }
     case "Weak": {
       return weakTrigger;
+    }
+    case "Convert": {
+      return convertTrigger;
     }
     default: throw "unimplemented";
   }

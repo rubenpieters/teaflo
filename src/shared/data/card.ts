@@ -100,6 +100,20 @@ export const cardCrew_0005: Event = {
   tag: "crew",
 };
 
+export const cardCrew_0006: Event = {
+  origin: { tag: "PlayerOrigin", cardId: 1003 },
+  name: "Dmg03",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddCrew", crew: allCrew.dmg_03 }};
+      },
+      inputs: [],
+      description: "add Dmg03",
+    },
+  ],
+  tag: "crew",
+};
+
 export const cardCrew_0003: Event = {
   origin: { tag: "PlayerOrigin", cardId: 1002 },
   name: "Tank02",
@@ -127,6 +141,21 @@ export const cardCrew_0004: Event = {
   ],
   tag: "crew",
 };
+
+export const cardCrew_0007: Event = {
+  origin: { tag: "PlayerOrigin", cardId: 1003 },
+  name: "Util01",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddCrew", crew: allCrew.util_01 }};
+      },
+      inputs: [],
+      description: "add Util01",
+    },
+  ],
+  tag: "crew",
+};
+
 
 export const cardEnemy_0001: Event = {
   origin: { tag: "PlayerOrigin", cardId: 2001 },

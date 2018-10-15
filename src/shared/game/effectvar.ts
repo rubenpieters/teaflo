@@ -1,5 +1,5 @@
 import { CreatureId, GameState, idEqual, findEntity } from "src/shared/game/state";
-import { Status, Guard, DmgBarrier, findStatus } from "src/shared/game/status";
+import { Status, Guard, DmgBarrier, findStatus, Poison } from "src/shared/game/status";
 import { Action } from "src/shared/game/action";
 import { InputType } from "src/shared/game/input";
 import { Origin } from "./target";
@@ -289,6 +289,36 @@ export const weakTrigger: EffT<{ chargeUse: number }> = {
         } else {
           return { action: { tag: "Abort" }, chargeUse: 0 };
         }
+      }
+    } else {
+      return { action: { tag: "Noop" }, chargeUse: 0 };
+    }
+  },
+  description: `when dealing damage: reduce by x`,
+  type: "instead",
+}
+
+export const convertTrigger: EffT<{ chargeUse: number }> = {
+  effect: (obj: Context) => {
+    const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
+    const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
+    console.log(`CHECKING: ${JSON.stringify(action)}`);
+    if (action.tag === "Damage" && origin !== "noOrigin" && origin.type === "ally") {
+      if (obj.status === undefined || obj.status.tag !== "Convert") {
+        throw `Wrong status: ${JSON.stringify(obj.status)}`;
+      } else {
+        const fragment = action.value % 100;
+        const value = Math.floor(action.value / 100);
+        return {
+          // TODO: make convert to tag a parameter?
+          action: queueStatus(evStatic(action.target), evStatic(<Poison>{
+            tag: "Poison",
+            value,
+            fragment,
+          }))
+          .effect(obj).action,
+          chargeUse: 0,
+        };
       }
     } else {
       return { action: { tag: "Noop" }, chargeUse: 0 };
