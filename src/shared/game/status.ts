@@ -6,6 +6,7 @@ import { GameState, CreatureId, toPositionId, Id, findEntity } from "src/shared/
 import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, evStatusValue, guardTrigger, dmgBarrierTrigger, bubbleTrigger, weakTrigger, convertTrigger } from "src/shared/game/effectvar";
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
+import * as EV from "src/shared/game/effectvar";
 
 export type StatusTag = Status["tag"];
 
@@ -77,6 +78,12 @@ export type Convert = {
   fragment: 0,
 };
 
+export type Mark = {
+  tag: "Mark",
+  value: number,
+  fragment: number,
+}
+
 export type Status
   = Poison
   | PiercingPoison
@@ -89,6 +96,7 @@ export type Status
   | DmgBarrier
   | Weak
   | Convert
+  | Mark
   ;
 
 export function showStatus(status: Status): string {
@@ -126,6 +134,9 @@ export function showStatus(status: Status): string {
     case "Convert": {
       return `Convert ${status.value} T ${status.fragment} F`;
     }
+    case "Mark": {
+      return `Mark`;
+    }
   }
 }
 
@@ -155,6 +166,12 @@ function mergeStatus<S extends Status>(
         over(x => x.value, x => x + status2.value),
       ));
     }
+    case "Mark": {
+      return collapseStatus(focus(status1,
+        over(x => x.fragment, x => x + status2.fragment),
+        over(x => x.value, x => x + status2.value),
+      ));
+    }
     default: {
       throw "TODO";
     }
@@ -170,6 +187,15 @@ function collapseStatus<S extends Status>(
   return focus(status,
     set(x => x.fragment, newFragment),
     over(x => x.value, x => x + addValue),
+  );
+}
+
+export function removeStatus<E extends HasStatus>(
+  e: E,
+  tag: StatusTag,
+) {
+  return focus(e,
+    over(x => x.status, x => x.filter(x => x.tag !== tag)),
   );
 }
 
@@ -368,6 +394,15 @@ function statusToTrigger(
     }
     case "Convert": {
       return convertTrigger;
+    }
+    case "Mark": {
+      return evTrigger(trigger => evCondition(trigger,
+          x => x.tag === "StartTurn",
+          extra(EV.loseFragments(evSelf, evStatic(<"Mark">"Mark"), evStatic(-50)), { chargeUse: 0 }),
+          extra(noop(), { chargeUse: 0 }),
+        ),
+        "before",
+      );
     }
     default: throw "unimplemented";
   }

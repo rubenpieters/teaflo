@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import * as _Crew from "src/shared/game/crew";
-import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, onCreature, toGlobalId, IdInstance, entityExists, toPositionId } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, onCreature, toGlobalId, IdInstance, entityExists, toPositionId, findEntity, onCreatures } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
@@ -542,10 +542,21 @@ function applyAction(
       break;
     }
     case "AddStatus": {
-      state = onCreature(action.target, state,
-        ally => _Status.addStatus(ally, action.status),
-        enemy => _Status.addStatus(enemy, action.status),
-      );
+      if (action.status.tag === "Mark") {
+        const e = findEntity(state, action.target);
+        if (_Status.findStatus(e, "Mark") === undefined) {
+          state = onCreatures(action.target.type, state,
+            ally => _Status.removeStatus(ally, "Mark"),
+            enemy => _Status.removeStatus(enemy, "Mark"),
+          );
+        }
+        
+      } else {
+        state = onCreature(action.target, state,
+          ally => _Status.addStatus(ally, action.status),
+          enemy => _Status.addStatus(enemy, action.status),
+        );
+      }
       break;
     }
     case "Noop": {

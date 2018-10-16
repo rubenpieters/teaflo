@@ -205,6 +205,26 @@ export function onCreature(
   }
 }
 
+export function onCreatures(
+  type: "ally" | "enemy",
+  state: GameState,
+  allyF: (ally: IdCrew) => IdCrew,
+  enemyF: (enemy: IdEnemy) => IdEnemy,
+) {
+  switch (type) {
+    case "ally": {
+      return focus(state,
+        over(x => x.crew, x => x.map(allyF)),
+      );
+    }
+    case "enemy": {
+      return focus(state,
+        over(x => x.enemies, x => x.map(enemyF)),
+      );
+    }
+  }
+}
+
 export function entityExists<A extends TargetType>(
   id: EntityIdA<A>,
   state: GameState,
