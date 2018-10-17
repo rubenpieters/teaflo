@@ -5,7 +5,7 @@ import { Crew } from "src/shared/game/crew";
 import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
 import * as allInstances from "src/shared/data/instance";
-import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, setHP, loseFragments, hasBubble, addInstance } from "src/shared/game/effectvar";
+import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, setHP, loseFragments, hasBubble, addInstance, leech } from "src/shared/game/effectvar";
 import { Poison, Guard, Bubble, DmgBarrier, Convert, Mark } from "src/shared/game/status";
 
 export const dmgPoison: Crew = {
@@ -230,6 +230,7 @@ export const dmg_04: Crew = {
         fragment: 50,
       })),
     )),
+    addTarget(0, target0 => leech(target0)),
   ],
   threatMap: {},
   charges: 5,

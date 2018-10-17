@@ -665,4 +665,47 @@ export function explode(
     },
     description: `explode ${showEv(varThreshold)}`,
   }
-}
+};
+
+export function leech(
+  target: EffectVar<CreatureId>,
+): Eff1<{}> {
+  return {
+    effect: (obj) => {
+      const id = evaluate(target)(obj);
+      const e = findEntity(obj.state, id);
+      const status = findStatus(e, "Mark");
+      const selfId = evaluate(evSelf)(obj);
+      if (status === undefined) {
+        const action: Action = {
+          tag: "Noop",
+        };
+        return { action };
+      } else {
+        const action1: Action = {
+          tag: "LoseFragment",
+          target: id,
+          type: "Mark",
+          value: status.value * 100 + status.fragment,
+        };
+        const action2: Action = {
+          tag: "Damage",
+          target: id,
+          value: 2 * status.value,
+          piercing: false,
+        };
+        const action3: Action = {
+          tag: "Heal",
+          target: selfId,
+          value: 2 * status.value,
+        };
+        const action: Action = {
+          tag: "CombinedAction",
+          actions: [action1, action2, action3],
+        }
+        return { action };
+      }
+    },
+    description: `leech ${showEv(target)}`,
+  }
+};
