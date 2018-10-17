@@ -114,6 +114,20 @@ export const cardCrew_0006: Event = {
   tag: "crew",
 };
 
+export const cardCrew_0008: Event = {
+  origin: { tag: "PlayerOrigin", cardId: 1003 },
+  name: "Dmg04",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddCrew", crew: allCrew.dmg_04 }};
+      },
+      inputs: [],
+      description: "add Dmg04",
+    },
+  ],
+  tag: "crew",
+};
+
 export const cardCrew_0003: Event = {
   origin: { tag: "PlayerOrigin", cardId: 1002 },
   name: "Tank02",

@@ -135,7 +135,7 @@ export function showStatus(status: Status): string {
       return `Convert ${status.value} T ${status.fragment} F`;
     }
     case "Mark": {
-      return `Mark`;
+      return `Mark ${status.value} T ${status.fragment} F`;
     }
   }
 }

@@ -550,7 +550,10 @@ function applyAction(
             enemy => _Status.removeStatus(enemy, "Mark"),
           );
         }
-        
+        state = onCreature(action.target, state,
+          ally => _Status.addStatus(ally, action.status),
+          enemy => _Status.addStatus(enemy, action.status),
+        );
       } else {
         state = onCreature(action.target, state,
           ally => _Status.addStatus(ally, action.status),

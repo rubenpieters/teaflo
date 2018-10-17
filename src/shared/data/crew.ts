@@ -6,7 +6,7 @@ import * as allAbilities from "src/shared/data/ability";
 import * as allTriggers from "src/shared/data/trigger";
 import * as allInstances from "src/shared/data/instance";
 import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, setHP, loseFragments, hasBubble, addInstance } from "src/shared/game/effectvar";
-import { Poison, Guard, Bubble, DmgBarrier, Convert } from "src/shared/game/status";
+import { Poison, Guard, Bubble, DmgBarrier, Convert, Mark } from "src/shared/game/status";
 
 export const dmgPoison: Crew = {
   ap: 1,
@@ -205,6 +205,31 @@ export const dmg_03: Crew = {
         fragment: 0,
       })))
     ),
+  ],
+  threatMap: {},
+  charges: 5,
+  fragmentLoss: {},
+  status: [],
+};
+
+export const dmg_04: Crew = {
+  ap: 1,
+  hp: 100,
+  maxHp: 100,
+  triggers: [
+  ],
+  ranged: false,
+  actions: [
+    noop(),
+  ],
+  abilities: [
+    addTarget(0, target0 => evAnd(
+      queueStatus(target0, evStatic(<Mark>{
+        tag: "Mark",
+        value: 0,
+        fragment: 50,
+      })),
+    )),
   ],
   threatMap: {},
   charges: 5,
