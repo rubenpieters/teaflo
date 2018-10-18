@@ -33,7 +33,7 @@ export const evSelf: EffectVar<CreatureId> = { tag: "Self" };
 type Input<A> = {
   tag: "Input",
   v: number,
-  f: (n: number) => A,
+  f: (id: CreatureId) => A,
 }
 
 function numberToTarget(input: number): CreatureId {
@@ -105,16 +105,16 @@ export function addTarget<A>(
   n: number,
   f: (target: EffectVar<CreatureId>) => Eff1<A>
 ): EffI<A> {
-  const effS = f({ tag: "Input", v: n, f: numberToTarget});
-  return { ...effS, inputs: [{ tag: "NumberInput" }], };
+  const effS = f({ tag: "Input", v: n, f: x => x});
+  return { ...effS, inputs: [{ tag: "TargetInput" }], };
 }
 
 export function addTargetI<A>(
   n: number,
   eff: (a: EffectVar<CreatureId>) => EffI<A>,
 ): EffI<A> {
-  const effS = eff({ tag: "Input", v: n, f: numberToTarget});
-  return { ...effS, inputs: effS.inputs.concat({ tag: "NumberInput" }), };
+  const effS = eff({ tag: "Input", v: n, f: x => x});
+  return { ...effS, inputs: effS.inputs.concat({ tag: "TargetInput" }), };
 }
 
 export function noTarget<A>(

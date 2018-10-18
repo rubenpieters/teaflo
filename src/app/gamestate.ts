@@ -1,6 +1,6 @@
 import { Solution, runSolutionAll, SolCard, SolRest, SolEvent } from "src/shared/game/solution";
 import { Card, Rest, Event, PlayerOrigin } from "src/shared/game/card";
-import { GameState, IdCrew, IdEnemy } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy, CreatureId } from "src/shared/game/state";
 import { InputEntityEffect, EntityEffect, solCardFromAbility } from "src/shared/game/ability";
 import { Action } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
@@ -14,6 +14,9 @@ import { Instance } from "src/shared/game/instance";
 export type Limit = {
   limit: number,
 };
+
+let targeting: boolean = false;
+let targeted: CreatureId | undefined = undefined;
 
 export type LimitedCard = Card & Limit;
 
@@ -223,7 +226,7 @@ function cb1(
   }
 } 
 
-function addToSolution(
+async function addToSolution(
   board: Board,
   card: Card,
 ) {
@@ -238,7 +241,7 @@ function addToSolution(
   // add user input to card
   let inputs: any[] = [];
   for (const effect of card.effects) {
-    inputs = getUserInputs(board, effect.inputs, inputs);
+    inputs = await getUserInputs(board, effect.inputs, inputs);
   }
 
   // TODO: unify with function from general.ts
@@ -458,6 +461,15 @@ function mkState(
     sprite.endFill();
     sprite.inputEnabled = true;
     sprite.events.onInputOver.add(() => showAlly(board, ally));
+    sprite.events.onInputDown.add(() => {
+      if (targeting) {
+        targeted = {
+          tag: "GlobalId",
+          id: ally.id,
+          type: "ally",
+        }
+      }
+    });
     sprites.push(sprite);
 
     const hpRatio = ally.hp / ally.maxHp;
@@ -516,6 +528,15 @@ function mkState(
     sprite.endFill();
     sprite.inputEnabled = true;
     sprite.events.onInputOver.add(() => showEnemy(board, enemy));
+    sprite.events.onInputDown.add(() => {
+      if (targeting) {
+        targeted = {
+          tag: "GlobalId",
+          id: enemy.id,
+          type: "enemy",
+        }
+      }
+    });
     sprites.push(sprite);
 
     const hpRatio = enemy.hp / enemy.maxHp;
@@ -553,11 +574,25 @@ function mkState(
   board.graphics.stateGfx = sprites;
 }
 
-function getUserInputs(
+function waitForTarget(): Promise<CreatureId> {
+  return new Promise(function (resolve, reject) {
+      (function wait(){
+        if (targeted !== undefined) {
+          const temp = targeted;
+          targeted = undefined;
+          targeting = false;
+          return resolve(temp);
+        }
+        setTimeout(wait, 30);
+      })();
+  });
+}
+
+async function getUserInputs(
   board: Board,
   toHandleInputs: InputType[],
   currentInputs: any[],
-): any[] {
+): Promise<any[]> {
   if (toHandleInputs.length === 0) {
     return currentInputs;
   } else {
@@ -565,7 +600,9 @@ function getUserInputs(
     const tail = toHandleInputs.slice(1);
     switch (currentInputType.tag) {
       case "TargetInput": {
-        throw "TODO";
+        targeting = true;
+        const gid: CreatureId = await waitForTarget();
+        return getUserInputs(board, tail, currentInputs.concat(gid));
       }
       case "NumberInput": {
         let input = prompt("Enter Number");
