@@ -12,8 +12,6 @@ export const dmgPoison: Crew = {
   ap: 1,
   hp: 15,
   maxHp: 15,
-  triggers: [
-  ],
   ranged: false,
   actions: [
     noop(),
@@ -32,12 +30,14 @@ export const dmgPoison: Crew = {
   charges: 5,
   fragmentLoss: {},
   status: [],
+  transforms: [],
 };
 
 export const tank_01: Crew = {
   ap: 1,
   hp: 100,
   maxHp: 100,
+  /* TODO: convert to status trigger
   triggers: [
     evTrigger(trigger => evCondition(trigger,
       x => x.tag === "Damage" && x.target.type === "ally", // TODO: and target not self?
@@ -46,7 +46,7 @@ export const tank_01: Crew = {
       ),
       "before",
     )
-  ],
+  ],*/
   ranged: false,
   actions: [
     noop(),
@@ -65,14 +65,13 @@ export const tank_01: Crew = {
   charges: 5,
   fragmentLoss: {},
   status: [],
+  transforms: [],
 };
 
 export const tank_02: Crew = {
   ap: 1,
   hp: 100,
   maxHp: 100,
-  triggers: [
-  ],
   ranged: false,
   actions: [
     noop(),
@@ -100,14 +99,13 @@ export const tank_02: Crew = {
   charges: 5,
   fragmentLoss: {},
   status: [],
+  transforms: [],
 };
 
 export const tank_03: Crew = {
   ap: 1,
   hp: 100,
   maxHp: 100,
-  triggers: [
-  ],
   ranged: false,
   actions: [
     noop(),
@@ -137,14 +135,13 @@ export const tank_03: Crew = {
   charges: 5,
   fragmentLoss: {},
   status: [],
+  transforms: [],
 };
 
 export const dmg_01: Crew = {
   ap: 1,
   hp: 100,
   maxHp: 100,
-  triggers: [
-  ],
   ranged: false,
   actions: [
     noop(),
@@ -159,14 +156,13 @@ export const dmg_01: Crew = {
   charges: 5,
   fragmentLoss: {},
   status: [],
+  transforms: [],
 };
 
 export const dmg_02: Crew = {
   ap: 1,
   hp: 100,
   maxHp: 100,
-  triggers: [
-  ],
   ranged: false,
   actions: [
     noop(),
@@ -185,14 +181,13 @@ export const dmg_02: Crew = {
   charges: 5,
   fragmentLoss: {},
   status: [],
+  transforms: [],
 };
 
 export const dmg_03: Crew = {
   ap: 1,
   hp: 100,
   maxHp: 100,
-  triggers: [
-  ],
   ranged: false,
   actions: [
     noop(),
@@ -210,14 +205,13 @@ export const dmg_03: Crew = {
   charges: 5,
   fragmentLoss: {},
   status: [],
+  transforms: [],
 };
 
 export const dmg_04: Crew = {
   ap: 1,
   hp: 100,
   maxHp: 100,
-  triggers: [
-  ],
   ranged: false,
   actions: [
     noop(),
@@ -236,14 +230,13 @@ export const dmg_04: Crew = {
   charges: 5,
   fragmentLoss: {},
   status: [],
+  transforms: [],
 };
 
 export const util_01: Crew = {
   ap: 1,
   hp: 60,
   maxHp: 60,
-  triggers: [
-  ],
   ranged: false,
   actions: [
     noop(),
@@ -264,4 +257,5 @@ export const util_01: Crew = {
   charges: 5,
   fragmentLoss: {},
   status: [],
+  transforms: [],
 };

@@ -11,6 +11,7 @@ import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
 import { StatusLog } from "src/shared/game/log";
 import { Instance } from "./instance";
+import { Transform, StatusTag, TransformTag } from "src/shared/game/status";
 
 export type ActionSpec = (state: GameState, selfId: number, selfType: TargetType) => Action;
 
@@ -117,13 +118,13 @@ export type Death = {
 export type QueueStatus = {
   tag: "QueueStatus",
   target: CreatureId,
-  status: Status,
+  status: Status | Transform,
 };
 
 export type AddStatus = {
   tag: "AddStatus",
   target: CreatureId,
-  status: Status,
+  status: Status | Transform,
 };
 
 export type Noop = {
@@ -176,7 +177,7 @@ export type StartTurn = {
 export type LoseFragment = {
   tag: "LoseFragment",
   target: CreatureId,
-  type: Status["tag"],
+  type: StatusTag | TransformTag,
   value: number,
 };
 
@@ -595,13 +596,13 @@ function applyAction(
           );
         }
         state = onCreature(action.target, state,
-          ally => _Status.addStatus(ally, action.status),
-          enemy => _Status.addStatus(enemy, action.status),
+          ally => _Status.addStatusTransform(ally, action.status),
+          enemy => _Status.addStatusTransform(enemy, action.status),
         );
       } else {
         state = onCreature(action.target, state,
-          ally => _Status.addStatus(ally, action.status),
-          enemy => _Status.addStatus(enemy, action.status),
+          ally => _Status.addStatusTransform(ally, action.status),
+          enemy => _Status.addStatusTransform(enemy, action.status),
         );
       }
       break;

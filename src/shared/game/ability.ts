@@ -47,5 +47,4 @@ export type InputEntityEffect = {
 export type TriggerEntityEffect = {
   effect: (obj: Context) => { action: Action, chargeUse: number },
   description: string,
-  type: "before" | "instead",
 }

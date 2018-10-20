@@ -4,7 +4,7 @@ import { GameState, IdCrew, IdEnemy, CreatureId } from "src/shared/game/state";
 import { InputEntityEffect, EntityEffect, solCardFromAbility } from "src/shared/game/ability";
 import { Action } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
-import { HasStatus, allStatus, showStatus } from "src/shared/game/status";
+import { HasStatus, showStatus } from "src/shared/game/status";
 import { TargetType } from "src/shared/game/target";
 import { Ability } from "src/shared/game/crew";
 import { InputType } from "../shared/game/input";
@@ -797,20 +797,7 @@ function showAlly(
   }, board.group);
   triggerText.setTextBounds(x, y, 180, 22);
   infoTexts.push(triggerText);
-
-  for (const trigger of ally.triggers) {
-    y += 30;
-    const triggerDescText: Phaser.Text = board.game.add.text(0, 0, trigger.description, {
-      font: "Arial",
-      fontSize: fontSize,
-      fill: "#222222",
-      boundsAlignH: "center",
-      boundsAlignV: "middle",
-    }, board.group);
-    triggerDescText.setTextBounds(x, y, 180, 22);
-    infoTexts.push(triggerDescText);
-  }
-
+  
   board.graphics.infoTexts = infoTexts;
 }
 

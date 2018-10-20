@@ -1,9 +1,10 @@
 import { CreatureId, GameState, idEqual, findEntity } from "src/shared/game/state";
-import { Status, Guard, DmgBarrier, findStatus, Poison } from "src/shared/game/status";
+import { Status, Guard, DmgBarrier, findStatus, Poison, StatusTag, TransformTag } from "src/shared/game/status";
 import { Action } from "src/shared/game/action";
 import { InputType } from "src/shared/game/input";
 import { Origin } from "./target";
 import { Instance } from "./instance";
+import { Transform } from "src/shared/game/status";
 
 export type Eff1<A> = {
   effect: (obj: Context) => { action: Action } & A,
@@ -11,7 +12,6 @@ export type Eff1<A> = {
 }
 
 export type EffI<A> = Eff1<A> & { inputs: InputType[] };
-export type EffT<A> = Eff1<A> & { type: "before" | "instead" };
 
 type Static<A> = {
   tag: "Static",
@@ -80,6 +80,14 @@ export const evStatusValue: EffectVar<number> = {
   tag: "StatusValue",
 }
 
+type TransformValue = {
+  tag: "TransformValue",
+}
+
+export const evTransformValue: EffectVar<number> = {
+  tag: "TransformValue",
+}
+
 type EffectVar<A>
   = Static<A>
   | Self
@@ -90,6 +98,7 @@ type EffectVar<A>
   | Trigger
   | TriggerOrigin
   | StatusValue
+  | TransformValue
   ;
 
 export type Context = {
@@ -98,6 +107,7 @@ export type Context = {
   trigger?: Action,
   inputs?: any[],
   status?: Status,
+  transform?: Transform,
   triggerOrigin?: Origin,
 }
 
@@ -125,13 +135,11 @@ export function noTarget<A>(
 
 export function evTrigger<A>(
   eff: (a: EffectVar<Action>) => Eff1<A>,
-  type: "before" | "instead",
-): EffT<A> {
+): Eff1<A> {
   const effS = eff({ tag: "Trigger"});
   return {
     effect: effS.effect,
     description: effS.description,
-    type,
   }
 }
 
@@ -176,8 +184,8 @@ export function hasBubble<A>(
     effect: (obj) => {
       const id = evaluate(ev)(obj);
       const e = findEntity(obj.state, id);
-      if (e.status.filter(x => x.tag === "Bubble").length >= 1) {
-        return fT.effect(obj); 
+      if (e.transforms.filter(x => x.tag === "Bubble").length >= 1) {
+        return fT.effect(obj);
       } else {
         return fF.effect(obj);
       }
@@ -186,16 +194,16 @@ export function hasBubble<A>(
   }
 }
 
-export const guardTrigger: EffT<{ chargeUse: number }> = {
+export const guardTrigger: Eff1<{ chargeUse: number }> = {
   effect: (obj: Context) => {
     const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
     const self: CreatureId = evaluate(<EffectVar<CreatureId>>evSelf)(obj);
     const state: GameState = obj.state;
     if (action.tag === "Damage" && idEqual(state, self, action.target)) {
-      if (obj.status === undefined || obj.status.tag !== "Guard") {
+      if (obj.transform === undefined || obj.transform.tag !== "Guard") {
         throw `Wrong status: ${JSON.stringify(obj.status)}`;
       } else {
-        const guard: Guard = obj.status;
+        const guard: Guard = obj.transform;
         if (guard.value > action.value) {
           return {
             action: loseFragments(evSelf, evStatic(<Status["tag"]>"Guard"), evStatic(action.value))
@@ -219,10 +227,9 @@ export const guardTrigger: EffT<{ chargeUse: number }> = {
     }
   },
   description: `on self damage: reduce incoming damage by guard value`,
-  type: "instead",
 }
 
-export const dmgBarrierTrigger: EffT<{ chargeUse: number }> = {
+export const dmgBarrierTrigger: Eff1<{ chargeUse: number }> = {
   effect: (obj: Context) => {
     const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
     const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
@@ -244,16 +251,15 @@ export const dmgBarrierTrigger: EffT<{ chargeUse: number }> = {
     }
   },
   description: `on self damage: retaliate`,
-  type: "before",
 }
 
-export const bubbleTrigger: EffT<{ chargeUse: number }> = {
+export const bubbleTrigger: Eff1<{ chargeUse: number }> = {
   effect: (obj: Context) => {
     const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
     const self: CreatureId = evaluate(<EffectVar<CreatureId>>evSelf)(obj);
     const state: GameState = obj.state;
     if (action.tag === "Damage" && idEqual(state, self, action.target)) {
-      if (obj.status === undefined || obj.status.tag !== "Bubble") {
+      if (obj.transform === undefined || obj.transform.tag !== "Bubble") {
         throw `Wrong status: ${JSON.stringify(obj.status)}`;
       } else {
         return {
@@ -267,19 +273,18 @@ export const bubbleTrigger: EffT<{ chargeUse: number }> = {
     }
   },
   description: `on self damage: absorb`,
-  type: "instead",
 }
 
-export const weakTrigger: EffT<{ chargeUse: number }> = {
+export const weakTrigger: Eff1<{ chargeUse: number }> = {
   effect: (obj: Context) => {
     const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
     const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
     const self: CreatureId = evaluate(<EffectVar<CreatureId>>evSelf)(obj);
     if (action.tag === "Damage" && origin !== "noOrigin" && idEqual(obj.state, origin, self)) {
-      if (obj.status === undefined || obj.status.tag !== "Weak") {
+      if (obj.transform === undefined || obj.transform.tag !== "Weak") {
         throw `Wrong status: ${JSON.stringify(obj.status)}`;
       } else {
-        const newDamage = action.value - obj.status.value;
+        const newDamage = action.value - obj.transform.value;
         if (newDamage > 0) {
           return {
             action: damage(evStatic(action.target), evStatic(newDamage), evStatic(false))
@@ -295,16 +300,15 @@ export const weakTrigger: EffT<{ chargeUse: number }> = {
     }
   },
   description: `when dealing damage: reduce by x`,
-  type: "instead",
 }
 
-export const convertTrigger: EffT<{ chargeUse: number }> = {
+export const convertTrigger: Eff1<{ chargeUse: number }> = {
   effect: (obj: Context) => {
     const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
     const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
     console.log(`CHECKING: ${JSON.stringify(action)}`);
     if (action.tag === "Damage" && origin !== "noOrigin" && origin.type === "ally") {
-      if (obj.status === undefined || obj.status.tag !== "Convert") {
+      if (obj.transform === undefined || obj.transform.tag !== "Convert") {
         throw `Wrong status: ${JSON.stringify(obj.status)}`;
       } else {
         const fragment = action.value % 100;
@@ -324,8 +328,7 @@ export const convertTrigger: EffT<{ chargeUse: number }> = {
       return { action: { tag: "Noop" }, chargeUse: 0 };
     }
   },
-  description: `when dealing damage: reduce by x`,
-  type: "instead",
+  description: `convert damage to poison`,
 }
 
 export function evAllies(
@@ -446,6 +449,14 @@ function evaluate<A>(
           return <A>(<any>context.status.value);
         }
       }
+      case "TransformValue": {
+        if (context.status === undefined) {
+          console.log("Context does not have transform");
+          throw "Context does not have transform";
+        } else {
+          return <A>(<any>context.transform);
+        }
+      }
       default: {
         console.log("Internal Effect Var");
         throw "Internal Effect Var";
@@ -483,6 +494,9 @@ function showEv<A>(ev: EffectVar<A>): string {
     case "StatusValue": {
       return `<Status Value>`;
     }
+    case "TransformValue": {
+      return `<Transform Value>`;
+    }
   }
 }
 
@@ -507,7 +521,7 @@ export function damage(
 
 export function queueStatus(
   target: EffectVar<CreatureId>,
-  status: EffectVar<Status>,
+  status: EffectVar<Status | Transform>,
 ): Eff1<{}> {
   return {
     effect: (obj) => {
@@ -593,7 +607,7 @@ export function setHP(
 
 export function loseFragments(
   target: EffectVar<CreatureId>,
-  type: EffectVar<Status["tag"]>,
+  type: EffectVar<StatusTag | TransformTag>,
   value: EffectVar<number>,
 ): Eff1<{}> {
   return {

@@ -2,9 +2,9 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, IdEnemy } from "src/shared/game/state";
 import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
-import { Guard, HasStatus, Status } from "src/shared/game/status";
+import { Guard, HasStatus, Status, Transform, TransformTag, StatusTag } from "src/shared/game/status";
 import { EnemyEffect, TriggerEntityEffect, EntityEffect } from "src/shared/game/ability";
-import { Eff1, EffT } from "./effectvar";
+import { Eff1 } from "./effectvar";
 import { Next } from "./next";
 
 /*export function showEnemy(
@@ -23,8 +23,9 @@ export type Enemy = {
   actions: EnemyEffect[],
   triggers: TriggerEntityEffect[],
   charges: number,
-  fragmentLoss: { [key in Status["tag"]]?: number },
+  fragmentLoss: { [key in StatusTag | TransformTag]?: number },
   status: Status[],
+  transforms: Transform[],
 };
 
 export function damage<E extends Enemy & HasStatus>(

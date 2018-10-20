@@ -30,9 +30,10 @@ function runSim(
           set(x => x.status, "Finished"),
         );
       }
+      throw "";
     }
     case "PhaseTurnAction": {
-
+      throw "";
     }
     case "Finished": {
       return sim;
@@ -45,7 +46,7 @@ export function phaseTransformCheckTransforms(
   id: CreatureId,
 ) {
   const e = findEntity(state, id);
-  if (e.triggers.map(x => x.type).filter(x => x === "instead").length === 0) {
+  if (e.transforms.length === 0) {
     // if entity has no transforms, skip to next entity
   } else {
     // if entity has transforms, start at transform index 0

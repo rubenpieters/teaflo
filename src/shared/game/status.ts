@@ -9,6 +9,7 @@ import { Generator } from "src/shared/handler/id/generator";
 import * as EV from "src/shared/game/effectvar";
 
 export type StatusTag = Status["tag"];
+export type TransformTag = Transform["tag"];
 
 export type Poison = {
   tag: "Poison",
@@ -88,19 +89,42 @@ export type Status
   = Poison
   | PiercingPoison
   | Regen
-  | Guard
   | Doom
   | Blind
   | Silence
-  | Bubble
   | DmgBarrier
-  | Weak
-  | Convert
   | Mark
   ;
 
-export function showStatus(status: Status): string {
+export type Transform
+  = Guard
+  | Bubble
+  | Weak
+  | Convert
+  ;
+
+/*export function isStatus<A extends { tag: string }>(
+  a: A,
+): A is Status {
+  if (
+    a.tag === "Poison" ||
+    a.tag === "PiercingPoison" ||
+    a.tag === "Regen" ||
+    a.tag === "Doom" ||
+    a.tag === "Blind" ||
+    a.tag === "Silence" ||
+    a.tag === "DmgBarrier" ||
+    a.tag === "Mark"
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}*/
+
+export function showStatus(status: Status | Transform): string {
   switch (status.tag) {
+    // Status
     case "Poison": {
       return `Poison ${status.value} T ${status.fragment} F`;
     }
@@ -109,9 +133,6 @@ export function showStatus(status: Status): string {
     }
     case "Regen": {
       return `Regen ${status.value} T ${status.fragment} F`;
-    }
-    case "Guard": {
-      return `Guard ${status.guard} ${status.value} T ${status.fragment} F`;
     }
     case "Doom": {
       return `Doom ${status.value} T ${status.fragment} F`;
@@ -122,11 +143,18 @@ export function showStatus(status: Status): string {
     case "Silence": {
       return `Silence ${status.value} T ${status.fragment} F`;
     }
-    case "Bubble": {
-      return `Bubble`;
-    }
     case "DmgBarrier": {
       return `DmgBarrier ${status.value} T ${status.fragment} F`;
+    }
+    case "Mark": {
+      return `Mark ${status.value} T ${status.fragment} F`;
+    }
+    // Transform
+    case "Guard": {
+      return `Guard ${status.guard} ${status.value} T ${status.fragment} F`;
+    }
+    case "Bubble": {
+      return `Bubble`;
     }
     case "Weak": {
       return `Weak ${status.value} T ${status.fragment} F`;
@@ -134,22 +162,22 @@ export function showStatus(status: Status): string {
     case "Convert": {
       return `Convert ${status.value} T ${status.fragment} F`;
     }
-    case "Mark": {
-      return `Mark ${status.value} T ${status.fragment} F`;
-    }
   }
 }
-
-export const allStatus: Status["tag"][] = ["Regen", "PiercingPoison", "Poison", "Doom", "Guard", "Blind", "Silence", "Bubble"];
 
 type DiscrStatus<T extends Status["tag"]> = Extract<Status, {tag: T}>
 
 export type HasStatus = {
   status: Status[],
-  fragmentLoss: { [key in Status["tag"]]?: number }
+  fragmentLoss: { [key in StatusTag]?: number }
 };
 
-function mergeStatus<S extends Status>(
+export type HasTransform = {
+  transforms: Transform[],
+  fragmentLoss: { [key in TransformTag]?: number }
+};
+
+function mergeStatus<S extends Status | Transform>(
   status1: S,
   status2: S,
 ): S {
@@ -178,7 +206,7 @@ function mergeStatus<S extends Status>(
   }
 }
 
-function collapseStatus<S extends Status>(
+function collapseStatus<S extends Status | Transform>(
   status: S,
 ): S {
   const fragment = status.fragment;
@@ -206,14 +234,14 @@ export function addStatus<E extends HasStatus>(
   // if (status.tag)
   // else 
   // merge statuses
-  if (status.tag === "DmgBarrier" || status.tag === "Bubble") {
+  if (status.tag === "DmgBarrier") {
     return focus(e,
       over(x => x.status, x => x.concat(status)),
     );
   } else {
     // merge statuses
     const filtered = e.status
-      .map((x, i) => { return { x, i}} )
+      .map((x, i) => { return { x, i }} )
       .filter(x => x.x.tag === status.tag);
     if (filtered.length > 1) {
       throw "addStatus: length>1 should be impossible";
@@ -230,9 +258,60 @@ export function addStatus<E extends HasStatus>(
   }
 }
 
+export function addTransform<E extends HasTransform>(
+  e: E,
+  transform: Transform,
+): E {
+  // if (status.tag)
+  // else 
+  // merge statuses
+  if (transform.tag === "Bubble") {
+    return focus(e,
+      over(x => x.transforms, x => x.concat(transform)),
+    );
+  } else {
+    // merge statuses
+    const filtered = e.transforms
+      .map((x, i) => { return { x, i }} )
+      .filter(x => x.x.tag === transform.tag);
+    if (filtered.length > 1) {
+      throw "addStatus: length>1 should be impossible";
+    } else if (filtered.length === 1) {
+      const { x, i } = filtered[0];
+      return focus(e,
+        over(x => x.transforms[i], x => mergeStatus(x, transform)),
+      );
+    } else {
+      return focus(e,
+        over(x => x.transforms, x => x.concat(transform)),
+      );
+    }
+  }
+}
+
+export function addStatusTransform<E extends HasStatus & HasTransform>(
+  e: E,
+  statusTransform: Status | Transform,
+) {
+  if (
+    statusTransform.tag === "Poison" ||
+    statusTransform.tag === "PiercingPoison" ||
+    statusTransform.tag === "Regen" ||
+    statusTransform.tag === "Doom" ||
+    statusTransform.tag === "Blind" ||
+    statusTransform.tag === "Silence" ||
+    statusTransform.tag === "DmgBarrier" ||
+    statusTransform.tag === "Mark"
+  ) {
+    return addStatus(e, statusTransform);
+  } else {
+    return addTransform(e, statusTransform);
+  }
+}
+
 export function loseFragments<E extends HasStatus & Id>(
   e: E,
-  tag: StatusTag,
+  tag: StatusTag | TransformTag,
   loss: number,
 ): E {
   const filtered = e.status
@@ -329,7 +408,7 @@ export function applyLoseFragments<E extends HasStatus & Id>(
   return { state, log };
 }
 
-export function checkTransforms<E extends HasStatus & { charges: number }>(
+export function checkTransforms<E extends HasTransform & { charges: number }>(
   trigger: Action,
   e: E,
   state: GameState,
@@ -339,22 +418,20 @@ export function checkTransforms<E extends HasStatus & { charges: number }>(
   origin: Origin,
 ): { state: GameState | "invalid", log: Action[], action: Action } {
   let action = trigger;
-  for (const status of e.status) {
-    const triggerEff = statusToTrigger(status.tag);
+  for (const transform of e.transforms) {
+    const triggerEff = transformToTrigger(transform.tag);
 
-    if (triggerEff.type === "instead") {
-      const effect = triggerEff.effect({ state, selfId, trigger: action, status, triggerOrigin: origin });
-      if (effect.action.tag !== "Noop" && effect.chargeUse <= e.charges) {
-        action = effect.action;
-        const result = applyActionAndTriggers({
-          tag: "ChargeUse", target: selfId, value: effect.chargeUse
-        }, state, log, idGen, origin);
-        if (result.state === "invalid") {
-          return { state: "invalid", log: result.log, action };
-        }
-        state = result.state;
-        log = result.log;
+    const effect = triggerEff.effect({ state, selfId, trigger: action, transform, triggerOrigin: origin });
+    if (effect.action.tag !== "Noop" && effect.chargeUse <= e.charges) {
+      action = effect.action;
+      const result = applyActionAndTriggers({
+        tag: "ChargeUse", target: selfId, value: effect.chargeUse
+      }, state, log, idGen, origin);
+      if (result.state === "invalid") {
+        return { state: "invalid", log: result.log, action };
       }
+      state = result.state;
+      log = result.log;
     }
   }
   return { state, log, action };
@@ -373,32 +450,30 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
   for (const status of e.status) {
     const triggerEff = statusToTrigger(status.tag);
     const effect = triggerEff.effect({ state, selfId, trigger, status, triggerOrigin: origin });
-    if (triggerEff.type !== "instead") {
-      if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
-        // skip noop/0 charge to prevent infinite loop
-      } else if (effect.action.tag === "Abort" && effect.chargeUse === 0) {
-        return { state, log, abort: true };
-      } else if (effect.chargeUse <= e.charges) {
-        const result = applyActionAndTriggers({
-          tag: "CombinedAction",
-          actions: [
-            { tag: "ChargeUse", target: selfId, value: effect.chargeUse },
-            effect.action
-          ]
-        }, state, log, idGen, origin);
-        if (result.state === "invalid") {
-          return { state: "invalid", log: result.log, abort: true };
-        }
-        state = result.state;
-        log = result.log;
+    if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
+      // skip noop/0 charge to prevent infinite loop
+    } else if (effect.action.tag === "Abort" && effect.chargeUse === 0) {
+      return { state, log, abort: true };
+    } else if (effect.chargeUse <= e.charges) {
+      const result = applyActionAndTriggers({
+        tag: "CombinedAction",
+        actions: [
+          { tag: "ChargeUse", target: selfId, value: effect.chargeUse },
+          effect.action
+        ]
+      }, state, log, idGen, origin);
+      if (result.state === "invalid") {
+        return { state: "invalid", log: result.log, abort: true };
       }
+      state = result.state;
+      log = result.log;
     }
   }
   return { state, log, abort: false };
 }
 
 function statusToTrigger(
-  tag: Status["tag"],
+  tag: StatusTag,
 ): TriggerEntityEffect {
   switch (tag) {
     case "Poison": {
@@ -407,23 +482,10 @@ function statusToTrigger(
           extra(damage(evSelf, evStatusValue, evStatic(false)), { chargeUse: 0 }),
           extra(noop(), { chargeUse: 0 }),
         ),
-        "before",
       );
-    }
-    case "Guard": {
-      return guardTrigger;
     }
     case "DmgBarrier": {
       return dmgBarrierTrigger;
-    }
-    case "Bubble": {
-      return bubbleTrigger;
-    }
-    case "Weak": {
-      return weakTrigger;
-    }
-    case "Convert": {
-      return convertTrigger;
     }
     case "Mark": {
       return evTrigger(trigger => evCondition(trigger,
@@ -431,10 +493,28 @@ function statusToTrigger(
           extra(EV.loseFragments(evSelf, evStatic(<"Mark">"Mark"), evStatic(-50)), { chargeUse: 0 }),
           extra(noop(), { chargeUse: 0 }),
         ),
-        "before",
       );
     }
     default: throw "unimplemented";
+  }
+}
+
+function transformToTrigger(
+  tag: TransformTag,
+): TriggerEntityEffect {
+  switch (tag) {
+    case "Guard": {
+      return guardTrigger;
+    }
+    case "Weak": {
+      return weakTrigger;
+    }
+    case "Convert": {
+      return convertTrigger;
+    }
+    case "Bubble": {
+      return bubbleTrigger;
+    }
   }
 }
 

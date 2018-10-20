@@ -21,6 +21,7 @@ export const dummy: Enemy = {
     Poison: 1,
   },
   status: [],
+  transforms: [],
 };
 
 export const dummyDmg1: Enemy = {
@@ -41,6 +42,7 @@ export const dummyDmg1: Enemy = {
     Poison: 1,
   },
   status: [],
+  transforms: [],
 };
 
 export const enemyBoss1: Enemy = {
@@ -64,6 +66,7 @@ export const enemyBoss1: Enemy = {
     Poison: 1,
   },
   status: [],
+  transforms: [],
 };
 
 function enemyBoss1Condition1(
