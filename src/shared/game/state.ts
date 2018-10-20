@@ -30,8 +30,7 @@ export type GameState = {
   crewLimit: number,
   statusQueue: { action: Action, origin: Origin }[],
   actionQueue: { action: Action, origin: Origin }[],
-  //currentAction: { action: Action, origin: Origin } | undefined,
-  //checkIndex: { type: "ally" | "enemy", },
+  currentAction: { action: Action, origin: Origin } | undefined,
 };
 
 export const initialState: GameState = {
@@ -44,6 +43,7 @@ export const initialState: GameState = {
   crewLimit: 4,
   statusQueue: [],
   actionQueue: [],
+  currentAction: undefined,
 };
 
 export type GlobalIdA<A> = {

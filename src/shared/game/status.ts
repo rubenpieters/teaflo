@@ -344,7 +344,7 @@ export function checkTransforms<E extends HasStatus & { charges: number }>(
 
     if (triggerEff.type === "instead") {
       const effect = triggerEff.effect({ state, selfId, trigger: action, status, triggerOrigin: origin });
-      if (effect.chargeUse <= e.charges) {
+      if (effect.action.tag !== "Noop" && effect.chargeUse <= e.charges) {
         action = effect.action;
         const result = applyActionAndTriggers({
           tag: "ChargeUse", target: selfId, value: effect.chargeUse

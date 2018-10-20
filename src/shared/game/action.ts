@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Crew } from "src/shared/game/crew";
 import * as _Crew from "src/shared/game/crew";
-import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, onCreature, toGlobalId, IdInstance, entityExists, toPositionId, findEntity, onCreatures } from "src/shared/game/state";
+import { GameState, IdCrew, IdEnemy, IdItem, CreatureId, onCreature, toGlobalId, IdInstance, entityExists, toPositionId, findEntity, onCreatures, PositionIdA } from "src/shared/game/state";
 import { Enemy } from "src/shared/game/enemy";
 import * as _Enemy from "src/shared/game/enemy";
 import { Generator } from "src/shared/handler/id/generator";
