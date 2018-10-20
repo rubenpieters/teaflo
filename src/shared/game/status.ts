@@ -329,6 +329,37 @@ export function applyLoseFragments<E extends HasStatus & Id>(
   return { state, log };
 }
 
+export function checkTransforms<E extends HasStatus & { charges: number }>(
+  trigger: Action,
+  e: E,
+  state: GameState,
+  selfId: CreatureId,
+  log: Action[],
+  idGen: Generator,
+  origin: Origin,
+): { state: GameState | "invalid", log: Action[], action: Action } {
+  let action = trigger;
+  for (const status of e.status) {
+    const triggerEff = statusToTrigger(status.tag);
+
+    if (triggerEff.type === "instead") {
+      const effect = triggerEff.effect({ state, selfId, trigger: action, status, triggerOrigin: origin });
+      if (effect.chargeUse <= e.charges) {
+        action = effect.action;
+        const result = applyActionAndTriggers({
+          tag: "ChargeUse", target: selfId, value: effect.chargeUse
+        }, state, log, idGen, origin);
+        if (result.state === "invalid") {
+          return { state: "invalid", log: result.log, action };
+        }
+        state = result.state;
+        log = result.log;
+      }
+    }
+  }
+  return { state, log, action };
+}
+
 // TODO: implement difference between before/instead/after triggers
 export function checkStatus<E extends HasStatus & { charges: number }>(
   trigger: Action,
@@ -342,25 +373,24 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
   for (const status of e.status) {
     const triggerEff = statusToTrigger(status.tag);
     const effect = triggerEff.effect({ state, selfId, trigger, status, triggerOrigin: origin });
-    if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
-      // skip noop/0 charge to prevent infinite loop
-    } else if (effect.action.tag === "Abort" && effect.chargeUse === 0) {
-      return { state, log, abort: true };
-    } else if (effect.chargeUse <= e.charges) {
-      const result = applyActionAndTriggers({
-        tag: "CombinedAction",
-        actions: [
-          { tag: "ChargeUse", target: selfId, value: effect.chargeUse },
-          effect.action
-        ]
-      }, state, log, idGen, origin);
-      if (result.state === "invalid") {
-        return { state: "invalid", log: result.log, abort: true };
-      }
-      state = result.state;
-      log = result.log;
-      if (triggerEff.type === "instead") {
+    if (triggerEff.type !== "instead") {
+      if (effect.action.tag === "Noop" && effect.chargeUse === 0) {
+        // skip noop/0 charge to prevent infinite loop
+      } else if (effect.action.tag === "Abort" && effect.chargeUse === 0) {
         return { state, log, abort: true };
+      } else if (effect.chargeUse <= e.charges) {
+        const result = applyActionAndTriggers({
+          tag: "CombinedAction",
+          actions: [
+            { tag: "ChargeUse", target: selfId, value: effect.chargeUse },
+            effect.action
+          ]
+        }, state, log, idGen, origin);
+        if (result.state === "invalid") {
+          return { state: "invalid", log: result.log, abort: true };
+        }
+        state = result.state;
+        log = result.log;
       }
     }
   }

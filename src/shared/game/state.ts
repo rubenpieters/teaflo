@@ -28,7 +28,10 @@ export type GameState = {
   items: IdItem[],
   gold: number,
   crewLimit: number,
+  statusQueue: { action: Action, origin: Origin }[],
   actionQueue: { action: Action, origin: Origin }[],
+  //currentAction: { action: Action, origin: Origin } | undefined,
+  //checkIndex: { type: "ally" | "enemy", },
 };
 
 export const initialState: GameState = {
@@ -39,6 +42,7 @@ export const initialState: GameState = {
   items: [],
   gold: 0,
   crewLimit: 4,
+  statusQueue: [],
   actionQueue: [],
 };
 

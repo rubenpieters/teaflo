@@ -225,6 +225,42 @@ export function highestThreatTarget(
   return highestThreat === undefined ? undefined : { target: highestThreat.ally, position: highestThreat.position };
 }
 
+export function applyTransforms(
+  action: Action,
+  state: GameState,
+  log: Action[],
+  idGen: Generator,
+  origin: Origin,
+): { state: GameState | "invalid", log: Action[], action: Action } {
+  let i = 0;
+  for (const enemy of state.enemies) {
+    const afterStatus = _Status.checkTransforms(
+      action, enemy, state, { tag: "PositionId", type: "enemy", id: i }, log, idGen, origin
+    );
+    if (afterStatus.state === "invalid") {
+      return afterStatus;
+    }
+    state = afterStatus.state;
+    log = afterStatus.log;
+    action = afterStatus.action;
+    i += 1;
+  }
+  i = 0;
+  for (const ally of state.crew) {
+    const afterStatus = _Status.checkTransforms(
+      action, ally, state, { tag: "PositionId", type: "ally", id: i }, log, idGen, origin
+    );
+    if (afterStatus.state === "invalid") {
+      return afterStatus;
+    }
+    state = afterStatus.state;
+    log = afterStatus.log;
+    action = afterStatus.action;
+    i += 1;
+  }
+  return { state, log, action };
+}
+
 export function applyActionAndTriggers(
   action: Action,
   state: GameState,
@@ -232,6 +268,14 @@ export function applyActionAndTriggers(
   idGen: Generator,
   origin: Origin,
 ): { state: GameState | "invalid", log: Action[] } {
+  const afterTransforms = applyTransforms(action, state, log, idGen, origin);
+  if (afterTransforms.state === "invalid") {
+    return afterTransforms;
+  }
+  state = afterTransforms.state;
+  log = afterTransforms.log;
+  action = afterTransforms.action;
+
   let i = 0;
   for (const enemy of state.enemies) {
     const afterStatus = _Status.checkStatus(
@@ -537,7 +581,7 @@ function applyAction(
       const newAction: Action = {...action, tag: "AddStatus"}
       state = focus(state,
         // TODO: pass correct origin
-        over(x => x.actionQueue, x => x.concat({ action: newAction, origin: <any>undefined })),
+        over(x => x.statusQueue, x => x.concat({ action: newAction, origin: <any>undefined })),
       );
       break;
     }
@@ -698,7 +742,7 @@ export function applyActionQueue(
   log: Action[],
   idGen: Generator,
 ): { state: GameState | "invalid", log: Action[] } {
-  for (const { action, origin } of state.actionQueue) {
+  for (const { action, origin } of state.statusQueue) {
     const afterApply = applyActionAndTriggers(action, state, log, idGen, origin);
     log = afterApply.log;
     if (afterApply.state === "invalid") {
@@ -706,6 +750,6 @@ export function applyActionQueue(
     }
     state = afterApply.state;
   }
-  state = focus(state, set(x => x.actionQueue, []));
+  state = focus(state, set(x => x.statusQueue, []));
   return { state, log };
 }
