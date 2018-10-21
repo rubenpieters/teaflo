@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { CardOrigin } from "src/shared/game/card";
 import { Action, applyActionAndTriggers, enemyTurn, checkDeaths, applyActionQueue, ActionSpec } from "src/shared/game/action";
 import { GameState, initialState, CreatureId } from "src/shared/game/state";
-import { SolutionLog, ActionLog, emptySolutionLog } from "src/shared/game/log";
+import { SolutionLog, ActionLog, emptySolutionLog, ApplyActionLog } from "src/shared/game/log";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
 import { EntityEffect } from "./ability";
 import { Origin } from "./target";
@@ -150,7 +150,7 @@ function solutionStep(
   };
 
   // Apply Turn Action
-  let actionResult: { state: GameState | "invalid", log: Action[] } =
+  let actionResult: { state: GameState | "invalid", log: ApplyActionLog } =
     applyActionAndTriggers(actionEffect, state, [], idGen, actionOrigin);
   
   log = focus(log, set(x => x.crewAction, actionResult.log));
@@ -168,7 +168,7 @@ function solutionStep(
   state = afterQueue1.state;
 
   // Apply StartTurn effect
-  let aferStartTurn: { state: GameState | "invalid", log: Action[] } =
+  let aferStartTurn: { state: GameState | "invalid", log: ApplyActionLog } =
     applyActionAndTriggers({ tag: "StartTurn" }, state, [], idGen, "noOrigin");
   log = focus(log, set(x => x.startTurn, aferStartTurn.log));
   if (aferStartTurn.state === "invalid") {

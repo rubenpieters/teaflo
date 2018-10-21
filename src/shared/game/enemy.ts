@@ -6,6 +6,7 @@ import { Guard, HasStatus, Status, Transform, TransformTag, StatusTag } from "sr
 import { EnemyEffect, TriggerEntityEffect, EntityEffect } from "src/shared/game/ability";
 import { Eff1 } from "./effectvar";
 import { Next } from "./next";
+import { ApplyActionLog } from "./log";
 
 /*export function showEnemy(
   enemy: Enemy
@@ -58,10 +59,10 @@ export function damage<E extends Enemy & HasStatus>(
 export function act(
   enemy: IdEnemy,
   state: GameState,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
   index: number,
-): { state: GameState | "invalid", log: Action[] }  {
+): { state: GameState | "invalid", log: ApplyActionLog }  {
   const { action, next } = enemy.actions[enemy.actionIndex].effect({ state, selfId: { tag: "GlobalId", id: enemy.id, type: "enemy" }});
   state = focus(state,
     over(x => x.enemies[index].actionIndex, x => nextActionId(state, enemy, x, next)),

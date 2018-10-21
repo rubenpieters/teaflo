@@ -6,6 +6,7 @@ import { HasStatus, Guard, Status, StatusTag, TransformTag } from "src/shared/ga
 import { InputType } from "src/shared/game/input";
 import { InputEntityEffect, EntityEffect, TriggerEntityEffect } from "src/shared/game/ability";
 import { Transform } from "src/shared/game/status";
+import { ApplyActionLog } from "./log";
 
 /*export function showCrew(
   crew: Crew
@@ -148,11 +149,11 @@ export function getAP<C extends Crew>(
 export function act(
   crew: IdCrew,
   state: GameState,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
   index: number,
-): { state: GameState | "invalid", log: Action[] }  {
-  const action = crew.actions[crew.actionIndex];
+): { state: GameState | "invalid", log: ApplyActionLog }  {
+  const action: EntityEffect = crew.actions[crew.actionIndex];
   state = focus(state,
     over(x => x.crew[index].actionIndex, x => {
       const newX = x + 1;

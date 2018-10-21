@@ -7,6 +7,7 @@ import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTa
 import { TriggerEntityEffect } from "src/shared/game/ability";
 import { Generator } from "src/shared/handler/id/generator";
 import * as EV from "src/shared/game/effectvar";
+import { ApplyActionLog, ApplyActionLine } from "./log";
 
 export type StatusTag = Status["tag"];
 export type TransformTag = Transform["tag"];
@@ -330,14 +331,14 @@ export function loseFragments<E extends HasStatus & Id>(
 
 export function applyLoseFragmentPhase(
   state: GameState,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
   origin: Origin,
-): { state: GameState | "invalid", log: Action[] } {
+): { state: GameState | "invalid", log: ApplyActionLog } {
   let i = 0;
   for (const _enemy of state.enemies) {
     const afterStatus = applyLoseFragments(
-      { tag: "PositionId", type: "enemy", id: i }, state, log, idGen, origin
+      { tag: "PositionId", type: "enemy", id: i }, state, log
     );
     if (afterStatus.state === "invalid") {
       return afterStatus;
@@ -349,7 +350,7 @@ export function applyLoseFragmentPhase(
   i = 0;
   for (const _ally of state.crew) {
     const afterStatus = applyLoseFragments(
-      { tag: "PositionId", type: "ally", id: i }, state, log, idGen, origin
+      { tag: "PositionId", type: "ally", id: i }, state, log
     );
     if (afterStatus.state === "invalid") {
       return afterStatus;
@@ -379,13 +380,11 @@ function applyStatusLoss(
   }
 }
 
-export function applyLoseFragments<E extends HasStatus & Id>(
+export function applyLoseFragments(
   id: CreatureId,
   state: GameState,
-  log: Action[],
-  idGen: Generator,
-  origin: Origin,
-): { state: GameState | "invalid", log: Action[] } {
+  log: ApplyActionLog,
+): { state: GameState | "invalid", log: ApplyActionLog } {
   const e = findEntity(state, id);
   const newStatusList: Status[] = [];
   for (const status of e.status) {
@@ -413,10 +412,10 @@ export function checkTransforms<E extends HasTransform & { charges: number }>(
   e: E,
   state: GameState,
   selfId: CreatureId,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
   origin: Origin,
-): { state: GameState | "invalid", log: Action[], action: Action } {
+): { state: GameState | "invalid", log: ApplyActionLog, action: Action } {
   let action = trigger;
   for (const transform of e.transforms) {
     const triggerEff = transformToTrigger(transform.tag);
@@ -427,11 +426,12 @@ export function checkTransforms<E extends HasTransform & { charges: number }>(
       const result = applyActionAndTriggers({
         tag: "ChargeUse", target: selfId, value: effect.chargeUse
       }, state, log, idGen, origin);
+      const extraLine: ApplyActionLine = { tag: "TransformAction", transformTo: action, log: result.log };
+      log = log.concat(extraLine);
       if (result.state === "invalid") {
-        return { state: "invalid", log: result.log, action };
+        return { state: "invalid", log, action };
       }
       state = result.state;
-      log = result.log;
     }
   }
   return { state, log, action };
@@ -443,10 +443,10 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
   e: E,
   state: GameState,
   selfId: CreatureId,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
   origin: Origin,
-): { state: GameState | "invalid", log: Action[], abort: boolean } {
+): { state: GameState | "invalid", log: ApplyActionLog, abort: boolean } {
   for (const status of e.status) {
     const triggerEff = statusToTrigger(status.tag);
     const effect = triggerEff.effect({ state, selfId, trigger, status, triggerOrigin: origin });
@@ -462,17 +462,18 @@ export function checkStatus<E extends HasStatus & { charges: number }>(
           effect.action
         ]
       }, state, log, idGen, origin);
+      const extraLine: ApplyActionLine = { tag: "TriggerBeforeAction", status, log: result.log };
+      log = log.concat(extraLine);
       if (result.state === "invalid") {
-        return { state: "invalid", log: result.log, abort: true };
+        return { state: "invalid", log, abort: true };
       }
       state = result.state;
-      log = result.log;
     }
   }
   return { state, log, abort: false };
 }
 
-function statusToTrigger(
+export function statusToTrigger(
   tag: StatusTag,
 ): TriggerEntityEffect {
   switch (tag) {
@@ -499,7 +500,7 @@ function statusToTrigger(
   }
 }
 
-function transformToTrigger(
+export function transformToTrigger(
   tag: TransformTag,
 ): TriggerEntityEffect {
   switch (tag) {

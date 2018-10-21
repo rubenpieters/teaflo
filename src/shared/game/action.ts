@@ -9,7 +9,7 @@ import { Origin, TargetType, indexOfId } from "src/shared/game/target";
 import { Item } from "src/shared/game/item";
 import { Status } from "src/shared/game/status";
 import * as _Status from "src/shared/game/status";
-import { StatusLog } from "src/shared/game/log";
+import { StatusLog, ApplyActionLog } from "src/shared/game/log";
 import { Instance } from "./instance";
 import { Transform, StatusTag, TransformTag } from "src/shared/game/status";
 
@@ -189,9 +189,9 @@ export type SetHP = {
 
 export function enemyTurn(
   state: GameState,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
-): { state: GameState | "invalid", log: Action[] }  {
+): { state: GameState | "invalid", log: ApplyActionLog }  {
   let acc: GameState | "invalid" = state;
   let i = 0;
   for (const enemy of state.enemies) {
@@ -229,10 +229,10 @@ export function highestThreatTarget(
 export function applyTransforms(
   action: Action,
   state: GameState,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
   origin: Origin,
-): { state: GameState | "invalid", log: Action[], action: Action } {
+): { state: GameState | "invalid", log: ApplyActionLog, action: Action } {
   let i = 0;
   for (const enemy of state.enemies) {
     const afterStatus = _Status.checkTransforms(
@@ -265,10 +265,10 @@ export function applyTransforms(
 export function applyActionAndTriggers(
   action: Action,
   state: GameState,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
   origin: Origin,
-): { state: GameState | "invalid", log: Action[] } {
+): { state: GameState | "invalid", log: ApplyActionLog } {
   const afterTransforms = applyTransforms(action, state, log, idGen, origin);
   if (afterTransforms.state === "invalid") {
     return afterTransforms;
@@ -305,128 +305,15 @@ export function applyActionAndTriggers(
   return afterApply;
 }
 
-function applyActionAndTriggersAt(
-  action: Action,
-  state: GameState,
-  log: Action[],
-  from: { id: number, type: "item" | "crew" | "enemy" },
-  idGen: Generator,
-  origin: Origin,
-): { state: GameState | "invalid", log: Action[] } {
-  // enemy interactions with effects
-  /*if (from.type === "enemy") {
-    let indexEnemy = 0;
-    for (const enemy of state.enemies.slice(from.id)) {
-      let indexTrigger = 0;
-      for (const trigger of enemy.triggers) {
-        if (trigger.charges > 0 && trigger.type === "before") {
-          const triggerResult = trigger.effect({ action, state, selfId: { tag: "GlobalId", id: enemy.id, type: "enemy" }});
-          state = focus(state,
-            over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
-          );
-          const afterTrigger = applyActionAndTriggersAt(
-            triggerResult.action, state, log, { id: from.id + 1, type: "enemy" }, idGen, origin);
-          if (afterTrigger.state === "invalid") {
-            return afterTrigger;
-          }
-          state = afterTrigger.state;
-          log = afterTrigger.log;
-        } else if (trigger.charges > 0 && trigger.type === "instead") {
-          const triggerResult = trigger.effect({ action, state, selfId: { tag: "GlobalId", id: enemy.id, type: "enemy" }});
-          state = focus(state,
-            over(x => x.enemies[indexEnemy].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
-          );
-          action = triggerResult.action;
-        }
-        indexTrigger += 1;
-      }
-      state = focus(state,
-        set(x => x.enemies[indexEnemy].triggers, state.enemies[indexEnemy].triggers.filter(v => v.charges > 0)),
-      );
-      indexEnemy += 1;
-    }
-  }*/
-
-  // item interactions with effects
-  /*if (from.type === "item" || from.type === "enemy") {
-    const startId = from.type === "item" ? from.id : 0;
-    let indexItem = startId;
-    for (const item of state.items.slice(startId)) {
-      let indexTrigger = 0;
-      for (const trigger of item.triggers) {
-        if (trigger.charges > 0 && trigger.onTag === action.tag && trigger.type === "before") {
-          const triggerResult = trigger.action(action)(state, item.id, "item");
-          state = focus(state,
-            over(x => x.items[indexItem].triggers[indexTrigger].charges, x => x - triggerResult.charges),
-          );
-          const afterTrigger = applyActionAndTriggersAt(
-            triggerResult.action, state, log, { id: from.id + 1, type: "item" }, idGen, origin);
-          if (afterTrigger.state === "invalid") {
-            return afterTrigger;
-          }
-          state = afterTrigger.state;
-          log = afterTrigger.log;
-        } else if (trigger.charges > 0 && trigger.onTag === action.tag && trigger.type === "instead") {
-          const triggerResult = trigger.action(action)(state, item.id, "item");
-          state = focus(state,
-            over(x => x.items[indexItem].triggers[indexTrigger].charges, x => x - triggerResult.charges),
-          );
-          action = triggerResult.action;
-        }
-      }
-      state = focus(state,
-        set(x => x.items[indexItem].triggers, state.items[indexItem].triggers.filter(v => v.charges > 0)),
-      );
-      indexItem += 1;
-    }
-  }*/
-
-  const fromCrew = from.type === "crew" ? from.id : 0;
-  // crew interactions with effects
-  /*let indexAlly = fromCrew;
-  for (const ally of state.crew.slice(fromCrew)) {
-    let indexTrigger = 0;
-    for (const trigger of ally.triggers) {
-      if (trigger.charges > 0 && trigger.type === "before") {
-        const triggerResult = trigger.effect({ action, state, selfId: { tag: "PositionId", id: ally.id, type: "ally" }});
-        state = focus(state,
-          over(x => x.crew[indexAlly].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
-        );
-        const afterTrigger = applyActionAndTriggersAt(
-          triggerResult.action, state, log, { id: from.id + 1, type: "crew" }, idGen, origin);
-        if (afterTrigger.state === "invalid") {
-          return afterTrigger;
-        }
-        state = afterTrigger.state;
-        log = afterTrigger.log;
-      } else if (trigger.charges > 0 && trigger.type === "instead") {
-        const triggerResult = trigger.effect({ action, state, selfId: { tag: "PositionId", id: ally.id, type: "ally" }});
-        state = focus(state,
-          over(x => x.crew[indexAlly].triggers[indexTrigger].charges, x => x - triggerResult.chargeUse),
-        );
-        action = triggerResult.action;
-      }
-    }
-    state = focus(state,
-      set(x => x.crew[indexAlly].triggers, state.crew[indexAlly].triggers.filter(v => v.charges > 0)),
-    );
-    indexAlly += 1;
-  }*/
-
-  const afterApply = applyAction(action, state, origin, log, idGen);
-
-  return afterApply;
-}
-
 // applies the results of this action to the state
 function applyAction(
   action: Action,
   state: GameState,
   origin: Origin,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
-): { state: GameState | "invalid", log: Action[] } {
-  log = log.concat(action);
+): { state: GameState | "invalid", log: ApplyActionLog } {
+  log = log.concat({ tag: "ApplyAction", action });
 
   switch (action.tag) {
     case "AddEnemy": {
@@ -517,7 +404,7 @@ function applyAction(
       break;
     }
     case "BattleTurn": {
-      const meleeCrew: IdCrew | undefined = state.crew[0];
+      /*const meleeCrew: IdCrew | undefined = state.crew[0];
       const def = { state, log };
       const afterMelee = meleeCrew === undefined ? def : _Crew.act(meleeCrew, state, log, idGen, 0);
       if (afterMelee.state === "invalid") {
@@ -537,7 +424,7 @@ function applyAction(
           log = afterRanged.log;
         }
         i += 1;
-      }
+      }*/
       break;
     }
     case "Death": {
@@ -707,9 +594,9 @@ function applyAction(
 
 export function checkDeaths(
   state: GameState,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
-): { state: GameState | "invalid", log: Action[] } {
+): { state: GameState | "invalid", log: ApplyActionLog } {
 
   for (const ally of state.crew) {
     if (ally.hp <= 0) {
@@ -740,9 +627,9 @@ export function checkDeaths(
 
 export function applyActionQueue(
   state: GameState,
-  log: Action[],
+  log: ApplyActionLog,
   idGen: Generator,
-): { state: GameState | "invalid", log: Action[] } {
+): { state: GameState | "invalid", log: ApplyActionLog } {
   for (const { action, origin } of state.statusQueue) {
     const afterApply = applyActionAndTriggers(action, state, log, idGen, origin);
     log = afterApply.log;

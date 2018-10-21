@@ -19,15 +19,15 @@ export function showSolutionLog(solutionLog: SolutionLog): string {
 
 export type ActionLog = {
   action: Action,
-  startTurn: Action[],
-  loseFragment: Action[],
-  crewAction: Action[],
-  queue1: Action[],
-  allyInstanceAction: Action[],
-  enemyAction: Action[],
-  queue2: Action[],
-  enemyInstanceAction: Action[],
-  deaths: Action[], // TODO: incorporate into queue2
+  startTurn: ApplyActionLog,
+  loseFragment: ApplyActionLog,
+  crewAction: ApplyActionLog,
+  queue1: ApplyActionLog,
+  allyInstanceAction: ApplyActionLog,
+  enemyAction: ApplyActionLog,
+  queue2: ApplyActionLog,
+  enemyInstanceAction: ApplyActionLog,
+  deaths: ApplyActionLog, // TODO: incorporate into queue2
 };
 
 export type StatusLog = {
@@ -39,17 +39,17 @@ export type StatusLog = {
 function showActionLog(actionLog: ActionLog): string {
   return "** " + showAction(actionLog.action) + " **\n"
     + "start turn\n"
-    + actionLog.startTurn.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + showApplyActionLog(actionLog.startTurn, "") + "\n"
     + "crew action\n"
-    + actionLog.crewAction.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + showApplyActionLog(actionLog.crewAction, "") + "\n"
     + "queue1\n"
-    + actionLog.queue1.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + showApplyActionLog(actionLog.queue1, "") + "\n"
     + "enemy action\n"
-    + actionLog.enemyAction.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + showApplyActionLog(actionLog.enemyAction, "") + "\n"
     + "queue2\n"
-    + actionLog.queue2.map(a => " - " + showAction(a)).join("\n") + "\n"
+    + showApplyActionLog(actionLog.queue2, "") + "\n"
     + "deaths\n"
-    + actionLog.deaths.map(a => " - " + showAction(a)).join("\n")
+    + showApplyActionLog(actionLog.deaths, "") + "\n"
     ;
 }
 
@@ -157,3 +157,61 @@ export type LoggedEffect
   = EnemyDamage
   | AllyDamage
   ;
+
+export type ApplyAction = {
+  tag: "ApplyAction",
+  action: Action,
+}
+
+export type StartAction = {
+  tag: "StartAction",
+  action: Action,
+}
+
+export type TransformAction = {
+  tag: "TransformAction",
+  transformTo: Action,
+  log: ApplyActionLog,
+}
+
+export type TriggerBeforeAction = {
+  tag: "TriggerBeforeAction",
+  log: ApplyActionLog,
+  status: Status,
+}
+
+export type ApplyActionLine
+  = ApplyAction
+  | StartAction
+  | TransformAction
+  | TriggerBeforeAction
+  ;
+
+export type ApplyActionLog = ApplyActionLine[];
+
+export function showApplyActionLog(
+  log: ApplyActionLog,
+  prefix: string,
+): string {
+  return log.map(x => showApplyActionLine(x, prefix)).join("\n");
+}
+
+export function showApplyActionLine(
+  line: ApplyActionLine,
+  prefix: string,
+): string {
+  switch (line.tag) {
+    case "ApplyAction": {
+      return `${prefix}Apply ${showAction(line.action)}`;
+    }
+    case "StartAction": {
+      return `${prefix}Start ${showAction(line.action)}`;
+    }
+    case "TransformAction": {
+      return `${prefix}Transform To ${showAction(line.transformTo)}\n${showApplyActionLog(line.log, "+")}`; 
+    }
+    case "TriggerBeforeAction": {
+      return `${prefix}Trigger ${showStatus(line.status)} (Before) \n${showApplyActionLog(line.log, "+")}`; 
+    }
+  }
+}
