@@ -81,6 +81,13 @@ export function newBoard(
   rightMenu.drawRect(0, 0, 200, 560);
   rightMenu.endFill();
 
+  const exportBtn: Phaser.Graphics = game.add.graphics(620, 550, group);
+  exportBtn.beginFill(0xFFFFFF);
+  exportBtn.drawRect(0, 0, 80, 20);
+  exportBtn.endFill();
+  exportBtn.inputEnabled = true;
+  exportBtn.events.onInputDown.add(() => console.log(JSON.stringify(board.solution)));
+
   chLeftMenuTab(board, "crew");
   return board;
 }
