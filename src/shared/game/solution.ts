@@ -1,147 +1,47 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { CardOrigin } from "src/shared/game/card";
-import { Action, applyActionAndTriggers, enemyTurn, checkDeaths, applyActionQueue, ActionSpec } from "src/shared/game/action";
-import { GameState, initialState, CreatureId } from "src/shared/game/state";
-import { SolutionLog, ActionLog, emptySolutionLog, ApplyActionLog } from "src/shared/game/log";
+import { Tree, extendTree, Location } from "src/shared/tree";
+import { Card, CardOrigin } from "src/shared/game/card";
+import { GameState, initialState } from "src/shared/game/state";
+import { Action, applyActionAndTriggers, applyActionQueue, enemyTurn, checkDeaths } from "src/shared/game/action";
+import { Origin } from "src/shared/game/target";
+import { ActionLog, ApplyActionLog, SolutionLog } from "src/shared/game/log";
 import { Generator, plusOneGenerator } from "src/shared/handler/id/generator";
-import { EntityEffect } from "./ability";
-import { Origin } from "./target";
 import { applyLoseFragmentPhase } from "./status";
 
-export type SolEvent = {
-  tag: "crew" | "enemy" | "item" | "general",
-  name: string,
-  origin: CardOrigin,
-  effects: EntityEffect[],
-};
+type CardInput = Card & { inputs: any[] };
 
-export type SolRest = {
-  tag: "rest",
-  name: string,
-  origin: CardOrigin,
-  effects: EntityEffect[],
-};
+export type Solution = Tree<CardInput>;
 
-export type SolCard = SolEvent | SolRest;
-
-export type Path = {
-  restCard: SolRest,
-  eventCards: { event: SolEvent, inputs: any[] }[],
-};
-
-export type Solution = {
-  paths: Path[]
-};
-
-export type SolutionIndex = {
-  path: number,
-  card: "rest" | number,
-  action: number,
-};
-
-export const initialIndex: SolutionIndex = {
-  path: 0,
-  card: "rest",
-  action: 0,
-};
-
-function nextAction(
-  index: SolutionIndex,
-  solution: Solution
-): { action: EntityEffect, origin: CardOrigin, inputs: any[] } {
-  const path: Path | undefined = solution.paths[index.path];
-  if (path === undefined) {
-    throw ("invalid index: " + JSON.stringify(index));
-  }
-  if (index.card === "rest") {
-    return { action: path.restCard.effects[index.action], origin: path.restCard.origin, inputs: [] };
-  }
-  const card: SolCard | undefined = path.eventCards[index.card].event;
-  if (card === undefined) {
-    throw ("invalid index: " + JSON.stringify(index));
-  }
-  const action: EntityEffect | undefined = card.effects[index.action];
-  if (action === undefined) {
-    throw ("invalid index " + JSON.stringify(index));
-  }
-  return { action, origin: card.origin, inputs: path.eventCards[index.card].inputs };
-}
-
-export function nextIndex(
-  index: SolutionIndex,
+export function extendSolution(
+  card: CardInput,
   solution: Solution,
-): SolutionIndex | "done" {
-  let newPath: number = index.path;
-  let newCard: "rest" | number = index.card;
-  let newAction: number = index.action;
-
-  newAction += 1;
-
-  if (newCard === "rest") {
-    if (newAction < solution.paths[newPath].restCard.effects.length) {
-      return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
-    } else {
-      newCard = 0;
-      newAction = 0;
-    }
-  }
-
-  if (
-    newCard < solution.paths[newPath].eventCards.length &&
-    newAction < solution.paths[newPath].eventCards[newCard].event.effects.length
-  ) {
-    return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
-  }
-
-  newCard += 1;
-  newAction = 0;
-
-  if (
-    newCard < solution.paths[newPath].eventCards.length &&
-    newAction < solution.paths[newPath].eventCards[newCard].event.effects.length
-  ) {
-    return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
-  }
-
-  newPath += 1;
-  newCard = "rest";
-  newAction = 0;
-
-  if (newPath < solution.paths.length) {
-    return focus(index, set(x => x.path, newPath), set(x => x.card, newCard), set(x => x.action, newAction));
-  } else {
-    return "done";
-  }
+  loc: Location,
+): Solution {
+  return extendTree(equalId, solution, loc, card);
 }
 
-function solutionStep(
-  index: SolutionIndex,
+function equalId<C extends { origin: CardOrigin }>(
+  card1: C,
+  card2: C,
+) {
+  if (card1.origin.tag === "PlayerOrigin") {
+    return card2.origin.tag === "PlayerOrigin";
+  } else if (card2.origin.tag === "PlayerOrigin") {
+    return false;
+  }
+  return card1.origin.id === card2.origin.id;
+}
+
+function runAction(
   state: GameState,
-  solution: Solution,
+  cardEffect: Action,
+  cardOrigin: Origin,
   idGen: Generator,
-): { result: "invalid" | { newIndex: "done" | SolutionIndex, newState: GameState }, log: ActionLog } {
-  const { action, origin, inputs } = nextAction(index, solution);
-
-  let actionEffect: Action = <any>undefined;
-  let actionOrigin: Origin = <any>undefined;
-  switch (origin.tag) {
-    case "PositionId":
-    case "GlobalId": {
-      actionEffect = action.effect(
-        { state, selfId: origin, inputs }
-      ).action;
-      actionOrigin = origin;
-      break;
-    }
-    case "PlayerOrigin": {
-      actionEffect = action.effect({ state }).action;
-      actionOrigin = "noOrigin";
-      break;
-    }
-  }
+): { state: GameState | "invalid", log: ActionLog } {
+  // TODO: review phases
 
   let log: ActionLog = {
-    action: actionEffect,
+    action: cardEffect,
     startTurn: [], loseFragment: [], crewAction: [], queue1: [],
     allyInstanceAction: [],
     enemyAction: [], queue2: [],
@@ -151,11 +51,11 @@ function solutionStep(
 
   // Apply Turn Action
   let actionResult: { state: GameState | "invalid", log: ApplyActionLog } =
-    applyActionAndTriggers(actionEffect, state, [], idGen, actionOrigin);
+    applyActionAndTriggers(cardEffect, state, [], idGen, cardOrigin);
   
   log = focus(log, set(x => x.crewAction, actionResult.log));
   if (actionResult.state === "invalid") {
-    return { result: "invalid", log };
+    return { state: "invalid", log };
   }
   state = actionResult.state;
 
@@ -163,7 +63,7 @@ function solutionStep(
   const afterQueue1 = applyActionQueue(state, [], idGen);
   log = focus(log, set(x => x.queue1, afterQueue1.log));
   if (afterQueue1.state === "invalid") {
-    return { result: "invalid", log };
+    return { state: "invalid", log };
   }
   state = afterQueue1.state;
 
@@ -172,7 +72,7 @@ function solutionStep(
     applyActionAndTriggers({ tag: "StartTurn" }, state, [], idGen, "noOrigin");
   log = focus(log, set(x => x.startTurn, aferStartTurn.log));
   if (aferStartTurn.state === "invalid") {
-    return { result: "invalid", log };
+    return { state: "invalid", log };
   }
   state = aferStartTurn.state;
 
@@ -180,7 +80,7 @@ function solutionStep(
   const afterLoseFragment = applyLoseFragmentPhase(state, [], idGen, "noOrigin");
   log = focus(log, set(x => x.loseFragment, afterLoseFragment.log));
   if (afterLoseFragment.state === "invalid") {
-    return { result: "invalid", log };
+    return { state: "invalid", log };
   }
   state = afterLoseFragment.state;
 
@@ -190,7 +90,7 @@ function solutionStep(
       instance.action.effect({ state }).action, state, [], idGen, "noOrigin");
       log = focus(log, over(x => x.allyInstanceAction, x => x.concat(result.log)));
       if (result.state === "invalid") {
-        return { result: "invalid", log };
+        return { state: "invalid", log };
       }
       state = result.state;
   }
@@ -199,7 +99,7 @@ function solutionStep(
   const afterEnemy = enemyTurn(state, [], idGen);
   log = focus(log, set(x => x.enemyAction, afterEnemy.log));
   if (afterEnemy.state === "invalid") {
-    return { result: "invalid", log };
+    return { state: "invalid", log };
   }
   state = afterEnemy.state;
 
@@ -207,7 +107,7 @@ function solutionStep(
   const afterQueue2 = applyActionQueue(state, [], idGen);
   log = focus(log, set(x => x.queue2, afterQueue2.log));
   if (afterQueue2.state === "invalid") {
-    return { result: "invalid", log };
+    return { state: "invalid", log };
   }
   state = afterQueue2.state;
 
@@ -217,7 +117,7 @@ function solutionStep(
       instance.action.effect({ state }).action, state, [], idGen, "noOrigin");
       log = focus(log, over(x => x.enemyInstanceAction, x => x.concat(result.log)));
       if (result.state === "invalid") {
-        return { result: "invalid", log };
+        return { state: "invalid", log };
       }
       state = result.state;
   }
@@ -225,75 +125,73 @@ function solutionStep(
   const afterDeaths = checkDeaths(state, [], idGen);
   log = focus(log, set(x => x.deaths, afterDeaths.log));
   if (afterDeaths.state === "invalid") {
-    return { result: "invalid", log };
+    return { state: "invalid", log };
   }
   state = afterDeaths.state;
 
-  const newIndex = nextIndex(index, solution);
-  return { result: { newIndex, newState: state }, log };
+  return { state, log };
 }
 
-export type SolutionResult = { state: GameState | "invalid", log: SolutionLog };
+function runCard(
+  state: GameState,
+  card: Card,
+  idGen: Generator,
+): { state: GameState | "invalid", log: ActionLog[] } {
+  let log: ActionLog[] = [];
+  for (const action of card.effects) {
+    let cardEffect: Action = <any>undefined;
+    let cardOrigin: Origin = <any>undefined;
+    switch (card.origin.tag) {
+      case "PositionId":
+      case "GlobalId": {
+        cardEffect = action.effect(
+          { state, selfId: card.origin, inputs: action.inputs }
+        ).action;
+        cardOrigin = card.origin;
+        break;
+      }
+      case "PlayerOrigin": {
+        cardEffect = action.effect({ state }).action;
+        cardOrigin = "noOrigin";
+        break;
+      }
+    }
+
+    const result = runAction(state, cardEffect, cardOrigin, idGen);
+    log = log.concat(result.log);
+    if (result.state === "invalid") {
+      return { state, log };
+    }
+    state = state;
+  }
+  return { state, log };
+}
 
 export function runSolution(
   solution: Solution,
-): SolutionResult {
-  if (solution.paths.length === 0) {
-    return { state: initialState, log: { actionLog: [] } };
-  }
-  return _runSolution(solution, initialIndex, initialState, emptySolutionLog, plusOneGenerator());
+  loc: Location,
+) {
+  return _runSolution(initialState, loc, solution, { actionLog: [] }, plusOneGenerator());
 }
 
+// run till location : runs from the starting point to that location
 function _runSolution(
-  solution: Solution,
-  index: SolutionIndex | "done",
   state: GameState,
+  loc: Location,
+  solution: Solution,
   log: SolutionLog,
   idGen: Generator,
-): SolutionResult {
-  if (index === "done") {
-    return { state, log };
+): { state: GameState | "invalid", log: SolutionLog } {
+  if (loc.length === 0) {
+    return { state: "invalid", log: { actionLog: [] }}; // throw `invalid location ${JSON.stringify(loc)}`;
   }
-
-  const solStep = solutionStep(index, state, solution, idGen);
-  const stepResult = solStep.result;
-  const newSolutionLog = focus(log, over(x => x.actionLog, x => x.concat(solStep.log)));
-  if (stepResult === "invalid") {
-    return { state: "invalid", log: newSolutionLog };
+  const i = loc[0];
+  const result = runCard(state, solution.nodes[i].v, idGen);
+  if (result.state === "invalid") {
+    return { state, log: { actionLog: log.actionLog.concat(result.log) } };
   }
-  const { newIndex, newState } = stepResult;
-  return _runSolution(solution, newIndex, newState, newSolutionLog, idGen);
-}
-
-export function runSolutionAll(
-  solution: Solution,
-): SolutionResult[] {
-  if (solution.paths.length === 0) {
-    return [];
+  if (loc.length === 1) {
+    return { state, log: { actionLog: log.actionLog.concat(result.log) } };
   }
-  return _runSolutionAll(solution, initialIndex, initialState, emptySolutionLog, plusOneGenerator(), []);
-}
-
-function _runSolutionAll(
-  solution: Solution,
-  index: SolutionIndex | "done",
-  state: GameState,
-  log: SolutionLog,
-  idGen: Generator,
-  acc: SolutionResult[],
-): SolutionResult[] {
-  if (index === "done") {
-    return acc;
-  }
-
-  const solStep = solutionStep(index, state, solution, idGen);
-  const stepResult = solStep.result;
-  const newSolutionLog = focus(log, over(x => x.actionLog, x => x.concat(solStep.log)));
-  if (stepResult === "invalid") {
-    return acc.concat({ state: "invalid", log: newSolutionLog });
-  } else {
-    const { newIndex, newState } = stepResult;
-    acc = acc.concat({ state: newState, log: newSolutionLog });
-    return _runSolutionAll(solution, newIndex, newState, newSolutionLog, idGen, acc);
-  }
+  return _runSolution(state, loc.slice(1,), solution.nodes[i].tree, log, idGen);
 }

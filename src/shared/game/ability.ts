@@ -5,7 +5,6 @@ import { GameState, CreatureId } from "src/shared/game/state";
 import { Card } from "src/shared/game/card";
 import { InputType } from "src/shared/game/input";
 import { Next } from "src/shared/game/next";
-import { SolCard } from "src/shared/game/solution";
 import { Context } from "./effectvar";
 
 export function solCardFromAbility(

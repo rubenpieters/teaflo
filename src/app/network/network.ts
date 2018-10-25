@@ -31,32 +31,26 @@ export function getBoard(_serverConn: ServerConnection, board: Board, seed: stri
   if (seed === "1") {
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
-      {...allCards.cardRest, limit: Infinity },
     ];
   } else if (seed === "2") {
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
-      {...allCards.cardRest, limit: Infinity },
     ];
   } else if (seed === "3") {
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
-      {...allCards.cardRest, limit: Infinity },
     ];
   } else if (seed === "4") {
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
-      {...allCards.cardRest, limit: Infinity },
     ];
   } else if (seed === "5") {
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
-      {...allCards.cardRest, limit: Infinity },
     ];
   } else if (seed === "sandbox") {
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
-      {...allCards.cardRest, limit: Infinity },
       {...allCards.cardDummy, limit: Infinity },
       {...allCards.cardDummyDmg1, limit: Infinity },
       {...allCards.cardCrew_0001, limit: Infinity },

@@ -1,20 +1,20 @@
 import { focus, over, set } from "src/shared/iassign-util";
 
-type Tree<A> = {
-  node: Node<A>[],
+export type Tree<A> = {
+  nodes: Node<A>[],
 }
 
-type Node<A> = {
+export type Node<A> = {
   v: A,
   tree: Tree<A>,
 }
 
-type Location = number[];
+export type Location = number[];
 
 export function emptyTree<A>(
 ): Tree<A> {
   return {
-    node: [],
+    nodes: [],
   }
 }
 
@@ -28,16 +28,36 @@ export function emptyNode<A>(
 }
 
 export function extendTree<A>(
+  check: (a1: A, a2: A) => boolean,
   tree: Tree<A>,
   loc: Location,
   a: A,
 ): Tree<A> {
   if (loc.length === 0) {
-    return focus(tree,
-      over(x => x.node, x => x.concat(emptyNode(a))),
-    );
+    const checkResult = tree.nodes.filter(x => check(a, x.v));
+    if (checkResult.length === 0) {
+      return focus(tree,
+        over(x => x.nodes, x => x.concat(emptyNode(a))),
+      );
+    } else {
+      return tree;
+    }
   } else {
-    const traverseTree = tree.node[loc[0]].tree;
-    return extendTree(traverseTree, loc.slice(1), a);
+    const traverseTree = tree.nodes[loc[0]].tree;
+    return extendTree(check, traverseTree, loc.slice(1), a);
   }
+}
+
+function getLocation<A>(
+  tree: Tree<A>,
+  loc: Location,
+): A {
+  if (loc.length === 0) {
+    throw `invalid location ${JSON.stringify(loc)}`;
+  }
+  const i = loc[0];
+  if (loc.length === 1) {
+    return tree.nodes[i].v;
+  }
+  return getLocation(tree.nodes[i].tree, loc.slice(1));
 }

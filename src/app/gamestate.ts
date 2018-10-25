@@ -1,5 +1,5 @@
-import { Solution, runSolutionAll, SolCard, SolRest, SolEvent } from "src/shared/game/solution";
-import { Card, Rest, Event, PlayerOrigin } from "src/shared/game/card";
+import { Solution, runSolution, extendSolution } from "src/shared/game/solution";
+import { Card, PlayerOrigin } from "src/shared/game/card";
 import { GameState, IdCrew, IdEnemy, CreatureId } from "src/shared/game/state";
 import { InputEntityEffect, EntityEffect, solCardFromAbility } from "src/shared/game/ability";
 import { Action } from "src/shared/game/action";
@@ -10,6 +10,7 @@ import { Ability } from "src/shared/game/crew";
 import { InputType } from "../shared/game/input";
 import { Context } from "../shared/game/effectvar";
 import { Instance } from "src/shared/game/instance";
+import { emptyTree, Location } from "src/shared/tree";
 
 export type Limit = {
   limit: number,
@@ -27,6 +28,7 @@ export const allLeftMenuOptions: LeftMenuOption[] = ["crew", "enemy", "item", "g
 export type Board = {
   availableCards: LimitedCard[],
   solution: Solution,
+  loc: Location,
   selectedLeftMenu: LeftMenuOption,
   graphics: BoardGraphics,
   game: Phaser.Game,
@@ -47,7 +49,8 @@ export function newBoard(
   group: Phaser.Group,
 ) {
   const board: Board = {
-    solution: { paths: [] },
+    solution: emptyTree(),
+    loc: [],
     availableCards: [],
     selectedLeftMenu: "crew",
     graphics: {
@@ -136,7 +139,8 @@ export function chAvailableCards(
 export function resetSolution(
   board: Board,
 ) {
-  board.solution = { paths: [] };
+  board.solution = emptyTree();
+  board.loc = [];
   mkSolution(board);
 }
 
@@ -257,15 +261,12 @@ async function addToSolution(
     case "enemy":
     case "item":
     case "general": {
-      if (board.solution.paths.length === 0) {
+      if (board.loc === []) {
         return "noPaths";
       } else {
-        board.solution.paths[board.solution.paths.length - 1].eventCards.push({ event: card, inputs });
+        // TODO: extend loc as well
+        board.solution = extendSolution({...card, inputs}, board.solution, board.loc);
       }
-      break;
-    }
-    case "rest": {
-      board.solution.paths.push({ restCard: card, eventCards: [] });
       break;
     }
   }
@@ -277,14 +278,12 @@ async function addToSolution(
 
 function removeEventFromSolution(
   board: Board,
-  card: SolCard,
+  card: Card,
   pathIndex: number,
   eventIndex: number,
 ) {
-  board.solution.paths[pathIndex].eventCards =
-    board.solution.paths[pathIndex].eventCards.slice(0, eventIndex).concat(
-      board.solution.paths[pathIndex].eventCards.slice(eventIndex + 1, board.solution.paths[pathIndex].eventCards.length)
-    );
+  // TODO: implement remove from solution
+  throw "TODO";
   if (card.origin.tag === "PlayerOrigin") {
     const index = board.availableCards.findIndex(c =>
       (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
@@ -294,28 +293,26 @@ function removeEventFromSolution(
   mkSolution(board);
 }
 
-function removeRestFromSolution(
+function drawTree(
   board: Board,
-  card: SolCard,
-  pathIndex: number,
-) {
-  for (const card of board.solution.paths[pathIndex].eventCards) {
-    if (card.event.origin.tag === "PlayerOrigin") {
-      const index = board.availableCards.findIndex(c =>
-        (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.event.origin).cardId);
-      board.availableCards[index].limit += 1;
-    }
+  solution: Solution,
+  x: number,
+  y: number,
+): { x: number, y: number, sprites: Phaser.Graphics[] } {
+  let sprites: Phaser.Graphics[] = []
+  for (const node of solution.nodes) {
+    const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
+    sprite.beginFill(0x4477CC);
+    sprite.drawRect(0, 0, 10, 10);
+    sprite.endFill();
+
+    sprites.push(sprite);
+    const result = drawTree(board, node.tree, x + 20, y);
+    sprites = sprites.concat(result.sprites);
+
+    y = result.y + 15;
   }
-  board.solution.paths =
-    board.solution.paths.slice(0, pathIndex).concat(
-      board.solution.paths.slice(pathIndex + 1, board.solution.paths.length)
-    );
-  // TODO: support rests with entity origin?
-  const index = board.availableCards.findIndex(c =>
-    (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
-  board.availableCards[index].limit += 1;
-  chLeftMenuTab(board, board.selectedLeftMenu);
-  mkSolution(board);
+  return { x, y, sprites }
 }
 
 function mkSolution(
@@ -328,94 +325,25 @@ function mkSolution(
   }
 
   // create new
-  let x = 230;
-  let y = 350;
-  const sprites: Phaser.Graphics[] = [];
-  let pathIndex = 0;
-  for (const path of board.solution.paths) {
-    // increase 1 for rest action
-    const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
-    sprite.beginFill(0x223377);
-    sprite.drawRect(0, 0, 40, 20);
-    sprite.endFill();
-    sprite.inputEnabled = true;
-    sprite.events.onInputDown.add(onSolutionRestCardClick(board, path.restCard, pathIndex));
-    sprites.push(sprite);
-    y -= 25;
+  const sprites: Phaser.Graphics[] = drawTree(board, board.solution, 200, 100).sprites;
 
-    let cardIndex = 0;
-    for (const card of path.eventCards) {
-      const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
-      sprite.beginFill(0x223377);
-      sprite.drawRect(0, 0, 40, 20);
-      sprite.endFill();
-      sprite.inputEnabled = true;
-      /*sprite.events.onInputOver.add(() => {
-        nodeTypeDetail.setText(JSON.stringify(card, undefined, 2));
-      });*/
-      sprite.events.onInputDown.add(onSolutionEventCardClick(board, card.event, pathIndex, cardIndex));
-      sprites.push(sprite);
-
-      y -= 25;
-      cardIndex += 1;
-    }
-
-    /*if (pathIndex === board.solution.paths.length - 1) {
-      const sprite = board.game.add.sprite(x, y, "slot", 0, board.group);
-      sprites.push(sprite);
-    }*/
-
-    y = 350;
-    x += 45;
-    pathIndex += 1;
-  }
-  /* const sprite = board.game.add.sprite(x, y, "slot", 0, board.group);
-  sprite.inputEnabled = true; */
-  // sprite.events.onInputDown.add(() => addRestToSolution({ actions: [{ tag: "Rest" }], id: -1, tag: "rest", subtag: "rest" }));
-  // sprites.push(sprite);
   board.graphics.solutionGfx = sprites;
 
   // update solution
 
-  const solutionResults = runSolutionAll(board.solution);
-  if (solutionResults.length === 0) {
-    console.log("empty state");
+  const result = runSolution(board.solution, board.loc);
+  if (result.state === "invalid") {
+    console.log("invalid state");
     board.lastState = undefined;
     clearState(board);
   } else {
-    const lastResult = solutionResults[solutionResults.length - 1];
-    console.log(lastResult.log);
-    if (lastResult.state === "invalid") {
-      console.log("invalid state");
-      board.lastState = undefined;
-      clearState(board);
-    } else {
-      board.lastState = lastResult.state;
-      mkState(board, lastResult.state);
-    }
+    board.lastState = result.state;
+    mkState(board, result.state);
   }
 }
-
-function onSolutionRestCardClick(
-  board: Board,
-  card: SolRest,
-  pathIndex: number,
-) {
-  return function(
-    _sprite: Phaser.Sprite,
-    pointer: Phaser.Pointer,
-  ) {
-    if (pointer.leftButton.isDown) {
-      // show solution up to here
-    } else if (pointer.rightButton.isDown) {
-      removeRestFromSolution(board, card, pathIndex);
-    }
-  };
-}
-
 function onSolutionEventCardClick(
   board: Board,
-  card: SolEvent,
+  card: Card,
   pathIndex: number,
   eventIndex: number,
 ) {

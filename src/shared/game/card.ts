@@ -22,18 +22,9 @@ export type CardOrigin
   | CreatureId
   ;
 
-export type Event = {
+export type Card = {
   tag: "crew" | "enemy" | "item" | "general",
   name: string,
   origin: CardOrigin,
   effects: InputEntityEffect[],
 };
-
-export type Rest = {
-  tag: "rest",
-  name: string,
-  origin: CardOrigin,
-  effects: InputEntityEffect[],
-};
-
-export type Card = Event | Rest;

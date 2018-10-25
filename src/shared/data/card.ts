@@ -2,22 +2,9 @@ import * as allCrew from "src/shared/data/crew";
 import * as allItems from "src/shared/data/item";
 import * as allEnemies from "src/shared/data/enemy";
 import { GameState, IdCrew, CreatureId } from "src/shared/game/state";
-import { Card, Rest, Event } from "src/shared/game/card";
+import { Card } from "src/shared/game/card";
 
-export const cardRest: Rest = {
-  origin: { tag: "PlayerOrigin", cardId: 0 },
-  name: "Rest",
-  effects: [
-    { 
-      effect: (_obj) => { return { action: { tag: "Rest" }}},
-      inputs: [],
-      description: "Rest",
-    },
-  ],
-  tag: "rest",
-};
-
-export const cardBattleTurn: Event = {
+export const cardBattleTurn: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1 },
   name: "Battle",
   effects: [
@@ -30,7 +17,7 @@ export const cardBattleTurn: Event = {
   tag: "general",
 };
 
-export const cardDummy: Event = {
+export const cardDummy: Card = {
   origin: { tag: "PlayerOrigin", cardId: 2 },
   name: "Dummy",
   effects: [
@@ -44,7 +31,7 @@ export const cardDummy: Event = {
   tag: "enemy",
 };
 
-export const cardDummyDmg1: Event = {
+export const cardDummyDmg1: Card = {
   origin: { tag: "PlayerOrigin", cardId: 2 },
   name: "DummyDmg1",
   effects: [
@@ -58,7 +45,7 @@ export const cardDummyDmg1: Event = {
   tag: "enemy",
 };
 
-export const cardCrew_0001: Event = {
+export const cardCrew_0001: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1001 },
   name: "Tank01",
   effects: [
@@ -72,7 +59,7 @@ export const cardCrew_0001: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0002: Event = {
+export const cardCrew_0002: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1002 },
   name: "DmgPoison",
   effects: [
@@ -86,7 +73,7 @@ export const cardCrew_0002: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0005: Event = {
+export const cardCrew_0005: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },
   name: "Dmg02",
   effects: [
@@ -100,7 +87,7 @@ export const cardCrew_0005: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0006: Event = {
+export const cardCrew_0006: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },
   name: "Dmg03",
   effects: [
@@ -114,7 +101,7 @@ export const cardCrew_0006: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0008: Event = {
+export const cardCrew_0008: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },
   name: "Dmg04",
   effects: [
@@ -128,7 +115,7 @@ export const cardCrew_0008: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0003: Event = {
+export const cardCrew_0003: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1002 },
   name: "Tank02",
   effects: [
@@ -142,7 +129,7 @@ export const cardCrew_0003: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0004: Event = {
+export const cardCrew_0004: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },
   name: "Tank03",
   effects: [
@@ -156,7 +143,7 @@ export const cardCrew_0004: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0007: Event = {
+export const cardCrew_0007: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },
   name: "Util01",
   effects: [
@@ -171,7 +158,7 @@ export const cardCrew_0007: Event = {
 };
 
 
-export const cardEnemy_0001: Event = {
+export const cardEnemy_0001: Card = {
   origin: { tag: "PlayerOrigin", cardId: 2001 },
   name: "Boss01",
   effects: [
@@ -186,7 +173,7 @@ export const cardEnemy_0001: Event = {
 };
 
 /*
-export const cardCrew_0003: Event = {
+export const cardCrew_0003: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },
   name: "ArmorSelf",
   effects: [
@@ -200,7 +187,7 @@ export const cardCrew_0003: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0004: Event = {
+export const cardCrew_0004: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1004 },
   name: "RegenDmg",
   effects: [
@@ -214,7 +201,7 @@ export const cardCrew_0004: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0005: Event = {
+export const cardCrew_0005: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1005 },
   name: "Tank1",
   effects: [
@@ -228,7 +215,7 @@ export const cardCrew_0005: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0006: Event = {
+export const cardCrew_0006: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1006 },
   name: "Dmg1",
   effects: [
@@ -242,7 +229,7 @@ export const cardCrew_0006: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0007: Event = {
+export const cardCrew_0007: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1007 },
   name: "Dmg2",
   effects: [
@@ -274,7 +261,7 @@ export const cardCrew_0007: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0008: Event = {
+export const cardCrew_0008: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1008 },
   name: "DmgPoison",
   effects: [
@@ -288,7 +275,7 @@ export const cardCrew_0008: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0009: Event = {
+export const cardCrew_0009: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1009 },
   name: "BasicCrew1",
   effects: [
@@ -302,7 +289,7 @@ export const cardCrew_0009: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0012: Event = {
+export const cardCrew_0012: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1012 },
   name: "Tank01",
   effects: [
@@ -316,7 +303,7 @@ export const cardCrew_0012: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0013: Event = {
+export const cardCrew_0013: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1013 },
   name: "Dmg01",
   effects: [
@@ -330,7 +317,7 @@ export const cardCrew_0013: Event = {
   tag: "crew",
 };
 
-export const cardCrew_0014: Event = {
+export const cardCrew_0014: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1014 },
   name: "Util01",
   effects: [
@@ -344,7 +331,7 @@ export const cardCrew_0014: Event = {
   tag: "crew",
 };
 
-export const cardItem_0000: Event = {
+export const cardItem_0000: Card = {
   origin: { tag: "PlayerOrigin", cardId: 2000 },
   name: "Shield",
   effects: [
@@ -364,7 +351,7 @@ export const cardItem_0000: Event = {
   tag: "item",
 };
 
-export const cardBattle_0009: Event = {
+export const cardBattle_0009: Card = {
   origin: { tag: "PlayerOrigin", cardId: 3009 },
   name: "Enemy9",
   effects: [
@@ -378,7 +365,7 @@ export const cardBattle_0009: Event = {
   tag: "enemy",
 };
 
-export const cardBattle_0010: Event = {
+export const cardBattle_0010: Card = {
   origin: { tag: "PlayerOrigin", cardId: 3010 },
   name: "Enemy10",
   effects: [
@@ -392,7 +379,7 @@ export const cardBattle_0010: Event = {
   tag: "enemy",
 };
 
-export const cardBattle_0011: Event = {
+export const cardBattle_0011: Card = {
   origin: { tag: "PlayerOrigin", cardId: 3011 },
   name: "Dummy",
   effects: [
@@ -406,7 +393,7 @@ export const cardBattle_0011: Event = {
   tag: "enemy",
 };
 
-export const cardBattle_0012: Event = {
+export const cardBattle_0012: Card = {
   origin: { tag: "PlayerOrigin", cardId: 3012 },
   name: "BasicEnemy1",
   effects: [
@@ -420,7 +407,7 @@ export const cardBattle_0012: Event = {
   tag: "enemy",
 };
 
-export const cardBattle_0013: Event = {
+export const cardBattle_0013: Card = {
   origin: { tag: "PlayerOrigin", cardId: 3013 },
   name: "BasicEnemy2",
   effects: [
@@ -434,7 +421,7 @@ export const cardBattle_0013: Event = {
   tag: "enemy",
 };
 
-export const cardBattle_0014: Event = {
+export const cardBattle_0014: Card = {
   origin: { tag: "PlayerOrigin", cardId: 3014 },
   name: "Boss3",
   effects: [
