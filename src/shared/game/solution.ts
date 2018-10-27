@@ -24,12 +24,11 @@ function equalId<C extends { origin: CardOrigin }>(
   card1: C,
   card2: C,
 ) {
-  if (card1.origin.tag === "PlayerOrigin") {
-    return card2.origin.tag === "PlayerOrigin";
-  } else if (card2.origin.tag === "PlayerOrigin") {
+  return false;
+  /*if (card1.origin.tag === "PlayerOrigin" || card2.origin.tag === "PlayerOrigin") {
     return false;
   }
-  return card1.origin.id === card2.origin.id;
+  return card1.origin.id === card2.origin.id;*/
 }
 
 function runAction(

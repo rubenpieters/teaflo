@@ -291,19 +291,32 @@ function removeEventFromSolution(
   mkSolution(board);
 }
 
+function locToPos(
+  loc: Location,
+): { x: number, y: number } {
+  let x = 0;
+  let y = 0;
+  for (const number of loc) {
+    x = x + 10;
+    y = y + 10 * number;
+  }
+  return { x, y };
+}
+
 function drawTree(
   board: Board,
   solution: Solution,
   loc: Location,
   x: number,
   y: number,
-): { x: number, y: number, sprites: Phaser.Graphics[] } {
+): Phaser.Graphics[] {
   let sprites: Phaser.Graphics[] = [];
   let i = 0;
   for (const node of solution.nodes) {
     const newLoc = loc.concat(i);
 
-    const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
+    const pos = locToPos(newLoc);
+    const sprite: Phaser.Graphics = board.game.add.graphics(x + pos.x, y + pos.y, board.group);
     if (newLoc.toString() === board.loc.toString()) {
       sprite.beginFill(0xFF77CC);
     } else {
@@ -315,13 +328,12 @@ function drawTree(
     sprite.events.onInputDown.add(() => changeLoc(board, newLoc));
 
     sprites.push(sprite);
-    const result = drawTree(board, node.tree, newLoc, x + 10, y);
-    sprites = sprites.concat(result.sprites);
+    const result = drawTree(board, node.tree, newLoc, x, y);
+    sprites = sprites.concat(result);
 
-    y = result.y + 10;
     i += 1;
   }
-  return { x, y, sprites }
+  return sprites
 }
 
 function mkTree(
@@ -333,7 +345,7 @@ function mkTree(
   }
 
   // create new
-  const sprites: Phaser.Graphics[] = drawTree(board, board.solution, [], 220, 100).sprites;
+  const sprites: Phaser.Graphics[] = drawTree(board, board.solution, [], 220, 100);
 
   board.graphics.treeGfx = sprites;
 }
