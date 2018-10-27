@@ -345,10 +345,31 @@ function mkTree(
     sprite.destroy();
   }
 
-  // create new
-  const sprites: Phaser.Graphics[] = drawTree(board, board.solution, [], 220, 100);
+  const x = 220;
+  const y = 100;
+  const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
+  if (board.loc.length === 0) {
+    sprite.beginFill(0xFF77CC);
+  } else {
+    sprite.beginFill(0x4477CC);
+  }
+  sprite.drawRect(0, 0, 7, 7);
+  sprite.endFill();
+  sprite.inputEnabled = true;
+  sprite.events.onInputDown.add((obj: any, pointer: Phaser.Pointer) => {
+    if (pointer.leftButton.isDown) {
+      changeLoc(board, [])
+    } else if (pointer.rightButton.isDown) {
+      board.loc = [];
+      board.solution = cutTree(board.solution, []);
+      mkTree(board);
+    }
+  });
 
-  board.graphics.treeGfx = sprites;
+  // create new
+  const sprites: Phaser.Graphics[] = drawTree(board, board.solution, [], x, y);
+
+  board.graphics.treeGfx = [sprite].concat(sprites);
 }
 
 function mkSolution(
