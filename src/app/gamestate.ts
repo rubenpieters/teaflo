@@ -10,7 +10,7 @@ import { Ability } from "src/shared/game/crew";
 import { InputType } from "../shared/game/input";
 import { Context } from "../shared/game/effectvar";
 import { Instance } from "src/shared/game/instance";
-import { emptyTree, Location } from "src/shared/tree";
+import { emptyTree, Location, cutTree } from "src/shared/tree";
 
 export type Limit = {
   limit: number,
@@ -312,10 +312,18 @@ function drawTree(
 ): Phaser.Graphics[] {
   let sprites: Phaser.Graphics[] = [];
   let i = 0;
+  const oldPos = locToPos(loc);
   for (const node of solution.nodes) {
     const newLoc = loc.concat(i);
 
     const pos = locToPos(newLoc);
+
+    const line: Phaser.Graphics = board.game.add.graphics(x + oldPos.x + 3, y + oldPos.y + 3, board.group);
+    line.beginFill(0x4477CC);
+    line.lineStyle(2, 0x4477CC, 1);
+    line.lineTo(pos.x - oldPos.x, pos.y - oldPos.y);
+    line.endFill();
+
     const sprite: Phaser.Graphics = board.game.add.graphics(x + pos.x, y + pos.y, board.group);
     if (newLoc.toString() === board.loc.toString()) {
       sprite.beginFill(0xFF77CC);
@@ -325,8 +333,18 @@ function drawTree(
     sprite.drawRect(0, 0, 7, 7);
     sprite.endFill();
     sprite.inputEnabled = true;
-    sprite.events.onInputDown.add(() => changeLoc(board, newLoc));
+    sprite.events.onInputDown.add((obj: any, pointer: Phaser.Pointer) => {
+      if (pointer.leftButton.isDown) {
+        changeLoc(board, newLoc)
+      } else if (pointer.rightButton.isDown) {
+        board.loc = loc;
+        console.log(`LOC: ${JSON.stringify(loc)}`);
+        board.solution = cutTree(board.solution, newLoc);
+        mkTree(board);
+      }
+    });
 
+    sprites.push(line);
     sprites.push(sprite);
     const result = drawTree(board, node.tree, newLoc, x, y);
     sprites = sprites.concat(result);
@@ -365,7 +383,7 @@ function mkSolution(
     board.lastState = undefined;
     clearState(board);
   } else {
-    console.log(result.state);
+    // console.log(result.state);
     board.lastState = result.state;
     mkState(board, result.state);
   }

@@ -49,6 +49,19 @@ export function extendTree<A>(
   }
 }
 
+export function cutTree<A>(
+  tree: Tree<A>,
+  loc: Location,
+): Tree<A> {
+  if (loc.length === 0) {
+    return emptyTree();
+  } else {
+    return focus(tree,
+      over(x => x.nodes[loc[0]].tree, x => cutTree(x, loc.slice(1))),
+    );
+  }
+}
+
 function getLocation<A>(
   tree: Tree<A>,
   loc: Location,
