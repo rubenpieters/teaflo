@@ -40,6 +40,7 @@ type BoardGraphics = {
   leftMenuTabs: Phaser.Graphics[],
   availableCardsGfx: AvailableCardGfx[],
   solutionGfx: Phaser.Graphics[],
+  treeGfx: Phaser.Graphics[],
   stateGfx: Phaser.Graphics[],
   infoTexts: Phaser.Text[],
 };
@@ -57,6 +58,7 @@ export function newBoard(
       leftMenuTabs: [],
       availableCardsGfx: [],
       solutionGfx: [],
+      treeGfx: [],
       stateGfx: [],
       infoTexts: [],
     },
@@ -141,6 +143,14 @@ export function resetSolution(
 ) {
   board.solution = emptyTree();
   board.loc = [];
+  mkSolution(board);
+}
+
+function changeLoc(
+  board: Board,
+  loc: Location,
+) {
+  board.loc = loc;
   mkSolution(board);
 }
 
@@ -256,16 +266,8 @@ async function addToSolution(
   }
 
   // TODO: unify with function from general.ts
-  switch (card.tag) {
-    case "crew":
-    case "enemy":
-    case "item":
-    case "general": {
-      board.solution = extendSolution({...card, inputs}, board.solution, board.loc);
-      board.loc = board.loc.concat(0);
-      break;
-    }
-  }
+  board.solution = extendSolution({...card, inputs}, board.solution, board.loc);
+  board.loc = board.loc.concat(0);
 
   mkSolution(board);
   chLeftMenuTab(board, board.selectedLeftMenu);
@@ -292,38 +294,55 @@ function removeEventFromSolution(
 function drawTree(
   board: Board,
   solution: Solution,
+  loc: Location,
   x: number,
   y: number,
 ): { x: number, y: number, sprites: Phaser.Graphics[] } {
-  let sprites: Phaser.Graphics[] = []
+  let sprites: Phaser.Graphics[] = [];
+  let i = 0;
   for (const node of solution.nodes) {
+    const newLoc = loc.concat(i);
+
     const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
-    sprite.beginFill(0x4477CC);
+    if (newLoc.toString() === board.loc.toString()) {
+      sprite.beginFill(0xFF77CC);
+    } else {
+      sprite.beginFill(0x4477CC);
+    }
     sprite.drawRect(0, 0, 7, 7);
     sprite.endFill();
+    sprite.inputEnabled = true;
+    sprite.events.onInputDown.add(() => changeLoc(board, newLoc));
 
     sprites.push(sprite);
-    const result = drawTree(board, node.tree, x + 10, y);
+    const result = drawTree(board, node.tree, newLoc, x + 10, y);
     sprites = sprites.concat(result.sprites);
 
     y = result.y + 10;
+    i += 1;
   }
   return { x, y, sprites }
+}
+
+function mkTree(
+  board: Board,
+) {
+  // clear old
+  for (const sprite of board.graphics.treeGfx) {
+    sprite.destroy();
+  }
+
+  // create new
+  const sprites: Phaser.Graphics[] = drawTree(board, board.solution, [], 220, 100).sprites;
+
+  board.graphics.treeGfx = sprites;
 }
 
 function mkSolution(
   board: Board,
   // solutionResults: SolutionResult[],
 ) {
-  // clear old
-  for (const sprite of board.graphics.solutionGfx) {
-    sprite.destroy();
-  }
-
-  // create new
-  const sprites: Phaser.Graphics[] = drawTree(board, board.solution, 220, 100).sprites;
-
-  board.graphics.solutionGfx = sprites;
+  mkTree(board);
 
   // update solution
 
@@ -339,6 +358,7 @@ function mkSolution(
     mkState(board, result.state);
   }
 }
+
 function onSolutionEventCardClick(
   board: Board,
   card: Card,
