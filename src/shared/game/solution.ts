@@ -162,7 +162,7 @@ function runCard(
     if (result.state === "invalid") {
       return { state, log };
     }
-    state = state;
+    state = result.state;
   }
   return { state, log };
 }
@@ -183,15 +183,17 @@ function _runSolution(
   idGen: Generator,
 ): { state: GameState | "invalid", log: SolutionLog } {
   if (loc.length === 0) {
-    return { state: "invalid", log: { actionLog: [] }}; // throw `invalid location ${JSON.stringify(loc)}`;
+    return { state, log };
   }
   const i = loc[0];
   const result = runCard(state, solution.nodes[i].v, idGen);
+  log = { actionLog: log.actionLog.concat(result.log) }
   if (result.state === "invalid") {
-    return { state, log: { actionLog: log.actionLog.concat(result.log) } };
+    return { state: "invalid", log };
   }
+  state = result.state;
   if (loc.length === 1) {
-    return { state, log: { actionLog: log.actionLog.concat(result.log) } };
+    return { state, log };
   }
   return _runSolution(state, loc.slice(1,), solution.nodes[i].tree, log, idGen);
 }

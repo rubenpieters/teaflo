@@ -261,12 +261,8 @@ async function addToSolution(
     case "enemy":
     case "item":
     case "general": {
-      if (board.loc === []) {
-        return "noPaths";
-      } else {
-        // TODO: extend loc as well
-        board.solution = extendSolution({...card, inputs}, board.solution, board.loc);
-      }
+      board.solution = extendSolution({...card, inputs}, board.solution, board.loc);
+      board.loc = board.loc.concat(0);
       break;
     }
   }
@@ -303,14 +299,14 @@ function drawTree(
   for (const node of solution.nodes) {
     const sprite: Phaser.Graphics = board.game.add.graphics(x, y, board.group);
     sprite.beginFill(0x4477CC);
-    sprite.drawRect(0, 0, 10, 10);
+    sprite.drawRect(0, 0, 7, 7);
     sprite.endFill();
 
     sprites.push(sprite);
-    const result = drawTree(board, node.tree, x + 20, y);
+    const result = drawTree(board, node.tree, x + 10, y);
     sprites = sprites.concat(result.sprites);
 
-    y = result.y + 15;
+    y = result.y + 10;
   }
   return { x, y, sprites }
 }
@@ -325,18 +321,20 @@ function mkSolution(
   }
 
   // create new
-  const sprites: Phaser.Graphics[] = drawTree(board, board.solution, 200, 100).sprites;
+  const sprites: Phaser.Graphics[] = drawTree(board, board.solution, 220, 100).sprites;
 
   board.graphics.solutionGfx = sprites;
 
   // update solution
 
   const result = runSolution(board.solution, board.loc);
+  console.log(result.log);
   if (result.state === "invalid") {
     console.log("invalid state");
     board.lastState = undefined;
     clearState(board);
   } else {
+    console.log(result.state);
     board.lastState = result.state;
     mkState(board, result.state);
   }

@@ -43,8 +43,9 @@ export function extendTree<A>(
       return tree;
     }
   } else {
-    const traverseTree = tree.nodes[loc[0]].tree;
-    return extendTree(check, traverseTree, loc.slice(1), a);
+    return focus(tree,
+      over(x => x.nodes[loc[0]].tree, x => extendTree(check, x, loc.slice(1), a)),
+    );
   }
 }
 
