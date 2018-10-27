@@ -274,23 +274,6 @@ async function addToSolution(
   return "cardAdded";
 }
 
-function removeEventFromSolution(
-  board: Board,
-  card: Card,
-  pathIndex: number,
-  eventIndex: number,
-) {
-  // TODO: implement remove from solution
-  throw "TODO";
-  if (card.origin.tag === "PlayerOrigin") {
-    const index = board.availableCards.findIndex(c =>
-      (<PlayerOrigin>c.origin).cardId === (<PlayerOrigin>card.origin).cardId);
-    board.availableCards[index].limit += 1;
-  }
-  chLeftMenuTab(board, board.selectedLeftMenu);
-  mkSolution(board);
-}
-
 function locToPos(
   loc: Location,
 ): { x: number, y: number } {
@@ -387,24 +370,6 @@ function mkSolution(
     board.lastState = result.state;
     mkState(board, result.state);
   }
-}
-
-function onSolutionEventCardClick(
-  board: Board,
-  card: Card,
-  pathIndex: number,
-  eventIndex: number,
-) {
-  return function(
-    _sprite: Phaser.Sprite,
-    pointer: Phaser.Pointer,
-  ) {
-    if (pointer.leftButton.isDown) {
-      // show solution up to here
-    } else if (pointer.rightButton.isDown) {
-      removeEventFromSolution(board, card, pathIndex, eventIndex);
-    }
-  };
 }
 
 function clearState(
