@@ -321,9 +321,8 @@ function drawTree(
         changeLoc(board, newLoc)
       } else if (pointer.rightButton.isDown) {
         board.loc = loc;
-        console.log(`LOC: ${JSON.stringify(loc)}`);
-        board.solution = cutTree(board.solution, newLoc);
-        mkTree(board);
+        board.solution = cutTree(board.solution, loc);
+        mkSolution(board);
       }
     });
 
