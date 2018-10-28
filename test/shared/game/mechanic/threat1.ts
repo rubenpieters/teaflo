@@ -5,6 +5,7 @@ import { showSolutionLog } from "src/shared/game/log";
 import { solCardFromAbility } from "src/shared/game/ability";
 import { addToSolution, fSt, useAbility } from "test/shared/game/general";
 
+/*
 export function mechanic_threat1() {
   let x = addToSolution(allCards.cardRest, { paths: [] }, []);
   x = addToSolution(allCards.cardCrew_0002, x.solution, []);
@@ -25,4 +26,4 @@ export function mechanic_threat1() {
 }
 
 //console.log(mechanic_threat1());
-mechanic_threat1();
+mechanic_threat1();*/

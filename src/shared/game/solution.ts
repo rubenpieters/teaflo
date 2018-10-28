@@ -133,7 +133,7 @@ function runAction(
 
 function runCard(
   state: GameState,
-  card: Card,
+  card: CardInput,
   idGen: Generator,
 ): { state: GameState | "invalid", log: ActionLog[] } {
   let log: ActionLog[] = [];
@@ -144,7 +144,7 @@ function runCard(
       case "PositionId":
       case "GlobalId": {
         cardEffect = action.effect(
-          { state, selfId: card.origin, inputs: action.inputs }
+          { state, selfId: card.origin, inputs: card.inputs }
         ).action;
         cardOrigin = card.origin;
         break;

@@ -1,33 +1,20 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Solution, runSolution, SolCard, SolEvent, SolRest, SolutionResult } from "src/shared/game/solution";
-import { Event, Rest } from "src/shared/game/card";
+import { Solution, runSolution, extendSolution } from "src/shared/game/solution";
 import { GameState } from "src/shared/game/state";
 import { solCardFromAbility } from "src/shared/game/ability";
+import { Card } from "src/shared/game/card";
+import { SolutionLog } from "src/shared/game/log";
+import { Location } from "src/shared/tree";
 
 export function addToSolution(
-  card: SolCard, 
-  solution: Solution,
+  card: Card, 
+  prev: { solution: Solution, loc: Location},
   inputs: any[],
-): { solution: Solution, result: SolutionResult } {
-  switch (card.tag) {
-    case "crew":
-    case "enemy":
-    case "item":
-    case "general": {
-      if (solution.paths.length === 0) {
-        throw "no paths created yet";
-      } else {
-        solution = focus(solution, over(x => x.paths[solution.paths.length - 1].eventCards, x => x.concat({ event: card, inputs})));
-      }
-      break;
-    }
-    case "rest": {
-      solution = focus(solution, over(x => x.paths, x => x.concat({ restCard: card, eventCards: [] })));
-      break;
-    }
-  }
+): { solution: Solution, loc: Location, result: { state: GameState | "invalid", log: SolutionLog } } {
+  const solution = extendSolution({...card, inputs}, prev.solution, prev.loc);
+  const newLoc = prev.loc.concat(0);
 
-  return { solution, result: runSolution(solution) };
+  return { solution, loc: newLoc, result: runSolution(solution, newLoc) };
 }
 
 export function useAbility(
