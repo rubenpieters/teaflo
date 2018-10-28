@@ -1,0 +1,47 @@
+** AddCrew **
+start turn
+Apply StartTurn
+crew action
+Apply AddCrew
+queue1
+
+enemy action
+
+queue2
+
+deaths
+
+
+** AddEnemy **
+start turn
+Apply StartTurn
+crew action
+Apply AddEnemy
+queue1
+
+enemy action
+Apply Noop
+queue2
+
+deaths
+
+
+** Combined 2 **
+start turn
+Trigger Poison 0 T 50 F (Before) 
++Apply Combined 2
++Apply ChargeUse 0 Pos [0] enemy
++Apply Damage 0 to Pos [0] enemy
+Apply StartTurn
+crew action
+Apply Combined 2
+Apply Damage 15 to Pos [0] enemy
+Apply QueueStatus Poison 0 T 50 F to Pos [0] enemy
+queue1
+Apply AddStatus Poison 0 T 50 F to Pos [0] enemy
+enemy action
+Apply Noop
+queue2
+
+deaths
+
