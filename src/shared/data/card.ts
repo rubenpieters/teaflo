@@ -172,6 +172,26 @@ export const cardEnemy_0001: Card = {
   tag: "enemy",
 };
 
+export const cardEnemy_0002: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 2001 },
+  name: "Boss02",
+  effects: [
+    { effect: (_obj) => {
+        return { action: {
+          tag: "CombinedAction",
+          actions: [
+            { tag: "AddEnemy", enemy: allEnemies.enemyBoss2_1 },
+            { tag: "AddEnemy", enemy: allEnemies.enemyBoss2_2 },
+          ],
+        }};
+      },
+      inputs: [],
+      description: "add Boss02",
+    },
+  ],
+  tag: "enemy",
+};
+
 /*
 export const cardCrew_0003: Card = {
   origin: { tag: "PlayerOrigin", cardId: 1003 },

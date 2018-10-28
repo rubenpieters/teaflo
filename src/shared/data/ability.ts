@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { TargetType } from "src/shared/game/target";
-import { Action, highestThreatTarget, Damage } from "src/shared/game/action";
+import { Action, Damage } from "src/shared/game/action";
 import { GameState, IdCrew, EntityId, findEntity, CreatureId, toPositionId, inCombat, IdEnemy, showId, PositionIdA } from "src/shared/game/state";
 import { Next } from "src/shared/game/next";
 import { Status } from "src/shared/game/status";

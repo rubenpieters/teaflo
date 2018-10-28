@@ -2,8 +2,8 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, CreatureId, toPositionId } from "src/shared/game/state";
 import { Next } from "src/shared/game/next";
 import { Enemy } from "src/shared/game/enemy";
-import { queueStatus, evAllyPositions, evStatic, extra, noop, damage, explode } from "src/shared/game/effectvar";
-import { Poison, findStatus } from "src/shared/game/status";
+import { queueStatus, evAllyPositions, evStatic, extra, noop, damage, explode, heal, evHighestThreat } from "src/shared/game/effectvar";
+import { Poison, findStatus, Strong } from "src/shared/game/status";
 
 
 export const dummy: Enemy = {
@@ -76,6 +76,53 @@ function enemyBoss1Condition1(
     const status = findStatus(x, "Poison");
     return status !== undefined && status.value >= 10;
   }).length > 0;
+}
+
+export const enemyBoss2_1: Enemy = {
+  ap: 1,
+  hp: 140,
+  maxHp: 140,
+  actions: [
+    extra(damage(evHighestThreat, evStatic(1), evStatic(false)),
+    { next: <Next>{ tag:"NextId"}}),
+  ],
+  triggers: [
+  ],
+  charges: 20,
+  fragmentLoss: {
+    Poison: 150,
+  },
+  status: [],
+  transforms: [],
+};
+
+export const enemyBoss2_2: Enemy = {
+  ap: 1,
+  hp: 90,
+  maxHp: 90,
+  actions: [
+    extra(queueStatus(evStatic(<CreatureId>{ tag: "PositionId", type: "enemy", id: 0}), evStatic(<Strong>{
+      tag: "Strong",
+      value: 1,
+      fragment: 0,
+    })), { next: <Next>{ tag: "NextCondition", condition: enemyBoss2_2Condition1, ifT: { tag: "NextId" }, ifF: { tag: "Repeat" } }}),
+    extra(heal(evStatic(<CreatureId>{ tag: "PositionId", type: "enemy", id: 0}), evStatic(30)),
+    { next: <Next>{ tag: "NextCondition", condition: enemyBoss2_2Condition1, ifT: { tag: "Repeat" }, ifF: { tag: "NextId" } }}),
+  ],
+  triggers: [
+  ],
+  charges: 20,
+  fragmentLoss: {
+    Poison: 75,
+  },
+  status: [],
+  transforms: [],
+};
+
+function enemyBoss2_2Condition1(
+  state: GameState,
+) {
+  return state.enemies[0].hp < 50;
 }
 
 /*

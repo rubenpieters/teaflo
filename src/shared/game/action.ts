@@ -207,25 +207,6 @@ export function enemyTurn(
   return { state: acc, log };
 }
 
-export function highestThreatTarget(
-  enemyId: CreatureId,
-  state: GameState,
-): { target: Crew, position: number } | undefined {
-  let enemyGlobalId = toGlobalId(state, enemyId).id;
-  let highestThreat: { ally: Crew, position: number, threat: number } | undefined = undefined;
-  let i = 0;
-  for (const ally of state.crew) {
-    const threat: number | undefined = ally.threatMap[enemyGlobalId];
-    if (highestThreat === undefined) {
-      highestThreat = { ally, position: i, threat: threat === undefined ? 0 : threat };
-    } else if (threat !== undefined && highestThreat.threat < threat) {
-      highestThreat = { ally, position: i, threat }
-    }
-    i += 1;
-  }
-  return highestThreat === undefined ? undefined : { target: highestThreat.ally, position: highestThreat.position };
-}
-
 export function applyTransforms(
   action: Action,
   state: GameState,

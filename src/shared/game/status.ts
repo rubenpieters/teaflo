@@ -74,6 +74,12 @@ export type Weak = {
   fragment: number,
 };
 
+export type Strong = {
+  tag: "Strong",
+  value: number,
+  fragment: number,
+};
+
 export type Convert = {
   tag: "Convert",
   value: 1,
@@ -102,6 +108,7 @@ export type Transform
   | Bubble
   | Weak
   | Convert
+  | Strong
   ;
 
 /*export function isStatus<A extends { tag: string }>(
@@ -159,6 +166,9 @@ export function showStatus(status: Status | Transform): string {
     }
     case "Weak": {
       return `Weak ${status.value} T ${status.fragment} F`;
+    }
+    case "Strong": {
+      return `Strong ${status.value} T ${status.fragment} F`;
     }
     case "Convert": {
       return `Convert ${status.value} T ${status.fragment} F`;
@@ -505,16 +515,19 @@ export function transformToTrigger(
 ): TriggerEntityEffect {
   switch (tag) {
     case "Guard": {
-      return guardTrigger;
+      return EV.guardTrigger;
     }
     case "Weak": {
-      return weakTrigger;
+      return EV.weakTrigger;
     }
     case "Convert": {
-      return convertTrigger;
+      return EV.convertTrigger;
     }
     case "Bubble": {
-      return bubbleTrigger;
+      return EV.bubbleTrigger;
+    }
+    case "Strong": {
+      return EV.strongTrigger;
     }
   }
 }

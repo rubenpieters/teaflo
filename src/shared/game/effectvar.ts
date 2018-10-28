@@ -1,10 +1,11 @@
-import { CreatureId, GameState, idEqual, findEntity } from "src/shared/game/state";
+import { CreatureId, GameState, idEqual, findEntity, toGlobalId } from "src/shared/game/state";
 import { Status, Guard, DmgBarrier, findStatus, Poison, StatusTag, TransformTag } from "src/shared/game/status";
 import { Action } from "src/shared/game/action";
 import { InputType } from "src/shared/game/input";
 import { Origin } from "./target";
 import { Instance } from "./instance";
 import { Transform } from "src/shared/game/status";
+import { Crew } from "./crew";
 
 export type Eff1<A> = {
   effect: (obj: Context) => { action: Action } & A,
@@ -88,6 +89,14 @@ export const evTransformValue: EffectVar<number> = {
   tag: "TransformValue",
 }
 
+type HighestThreat = {
+  tag: "HighestThreat",
+}
+
+export const evHighestThreat: EffectVar<CreatureId> = {
+  tag: "HighestThreat",
+}
+
 type EffectVar<A>
   = Static<A>
   | Self
@@ -99,6 +108,7 @@ type EffectVar<A>
   | TriggerOrigin
   | StatusValue
   | TransformValue
+  | HighestThreat
   ;
 
 export type Context = {
@@ -302,6 +312,33 @@ export const weakTrigger: Eff1<{ chargeUse: number }> = {
   description: `when dealing damage: reduce by x`,
 }
 
+export const strongTrigger: Eff1<{ chargeUse: number }> = {
+  effect: (obj: Context) => {
+    const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
+    const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
+    const self: CreatureId = evaluate(<EffectVar<CreatureId>>evSelf)(obj);
+    if (action.tag === "Damage" && origin !== "noOrigin" && idEqual(obj.state, origin, self)) {
+      if (obj.transform === undefined || obj.transform.tag !== "Strong") {
+        throw `Wrong status: ${JSON.stringify(obj.status)}`;
+      } else {
+        const newDamage = action.value + obj.transform.value;
+        if (newDamage > 0) {
+          return {
+            action: damage(evStatic(action.target), evStatic(newDamage), evStatic(false))
+            .effect(obj).action,
+            chargeUse: 0,
+          };
+        } else {
+          return { action: { tag: "Abort" }, chargeUse: 0 };
+        }
+      }
+    } else {
+      return { action: { tag: "Noop" }, chargeUse: 0 };
+    }
+  },
+  description: `when dealing damage: increase by x`,
+}
+
 export const convertTrigger: Eff1<{ chargeUse: number }> = {
   effect: (obj: Context) => {
     const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
@@ -411,7 +448,7 @@ function evaluate<A>(
           console.log("Context does not have selfId");
           throw "Context does not have selfId";
         } else {
-          return <A>(<any>context.selfId);
+          return <any>context.selfId;
         }
       }
       case "Static": {
@@ -430,7 +467,7 @@ function evaluate<A>(
           console.log("Context does not have trigger");
           throw "Context does not have trigger";
         } else {
-          return <A>(<any>context.trigger);
+          return <any>context.trigger;
         }
       }
       case "TriggerOrigin": {
@@ -438,7 +475,7 @@ function evaluate<A>(
           console.log("Context does not have triggerOrigin");
           throw "Context does not have triggerOrigin";
         } else {
-          return <A>(<any>context.triggerOrigin);
+          return <any>context.triggerOrigin;
         }
       }
       case "StatusValue": {
@@ -446,7 +483,7 @@ function evaluate<A>(
           console.log("Context does not have status");
           throw "Context does not have status";
         } else {
-          return <A>(<any>context.status.value);
+          return <any>context.status.value;
         }
       }
       case "TransformValue": {
@@ -454,7 +491,19 @@ function evaluate<A>(
           console.log("Context does not have transform");
           throw "Context does not have transform";
         } else {
-          return <A>(<any>context.transform);
+          return <any>context.transform;
+        }
+      }
+      case "HighestThreat": {
+        if (context.selfId === undefined) {
+          console.log("Context does not have selfId");
+          throw "Context does not have selfId";
+        } else {
+          const target = highestThreatTarget(context.selfId, context.state);
+          const id: CreatureId = target === undefined ?
+            { tag: "PositionId", type: "ally", id: 0 } :
+            { tag: "PositionId", type: "ally", id: target.position };
+          return <any>id;
         }
       }
       default: {
@@ -463,6 +512,25 @@ function evaluate<A>(
       }
     }
   }
+}
+
+function highestThreatTarget(
+  enemyId: CreatureId,
+  state: GameState,
+): { target: Crew, position: number } | undefined {
+  let enemyGlobalId = toGlobalId(state, enemyId).id;
+  let highestThreat: { ally: Crew, position: number, threat: number } | undefined = undefined;
+  let i = 0;
+  for (const ally of state.crew) {
+    const threat: number | undefined = ally.threatMap[enemyGlobalId];
+    if (highestThreat === undefined) {
+      highestThreat = { ally, position: i, threat: threat === undefined ? 0 : threat };
+    } else if (threat !== undefined && highestThreat.threat < threat) {
+      highestThreat = { ally, position: i, threat }
+    }
+    i += 1;
+  }
+  return highestThreat === undefined ? undefined : { target: highestThreat.ally, position: highestThreat.position };
 }
 
 function showEv<A>(ev: EffectVar<A>): string {
@@ -496,6 +564,9 @@ function showEv<A>(ev: EffectVar<A>): string {
     }
     case "TransformValue": {
       return `<Transform Value>`;
+    }
+    case "HighestThreat": {
+      return `<Highest Threat>`;
     }
   }
 }
