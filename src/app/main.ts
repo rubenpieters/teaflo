@@ -4,7 +4,6 @@ import "phaser";
 
 import Boot from "src/app/states/boot";
 import Load from "src/app/states/load";
-import Menu from "src/app/states/menu";
 import Game from "src/app/states/game";
 
 import { config } from "src/app/config";
@@ -16,7 +15,6 @@ class App extends Phaser.Game {
 
     this.state.add("boot", Boot);
     this.state.add("load", Load);
-    this.state.add("menu", Menu);
     this.state.add("game", Game);
 
     this.state.start("boot");
