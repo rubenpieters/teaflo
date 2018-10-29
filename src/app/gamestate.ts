@@ -42,6 +42,7 @@ type BoardGraphics = {
   solutionGfx: Phaser.Graphics[],
   treeGfx: Phaser.Graphics[],
   stateGfx: Phaser.Graphics[],
+  popupGfx: Phaser.Sprite[],
   infoTexts: Phaser.Text[],
 };
 
@@ -60,6 +61,7 @@ export function newBoard(
       solutionGfx: [],
       treeGfx: [],
       stateGfx: [],
+      popupGfx: [],
       infoTexts: [],
     },
     game,
@@ -428,7 +430,8 @@ function mkState(
     sprite.drawRect(0, 0, 20, 40);
     sprite.endFill();
     sprite.inputEnabled = true;
-    sprite.events.onInputOver.add(() => showAlly(board, ally));
+    sprite.events.onInputOver.add(() => showAlly(board, ally, x, y));
+    sprite.events.onInputOut.add(() => clearPopups(board));
     sprite.events.onInputDown.add(() => {
       if (targeting) {
         targeted = {
@@ -481,7 +484,8 @@ function mkState(
     sprite.drawRect(0, 0, 10, 20);
     sprite.endFill();
     sprite.inputEnabled = true;
-    sprite.events.onInputOver.add(() => showInstance(board, instance));
+    sprite.events.onInputOver.add(() => showInstance(board, instance, x, y));
+    sprite.events.onInputOut.add(() => clearPopups(board));
     sprites.push(sprite);
 
     x -= 15;
@@ -495,7 +499,8 @@ function mkState(
     sprite.drawRect(0, 0, 20, 40);
     sprite.endFill();
     sprite.inputEnabled = true;
-    sprite.events.onInputOver.add(() => showEnemy(board, enemy));
+    sprite.events.onInputOver.add(() => showEnemy(board, enemy, x, y));
+    sprite.events.onInputOut.add(() => clearPopups(board));
     sprite.events.onInputDown.add(() => {
       if (targeting) {
         targeted = {
@@ -533,7 +538,7 @@ function mkState(
     sprite.drawRect(0, 0, 10, 20);
     sprite.endFill();
     sprite.inputEnabled = true;
-    sprite.events.onInputOver.add(() => showInstance(board, instance));
+    sprite.events.onInputOver.add(() => showInstance(board, instance, x, y));
     sprites.push(sprite);
 
     x += 15;
@@ -688,15 +693,15 @@ function showEntityStatus(
 function showAlly(
   board: Board,
   ally: IdCrew,
+  x: number,
+  y: number,
 ) {
   // clear old
-  for (const text of board.graphics.infoTexts) {
-    text.destroy();
+  for (const sprite of board.graphics.popupGfx) {
+    sprite.destroy();
   }
 
-  const x = 620;
-  let y = 50;
-  const infoTexts: Phaser.Text[] = [];
+  const popups: Phaser.Sprite[] = [];
 
   const fontSize = 15;
   const hpText: Phaser.Text = board.game.add.text(0, 0, `HP: ${ally.hp}/${ally.maxHp} AP: ${ally.ap}`, {
@@ -707,7 +712,7 @@ function showAlly(
     boundsAlignV: "middle",
   }, board.group);
   hpText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(hpText);
+  popups.push(hpText);
 
   y += 40;
   const chargesText: Phaser.Text = board.game.add.text(0, 0, `Charges: ${ally.charges}`, {
@@ -718,7 +723,7 @@ function showAlly(
     boundsAlignV: "middle",
   }, board.group);
   chargesText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(chargesText);
+  popups.push(chargesText);
 
   y += 40;
   const threatMapText: Phaser.Text = board.game.add.text(0, 0, `${JSON.stringify(ally.threatMap)}`, {
@@ -729,7 +734,7 @@ function showAlly(
     boundsAlignV: "middle",
   }, board.group);
   threatMapText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(threatMapText);
+  popups.push(threatMapText);
 
   y += 40;
   const actionText: Phaser.Text = board.game.add.text(0, 0, `Actions`, {
@@ -740,7 +745,7 @@ function showAlly(
     boundsAlignV: "middle",
   }, board.group);
   actionText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(actionText);
+  popups.push(actionText);
 
   for (const action of ally.actions) {
     y += 30;
@@ -752,7 +757,7 @@ function showAlly(
       boundsAlignV: "middle",
     }, board.group);
     actionDescText.setTextBounds(x, y, 180, 22);
-    infoTexts.push(actionDescText);
+    popups.push(actionDescText);
   }
 
   y += 40;
@@ -764,23 +769,28 @@ function showAlly(
     boundsAlignV: "middle",
   }, board.group);
   triggerText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(triggerText);
+  popups.push(triggerText);
   
-  board.graphics.infoTexts = infoTexts;
+  board.graphics.popupGfx = popups;
 }
 
 function showEnemy(
   board: Board,
   enemy: IdEnemy,
+  x: number,
+  y: number,
 ) {
   // clear old
-  for (const text of board.graphics.infoTexts) {
-    text.destroy();
+  for (const sprite of board.graphics.popupGfx) {
+    sprite.destroy();
   }
 
-  const x = 620;
-  let y = 50;
-  const infoTexts: Phaser.Text[] = [];
+  const popups: Phaser.Sprite[] = [];
+
+  //const bg: Phaser.Sprite = board.game.add.sprite(x, y, "slot", undefined, board.group);
+  //bg.width = 50;
+  //bg.height = 100;
+  //popups.push(bg);
 
   const fontSize = 15;
   const enemyActionText: Phaser.Text = board.game.add.text(0, 0, `HP: ${enemy.hp}/${enemy.maxHp}`, {
@@ -791,7 +801,7 @@ function showEnemy(
     boundsAlignV: "middle",
   }, board.group);
   enemyActionText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(enemyActionText);
+  popups.push(enemyActionText);
 
   y += 40;
   const chargesText: Phaser.Text = board.game.add.text(0, 0, `Charges: ${enemy.charges}`, {
@@ -802,7 +812,7 @@ function showEnemy(
     boundsAlignV: "middle",
   }, board.group);
   chargesText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(chargesText);
+  popups.push(chargesText);
 
   y += 40;
   const actionText: Phaser.Text = board.game.add.text(0, 0, `Actions`, {
@@ -813,7 +823,7 @@ function showEnemy(
     boundsAlignV: "middle",
   }, board.group);
   actionText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(actionText);
+  popups.push(actionText);
 
   let i = 0;
   for (const action of enemy.actions) {
@@ -827,11 +837,11 @@ function showEnemy(
       boundsAlignV: "middle",
     }, board.group);
     actionDescText.setTextBounds(x, y, 180, 22);
-    infoTexts.push(actionDescText);
+    popups.push(actionDescText);
     i += 1;
   }
 
-  board.graphics.infoTexts = infoTexts;
+  board.graphics.popupGfx = popups;
 }
 
 function showAbility(
@@ -864,15 +874,15 @@ function showAbility(
 function showInstance(
   board: Board,
   instance: Instance,
+  x: number,
+  y: number,
 ) {
   // clear old
-  for (const text of board.graphics.infoTexts) {
-    text.destroy();
+  for (const sprite of board.graphics.popupGfx) {
+    sprite.destroy();
   }
 
-  const x = 620;
-  let y = 50;
-  const infoTexts: Phaser.Text[] = [];
+  const popups: Phaser.Text[] = [];
 
   const fontSize = 15;
   const hpText: Phaser.Text = board.game.add.text(0, 0, `HP: ${instance.hp}/${instance.maxHp} AP: ${instance.ap}`, {
@@ -883,7 +893,7 @@ function showInstance(
     boundsAlignV: "middle",
   }, board.group);
   hpText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(hpText);
+  popups.push(hpText);
 
   y += 40;
   const actionText: Phaser.Text = board.game.add.text(0, 0, `Actions`, {
@@ -894,7 +904,7 @@ function showInstance(
     boundsAlignV: "middle",
   }, board.group);
   actionText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(actionText);
+  popups.push(actionText);
 
   y += 30;
   const actionDescText: Phaser.Text = board.game.add.text(0, 0, instance.action.description, {
@@ -905,7 +915,15 @@ function showInstance(
     boundsAlignV: "middle",
   }, board.group);
   actionDescText.setTextBounds(x, y, 180, 22);
-  infoTexts.push(actionDescText);
+  popups.push(actionDescText);
 
-  board.graphics.infoTexts = infoTexts;
+  board.graphics.infoTexts = popups;
+}
+
+function clearPopups(
+  board: Board,
+) {
+  for (const sprite of board.graphics.popupGfx) {
+    sprite.destroy();
+  }
 }
