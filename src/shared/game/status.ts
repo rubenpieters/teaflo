@@ -90,7 +90,13 @@ export type Mark = {
   tag: "Mark",
   value: number,
   fragment: number,
-}
+};
+
+export type Intercept = {
+  tag: "Intercept",
+  value: number,
+  fragment: number,
+};
 
 export type Status
   = Poison
@@ -101,6 +107,7 @@ export type Status
   | Silence
   | DmgBarrier
   | Mark
+  | Intercept
   ;
 
 export type Transform
@@ -156,6 +163,9 @@ export function showStatus(status: Status | Transform): string {
     }
     case "Mark": {
       return `Mark ${status.value} T ${status.fragment} F`;
+    }
+    case "Intercept": {
+      return `Intercept ${status.value} T ${status.fragment} F`;
     }
     // Transform
     case "Guard": {
@@ -318,7 +328,8 @@ export function addStatusTransform<E extends HasStatus & HasTransform>(
     statusTransform.tag === "Blind" ||
     statusTransform.tag === "Silence" ||
     statusTransform.tag === "DmgBarrier" ||
-    statusTransform.tag === "Mark"
+    statusTransform.tag === "Mark" ||
+    statusTransform.tag === "Intercept"
   ) {
     return addStatus(e, statusTransform);
   } else {
@@ -511,6 +522,9 @@ export function statusToTrigger(
           extra(noop(), { chargeUse: 0 }),
         ),
       );
+    }
+    case "Intercept": {
+      return EV.interceptTrigger;
     }
     default: throw "unimplemented";
   }

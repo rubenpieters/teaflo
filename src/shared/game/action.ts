@@ -299,7 +299,7 @@ function applyAction(
   switch (action.tag) {
     case "AddEnemy": {
       const id = idGen.newId();
-      const addedEnemy: IdEnemy = {...action.enemy, ...{ id, actionIndex: 0, tag: "enemy", status: [] } };
+      const addedEnemy: IdEnemy = {...action.enemy, ...{ id, actionIndex: 0, tag: "enemy" } };
       state = focus(state, over(x => x.enemies, x => x.concat(addedEnemy)));
       break;
     }
@@ -308,7 +308,7 @@ function applyAction(
         return { state: "invalid", log };
       } else {
         const id = idGen.newId();
-        const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally", status: [] } };
+        const addedCrew: IdCrew = {...action.crew, ...{ id, actionIndex: 0, tag: "ally" } };
         state = focus(state, over(x => x.crew, x => x.concat(addedCrew)));
       }
       break;

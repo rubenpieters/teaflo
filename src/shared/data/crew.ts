@@ -37,16 +37,6 @@ export const tank_01: Crew = {
   ap: 1,
   hp: 100,
   maxHp: 100,
-  /* TODO: convert to status trigger
-  triggers: [
-    evTrigger(trigger => evCondition(trigger,
-      x => x.tag === "Damage" && x.target.type === "ally", // TODO: and target not self?
-      extra(evEnemies(enemy => addThreat(evSelf, evStatic(5), enemy)), { chargeUse: 1 }),
-      extra(noop(), { chargeUse: 0 }),
-      ),
-      "before",
-    )
-  ],*/
   ranged: false,
   actions: [
     noop(),
@@ -64,7 +54,13 @@ export const tank_01: Crew = {
   threatMap: {},
   charges: 5,
   fragmentLoss: {},
-  status: [],
+  status: [
+    {
+      tag: "Intercept",
+      fragment: 0,
+      value: 1,
+    },
+  ],
   transforms: [],
 };
 

@@ -343,7 +343,6 @@ export const convertTrigger: Eff1<{ chargeUse: number }> = {
   effect: (obj: Context) => {
     const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
     const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
-    console.log(`CHECKING: ${JSON.stringify(action)}`);
     if (action.tag === "Damage" && origin !== "noOrigin" && origin.type === "ally") {
       if (obj.transform === undefined || obj.transform.tag !== "Convert") {
         throw `Wrong status: ${JSON.stringify(obj.status)}`;
@@ -359,6 +358,29 @@ export const convertTrigger: Eff1<{ chargeUse: number }> = {
           }))
           .effect(obj).action,
           chargeUse: 0,
+        };
+      }
+    } else {
+      return { action: { tag: "Noop" }, chargeUse: 0 };
+    }
+  },
+  description: `convert damage to poison`,
+}
+
+export const interceptTrigger: Eff1<{ chargeUse: number }> = {
+  effect: (obj: Context) => {
+    const action: Action = evaluate(<EffectVar<Action>>evGetTrigger)(obj);
+    const origin: Origin = evaluate(<EffectVar<Origin>>evGetTriggerOrigin)(obj);
+    const self: CreatureId = evaluate(<EffectVar<CreatureId>>evSelf)(obj);
+    console.log(`CHECKING: ${JSON.stringify(action)}`);
+    if (action.tag === "Damage" && origin !== "noOrigin" && action.target.type === "ally" && !idEqual(obj.state, self, action.target)) {
+      if (obj.status === undefined || obj.status.tag !== "Intercept") {
+        throw `Wrong status: ${JSON.stringify(obj.status)}`;
+      } else {
+        return {
+          action: evEnemies(enemy => addThreat(evSelf, evStatic(5), enemy))
+          .effect(obj).action,
+          chargeUse: 1,
         };
       }
     } else {

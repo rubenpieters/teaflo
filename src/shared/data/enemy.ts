@@ -84,7 +84,7 @@ export const enemyBoss2_1: Enemy = {
   maxHp: 140,
   actions: [
     extra(damage(evHighestThreat, evStatic(1), evStatic(false)),
-    { next: <Next>{ tag:"NextId"}}),
+    { next: <Next>{ tag: "NextId" }}),
   ],
   triggers: [
   ],
@@ -106,7 +106,7 @@ export const enemyBoss2_2: Enemy = {
       value: 1,
       fragment: 0,
     })), { next: <Next>{ tag: "NextCondition", condition: enemyBoss2_2Condition1, ifT: { tag: "NextId" }, ifF: { tag: "Repeat" } }}),
-    extra(heal(evStatic(<CreatureId>{ tag: "PositionId", type: "enemy", id: 0}), evStatic(30)),
+    extra(heal(evStatic(<CreatureId>{ tag: "PositionId", type: "enemy", id: 0 }), evStatic(30)),
     { next: <Next>{ tag: "NextCondition", condition: enemyBoss2_2Condition1, ifT: { tag: "Repeat" }, ifF: { tag: "NextId" } }}),
   ],
   triggers: [
