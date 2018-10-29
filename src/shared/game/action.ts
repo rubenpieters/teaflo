@@ -512,7 +512,7 @@ function applyAction(
       break;
     }
     case "ClearStatus": {
-      throw "TODO";
+      throw "applyAction: TODO";
       /*state = onCreature(action.target, state,
         ally => _Status.clearStatus(ally, action.status),
         enemy => _Status.clearStatus(enemy, action.status),

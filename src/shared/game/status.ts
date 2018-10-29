@@ -205,6 +205,12 @@ function mergeStatus<S extends Status | Transform>(
         over(x => x.value, x => x + status2.value),
       ));
     }
+    case "Strong": {
+      return collapseStatus(focus(status1,
+        over(x => x.fragment, x => x + status2.fragment),
+        over(x => x.value, x => x + status2.value),
+      ));
+    }
     case "Mark": {
       return collapseStatus(focus(status1,
         over(x => x.fragment, x => x + status2.fragment),
@@ -212,7 +218,7 @@ function mergeStatus<S extends Status | Transform>(
       ));
     }
     default: {
-      throw "TODO";
+      throw "mergeStatus: TODO";
     }
   }
 }
