@@ -62,7 +62,7 @@ export function cutTree<A>(
   }
 }
 
-function getLocation<A>(
+export function getLocation<A>(
   tree: Tree<A>,
   loc: Location,
 ): A {
@@ -70,6 +70,9 @@ function getLocation<A>(
     throw `invalid location ${JSON.stringify(loc)}`;
   }
   const i = loc[0];
+  if (i >= tree.nodes.length) {
+    throw `invalid location ${JSON.stringify(loc)}`;
+  }
   if (loc.length === 1) {
     return tree.nodes[i].v;
   }
