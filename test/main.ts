@@ -2,7 +2,6 @@ import iassign from "immutable-assign";
 import expect from "expect";
 import * as fs from "fs";
 import * as path from "path";
-import { simpleTest } from "test/shared/game/simpletest";
 
 type TestResult = {
   goldenFileCreated: boolean,
@@ -52,6 +51,3 @@ function goldenTest(
 
   return { goldenFileCreated, testSucceeded };
 }
-
-const simpleTestRes = goldenTest("golden_files/simpletest.txt", simpleTest);
-expect(simpleTestRes.testSucceeded).toEqual(true);
