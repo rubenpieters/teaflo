@@ -57,7 +57,7 @@ export const enemyBoss1: Enemy = {
         fragment: 50,
       }
     ))), { next: <Next>{ tag: "NextCondition", condition: enemyBoss1Condition1, ifT: { tag: "NextId" }, ifF: { tag: "Repeat" } }}),
-    extra(evAllyPositions(ally => explode(ally, evStatic(10))), { next: <Next>{ tag: "NextId" }}),
+    extra(evAllyPositions(ally => explode(ally, evStatic(10), evStatic(2))), { next: <Next>{ tag: "NextId" }}),
   ],
   triggers: [
   ],

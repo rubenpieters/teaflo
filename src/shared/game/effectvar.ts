@@ -748,6 +748,7 @@ export function noop(
 export function explode(
   varId: EffectVar<CreatureId>,
   varThreshold: EffectVar<number>,
+  varMultiplier: EffectVar<number>,
 ): Eff1<{}> {
   return {
     effect: (obj) => {
@@ -755,6 +756,7 @@ export function explode(
       const e = findEntity(obj.state, id);
       const status = findStatus(e, "Poison");
       const threshold = evaluate(varThreshold)(obj);
+      const multiplier = evaluate(varMultiplier)(obj);
       if (status === undefined || status.value < threshold) {
         const action: Action = {
           tag: "Noop",
@@ -764,7 +766,7 @@ export function explode(
         const action: Action = {
           tag: "Damage",
           target: id,
-          value: 2 * status.value,
+          value: multiplier * status.value,
           piercing: false,
         };
         return { action };
