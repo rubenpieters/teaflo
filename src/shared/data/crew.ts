@@ -8,6 +8,64 @@ import * as allInstances from "src/shared/data/instance";
 import { evStatic, evAnd, evAllies, evSelf, damage, addTarget, queueStatus, noTarget, chargeUse, heal, noop, evCondition, evTrigger, extra, addThreat, evEnemies, setHP, loseFragments, hasBubble, addInstance, leech, explode } from "src/shared/game/effectvar";
 import { Poison, Guard, Bubble, DmgBarrier, Convert, Mark } from "src/shared/game/status";
 
+export const basicDmg01: Crew = {
+  ap: 1,
+  hp: 45,
+  maxHp: 45,
+  ranged: false,
+  actions: [
+    noop(),
+  ],
+  abilities: [
+    addTarget(0, target0 => damage(target0, evStatic(10), evStatic(false))),
+  ],
+  threatMap: {},
+  charges: 5,
+  fragmentLoss: {},
+  status: [],
+  transforms: [],
+};
+
+export const basicTank01: Crew = {
+  ap: 1,
+  hp: 70,
+  maxHp: 70,
+  ranged: false,
+  actions: [
+    noop(),
+  ],
+  abilities: [
+    noTarget(evEnemies(enemy => addThreat(evSelf, evStatic(15), enemy))),
+  ],
+  threatMap: {},
+  charges: 5,
+  fragmentLoss: {},
+  status: [],
+  transforms: [],
+};
+
+export const basicUtil01: Crew = {
+  ap: 1,
+  hp: 35,
+  maxHp: 35,
+  ranged: false,
+  actions: [
+    noop(),
+  ],
+  abilities: [
+    addTarget(0, target0 => queueStatus(target0, evStatic(<Bubble>{
+      tag: "Bubble",
+      value: 1,
+      fragment: 0,
+    }))),
+  ],
+  threatMap: {},
+  charges: 5,
+  fragmentLoss: {},
+  status: [],
+  transforms: [],
+};
+
 export const dmgPoison: Crew = {
   ap: 1,
   hp: 15,

@@ -12,6 +12,8 @@ import { ApplyActionLog, ApplyActionLine } from "./log";
 export type StatusTag = Status["tag"];
 export type TransformTag = Transform["tag"];
 
+export type Mod = Status | Transform;
+
 export type Poison = {
   tag: "Poison",
   value: number,
@@ -337,22 +339,32 @@ export function addStatusTransform<E extends HasStatus & HasTransform>(
   }
 }
 
-export function loseFragments<E extends HasStatus & Id>(
+export function loseFragments<E extends HasStatus & HasTransform & Id>(
   e: E,
   tag: StatusTag | TransformTag,
   loss: number,
 ): E {
-  const filtered = e.status
-    .map((x, i) => { return { x, i}} )
+  const filteredSt = e.status
+    .map((x, i) => { return { x, i } } )
     .filter(x => x.x.tag === tag);
-  for (const { x, i } of filtered) {
+  for (const { x, i } of filteredSt) {
     const newStatus = applyStatusLoss(x, loss);
     e = focus(e,
       set(x => x.status[i], newStatus),
     );
   }
+  const filteredTr = e.transforms
+    .map((x, i) => { return { x, i } } )
+    .filter(x => x.x.tag === tag);
+  for (const { x, i } of filteredTr) {
+    const newStatus = applyStatusLoss(x, loss);
+    e = focus(e,
+      set(x => x.transforms[i], newStatus),
+    );
+  }
   return focus(e,
     over(x => x.status, x => x.filter(x => x !== undefined)),
+    over(x => x.transforms, x => x.filter(x => x !== undefined)),
   );
 }
 
@@ -389,15 +401,18 @@ export function applyLoseFragmentPhase(
   return { state, log };
 }
 
-function applyStatusLoss(
-  status: Status,
+function applyStatusLoss<S extends Status | Transform>(
+  status: S,
   loss: number,
-): Status | undefined {
+): S | undefined {
   const fragmentValue = 100 * status.value + status.fragment;
   if (fragmentValue > loss) {
     const newFragmentValue = fragmentValue - loss;
     const newFragment = newFragmentValue % 100;
     const newStatus = Math.floor(newFragmentValue / 100);
+    console.log(`LOSS: ${loss}`);
+    console.log(`newFragment: ${newFragment}`);
+    console.log(`newStatus: ${newStatus}`);
     return focus(status,
       set(x => x.value, newStatus),
       set(x => x.fragment, newFragment),
@@ -421,14 +436,24 @@ export function applyLoseFragments(
       newStatusList.push(newStatus);
     }
   }
+  const newTransformList: Transform[] = [];
+  for (const transform of e.transforms) {
+    const loss = e.fragmentLoss[transform.tag] === undefined ? 0 : <number>e.fragmentLoss[transform.tag];
+    const newTransform = applyStatusLoss(transform, loss);
+    if (newTransform !== undefined) {
+      newTransformList.push(newTransform);
+    }
+  }
   const pos = toPositionId(state, id).id;
   if (id.type === "ally") {
     state = focus(state,
       set(x => x.crew[pos].status, newStatusList),
+      set(x => x.crew[pos].transforms, newTransformList),
     );
   } else if (id.type === "enemy") {
     state = focus(state,
       set(x => x.enemies[pos].status, newStatusList),
+      set(x => x.enemies[pos].transforms, newTransformList),
     );
   }
   return { state, log };

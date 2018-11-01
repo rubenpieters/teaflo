@@ -4,7 +4,7 @@ import { GameState, IdCrew, IdEnemy, CreatureId } from "src/shared/game/state";
 import { InputEntityEffect, EntityEffect, solCardFromAbility } from "src/shared/game/ability";
 import { Action } from "src/shared/game/action";
 import { showTrigger } from "src/shared/game/trigger";
-import { HasStatus, showStatus } from "src/shared/game/status";
+import { HasStatus, showStatus, HasTransform, Mod } from "src/shared/game/status";
 import { TargetType } from "src/shared/game/target";
 import { Ability } from "src/shared/game/crew";
 import { InputType } from "../shared/game/input";
@@ -662,7 +662,7 @@ function showAction(
 
 function showEntityStatus(
   board: Board,
-  hasStatus: HasStatus,
+  e: HasStatus & HasTransform,
 ) {
   // clear old
   for (const text of board.graphics.infoTexts) {
@@ -673,7 +673,9 @@ function showEntityStatus(
   let y = 50;
   const infoTexts: Phaser.Text[] = [];
 
-  for (const status of hasStatus.status) {
+  const mods: Mod[] = (<Mod[]>e.status).concat(e.transforms);
+
+  for (const status of mods) {
     const fontSize = 15;
     const enemyActionText: Phaser.Text = board.game.add.text(0, 0, showStatus(status), {
       font: "Arial",

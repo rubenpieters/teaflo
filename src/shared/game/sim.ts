@@ -51,7 +51,6 @@ function runSim(
           set(x => x.status, { tag: "Finished" }),
         );
       }
-      throw "";
     }
     case "TransformPhase": {
       throw "";

@@ -157,6 +157,47 @@ export const cardCrew_0007: Card = {
   tag: "crew",
 };
 
+export const cardCrew_0009: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 1003 },
+  name: "BDmg01",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddCrew", crew: allCrew.basicDmg01 }};
+      },
+      inputs: [],
+      description: "add BDmg01",
+    },
+  ],
+  tag: "crew",
+};
+
+export const cardCrew_0010: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 1003 },
+  name: "BTank01",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddCrew", crew: allCrew.basicTank01 }};
+      },
+      inputs: [],
+      description: "add BTank01",
+    },
+  ],
+  tag: "crew",
+};
+
+export const cardCrew_0011: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 1003 },
+  name: "BUtil01",
+  effects: [
+    { effect: (_obj) => {
+      return { action: { tag: "AddCrew", crew: allCrew.basicUtil01 }};
+      },
+      inputs: [],
+      description: "add BUtil01",
+    },
+  ],
+  tag: "crew",
+};
 
 export const cardEnemy_0001: Card = {
   origin: { tag: "PlayerOrigin", cardId: 2001 },
@@ -173,20 +214,38 @@ export const cardEnemy_0001: Card = {
 };
 
 export const cardEnemy_0002: Card = {
-  origin: { tag: "PlayerOrigin", cardId: 2001 },
-  name: "Boss02",
+  origin: { tag: "PlayerOrigin", cardId: 2002 },
+  name: "Basic01",
   effects: [
     { effect: (_obj) => {
         return { action: {
           tag: "CombinedAction",
           actions: [
-            { tag: "AddEnemy", enemy: allEnemies.enemyBoss2_1 },
-            { tag: "AddEnemy", enemy: allEnemies.enemyBoss2_2 },
+            { tag: "AddEnemy", enemy: allEnemies.basicEnemy01 },
           ],
         }};
       },
       inputs: [],
-      description: "add Boss02",
+      description: "add Basic01",
+    },
+  ],
+  tag: "enemy",
+};
+
+export const cardEnemy_0003: Card = {
+  origin: { tag: "PlayerOrigin", cardId: 2003 },
+  name: "Basic02",
+  effects: [
+    { effect: (_obj) => {
+        return { action: {
+          tag: "CombinedAction",
+          actions: [
+            { tag: "AddEnemy", enemy: allEnemies.basicEnemy02 },
+          ],
+        }};
+      },
+      inputs: [],
+      description: "add Basic02",
     },
   ],
   tag: "enemy",

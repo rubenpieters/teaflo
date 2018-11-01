@@ -2,8 +2,8 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { GameState, CreatureId, toPositionId } from "src/shared/game/state";
 import { Next } from "src/shared/game/next";
 import { Enemy } from "src/shared/game/enemy";
-import { queueStatus, evAllyPositions, evStatic, extra, noop, damage, explode, heal, evHighestThreat } from "src/shared/game/effectvar";
-import { Poison, findStatus, Strong } from "src/shared/game/status";
+import { queueStatus, evAllyPositions, evStatic, extra, noop, damage, explode, heal, evHighestThreat, evAllies } from "src/shared/game/effectvar";
+import { Poison, findStatus, Strong, Weak } from "src/shared/game/status";
 
 
 export const dummy: Enemy = {
@@ -34,6 +34,50 @@ export const dummyDmg1: Enemy = {
       { next: <Next>{ tag: "NextId" }}
     ),
     // damageHighestThreat(1, _ => { return { tag: "NextId" }}),
+  ],
+  triggers: [
+  ],
+  charges: 20,
+  fragmentLoss: {
+    Poison: 1,
+  },
+  status: [],
+  transforms: [],
+};
+
+export const basicEnemy01: Enemy = {
+  ap: 1,
+  hp: 30,
+  maxHp: 30,
+  actions: [
+    extra(damage(evHighestThreat, evStatic(10), evStatic(false)),
+    { next: <Next>{ tag: "NextId" }}),
+  ],
+  triggers: [
+  ],
+  charges: 20,
+  fragmentLoss: {
+    Poison: 1,
+  },
+  status: [],
+  transforms: [],
+};
+
+export const basicEnemy02: Enemy = {
+  ap: 1,
+  hp: 30,
+  maxHp: 30,
+  actions: [
+    extra(
+      evAllies(ally => queueStatus(ally, evStatic(<Weak>{
+        tag: "Weak",
+        value: 1,
+        fragment: 0,
+      }))),
+      { next: <Next>{ tag: "NextId" }}
+    ),
+    extra(damage(evHighestThreat, evStatic(40), evStatic(false)),
+    { next: <Next>{ tag: "NextId" }}),
   ],
   triggers: [
   ],

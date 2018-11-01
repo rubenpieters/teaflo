@@ -31,10 +31,16 @@ export function getBoard(_serverConn: ServerConnection, board: Board, seed: stri
   if (seed === "1") {
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
+      {...allCards.cardCrew_0009, limit: Infinity },
+      {...allCards.cardEnemy_0002, limit: Infinity },
     ];
   } else if (seed === "2") {
     cards = [
       {...allCards.cardBattleTurn, limit: Infinity },
+      {...allCards.cardCrew_0009, limit: Infinity },
+      {...allCards.cardCrew_0010, limit: Infinity },
+      {...allCards.cardCrew_0011, limit: Infinity },
+      {...allCards.cardEnemy_0003, limit: Infinity },
     ];
   } else if (seed === "3") {
     cards = [
