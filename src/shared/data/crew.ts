@@ -53,11 +53,14 @@ export const basicUtil01: Crew = {
     noop(),
   ],
   abilities: [
-    addTarget(0, target0 => queueStatus(target0, evStatic(<Bubble>{
-      tag: "Bubble",
-      value: 1,
-      fragment: 0,
-    }))),
+    addTarget(0, target0 => evAnd(
+      chargeUse(evSelf, evStatic(4)),
+      queueStatus(target0, evStatic(<Bubble>{
+        tag: "Bubble",
+        value: 1,
+        fragment: 0,
+      })),
+    )),
   ],
   threatMap: {},
   charges: 5,

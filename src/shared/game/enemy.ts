@@ -1,8 +1,8 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, IdEnemy } from "src/shared/game/state";
+import { GameState, IdEnemy, onCreature } from "src/shared/game/state";
 import { Action, applyActionAndTriggers } from "src/shared/game/action";
 import { Generator } from "src/shared/handler/id/generator";
-import { Guard, HasStatus, Status, Transform, TransformTag, StatusTag } from "src/shared/game/status";
+import { Guard, HasStatus, Status, Transform, TransformTag, StatusTag, findStatus, applyLoseFragments, loseFragments } from "src/shared/game/status";
 import { EnemyEffect, TriggerEntityEffect, EntityEffect } from "src/shared/game/ability";
 import { Eff1 } from "./effectvar";
 import { Next } from "./next";
@@ -63,13 +63,21 @@ export function act(
   idGen: Generator,
   index: number,
 ): { state: GameState | "invalid", log: ApplyActionLog }  {
-  const { action, next } = enemy.actions[enemy.actionIndex].effect({ state, selfId: { tag: "GlobalId", id: enemy.id, type: "enemy" }});
-  state = focus(state,
-    over(x => x.enemies[index].actionIndex, x => nextActionId(state, enemy, x, next)),
-  );
-  return applyActionAndTriggers(
-    action, state, log, idGen, { tag: "GlobalId", id: enemy.id, type: "enemy" }
-  );
+  const sleep = findStatus(enemy, "Sleep");
+  if (sleep !== undefined) {
+    return applyActionAndTriggers(
+      { tag: "LoseFragment", target: { tag: "GlobalId", id: enemy.id, type: "enemy" }, type: "Sleep", value: 100 },
+      state, log, idGen, { tag: "GlobalId", id: enemy.id, type: "enemy" }
+    );
+  } else {
+    const { action, next } = enemy.actions[enemy.actionIndex].effect({ state, selfId: { tag: "GlobalId", id: enemy.id, type: "enemy" }});
+    state = focus(state,
+      over(x => x.enemies[index].actionIndex, x => nextActionId(state, enemy, x, next)),
+    );
+    return applyActionAndTriggers(
+      action, state, log, idGen, { tag: "GlobalId", id: enemy.id, type: "enemy" }
+    );
+  }
 }
 
 function nextActionId(

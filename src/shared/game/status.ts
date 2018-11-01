@@ -100,6 +100,12 @@ export type Intercept = {
   fragment: number,
 };
 
+export type Sleep = {
+  tag: "Sleep",
+  value: number,
+  fragment: number,
+};
+
 export type Status
   = Poison
   | PiercingPoison
@@ -110,6 +116,7 @@ export type Status
   | DmgBarrier
   | Mark
   | Intercept
+  | Sleep
   ;
 
 export type Transform
@@ -168,6 +175,9 @@ export function showStatus(status: Status | Transform): string {
     }
     case "Intercept": {
       return `Intercept ${status.value} T ${status.fragment} F`;
+    }
+    case "Sleep": {
+      return `Sleep ${status.value} T ${status.fragment} F`;
     }
     // Transform
     case "Guard": {
@@ -331,7 +341,8 @@ export function addStatusTransform<E extends HasStatus & HasTransform>(
     statusTransform.tag === "Silence" ||
     statusTransform.tag === "DmgBarrier" ||
     statusTransform.tag === "Mark" ||
-    statusTransform.tag === "Intercept"
+    statusTransform.tag === "Intercept"||
+    statusTransform.tag === "Sleep"
   ) {
     return addStatus(e, statusTransform);
   } else {
@@ -550,6 +561,12 @@ export function statusToTrigger(
     }
     case "Intercept": {
       return EV.interceptTrigger;
+    }
+    case "Sleep": {
+      // TODO: wake up on damage/aggro actions
+      return evTrigger(trigger =>
+        extra(noop(), { chargeUse: 0 }),
+      );
     }
     default: throw "unimplemented";
   }

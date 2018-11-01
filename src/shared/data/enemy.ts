@@ -59,14 +59,20 @@ export const basicEnemy01: Enemy = {
   fragmentLoss: {
     Poison: 1,
   },
-  status: [],
+  status: [
+    {
+      tag: "Sleep",
+      fragment: 0,
+      value: 2,
+    },
+  ],
   transforms: [],
 };
 
 export const basicEnemy02: Enemy = {
   ap: 1,
-  hp: 30,
-  maxHp: 30,
+  hp: 24,
+  maxHp: 24,
   actions: [
     extra(
       evAllies(ally => queueStatus(ally, evStatic(<Weak>{
@@ -76,7 +82,7 @@ export const basicEnemy02: Enemy = {
       }))),
       { next: <Next>{ tag: "NextId" }}
     ),
-    extra(damage(evHighestThreat, evStatic(40), evStatic(false)),
+    extra(damage(evHighestThreat, evStatic(50), evStatic(false)),
     { next: <Next>{ tag: "NextId" }}),
   ],
   triggers: [
@@ -85,7 +91,13 @@ export const basicEnemy02: Enemy = {
   fragmentLoss: {
     Poison: 1,
   },
-  status: [],
+  status: [
+    {
+      tag: "Sleep",
+      fragment: 0,
+      value: 4,
+    },
+  ],
   transforms: [],
 };
 
