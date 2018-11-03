@@ -17,7 +17,7 @@ export default class Load extends Phaser.State {
       fill: "#D3D3D3",
       fontSize: 100,
       boundsAlignH: "center",
-      boundsAlignV: "middle"
+      boundsAlignV: "middle",
     });
 
     loadingText.setTextBounds(
@@ -32,11 +32,9 @@ export default class Load extends Phaser.State {
   }
 
   public preload(): void {
-    this.game.load.image("card1", "textures/card1.jpg");
-    this.game.load.image("slot", "textures/slot.jpg");
-    this.game.load.image("ally", "textures/ally.jpg");
-    this.game.load.image("item", "textures/item.jpg");
-    this.game.load.image("rest", "textures/rest.jpg");
+    this.game.load.image("level_btn_neutral", "textures/level_btn_neutral.png");
+    this.game.load.image("level_btn_over", "textures/level_btn_over.png");
+    this.game.load.image("level_btn_down", "textures/level_btn_down.png");
 
     loadingText.setText("Click anywhere to continue...");
     ready = true;
