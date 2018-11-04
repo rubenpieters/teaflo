@@ -62,13 +62,13 @@ export function levelSelect_Main(
     for (const levelId of levelMap[act]) {
       let btnString = levelId;
   
-      const spriteSizeX = 600;
-      const spriteSizeY = 300;
+      const spriteSizeX = 400;
+      const spriteSizeY = 200;
       const pos = {
         xMin: fromLeft(500),
         xMax: fromLeft(500 + spriteSizeX),
-        yMin: fromTop(400 + (spriteSizeY + 100) * i),
-        yMax: fromTop(400 + (spriteSizeY + 100) * i + spriteSizeY),
+        yMin: fromTop(400 + (spriteSizeY + 50) * i),
+        yMax: fromTop(400 + (spriteSizeY + 50) * i + spriteSizeY),
       }
   
       const button = createButton(game, levelSelectPool, pos, btnString, "btn_level", allButtons,

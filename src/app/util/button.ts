@@ -14,7 +14,7 @@ export function createButton(
   uniqueIn: Phaser.Sprite[],
   onDownCb: (() => void) | undefined,
 ): Phaser.Sprite {
-  const btnSprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, `${key}_neutral`);
+  const btnSprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key, 0);
   
   return spawnButton(game, btnSprite, pos, btnString, key, uniqueIn, onDownCb);
 }
@@ -35,11 +35,11 @@ export function spawnButton(
       // Change this button to selected
       uniqueIn.map(x => {
         if (x.data.selected) {
-          x.loadTexture(`${key}_neutral`);
+          x.frame = 0;
         }
         x.data.selected = false;
       });
-      btnSprite.loadTexture(`${key}_down`);
+      btnSprite.frame = 1;
       btnSprite.data.selected = true;
       if (onDownCb !== undefined) {
         onDownCb();
@@ -49,13 +49,13 @@ export function spawnButton(
   btnSprite.events.onInputOver.removeAll();
   btnSprite.events.onInputOver.add(() => {
     if (! btnSprite.data.selected) {
-      btnSprite.loadTexture(`${key}_over`);
+      btnSprite.frame = 2;
     }
   });
   btnSprite.events.onInputOut.removeAll();
   btnSprite.events.onInputOut.add(() => {
     if (! btnSprite.data.selected) {
-      btnSprite.loadTexture(`${key}_neutral`);
+      btnSprite.frame = 0;
     }
   });
   const btnText = game.add.text(
