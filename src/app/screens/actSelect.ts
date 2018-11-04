@@ -1,5 +1,6 @@
-import { fromBottom, fromLeft, fromTop } from "../config";
+import { config } from "../config";
 import { createButton, killButton } from "../util/button";
+import { createPosition } from "../util/position";
 
 // act -> button string mapping
 export const actNumberMap: { [key: number]: string } = {
@@ -20,14 +21,10 @@ export function actSelect_Main(
   for (const actNumber in actNumberMap) {
     let btnString = actNumberMap[actNumber];
 
-    const spriteSizeX = 200;
-    const spriteSizeY = 200;
-    const pos = {
-      xMin: fromLeft(100 + spriteSizeX * i),
-      xMax: fromLeft(100 + spriteSizeX * i + spriteSizeX),
-      yMin: fromBottom(spriteSizeY),
-      yMax: fromBottom(0),
-    }
+    const pos = createPosition(
+      "left", 100 + config.actButtonWidth * i, config.actButtonWidth,
+      "bot", 0, config.actButtonHeight,
+    );
 
     const button = createButton(game, actSelectPool, pos, btnString, "btn_act", allButtons,
       () => levelSelect_Main(game, levelSelectPool, Number(actNumber))
@@ -62,14 +59,10 @@ export function levelSelect_Main(
     for (const levelId of levelMap[act]) {
       let btnString = levelId;
   
-      const spriteSizeX = 400;
-      const spriteSizeY = 200;
-      const pos = {
-        xMin: fromLeft(500),
-        xMax: fromLeft(500 + spriteSizeX),
-        yMin: fromTop(400 + (spriteSizeY + 50) * i),
-        yMax: fromTop(400 + (spriteSizeY + 50) * i + spriteSizeY),
-      }
+      const pos = createPosition(
+        "left", 800, config.levelButtonWidth,
+        "top", 400 + (config.levelButtonHeight + 50) * i, config.levelButtonHeight,
+      );
   
       const button = createButton(game, levelSelectPool, pos, btnString, "btn_level", allButtons,
         undefined

@@ -1,9 +1,4 @@
-export type Position = {
-  xMin: number,
-  xMax: number,
-  yMin: number,
-  yMax: number,
-}
+import { Position } from "src/app/util/position";
 
 export function createButton(
   game: Phaser.Game,
@@ -16,7 +11,7 @@ export function createButton(
 ): Phaser.Sprite {
   const btnSprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key, 0);
   
-  return spawnButton(game, btnSprite, pos, btnString, key, uniqueIn, onDownCb);
+  return spawnButton(game, btnSprite, pos, btnString, uniqueIn, onDownCb);
 }
 
 export function spawnButton(
@@ -24,7 +19,6 @@ export function spawnButton(
   btnSprite: Phaser.Sprite,
   pos: Position,
   btnString: string,
-  key: string,
   uniqueIn: Phaser.Sprite[],
   onDownCb: (() => void) | undefined,
 ): Phaser.Sprite {
@@ -33,7 +27,7 @@ export function spawnButton(
   btnSprite.events.onInputUp.add(() => {
     if (! btnSprite.data.selected) {
       // Change this button to selected
-      uniqueIn.map(x => {
+      uniqueIn.forEach(x => {
         if (x.data.selected) {
           x.frame = 0;
         }
