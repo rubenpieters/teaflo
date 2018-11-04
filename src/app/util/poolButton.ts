@@ -73,16 +73,19 @@ export function createPoolButton(
   );
   btnText.setTextBounds(0, 0, pos.xMax - pos.xMin, pos.yMax - pos.yMin);
   btnSprite.addChild(btnText);
-  btnSprite.data.text = btnText;
+  
+  btnSprite.events.onKilled.removeAll();
+  btnSprite.events.onKilled.add(() => {
+    btnText.destroy();
+    btnSprite.data.selected = false;
+    btnSprite.data.selecting = false;
+  });
+  btnSprite.events.onDestroy.removeAll();
+  btnSprite.events.onDestroy.add(() => {
+    btnText.destroy();
+    btnSprite.data.selected = false;
+    btnSprite.data.selecting = false;
+  });
 
   return btnSprite;
-}
-
-export function killPoolButton(
-  button: Phaser.Sprite,
-) {
-  button.data.text.destroy();
-  button.data.selected = false;
-  button.data.selecting = false;
-  button.kill();
 }

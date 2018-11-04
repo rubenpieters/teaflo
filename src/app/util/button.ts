@@ -6,35 +6,35 @@ const OVER = 2;
 
 export function createButton(
   game: Phaser.Game,
+  group: Phaser.Group,
   pos: Position,
   btnString: string,
   key: string,
   onDownCb: (() => void) | undefined,
 ): Phaser.Sprite {
-  const btnSprite: Phaser.Sprite = game.add.sprite(pos.xMin, pos.yMin, key, NEUTRAL);
+  const btnSprite: Phaser.Sprite = game.add.sprite(pos.xMin, pos.yMin, key, NEUTRAL, group);
   
   btnSprite.inputEnabled = true;
+  btnSprite.events.onInputDown.removeAll();
   btnSprite.events.onInputDown.add(() => {
     btnSprite.data.selecting = true;
     btnSprite.frame = DOWN;
   });
+  btnSprite.events.onInputUp.removeAll();
   btnSprite.events.onInputUp.add((opts: { force: boolean }) => {
     btnSprite.data.selecting = false;
     if (
       opts.force ||
       inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
     ) {
-      if (! btnSprite.data.selected) {
-        // Change this button to selected
-        btnSprite.data.selected = true;
-        if (onDownCb !== undefined) {
-          onDownCb();
-        }
+      if (onDownCb !== undefined) {
+        onDownCb();
       }
       
       btnSprite.frame = DOWN;
     }
   });
+  btnSprite.events.onInputOver.removeAll();
   btnSprite.events.onInputOver.add(() => {
     if (btnSprite.data.selecting) {
       btnSprite.frame = DOWN;
@@ -42,6 +42,7 @@ export function createButton(
       btnSprite.frame = OVER;
     }
   });
+  btnSprite.events.onInputOut.removeAll();
   btnSprite.events.onInputOut.add(() => {
     btnSprite.frame = NEUTRAL;
   });
@@ -55,15 +56,17 @@ export function createButton(
   );
   btnText.setTextBounds(0, 0, pos.xMax - pos.xMin, pos.yMax - pos.yMin);
   btnSprite.addChild(btnText);
-  btnSprite.data.text = btnText;
+
+  btnSprite.events.onKilled.removeAll();
+  btnSprite.events.onKilled.add(() => {
+    btnText.destroy();
+    btnSprite.data.selecting = false;
+  });
+  btnSprite.events.onDestroy.removeAll();
+  btnSprite.events.onDestroy.add(() => {
+    btnText.destroy();
+    btnSprite.data.selecting = false;
+  });
 
   return btnSprite;
-}
-
-export function killButton(
-  button: Phaser.Sprite,
-) {
-  button.data.text.destroy();
-  button.data.selecting = false;
-  button.kill();
 }
