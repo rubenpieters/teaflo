@@ -4,20 +4,25 @@ const NEUTRAL = 0;
 const DOWN = 1;
 const OVER = 2;
 
-export function createButton(
+export function createPoolButton(
   game: Phaser.Game,
+  pool: Phaser.Group,
   pos: Position,
   btnString: string,
   key: string,
   onDownCb: (() => void) | undefined,
 ): Phaser.Sprite {
-  const btnSprite: Phaser.Sprite = game.add.sprite(pos.xMin, pos.yMin, key, NEUTRAL);
+  const btnSprite: Phaser.Sprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key, NEUTRAL);
   
   btnSprite.inputEnabled = true;
+  btnSprite.events.onInputDown.removeAll();
   btnSprite.events.onInputDown.add(() => {
     btnSprite.data.selecting = true;
-    btnSprite.frame = DOWN;
+    if (! btnSprite.data.selected) {
+      btnSprite.frame = DOWN;
+    }
   });
+  btnSprite.events.onInputUp.removeAll();
   btnSprite.events.onInputUp.add((opts: { force: boolean }) => {
     btnSprite.data.selecting = false;
     if (
@@ -25,6 +30,13 @@ export function createButton(
       inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
     ) {
       if (! btnSprite.data.selected) {
+        // Unselect other buttons
+        pool.forEachAlive((x: Phaser.Sprite) => {
+          if (x.data.selected) {
+            x.frame = NEUTRAL;
+          }
+          x.data.selected = false;
+        });
         // Change this button to selected
         btnSprite.data.selected = true;
         if (onDownCb !== undefined) {
@@ -35,15 +47,21 @@ export function createButton(
       btnSprite.frame = DOWN;
     }
   });
+  btnSprite.events.onInputOver.removeAll();
   btnSprite.events.onInputOver.add(() => {
-    if (btnSprite.data.selecting) {
+    if (btnSprite.data.selecting || btnSprite.data.selected) {
       btnSprite.frame = DOWN;
     } else {
       btnSprite.frame = OVER;
     }
   });
+  btnSprite.events.onInputOut.removeAll();
   btnSprite.events.onInputOut.add(() => {
-    btnSprite.frame = NEUTRAL;
+    if (btnSprite.data.selected) {
+      btnSprite.frame = DOWN;
+    } else {
+      btnSprite.frame = NEUTRAL;
+    }
   });
   const btnText = game.add.text(
     0, 0, btnString, {
@@ -60,10 +78,11 @@ export function createButton(
   return btnSprite;
 }
 
-export function killButton(
+export function killPoolButton(
   button: Phaser.Sprite,
 ) {
   button.data.text.destroy();
+  button.data.selected = false;
   button.data.selecting = false;
   button.kill();
 }

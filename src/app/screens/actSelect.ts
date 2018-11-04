@@ -1,5 +1,6 @@
 import { config } from "../config";
-import { createButton, killButton } from "../util/button";
+import { createPoolButton, killPoolButton } from "src/app/util/poolButton";
+import { createButton, killButton } from "src/app/util/button";
 import { createPosition } from "../util/position";
 
 // act -> button string mapping
@@ -11,11 +12,11 @@ export const actNumberMap: { [key: number]: string } = {
 
 export function actSelect_Main(
   game: Phaser.Game,
-  actSelectPool: Phaser.Group,
-  levelSelectPool: Phaser.Group,
+  actSelectBtnPool: Phaser.Group,
+  levelSelectBtnPool: Phaser.Group,
 ) {
-  actSelectPool.forEachAlive((x: Phaser.Sprite) => killButton(x));
-  let allButtons: Phaser.Sprite[] = [];
+  actSelectBtnPool.forEachAlive((x: Phaser.Sprite) => killPoolButton(x));
+  let first: Phaser.Sprite | undefined = undefined;
 
   let i = 0;
   for (const actNumber in actNumberMap) {
@@ -26,15 +27,19 @@ export function actSelect_Main(
       "bot", 0, config.actButtonHeight,
     );
 
-    const button = createButton(game, actSelectPool, pos, btnString, "btn_act", allButtons,
-      () => levelSelect_Main(game, levelSelectPool, Number(actNumber))
+    const button = createPoolButton(game, actSelectBtnPool, pos, btnString, "btn_act",
+      () => levelSelect_Main(game, levelSelectBtnPool, Number(actNumber))
     );
+    if (i === 0) {
+      first = button;
+    }
 
-    allButtons.push(button);
     i += 1;
   }
 
-  allButtons[0].events.onInputUp.dispatch();
+  if (first !== undefined) {
+    first.events.onInputUp.dispatch({ force: true });
+  }
 }
 
 // act -> level id mapping
@@ -46,32 +51,55 @@ export const levelMap: { [key: number]: string[] | "info" } = {
 
 export function levelSelect_Main(
   game: Phaser.Game,
-  levelSelectPool: Phaser.Group,
+  levelSelectBtnPool: Phaser.Group,
   act: number,
 ) {
-  levelSelectPool.forEachAlive((x: Phaser.Sprite) => killButton(x));
-  let allButtons: Phaser.Sprite[] = [];
+  levelSelectBtnPool.forEachAlive((x: Phaser.Sprite) => killPoolButton(x));
+  let first: Phaser.Sprite | undefined = undefined;
 
   let i = 0;
-  if (levelMap[act] === "info") {
+  for (const levelId of levelMap[act]) {
+    if (levelMap[act] === "info") {
 
-  } else {
-    for (const levelId of levelMap[act]) {
+    } else {
       let btnString = levelId;
   
       const pos = createPosition(
-        "left", 800, config.levelButtonWidth,
+        "left", 250, config.levelButtonWidth,
         "top", 400 + (config.levelButtonHeight + 50) * i, config.levelButtonHeight,
       );
   
-      const button = createButton(game, levelSelectPool, pos, btnString, "btn_level", allButtons,
+      const button = createPoolButton(game, levelSelectBtnPool, pos, btnString, "btn_level",
         undefined
       );
+      if (i === 0) {
+        first = button;
+      }
   
-      allButtons.push(button);
       i += 1;
     }
-
-    allButtons[0].events.onInputUp.dispatch();
   }
+
+  if (first !== undefined) {
+    first.events.onInputUp.dispatch({ force: true });
+  }
+}
+
+export function levelSelect_Select(
+  game: Phaser.Game,
+) {
+
+}
+
+export function levelSelect_Info(
+  game: Phaser.Game,
+) {
+  const pos = createPosition(
+    "right", 250, config.levelBgWidth,
+    "top", 400, config.levelBgHeight,
+  );
+
+  /*const button = createPoolButton(game, levelSelectBtnPool, pos, btnString, "btn_level",
+    undefined
+  );*/
 }

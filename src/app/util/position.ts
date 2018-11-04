@@ -22,3 +22,11 @@ export function createPosition(
     yMax: fromY === "top" ? y + height : config.gameHeight - y,
   }
 }
+
+export function inPosition(
+  pos: Position,
+  x: number,
+  y: number,
+) {
+  return x >= pos.xMin && x <= pos.xMax && y >= pos.yMin && y <= pos.yMax;
+}

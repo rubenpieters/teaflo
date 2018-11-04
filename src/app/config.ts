@@ -7,4 +7,7 @@ export const config = {
 
   levelButtonWidth: 400,
   levelButtonHeight: 200,
+
+  levelBgWidth: 700,
+  levelBgHeight: 1100,
 };
