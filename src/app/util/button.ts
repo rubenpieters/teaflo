@@ -77,5 +77,6 @@ export function killButton(
   button: Phaser.Sprite,
 ) {
   button.data.text.destroy();
+  button.data.selected = false;
   button.kill();
 }

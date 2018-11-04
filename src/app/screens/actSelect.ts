@@ -36,6 +36,8 @@ export function actSelect_Main(
     allButtons.push(button);
     i += 1;
   }
+
+  allButtons[0].events.onInputUp.dispatch();
 }
 
 // act -> level id mapping
@@ -76,5 +78,7 @@ export function levelSelect_Main(
       allButtons.push(button);
       i += 1;
     }
+
+    allButtons[0].events.onInputUp.dispatch();
   }
 }
