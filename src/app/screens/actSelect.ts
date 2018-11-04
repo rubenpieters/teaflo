@@ -1,5 +1,7 @@
-import { fromBottom, fromLeft } from "../config";
+import { fromBottom, fromLeft, fromTop } from "../config";
+import { createButton, killButton } from "../util/button";
 
+// act -> button string mapping
 export const actNumberMap: { [key: number]: string } = {
   0: "1",
   1: "2",
@@ -8,8 +10,10 @@ export const actNumberMap: { [key: number]: string } = {
 
 export function actSelect_Main(
   game: Phaser.Game,
-  group: Phaser.Group
+  actSelectPool: Phaser.Group,
+  levelSelectPool: Phaser.Group,
 ) {
+  actSelectPool.forEachAlive((x: Phaser.Sprite) => killButton(x));
   let allButtons: Phaser.Sprite[] = [];
 
   let i = 0;
@@ -18,55 +22,59 @@ export function actSelect_Main(
 
     const spriteSizeX = 200;
     const spriteSizeY = 200;
-    const xMin = fromLeft(100 + spriteSizeX * i);
-    const xMax = fromLeft(100 + spriteSizeX * i) + spriteSizeX;
-    const yMin = fromBottom(spriteSizeY);
-    const yMax = fromBottom(0);
+    const pos = {
+      xMin: fromLeft(100 + spriteSizeX * i),
+      xMax: fromLeft(100 + spriteSizeX * i + spriteSizeX),
+      yMin: fromBottom(spriteSizeY),
+      yMax: fromBottom(0),
+    }
 
-    const btnSprite = game.add.sprite(
-      xMin,
-      yMin,
-      "level_btn_neutral",
-      undefined,
-      group
+    const button = createButton(game, actSelectPool, pos, btnString, "btn_act", allButtons,
+      () => levelSelect_Main(game, levelSelectPool, Number(actNumber))
     );
-    btnSprite.inputEnabled = true;
-    btnSprite.events.onInputUp.add(() => {
-      if (! btnSprite.data.selected) {
-        // Change this button to selected
-        allButtons.map(x => {
-          if (x.data.selected) {
-            x.loadTexture("level_btn_neutral");
-          }
-          x.data.selected = false
-        });
-        btnSprite.loadTexture("level_btn_down");
-        btnSprite.data.selected = true;
-      }
-    });
-    btnSprite.events.onInputOver.add(() => {
-      if (! btnSprite.data.selected) {
-        btnSprite.loadTexture("level_btn_over");
-      }
-    });
-    btnSprite.events.onInputOut.add(() => {
-      if (! btnSprite.data.selected) {
-        btnSprite.loadTexture("level_btn_neutral");
-      }
-    });
 
-    const btnText = game.add.text(
-      0, 0, btnString, {
-        fill: "#FF0000",
-        fontSize: 100,
-        boundsAlignH: "center",
-        boundsAlignV: "middle",
-      }
-    );
-    btnText.setTextBounds(0, 0, xMax - xMin, yMax - yMin);
-    btnSprite.addChild(btnText);
-
-    allButtons.push(btnSprite);
+    allButtons.push(button);
     i += 1;
+  }
+}
+
+// act -> level id mapping
+export const levelMap: { [key: number]: string[] | "info" } = {
+  0: ["a1_l1"],
+  1: ["a2_l1", "a2_l2", "a2_l3"],
+  2: "info",
+}
+
+export function levelSelect_Main(
+  game: Phaser.Game,
+  levelSelectPool: Phaser.Group,
+  act: number,
+) {
+  levelSelectPool.forEachAlive((x: Phaser.Sprite) => killButton(x));
+  let allButtons: Phaser.Sprite[] = [];
+
+  let i = 0;
+  if (levelMap[act] === "info") {
+
+  } else {
+    for (const levelId of levelMap[act]) {
+      let btnString = levelId;
+  
+      const spriteSizeX = 600;
+      const spriteSizeY = 300;
+      const pos = {
+        xMin: fromLeft(500),
+        xMax: fromLeft(500 + spriteSizeX),
+        yMin: fromTop(400 + (spriteSizeY + 100) * i),
+        yMax: fromTop(400 + (spriteSizeY + 100) * i + spriteSizeY),
+      }
+  
+      const button = createButton(game, levelSelectPool, pos, btnString, "btn_level", allButtons,
+        undefined
+      );
+  
+      allButtons.push(button);
+      i += 1;
+    }
   }
 }

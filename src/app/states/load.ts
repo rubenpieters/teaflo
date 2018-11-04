@@ -32,9 +32,12 @@ export default class Load extends Phaser.State {
   }
 
   public preload(): void {
-    this.game.load.image("level_btn_neutral", "textures/level_btn_neutral.png");
-    this.game.load.image("level_btn_over", "textures/level_btn_over.png");
-    this.game.load.image("level_btn_down", "textures/level_btn_down.png");
+    this.game.load.image("btn_act_neutral", "textures/btn_act_neutral.png");
+    this.game.load.image("btn_act_over", "textures/btn_act_over.png");
+    this.game.load.image("btn_act_down", "textures/btn_act_down.png");
+    this.game.load.image("btn_level_neutral", "textures/btn_level_neutral.png");
+    this.game.load.image("btn_level_over", "textures/btn_level_over.png");
+    this.game.load.image("btn_level_down", "textures/btn_level_down.png");
 
     loadingText.setText("Click anywhere to continue...");
     ready = true;
