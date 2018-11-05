@@ -2,6 +2,7 @@ import { config } from "src/app/config";
 import { createPoolButton } from "src/app/util/poolButton";
 import { createButton } from "src/app/util/button";
 import { createPosition } from "src/app/util/position";
+import { LevelSelect } from "src/app/states/game";
 
 // act -> button string mapping
 export const actNumberMap: { [key: number]: string } = {
@@ -14,7 +15,7 @@ export function actSelect_Main(
   game: Phaser.Game,
   actSelectBtnPool: Phaser.Group,
   levelSelectBtnPool: Phaser.Group,
-  levelSelectGroup: Phaser.Group,
+  levelSelect: LevelSelect,
 ) {
   actSelectBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
   let first: Phaser.Sprite | undefined = undefined;
@@ -29,7 +30,7 @@ export function actSelect_Main(
     );
 
     const button = createPoolButton(game, actSelectBtnPool, pos, btnString, "btn_act",
-      () => levelSelect_Main(game, levelSelectBtnPool, levelSelectGroup, Number(actNumber))
+      () => levelSelect_Main(game, levelSelectBtnPool, levelSelect, Number(actNumber))
     );
     if (i === 0) {
       first = button;
@@ -53,7 +54,7 @@ export const levelMap: { [key: number]: string[] | "info" } = {
 export function levelSelect_Main(
   game: Phaser.Game,
   levelSelectBtnPool: Phaser.Group,
-  levelSelectGroup: Phaser.Group,
+  LevelSelect: LevelSelect,
   act: number,
 ) {
   levelSelectBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
@@ -72,7 +73,7 @@ export function levelSelect_Main(
       );
   
       const button = createPoolButton(game, levelSelectBtnPool, pos, btnString, "btn_level",
-        () => levelSelect_Info(game, levelSelectGroup)
+        () => levelSelect_Info(game, LevelSelect)
       );
       if (i === 0) {
         first = button;
@@ -95,22 +96,34 @@ export function levelSelect_Select(
 
 export function levelSelect_Info(
   game: Phaser.Game,
-  levelSelectGroup: Phaser.Group,
+  levelSelect: LevelSelect,
 ) {
-  levelSelectGroup.forEachAlive((x: Phaser.Sprite) => x.destroy());
+  if (levelSelect.leftBg === undefined) {
+    const leftBgSpritePos = createPosition(
+      "right", 250, config.levelBgWidth,
+      "top", 400, config.levelBgHeight,
+    );
+    const leftBgSprite = game.add.sprite(leftBgSpritePos.xMin, leftBgSpritePos.yMin, "bg_level", undefined, levelSelect.group);
+    levelSelect.leftBg = leftBgSprite;
+  }
 
-  const bgSpritePos = createPosition(
-    "right", 250, config.levelBgWidth,
-    "top", 400, config.levelBgHeight,
-  );
-  console.log(`BG: ${JSON.stringify(bgSpritePos)}`);
-  const bgSprite = game.add.sprite(bgSpritePos.xMin, bgSpritePos.yMin, "bg_level", undefined, levelSelectGroup)
+  if (levelSelect.rightBg === undefined) {
+    const rightBgSpritePos = createPosition(
+      "right", 1500, config.levelBgWidth,
+      "top", 400, config.levelBgHeight,
+    );
+    const rightBgSprite = game.add.sprite(rightBgSpritePos.xMin, rightBgSpritePos.yMin, "bg_level", undefined, levelSelect.group);
+    levelSelect.rightBg = rightBgSprite;
+  }
 
-  const startBtnPos = createPosition(
-    "right", 500, config.levelButtonWidth,
-    "top", 1200, config.levelButtonHeight,
-  );
-  const startBtn = createButton(game, levelSelectGroup, startBtnPos, "Start", "btn_level",
-    () => console.log("click")
-  );
+  if (levelSelect.startBtn === undefined) {
+    const startBtnPos = createPosition(
+      "right", 500, config.levelButtonWidth,
+      "top", 1500, config.levelButtonHeight,
+    );
+    const startBtn = createButton(game, levelSelect.group, startBtnPos, "Start", "btn_level",
+      () => console.log("click")
+    );
+    levelSelect.startBtn = startBtn;
+  }
 }
