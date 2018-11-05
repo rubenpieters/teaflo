@@ -3,6 +3,7 @@ import { createPoolButton } from "src/app/util/poolButton";
 import { createButton } from "src/app/util/button";
 import { createPosition, relativeIn } from "src/app/util/position";
 import { LevelSelect } from "src/app/states/game";
+import { createPoolLevelSelectCard } from "../util/poolLevelSelectCard";
 
 // act -> button string mapping
 export const actNumberMap: { [key: number]: string } = {
@@ -73,7 +74,7 @@ export function levelSelect_Main(
       );
   
       const button = createPoolButton(game, levelSelectBtnPool, pos, btnString, "btn_level",
-        () => levelSelect_Info(game, LevelSelect)
+        () => levelSelect_Info(game, LevelSelect, levelId)
       );
       if (i === 0) {
         first = button;
@@ -94,9 +95,18 @@ export function levelSelect_Select(
 
 }
 
+// level id -> card id mapping
+export const levelToCardMap: { [key: string]: string[] } = {
+  "a1_l1": [],
+  "a2_l1": ["card1", "card2", "card3"],
+  "a2_l2": ["card1", "card2", "card3"],
+  "a2_l3": ["card1", "card2", "card3"],
+}
+
 export function levelSelect_Info(
   game: Phaser.Game,
   levelSelect: LevelSelect,
+  levelId: string,
 ) {
   const leftBgSpritePos = createPosition(
     "right", 1500, config.levelBgWidth,
@@ -127,5 +137,19 @@ export function levelSelect_Info(
     );
     levelSelect.rightBg.addChild(startBtn);
     levelSelect.startBtn = startBtn;
+  }
+
+  levelSelect.cardPool.forEachAlive((x: Phaser.Sprite) => x.kill());
+  let i = 0;
+  for (const cardId of levelToCardMap[levelId]) {
+    const cardPos = relativeIn(
+      config.levelBgWidth, config.levelBgHeight,
+      15 + 20 * i, config.levelSelectCardWidth,
+      15, config.levelSelectCardHeight,
+    );
+    const card = createPoolLevelSelectCard(game, levelSelect.cardPool, cardPos, cardId);
+    levelSelect.leftBg.addChild(card);
+  
+    i += 1;
   }
 }

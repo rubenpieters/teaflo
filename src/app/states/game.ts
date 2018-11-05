@@ -5,6 +5,7 @@ let levelSelectBtnPool: Phaser.Group;
 
 export type LevelSelect = {
   group: Phaser.Group,
+  cardPool: Phaser.Group,
   rightBg?: Phaser.Sprite,
   leftBg?: Phaser.Sprite,
   startBtn?: Phaser.Sprite,
@@ -15,7 +16,10 @@ export default class Game extends Phaser.State {
   public init(): void {
     actSelectBtnPool = new Phaser.Group(this.game);
     levelSelectBtnPool = new Phaser.Group(this.game);
-    levelSelect = { group: new Phaser.Group(this.game) };
+    levelSelect = {
+      group: new Phaser.Group(this.game),
+      cardPool: new Phaser.Group(this.game),
+    };
   }
 
   public create(): void {

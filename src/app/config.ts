@@ -10,4 +10,7 @@ export const config = {
 
   levelBgWidth: 1000,
   levelBgHeight: 1500,
+
+  levelSelectCardWidth: 150,
+  levelSelectCardHeight: 300,
 };
