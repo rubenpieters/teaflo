@@ -23,6 +23,22 @@ export function createPosition(
   }
 }
 
+export function relativeIn(
+  parentWidth: number,
+  parentHeight: number,
+  xPct: number,
+  width: number,
+  yPct: number,
+  height: number,
+): Position {
+  return {
+    xMin: (xPct * parentWidth / 100) - (width / 2),
+    xMax: (xPct * parentWidth / 100) + (width / 2),
+    yMin: (yPct * parentHeight / 100) - (height / 2),
+    yMax: (yPct * parentHeight / 100) + (height / 2),
+  }
+}
+
 export function inPosition(
   pos: Position,
   x: number,

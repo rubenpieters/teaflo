@@ -1,7 +1,7 @@
 import { config } from "src/app/config";
 import { createPoolButton } from "src/app/util/poolButton";
 import { createButton } from "src/app/util/button";
-import { createPosition } from "src/app/util/position";
+import { createPosition, relativeIn } from "src/app/util/position";
 import { LevelSelect } from "src/app/states/game";
 
 // act -> button string mapping
@@ -98,32 +98,34 @@ export function levelSelect_Info(
   game: Phaser.Game,
   levelSelect: LevelSelect,
 ) {
+  const leftBgSpritePos = createPosition(
+    "right", 1500, config.levelBgWidth,
+    "top", 400, config.levelBgHeight,
+  );
   if (levelSelect.leftBg === undefined) {
-    const leftBgSpritePos = createPosition(
-      "right", 250, config.levelBgWidth,
-      "top", 400, config.levelBgHeight,
-    );
     const leftBgSprite = game.add.sprite(leftBgSpritePos.xMin, leftBgSpritePos.yMin, "bg_level", undefined, levelSelect.group);
     levelSelect.leftBg = leftBgSprite;
   }
 
+  const rightBgSpritePos = createPosition(
+    "right", 250, config.levelBgWidth,
+    "top", 400, config.levelBgHeight,
+  );
   if (levelSelect.rightBg === undefined) {
-    const rightBgSpritePos = createPosition(
-      "right", 1500, config.levelBgWidth,
-      "top", 400, config.levelBgHeight,
-    );
     const rightBgSprite = game.add.sprite(rightBgSpritePos.xMin, rightBgSpritePos.yMin, "bg_level", undefined, levelSelect.group);
     levelSelect.rightBg = rightBgSprite;
   }
 
   if (levelSelect.startBtn === undefined) {
-    const startBtnPos = createPosition(
-      "right", 500, config.levelButtonWidth,
-      "top", 1500, config.levelButtonHeight,
+    const startBtnPos = relativeIn(
+      config.levelBgWidth, config.levelBgHeight,
+      70, config.levelButtonWidth,
+      90, config.levelButtonHeight,
     );
     const startBtn = createButton(game, levelSelect.group, startBtnPos, "Start", "btn_level",
       () => console.log("click")
     );
+    levelSelect.rightBg.addChild(startBtn);
     levelSelect.startBtn = startBtn;
   }
 }
