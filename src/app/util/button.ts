@@ -30,8 +30,8 @@ export function createButton(
       if (onDownCb !== undefined) {
         onDownCb();
       }
-      
-      btnSprite.frame = DOWN;
+
+      btnSprite.frame = OVER;
     }
   });
   btnSprite.events.onInputOver.removeAll();

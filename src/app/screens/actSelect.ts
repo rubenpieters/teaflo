@@ -1,9 +1,10 @@
 import { config } from "src/app/config";
 import { createPoolButton } from "src/app/util/poolButton";
 import { createButton } from "src/app/util/button";
-import { createPosition, relativeIn } from "src/app/util/position";
+import { createPosition, relativeIn, absoluteIn } from "src/app/util/position";
 import { LevelSelect } from "src/app/states/game";
 import { createPoolLevelSelectCard } from "../util/poolLevelSelectCard";
+import { createPoolCardSlot } from "../util/poolCardSlot";
 
 // act -> button string mapping
 export const actNumberMap: { [key: number]: string } = {
@@ -95,12 +96,17 @@ export function levelSelect_Select(
 
 }
 
+type LevelData = {
+  cardIds: string[],
+  slots: number,
+}
+
 // level id -> card id mapping
-export const levelToCardMap: { [key: string]: string[] } = {
-  "a1_l1": [],
-  "a2_l1": ["card1", "card2", "card3"],
-  "a2_l2": ["card1", "card2", "card3"],
-  "a2_l3": ["card1", "card2", "card3"],
+export const levelDataMap: { [key: string]: LevelData } = {
+  "a1_l1": { cardIds: [], slots: 0 },
+  "a2_l1": { cardIds: ["card1", "card2", "card3"], slots: 4 },
+  "a2_l2": { cardIds: ["card1", "card2", "card3"], slots: 4 },
+  "a2_l3": { cardIds: ["card1", "card2", "card3"], slots: 4 },
 }
 
 export function levelSelect_Info(
@@ -127,29 +133,44 @@ export function levelSelect_Info(
   }
 
   if (levelSelect.startBtn === undefined) {
-    const startBtnPos = relativeIn(
-      config.levelBgWidth, config.levelBgHeight,
+    const startBtnPos = absoluteIn(
+      rightBgSpritePos, config.levelBgWidth, config.levelBgHeight,
       70, config.levelButtonWidth,
       90, config.levelButtonHeight,
     );
+    console.log(`${JSON.stringify(startBtnPos)}`);
     const startBtn = createButton(game, levelSelect.group, startBtnPos, "Start", "btn_level",
       () => console.log("click")
     );
-    levelSelect.rightBg.addChild(startBtn);
     levelSelect.startBtn = startBtn;
   }
 
   levelSelect.cardPool.forEachAlive((x: Phaser.Sprite) => x.kill());
   let i = 0;
-  for (const cardId of levelToCardMap[levelId]) {
-    const cardPos = relativeIn(
-      config.levelBgWidth, config.levelBgHeight,
+  for (const cardId of levelDataMap[levelId].cardIds) {
+    const cardSlotPos = absoluteIn(
+      leftBgSpritePos, config.levelBgWidth, config.levelBgHeight,
+      17 + 20 * i, config.levelSelectCardWidth,
+      17, config.levelSelectCardHeight,
+    );
+    const cardPos = absoluteIn(
+      leftBgSpritePos, config.levelBgWidth, config.levelBgHeight,
       15 + 20 * i, config.levelSelectCardWidth,
       15, config.levelSelectCardHeight,
     );
-    const card = createPoolLevelSelectCard(game, levelSelect.cardPool, cardPos, cardId);
-    levelSelect.leftBg.addChild(card);
+    const cardSlot = createPoolCardSlot(game, levelSelect.cardSlotPool, cardSlotPos);
+    const card = createPoolLevelSelectCard(game, levelSelect.cardPool, levelSelect.cardSlotPool, cardPos, cardId);
   
     i += 1;
+  }
+
+  for (let i = 0; i < levelDataMap[levelId].slots; i++) {
+    const cardSlotPos = absoluteIn(
+      rightBgSpritePos, config.levelBgWidth, config.levelBgHeight,
+      17 + 20 * i, config.levelSelectCardWidth,
+      17, config.levelSelectCardHeight,
+    );
+
+    const cardSlot = createPoolCardSlot(game, levelSelect.cardSlotPool, cardSlotPos);
   }
 }

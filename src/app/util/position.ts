@@ -39,6 +39,23 @@ export function relativeIn(
   }
 }
 
+export function absoluteIn(
+  pos: Position,
+  parentWidth: number,
+  parentHeight: number,
+  xPct: number,
+  width: number,
+  yPct: number,
+  height: number,
+): Position {
+  return {
+    xMin: pos.xMin + (xPct * parentWidth / 100) - (width / 2),
+    xMax: pos.xMin + (xPct * parentWidth / 100) + (width / 2),
+    yMin: pos.yMin + (yPct * parentHeight / 100) - (height / 2),
+    yMax: pos.yMin + (yPct * parentHeight / 100) + (height / 2),
+  }
+}
+
 export function inPosition(
   pos: Position,
   x: number,
