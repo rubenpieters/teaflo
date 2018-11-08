@@ -20,11 +20,11 @@ export function createPoolLevelSelectCard(
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
       const slotBounds = slot.getBounds();
       if (! overlap && Phaser.Rectangle.intersects(<any>cardBounds, <any>slotBounds)) {
-        slot.loadTexture("card_slot_highlight");
+        slot.frame = 1;
         card.data.dropPos = { x: slot.x - (2 * config.levelBgWidth / 100), y: slot.y - (2 * config.levelBgHeight / 100) };
         overlap = true;
       } else {
-        slot.loadTexture("card_slot");
+        slot.frame = 0;
       }
     });
   });
@@ -38,7 +38,7 @@ export function createPoolLevelSelectCard(
       card.y = card.data.dropPos.y;
     }
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
-      slot.loadTexture("card_slot");
+      slot.frame = 0;
     });
   });
   

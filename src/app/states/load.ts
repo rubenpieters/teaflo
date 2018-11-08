@@ -38,8 +38,7 @@ export default class Load extends Phaser.State {
     this.game.load.image("card1", "textures/card1.png");
     this.game.load.image("card2", "textures/card2.png");
     this.game.load.image("card3", "textures/card3.png");
-    this.game.load.image("card_slot", "textures/card_slot.png");
-    this.game.load.image("card_slot_highlight", "textures/card_slot_highlight.png");
+    this.game.load.spritesheet("card_slot", "textures/card_slot.png", 150, 300);
 
     loadingText.setText("Click anywhere to continue...");
     ready = true;
