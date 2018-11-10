@@ -11,6 +11,7 @@ export function createPoolLevelSelectCard(
 ): Phaser.Sprite {
   const card: Phaser.Sprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
   card.data.originalPos = { x: pos.xMin, y: pos.yMin };
+  card.data.cardId = cardId;
   card.inputEnabled = true;
   card.input.enableDrag(false, true);
   
@@ -48,25 +49,27 @@ export function createPoolLevelSelectCard(
         // the hover slot does not contain a card
         // just place it there
         card.data.hoverSlot.data.card = card;
-        console.log(`hover: ${card.data.hoverSlot.data.card.cardId}`);
         // clear drop slot
-        if (card.data.dropSlot !== undefined) {
-          card.data.dropSlot.data.card = undefined;
-        }
+        card.data.dropSlot.data.card = undefined;
+        // set the drop slot of the card to its hover slot
+        card.data.dropSlot = card.data.hoverSlot;
       } else {
         console.log("SWAP");
         // the hover slot does contain a card
+        // aliases
+        const replacedCard = card.data.hoverSlot.data.card;
         // swap it with the currently dropped card
-        card.data.dropSlot.data.card = card.data.hoverSlot.data.card;
-        console.log(`drop: ${card.data.dropSlot.data.card.cardId}`);
+        // - first replaced card to drop slot
+        card.data.dropSlot.data.card = replacedCard;
+        replacedCard.data.dropSlot = card.data.hoverSlot;
+        // - then this card to hover slot
         card.data.hoverSlot.data.card = card;
-        console.log(`hover: ${card.data.hoverSlot.data.card.cardId}`);
-        // move hover slot card (now in drop slot)
-        card.data.dropSlot.data.card.x = card.data.originalPos.x;
-        card.data.dropSlot.data.card.y = card.data.originalPos.y;
+        card.data.dropSlot = card.data.hoverSlot;
+        // move replaced card
+        replacedCard.x = card.data.originalPos.x;
+        replacedCard.y = card.data.originalPos.y;
       }
       card.data.originalPos = card.data.dropPos;
-      card.data.dropSlot = card.data.hoverSlot;
     }
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
       slot.frame = 0;

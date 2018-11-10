@@ -142,7 +142,7 @@ export function levelSelect_Info(
     const startBtn = createButton(game, levelSelect.group, startBtnPos, "Start", "btn_level",
       () => console.log(`${levelSelect.slots.map(x => {
         if (x.data.card !== undefined) {
-          return x.data.card.cardId
+          return x.data.card.data.cardId
         } else {
           return undefined;
         }
@@ -166,7 +166,9 @@ export function levelSelect_Info(
     );
     const cardSlot = createPoolCardSlot(game, levelSelect.cardSlotPool, cardSlotPos);
     const card = createPoolLevelSelectCard(game, levelSelect.cardPool, levelSelect.cardSlotPool, cardPos, cardId, cardId);
-  
+    cardSlot.data.card = card;
+    card.data.dropSlot = cardSlot;
+
     i += 1;
   }
 
