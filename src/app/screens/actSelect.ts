@@ -140,7 +140,7 @@ export function levelSelect_Info(
     );
     console.log(`${JSON.stringify(startBtnPos)}`);
     const startBtn = createButton(game, levelSelect.group, startBtnPos, "Start", "btn_level",
-      () => console.log("click")
+      () => console.log(`${levelSelect.slots.map(x => x.data.choice)}`)
     );
     levelSelect.startBtn = startBtn;
   }
@@ -159,11 +159,12 @@ export function levelSelect_Info(
       15, config.levelSelectCardHeight,
     );
     const cardSlot = createPoolCardSlot(game, levelSelect.cardSlotPool, cardSlotPos);
-    const card = createPoolLevelSelectCard(game, levelSelect.cardPool, levelSelect.cardSlotPool, cardPos, cardId);
+    const card = createPoolLevelSelectCard(game, levelSelect.cardPool, levelSelect.cardSlotPool, cardPos, cardId, cardId);
   
     i += 1;
   }
 
+  const slots: Phaser.Sprite[] = [];
   for (let i = 0; i < levelDataMap[levelId].slots; i++) {
     const cardSlotPos = absoluteIn(
       rightBgSpritePos, config.levelBgWidth, config.levelBgHeight,
@@ -172,5 +173,7 @@ export function levelSelect_Info(
     );
 
     const cardSlot = createPoolCardSlot(game, levelSelect.cardSlotPool, cardSlotPos);
+    slots.push(cardSlot);
   }
+  levelSelect.slots = slots;
 }

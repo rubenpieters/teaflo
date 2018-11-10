@@ -10,6 +10,7 @@ export type LevelSelect = {
   rightBg?: Phaser.Sprite,
   leftBg?: Phaser.Sprite,
   startBtn?: Phaser.Sprite,
+  slots: Phaser.Sprite[],
 };
 let levelSelect: LevelSelect;
 
@@ -21,6 +22,7 @@ export default class Game extends Phaser.State {
       group: new Phaser.Group(this.game),
       cardSlotPool: new Phaser.Group(this.game),
       cardPool: new Phaser.Group(this.game),
+      slots: [],
     };
   }
 

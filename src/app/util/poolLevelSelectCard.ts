@@ -7,6 +7,7 @@ export function createPoolLevelSelectCard(
   slotPool: Phaser.Group,
   pos: Position,
   key: string,
+  cardId: string,
 ): Phaser.Sprite {
   const card: Phaser.Sprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
   card.data.originalPos = { x: pos.xMin, y: pos.yMin };
@@ -22,9 +23,18 @@ export function createPoolLevelSelectCard(
       if (! overlap && Phaser.Rectangle.intersects(<any>cardBounds, <any>slotBounds)) {
         slot.frame = 1;
         card.data.dropPos = { x: slot.x - (2 * config.levelBgWidth / 100), y: slot.y - (2 * config.levelBgHeight / 100) };
+        card.data.hoverSlot = slot;
         overlap = true;
       } else {
         slot.frame = 0;
+      }
+      // TODO: doesn't actually work correctly when on the last one?
+      if (! overlap) {
+        card.data.dropPos = undefined;
+        if (card.data.hoverSlot !== undefined) {
+          card.data.hoverSlot.data.choice = undefined;
+        }
+        card.data.hoverSlot = undefined;
       }
     });
   });
@@ -33,15 +43,18 @@ export function createPoolLevelSelectCard(
     if (card.data.dropPos === undefined) {
       card.x = card.data.originalPos.x;
       card.y = card.data.originalPos.y;
+      card.data.dropSlot.data.choice = cardId;
     } else {
       card.x = card.data.dropPos.x;
       card.y = card.data.dropPos.y;
+      card.data.originalPos = card.data.dropPos;
+      card.data.dropSlot = card.data.hoverSlot;
+      card.data.dropSlot.data.choice = cardId;
     }
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
       slot.frame = 0;
     });
   });
-  
 
   return card;
 }
