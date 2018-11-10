@@ -1,7 +1,6 @@
 import { Position } from "src/app/util/position";
 
 export function createPoolCardSlot(
-  game: Phaser.Game,
   pool: Phaser.Group,
   pos: Position,
 ): Phaser.Sprite {

@@ -31,7 +31,7 @@ export function createButton(
         onDownCb();
       }
 
-      btnSprite.frame = OVER;
+      btnSprite.frame = NEUTRAL;
     }
   });
   btnSprite.events.onInputOver.removeAll();

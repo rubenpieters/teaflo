@@ -2,7 +2,6 @@ import { Position } from "src/app/util/position";
 import { config } from "../config";
 
 export function createPoolLevelSelectCard(
-  game: Phaser.Game,
   pool: Phaser.Group,
   slotPool: Phaser.Group,
   pos: Position,

@@ -1,8 +1,8 @@
 import { config } from "src/app/config";
 import { createPoolButton } from "src/app/util/poolButton";
 import { createButton } from "src/app/util/button";
-import { createPosition, relativeIn, absoluteIn } from "src/app/util/position";
-import { LevelSelect } from "src/app/states/game";
+import { createPosition, absoluteIn } from "src/app/util/position";
+import { LevelSelect, levelSelectToGameScreen } from "src/app/states/game";
 import { createPoolLevelSelectCard } from "../util/poolLevelSelectCard";
 import { createPoolCardSlot } from "../util/poolCardSlot";
 
@@ -56,7 +56,7 @@ export const levelMap: { [key: number]: string[] | "info" } = {
 export function levelSelect_Main(
   game: Phaser.Game,
   levelSelectBtnPool: Phaser.Group,
-  LevelSelect: LevelSelect,
+  levelSelect: LevelSelect,
   act: number,
 ) {
   levelSelectBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
@@ -75,7 +75,7 @@ export function levelSelect_Main(
       );
   
       const button = createPoolButton(game, levelSelectBtnPool, pos, btnString, "btn_level",
-        () => levelSelect_Info(game, LevelSelect, levelId)
+        () => levelSelect_Info(game, levelSelect, levelId)
       );
       if (i === 0) {
         first = button;
@@ -88,12 +88,6 @@ export function levelSelect_Main(
   if (first !== undefined) {
     first.events.onInputUp.dispatch({ force: true });
   }
-}
-
-export function levelSelect_Select(
-  game: Phaser.Game,
-) {
-
 }
 
 type LevelData = {
@@ -138,15 +132,17 @@ export function levelSelect_Info(
       70, config.levelButtonWidth,
       90, config.levelButtonHeight,
     );
-    console.log(`${JSON.stringify(startBtnPos)}`);
     const startBtn = createButton(game, levelSelect.group, startBtnPos, "Start", "btn_level",
-      () => console.log(`${levelSelect.slots.map(x => {
-        if (x.data.card !== undefined) {
-          return x.data.card.data.cardId
-        } else {
-          return undefined;
-        }
-      })}`)
+      () => {
+        const cards = levelSelect.slots.map(x => {
+          if (x.data.card !== undefined) {
+            return x.data.card.data.cardId
+          } else {
+            return undefined;
+          }
+        });
+        levelSelectToGameScreen(game, cards);
+      }
     );
     levelSelect.startBtn = startBtn;
   }
@@ -164,8 +160,8 @@ export function levelSelect_Info(
       15 + 20 * i, config.levelSelectCardWidth,
       15, config.levelSelectCardHeight,
     );
-    const cardSlot = createPoolCardSlot(game, levelSelect.cardSlotPool, cardSlotPos);
-    const card = createPoolLevelSelectCard(game, levelSelect.cardPool, levelSelect.cardSlotPool, cardPos, cardId, cardId);
+    const cardSlot = createPoolCardSlot(levelSelect.cardSlotPool, cardSlotPos);
+    const card = createPoolLevelSelectCard(levelSelect.cardPool, levelSelect.cardSlotPool, cardPos, cardId, cardId);
     cardSlot.data.card = card;
     card.data.resetSlot = cardSlot;
 
@@ -180,7 +176,7 @@ export function levelSelect_Info(
       17, config.levelSelectCardHeight,
     );
 
-    const cardSlot = createPoolCardSlot(game, levelSelect.cardSlotPool, cardSlotPos);
+    const cardSlot = createPoolCardSlot(levelSelect.cardSlotPool, cardSlotPos);
     slots.push(cardSlot);
   }
   levelSelect.slots = slots;
