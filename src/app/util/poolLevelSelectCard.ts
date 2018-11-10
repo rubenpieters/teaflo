@@ -28,28 +28,45 @@ export function createPoolLevelSelectCard(
       } else {
         slot.frame = 0;
       }
-      // TODO: doesn't actually work correctly when on the last one?
-      if (! overlap) {
-        card.data.dropPos = undefined;
-        if (card.data.hoverSlot !== undefined) {
-          card.data.hoverSlot.data.choice = undefined;
-        }
-        card.data.hoverSlot = undefined;
-      }
     });
+    if (! overlap) {
+      card.data.dropPos = undefined;
+      card.data.hoverSlot = undefined;
+    }
   });
   card.events.onDragStop.removeAll();
   card.events.onDragStop.add(() => {
     if (card.data.dropPos === undefined) {
       card.x = card.data.originalPos.x;
       card.y = card.data.originalPos.y;
-      card.data.dropSlot.data.choice = cardId;
+      card.data.dropSlot.data.card = card;
     } else {
       card.x = card.data.dropPos.x;
       card.y = card.data.dropPos.y;
+      if (card.data.hoverSlot.data.card === undefined) {
+        console.log("PLACE");
+        // the hover slot does not contain a card
+        // just place it there
+        card.data.hoverSlot.data.card = card;
+        console.log(`hover: ${card.data.hoverSlot.data.card.cardId}`);
+        // clear drop slot
+        if (card.data.dropSlot !== undefined) {
+          card.data.dropSlot.data.card = undefined;
+        }
+      } else {
+        console.log("SWAP");
+        // the hover slot does contain a card
+        // swap it with the currently dropped card
+        card.data.dropSlot.data.card = card.data.hoverSlot.data.card;
+        console.log(`drop: ${card.data.dropSlot.data.card.cardId}`);
+        card.data.hoverSlot.data.card = card;
+        console.log(`hover: ${card.data.hoverSlot.data.card.cardId}`);
+        // move hover slot card (now in drop slot)
+        card.data.dropSlot.data.card.x = card.data.originalPos.x;
+        card.data.dropSlot.data.card.y = card.data.originalPos.y;
+      }
       card.data.originalPos = card.data.dropPos;
       card.data.dropSlot = card.data.hoverSlot;
-      card.data.dropSlot.data.choice = cardId;
     }
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
       slot.frame = 0;

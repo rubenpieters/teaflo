@@ -9,11 +9,11 @@ export function createPoolCardSlot(
   
   slot.events.onKilled.removeAll();
   slot.events.onKilled.add(() => {
-    slot.data.choice = undefined;
+    slot.data.card = undefined;
   });
   slot.events.onDestroy.removeAll();
   slot.events.onDestroy.add(() => {
-    slot.data.choice = undefined;
+    slot.data.card = undefined;
   });
 
   return slot;

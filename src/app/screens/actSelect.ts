@@ -140,7 +140,13 @@ export function levelSelect_Info(
     );
     console.log(`${JSON.stringify(startBtnPos)}`);
     const startBtn = createButton(game, levelSelect.group, startBtnPos, "Start", "btn_level",
-      () => console.log(`${levelSelect.slots.map(x => x.data.choice)}`)
+      () => console.log(`${levelSelect.slots.map(x => {
+        if (x.data.card !== undefined) {
+          return x.data.card.cardId
+        } else {
+          return undefined;
+        }
+      })}`)
     );
     levelSelect.startBtn = startBtn;
   }
