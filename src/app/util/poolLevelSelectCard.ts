@@ -1,5 +1,6 @@
 import { Position } from "src/app/util/position";
-import { config } from "../config";
+import { config } from "src/app/config";
+import { intersects } from "src/shared/phaser-utils";
 
 export function createPoolLevelSelectCard(
   pool: Phaser.Group,
@@ -19,7 +20,7 @@ export function createPoolLevelSelectCard(
     let overlap = false;
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
       const slotBounds = slot.getBounds();
-      if (! overlap && Phaser.Rectangle.intersects(<any>cardBounds, <any>slotBounds)) {
+      if (! overlap && intersects(cardBounds, slotBounds)) {
         slot.frame = 1;
         card.data.hoverSlot = slot;
         overlap = true;
