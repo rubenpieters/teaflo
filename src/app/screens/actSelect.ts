@@ -167,7 +167,7 @@ export function levelSelect_Info(
     const cardSlot = createPoolCardSlot(game, levelSelect.cardSlotPool, cardSlotPos);
     const card = createPoolLevelSelectCard(game, levelSelect.cardPool, levelSelect.cardSlotPool, cardPos, cardId, cardId);
     cardSlot.data.card = card;
-    card.data.dropSlot = cardSlot;
+    card.data.resetSlot = cardSlot;
 
     i += 1;
   }

@@ -10,7 +10,6 @@ export function createPoolLevelSelectCard(
   cardId: string,
 ): Phaser.Sprite {
   const card: Phaser.Sprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
-  card.data.originalPos = { x: pos.xMin, y: pos.yMin };
   card.data.cardId = cardId;
   card.inputEnabled = true;
   card.input.enableDrag(false, true);
@@ -23,7 +22,6 @@ export function createPoolLevelSelectCard(
       const slotBounds = slot.getBounds();
       if (! overlap && Phaser.Rectangle.intersects(<any>cardBounds, <any>slotBounds)) {
         slot.frame = 1;
-        card.data.dropPos = { x: slot.x - (2 * config.levelBgWidth / 100), y: slot.y - (2 * config.levelBgHeight / 100) };
         card.data.hoverSlot = slot;
         overlap = true;
       } else {
@@ -31,45 +29,38 @@ export function createPoolLevelSelectCard(
       }
     });
     if (! overlap) {
-      card.data.dropPos = undefined;
       card.data.hoverSlot = undefined;
     }
   });
   card.events.onDragStop.removeAll();
   card.events.onDragStop.add(() => {
-    if (card.data.dropPos === undefined) {
-      card.x = card.data.originalPos.x;
-      card.y = card.data.originalPos.y;
-      card.data.dropSlot.data.card = card;
+    if (card.data.hoverSlot === undefined) {
+      card.data.resetSlot.data.card = card;
+      moveToSlot(card, card.data.resetSlot);
     } else {
-      card.x = card.data.dropPos.x;
-      card.y = card.data.dropPos.y;
+      moveToSlot(card, card.data.hoverSlot);
       if (card.data.hoverSlot.data.card === undefined) {
-        console.log("PLACE");
         // the hover slot does not contain a card
         // just place it there
         card.data.hoverSlot.data.card = card;
-        // clear drop slot
-        card.data.dropSlot.data.card = undefined;
-        // set the drop slot of the card to its hover slot
-        card.data.dropSlot = card.data.hoverSlot;
+        // reset the card info of its reset slot
+        card.data.resetSlot.data.card = undefined;
+        // its reset slot is now the hover slot
+        card.data.resetSlot = card.data.hoverSlot;
       } else {
-        console.log("SWAP");
         // the hover slot does contain a card
-        // aliases
+        // alias
         const replacedCard = card.data.hoverSlot.data.card;
         // swap it with the currently dropped card
         // - first replaced card to drop slot
-        card.data.dropSlot.data.card = replacedCard;
-        replacedCard.data.dropSlot = card.data.hoverSlot;
+        card.data.resetSlot.data.card = replacedCard;
+        replacedCard.data.resetSlot = card.data.resetSlot;
         // - then this card to hover slot
         card.data.hoverSlot.data.card = card;
-        card.data.dropSlot = card.data.hoverSlot;
+        card.data.resetSlot = card.data.hoverSlot;
         // move replaced card
-        replacedCard.x = card.data.originalPos.x;
-        replacedCard.y = card.data.originalPos.y;
+        moveToSlot(replacedCard, replacedCard.data.resetSlot);
       }
-      card.data.originalPos = card.data.dropPos;
     }
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
       slot.frame = 0;
@@ -77,4 +68,12 @@ export function createPoolLevelSelectCard(
   });
 
   return card;
+}
+
+function moveToSlot(
+  card: Phaser.Sprite,
+  slot: Phaser.Sprite,
+) {
+  card.x = slot.x - (2 * config.levelBgWidth / 100);
+  card.y = slot.y - (2 * config.levelBgHeight / 100);
 }
