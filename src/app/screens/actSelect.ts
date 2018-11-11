@@ -2,7 +2,7 @@ import { config } from "src/app/config";
 import { createPoolButton } from "src/app/util/poolButton";
 import { createButton } from "src/app/util/button";
 import { createPosition, absoluteIn } from "src/app/util/position";
-import { LevelSelect, levelSelectToGameScreen } from "src/app/states/game";
+import { LevelSelect, levelSelectToGameScreen, GameRefs } from "src/app/states/game";
 import { createPoolLevelSelectCard } from "../util/poolLevelSelectCard";
 import { createPoolCardSlot } from "../util/poolCardSlot";
 
@@ -15,12 +15,10 @@ export const actNumberMap: { [key: number]: string } = {
 
 export function actSelect_Main(
   game: Phaser.Game,
-  actSelectBtnPool: Phaser.Group,
-  levelSelectBtnPool: Phaser.Group,
+  gameRefs: GameRefs,
   levelSelect: LevelSelect,
-  hoverViewPool: Phaser.Group,
 ) {
-  actSelectBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
+  gameRefs.actSelectBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
   let first: Phaser.Sprite | undefined = undefined;
 
   let i = 0;
@@ -32,8 +30,8 @@ export function actSelect_Main(
       "bot", 0, config.actButtonHeight,
     );
 
-    const button = createPoolButton(game, actSelectBtnPool, pos, btnString, "btn_act",
-      () => levelSelect_Main(game, levelSelectBtnPool, levelSelect, hoverViewPool, Number(actNumber))
+    const button = createPoolButton(game, gameRefs.actSelectBtnPool, pos, btnString, "btn_act",
+      () => levelSelect_Main(game, gameRefs, levelSelect, Number(actNumber))
     );
     if (i === 0) {
       first = button;
@@ -56,12 +54,11 @@ export const levelMap: { [key: number]: string[] | "info" } = {
 
 export function levelSelect_Main(
   game: Phaser.Game,
-  levelSelectBtnPool: Phaser.Group,
+  gameRefs: GameRefs,
   levelSelect: LevelSelect,
-  hoverViewPool: Phaser.Group,
   act: number,
 ) {
-  levelSelectBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
+  gameRefs.levelSelectBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
   let first: Phaser.Sprite | undefined = undefined;
 
   let i = 0;
@@ -76,8 +73,8 @@ export function levelSelect_Main(
         "top", 400 + (config.levelButtonHeight + 50) * i, config.levelButtonHeight,
       );
   
-      const button = createPoolButton(game, levelSelectBtnPool, pos, btnString, "btn_level",
-        () => levelSelect_Info(game, levelSelect, hoverViewPool, levelId)
+      const button = createPoolButton(game, gameRefs.levelSelectBtnPool, pos, btnString, "btn_level",
+        () => levelSelect_Info(game, levelSelect, gameRefs.hoverViewPool, levelId)
       );
       if (i === 0) {
         first = button;

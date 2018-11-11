@@ -1,9 +1,14 @@
 import { actSelect_Main } from "src/app/screens/actSelect";
 import { gameScreen_Main } from "../screens/gameScreen";
+import { SaveFileV1 } from "../savefile/rep";
 
-let actSelectBtnPool: Phaser.Group;
-let levelSelectBtnPool: Phaser.Group;
-let hoverViewPool: Phaser.Group;
+export type GameRefs = {
+  actSelectBtnPool: Phaser.Group,
+  levelSelectBtnPool: Phaser.Group,
+  hoverViewPool: Phaser.Group,
+  saveFile: SaveFileV1,
+}
+let gameRefs: GameRefs;
 
 export type LevelSelect = {
   group: Phaser.Group,
@@ -20,14 +25,25 @@ export type GameScreen = {
   group: Phaser.Group,
   unitPool: Phaser.Group,
   exitBtn?: Phaser.Sprite,
+  victoryBtn?: Phaser.Sprite,
 }
 let gameScreen: GameScreen;
+
+const newSaveFile: SaveFileV1 = {
+  version: "V1",
+  actUnlocked: {
+    0: "unlocked",
+  },
+  levelUnlocked: {
+    "a1_l1": "unlocked",
+  },
+}
 
 export default class Game extends Phaser.State {
   public init(): void {
     // NOTE: order of creating these groups determines their z-index
-    actSelectBtnPool = new Phaser.Group(this.game);
-    levelSelectBtnPool = new Phaser.Group(this.game);
+    const actSelectBtnPool = new Phaser.Group(this.game);
+    const levelSelectBtnPool = new Phaser.Group(this.game);
     levelSelect = {
       group: new Phaser.Group(this.game),
       cardSlotPool: new Phaser.Group(this.game),
@@ -38,13 +54,19 @@ export default class Game extends Phaser.State {
       group: new Phaser.Group(this.game),
       unitPool: new Phaser.Group(this.game),
     }
-    hoverViewPool = new Phaser.Group(this.game);
+    gameRefs = {
+      actSelectBtnPool: actSelectBtnPool,
+      levelSelectBtnPool: levelSelectBtnPool,
+      hoverViewPool: new Phaser.Group(this.game),
+      // TODO: read file from somewhere
+      saveFile: newSaveFile,
+    }
   }
 
   public create(): void {
     this.stage.backgroundColor = 0xDCDCDC;
 
-    actSelect_Main(this.game, actSelectBtnPool, levelSelectBtnPool, levelSelect, hoverViewPool);
+    actSelect_Main(this.game, gameRefs, levelSelect);
   }
 }
 
@@ -54,7 +76,10 @@ export function levelSelectToGameScreen(
 ) {
   setSelectScreenVisible(false);
   setGameScreenVisible(true);
-  gameScreen_Main(game, cards, gameScreen);
+  const gameState = {
+    cardIds: cards,
+  }
+  gameScreen_Main(game, gameState, gameScreen);
 }
 
 export function gameScreenToLevelSelect(
@@ -67,8 +92,8 @@ export function gameScreenToLevelSelect(
 function setSelectScreenVisible(
   visible: boolean,
 ) {
-  actSelectBtnPool.visible = visible;
-  levelSelectBtnPool.visible = visible;
+  gameRefs.actSelectBtnPool.visible = visible;
+  gameRefs.levelSelectBtnPool.visible = visible;
   levelSelect.group.visible = visible;
   levelSelect.cardPool.visible = visible;
   levelSelect.cardSlotPool.visible = visible;
