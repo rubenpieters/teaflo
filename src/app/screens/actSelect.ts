@@ -5,12 +5,13 @@ import { createPosition, absoluteIn } from "src/app/util/position";
 import { LevelSelect, levelSelectToGameScreen, GameRefs } from "src/app/states/game";
 import { createPoolLevelSelectCard } from "../util/poolLevelSelectCard";
 import { createPoolCardSlot } from "../util/poolCardSlot";
+import { actAvailable, levelAvailable } from "../savefile/rep";
+import { createLockedPoolButton } from "../util/lockedPoolButton";
 
 // act -> button string mapping
 export const actNumberMap: { [key: number]: string } = {
   0: "1",
   1: "2",
-  2: "...",
 };
 
 export function actSelect_Main(
@@ -29,10 +30,15 @@ export function actSelect_Main(
       "left", 100 + config.actButtonWidth * i, config.actButtonWidth,
       "bot", 0, config.actButtonHeight,
     );
-
-    const button = createPoolButton(game, gameRefs.actSelectBtnPool, pos, btnString, "btn_act",
-      () => levelSelect_Main(game, gameRefs, levelSelect, Number(actNumber))
-    );
+    
+    let button: Phaser.Sprite;
+    if (actAvailable(gameRefs.saveFile, Number(actNumber))) {
+      button = createPoolButton(game, gameRefs.actSelectBtnPool, pos, btnString, "btn_act",
+        () => levelSelect_Main(game, gameRefs, levelSelect, Number(actNumber))
+      );
+    } else {
+      button = createLockedPoolButton(game, gameRefs.actSelectBtnPool, pos, btnString, "btn_act");
+    }
     if (i === 0) {
       first = button;
     }
@@ -46,10 +52,9 @@ export function actSelect_Main(
 }
 
 // act -> level id mapping
-export const levelMap: { [key: number]: string[] | "info" } = {
-  0: ["a1_l1"],
+export const levelMap: { [key: number]: string[] } = {
+  0: ["a1_l1", "a1_l2"],
   1: ["a2_l1", "a2_l2", "a2_l3"],
-  2: "info",
 }
 
 export function levelSelect_Main(
@@ -63,25 +68,26 @@ export function levelSelect_Main(
 
   let i = 0;
   for (const levelId of levelMap[act]) {
-    if (levelMap[act] === "info") {
+    let btnString = levelId;
+  
+    const pos = createPosition(
+      "left", 250, config.levelButtonWidth,
+      "top", 400 + (config.levelButtonHeight + 50) * i, config.levelButtonHeight,
+    );
 
-    } else {
-      let btnString = levelId;
-  
-      const pos = createPosition(
-        "left", 250, config.levelButtonWidth,
-        "top", 400 + (config.levelButtonHeight + 50) * i, config.levelButtonHeight,
-      );
-  
-      const button = createPoolButton(game, gameRefs.levelSelectBtnPool, pos, btnString, "btn_level",
+    let button: Phaser.Sprite;
+    if (levelAvailable(gameRefs.saveFile, levelId)) {
+      button = createPoolButton(game, gameRefs.levelSelectBtnPool, pos, btnString, "btn_level",
         () => levelSelect_Info(game, levelSelect, gameRefs.hoverViewPool, levelId)
       );
-      if (i === 0) {
-        first = button;
-      }
-  
-      i += 1;
+    } else {
+      button = createLockedPoolButton(game, gameRefs.levelSelectBtnPool, pos, btnString, "btn_level");
     }
+    if (i === 0) {
+      first = button;
+    }
+
+    i += 1;
   }
 
   if (first !== undefined) {
@@ -97,6 +103,7 @@ type LevelData = {
 // level id -> card id mapping
 export const levelDataMap: { [key: string]: LevelData } = {
   "a1_l1": { cardIds: [], slots: 0 },
+  "a1_l2": { cardIds: [], slots: 0 },
   "a2_l1": { cardIds: ["card1", "card2", "card3"], slots: 4 },
   "a2_l2": { cardIds: ["card1", "card2", "card3"], slots: 4 },
   "a2_l3": { cardIds: ["card1", "card2", "card3"], slots: 4 },
