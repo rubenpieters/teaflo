@@ -1,6 +1,7 @@
 import { actSelect_Main } from "src/app/screens/actSelect";
 import { gameScreen_Main } from "../screens/gameScreen";
 import { SaveFileV1 } from "../savefile/rep";
+import { applyUnlocks } from "../savefile/unlocks";
 
 export type GameRefs = {
   actSelectBtnPool: Phaser.Group,
@@ -72,20 +73,28 @@ export default class Game extends Phaser.State {
 
 export function levelSelectToGameScreen(
   game: Phaser.Game,
-  cards: string[]
+  cards: string[],
+  levelId: string,
 ) {
   setSelectScreenVisible(false);
   setGameScreenVisible(true);
   const gameState = {
     cardIds: cards,
   }
-  gameScreen_Main(game, gameState, gameScreen);
+  gameScreen_Main(game, gameState, gameScreen, levelId);
 }
 
 export function gameScreenToLevelSelect(
-  _game: Phaser.Game,
+  game: Phaser.Game,
+  unlock: string | undefined,
 ) {
   setGameScreenVisible(false);
+  if (unlock !== undefined) {
+    console.log(`UNLOCK: ${unlock}`);
+    gameRefs.saveFile = applyUnlocks(gameRefs.saveFile, unlock);
+    console.log(gameRefs.saveFile);
+    actSelect_Main(game, gameRefs, levelSelect);
+  }
   setSelectScreenVisible(true);
 }
 

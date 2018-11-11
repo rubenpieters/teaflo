@@ -1,8 +1,8 @@
-import { Position, inPosition } from "src/app/util/position";
+import { Position } from "src/app/util/position";
 
 const NEUTRAL = 0;
-const DOWN = 1;
-const OVER = 2;
+//const DOWN = 1;
+//const OVER = 2;
 
 export function createLockedPoolButton(
   game: Phaser.Game,

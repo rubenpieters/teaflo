@@ -133,26 +133,27 @@ export function levelSelect_Info(
     levelSelect.rightBg = rightBgSprite;
   }
 
-  if (levelSelect.startBtn === undefined) {
-    const startBtnPos = absoluteIn(
-      rightBgSpritePos, config.levelBgWidth, config.levelBgHeight,
-      70, config.levelButtonWidth,
-      90, config.levelButtonHeight,
-    );
-    const startBtn = createButton(game, levelSelect.group, startBtnPos, "Start", "btn_level",
-      () => {
-        const cards = levelSelect.slots.map(x => {
-          if (x.data.card !== undefined) {
-            return x.data.card.data.cardId
-          } else {
-            return undefined;
-          }
-        });
-        levelSelectToGameScreen(game, cards);
-      }
-    );
-    levelSelect.startBtn = startBtn;
+  if (levelSelect.startBtn !== undefined) {
+    levelSelect.startBtn.destroy();
   }
+  const startBtnPos = absoluteIn(
+    rightBgSpritePos, config.levelBgWidth, config.levelBgHeight,
+    70, config.levelButtonWidth,
+    90, config.levelButtonHeight,
+  );
+  const startBtn = createButton(game, levelSelect.group, startBtnPos, "Start", "btn_level",
+    () => {
+      const cards = levelSelect.slots.map(x => {
+        if (x.data.card !== undefined) {
+          return x.data.card.data.cardId
+        } else {
+          return undefined;
+        }
+      });
+      levelSelectToGameScreen(game, cards, levelId);
+    }
+  );
+  levelSelect.startBtn = startBtn;
 
   levelSelect.cardPool.forEachAlive((x: Phaser.Sprite) => x.kill());
   let i = 0;

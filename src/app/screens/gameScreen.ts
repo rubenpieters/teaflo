@@ -8,6 +8,7 @@ export function gameScreen_Main(
   game: Phaser.Game,
   gameState: GameState,
   gameScreen: GameScreen,
+  levelId: string,
 ) {
   console.log(JSON.stringify(gameState));
   if (gameScreen.exitBtn === undefined) {
@@ -16,19 +17,20 @@ export function gameScreen_Main(
       "top", 400, config.levelButtonHeight,
     );
     const exitBtn = createButton(game, gameScreen.group, exitBtnPos, "Exit", "btn_level",
-      () => gameScreenToLevelSelect(game)
+      () => gameScreenToLevelSelect(game, undefined)
     );
     gameScreen.exitBtn = exitBtn;
   }
 
-  if (gameScreen.victoryBtn === undefined) {
-    const victoryBtnPos = createPosition(
-      "right", 700, config.levelButtonWidth,
-      "top", 400, config.levelButtonHeight,
-    );
-    const victoryBtn = createButton(game, gameScreen.group, victoryBtnPos, "Claim", "btn_level",
-      () => gameScreenToLevelSelect(game)
-    );
-    gameScreen.victoryBtn = victoryBtn;
+  if (gameScreen.victoryBtn !== undefined) {
+    gameScreen.victoryBtn.destroy();
   }
+  const victoryBtnPos = createPosition(
+    "right", 700, config.levelButtonWidth,
+    "top", 400, config.levelButtonHeight,
+  );
+  const victoryBtn = createButton(game, gameScreen.group, victoryBtnPos, "Claim", "btn_level",
+    () => gameScreenToLevelSelect(game, levelId)
+  );
+  gameScreen.victoryBtn = victoryBtn;
 }
