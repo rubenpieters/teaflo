@@ -18,6 +18,7 @@ export function actSelect_Main(
   actSelectBtnPool: Phaser.Group,
   levelSelectBtnPool: Phaser.Group,
   levelSelect: LevelSelect,
+  hoverViewPool: Phaser.Group,
 ) {
   actSelectBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
   let first: Phaser.Sprite | undefined = undefined;
@@ -32,7 +33,7 @@ export function actSelect_Main(
     );
 
     const button = createPoolButton(game, actSelectBtnPool, pos, btnString, "btn_act",
-      () => levelSelect_Main(game, levelSelectBtnPool, levelSelect, Number(actNumber))
+      () => levelSelect_Main(game, levelSelectBtnPool, levelSelect, hoverViewPool, Number(actNumber))
     );
     if (i === 0) {
       first = button;
@@ -57,6 +58,7 @@ export function levelSelect_Main(
   game: Phaser.Game,
   levelSelectBtnPool: Phaser.Group,
   levelSelect: LevelSelect,
+  hoverViewPool: Phaser.Group,
   act: number,
 ) {
   levelSelectBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
@@ -75,7 +77,7 @@ export function levelSelect_Main(
       );
   
       const button = createPoolButton(game, levelSelectBtnPool, pos, btnString, "btn_level",
-        () => levelSelect_Info(game, levelSelect, levelId)
+        () => levelSelect_Info(game, levelSelect, hoverViewPool, levelId)
       );
       if (i === 0) {
         first = button;
@@ -106,6 +108,7 @@ export const levelDataMap: { [key: string]: LevelData } = {
 export function levelSelect_Info(
   game: Phaser.Game,
   levelSelect: LevelSelect,
+  hoverViewPool: Phaser.Group,
   levelId: string,
 ) {
   const leftBgSpritePos = createPosition(
@@ -161,7 +164,7 @@ export function levelSelect_Info(
       15, config.levelSelectCardHeight,
     );
     const cardSlot = createPoolCardSlot(levelSelect.cardSlotPool, cardSlotPos);
-    const card = createPoolLevelSelectCard(levelSelect.cardPool, levelSelect.cardSlotPool, cardPos, cardId, cardId);
+    const card = createPoolLevelSelectCard(levelSelect.cardPool, levelSelect.cardSlotPool, hoverViewPool, cardPos, cardId, cardId);
     cardSlot.data.card = card;
     card.data.resetSlot = cardSlot;
 

@@ -3,6 +3,7 @@ import { gameScreen_Main } from "../screens/gameScreen";
 
 let actSelectBtnPool: Phaser.Group;
 let levelSelectBtnPool: Phaser.Group;
+let hoverViewPool: Phaser.Group;
 
 export type LevelSelect = {
   group: Phaser.Group,
@@ -24,9 +25,9 @@ let gameScreen: GameScreen;
 
 export default class Game extends Phaser.State {
   public init(): void {
+    // NOTE: order of creating these groups determines their z-index
     actSelectBtnPool = new Phaser.Group(this.game);
     levelSelectBtnPool = new Phaser.Group(this.game);
-    // NOTE: order of creating these groups determines their z-index
     levelSelect = {
       group: new Phaser.Group(this.game),
       cardSlotPool: new Phaser.Group(this.game),
@@ -37,12 +38,13 @@ export default class Game extends Phaser.State {
       group: new Phaser.Group(this.game),
       unitPool: new Phaser.Group(this.game),
     }
+    hoverViewPool = new Phaser.Group(this.game);
   }
 
   public create(): void {
     this.stage.backgroundColor = 0xDCDCDC;
 
-    actSelect_Main(this.game, actSelectBtnPool, levelSelectBtnPool, levelSelect);
+    actSelect_Main(this.game, actSelectBtnPool, levelSelectBtnPool, levelSelect, hoverViewPool);
   }
 }
 

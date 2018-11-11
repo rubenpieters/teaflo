@@ -1,10 +1,12 @@
 import { Position } from "src/app/util/position";
 import { config } from "src/app/config";
 import { intersects } from "src/shared/phaser-utils";
+import { createPoolHoverCard } from "./poolHoverCard";
 
 export function createPoolLevelSelectCard(
   pool: Phaser.Group,
   slotPool: Phaser.Group,
+  hoverViewPool: Phaser.Group,
   pos: Position,
   key: string,
   cardId: string,
@@ -13,7 +15,24 @@ export function createPoolLevelSelectCard(
   card.data.cardId = cardId;
   card.inputEnabled = true;
   card.input.enableDrag(false, true);
+
+  card.events.onInputOver.add(() => {
+    const hoverPos: Position = {
+      xMin: card.x + config.levelSelectCardWidth + 10,
+      xMax: card.x + config.levelSelectCardWidth + 10 + config.hoverCardWidth,
+      yMin: card.y,
+      yMax: card.y + config.hoverCardHeight,
+    };
+    card.data.hoverView = createPoolHoverCard(hoverViewPool, hoverPos, key);
+  });
+  card.events.onInputOut.add(() => {
+    card.data.hoverView.kill();
+  });
   
+  card.events.onDragStart.removeAll();
+  card.events.onDragStart.add(() => {
+    card.data.hoverView.kill();
+  });
   card.events.onDragUpdate.removeAll();
   card.events.onDragUpdate.add(() => {
     const cardBounds = card.getBounds();
@@ -65,6 +84,21 @@ export function createPoolLevelSelectCard(
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
       slot.frame = 0;
     });
+  });
+  
+  card.events.onKilled.removeAll();
+  card.events.onKilled.add(() => {
+    card.data.hoverSlot = undefined;
+    card.data.resetSlot = undefined;
+    card.data.cardId = undefined;
+    card.data.hoverView = undefined;
+  });
+  card.events.onDestroy.removeAll();
+  card.events.onDestroy.add(() => {
+    card.data.hoverSlot = undefined;
+    card.data.resetSlot = undefined;
+    card.data.cardId = undefined;
+    card.data.hoverView = undefined;
   });
 
   return card;

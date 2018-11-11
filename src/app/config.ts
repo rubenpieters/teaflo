@@ -13,4 +13,7 @@ export const config = {
 
   levelSelectCardWidth: 150,
   levelSelectCardHeight: 300,
+
+  hoverCardWidth: 300,
+  hoverCardHeight: 600,
 };
