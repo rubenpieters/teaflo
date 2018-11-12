@@ -26,12 +26,16 @@ export function createPoolLevelSelectCard(
     card.data.hoverView = createPoolHoverCard(hoverViewPool, hoverPos, key);
   });
   card.events.onInputOut.add(() => {
-    card.data.hoverView.kill();
+    if (card.data.hoverView !== undefined) {
+      card.data.hoverView.kill();
+    }
   });
   
   card.events.onDragStart.removeAll();
   card.events.onDragStart.add(() => {
-    card.data.hoverView.kill();
+    if (card.data.hoverView !== undefined) {
+      card.data.hoverView.kill();
+    }
   });
   card.events.onDragUpdate.removeAll();
   card.events.onDragUpdate.add(() => {
@@ -88,6 +92,9 @@ export function createPoolLevelSelectCard(
   
   card.events.onKilled.removeAll();
   card.events.onKilled.add(() => {
+    if (card.data.hoverView !== undefined) {
+      card.data.hoverView.kill();
+    }
     card.data.hoverSlot = undefined;
     card.data.resetSlot = undefined;
     card.data.cardId = undefined;
@@ -95,6 +102,9 @@ export function createPoolLevelSelectCard(
   });
   card.events.onDestroy.removeAll();
   card.events.onDestroy.add(() => {
+    if (card.data.hoverView !== undefined) {
+      card.data.hoverView.kill();
+    }
     card.data.hoverSlot = undefined;
     card.data.resetSlot = undefined;
     card.data.cardId = undefined;
