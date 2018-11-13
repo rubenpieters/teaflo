@@ -16,6 +16,7 @@ export function createPoolLevelSelectCard(
   card.inputEnabled = true;
   card.input.enableDrag(false, true);
 
+  card.events.onInputOver.removeAll();
   card.events.onInputOver.add(() => {
     const hoverPos: Position = {
       xMin: card.x + config.levelSelectCardWidth + 10,
@@ -25,6 +26,7 @@ export function createPoolLevelSelectCard(
     };
     card.data.hoverView = createPoolHoverCard(hoverViewPool, hoverPos, key);
   });
+  card.events.onInputOut.removeAll();
   card.events.onInputOut.add(() => {
     if (card.data.hoverView !== undefined) {
       card.data.hoverView.kill();
@@ -44,6 +46,7 @@ export function createPoolLevelSelectCard(
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
       const slotBounds = slot.getBounds();
       if (! overlap && intersects(cardBounds, slotBounds)) {
+        console.log("TEST");
         slot.frame = 1;
         card.data.hoverSlot = slot;
         overlap = true;

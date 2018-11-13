@@ -115,6 +115,9 @@ export function levelSelect_Info(
   hoverViewPool: Phaser.Group,
   levelId: string,
 ) {
+  levelSelect.cardSlotPool.forEachAlive((x: Phaser.Sprite) => x.kill());
+  levelSelect.cardPool.forEachAlive((x: Phaser.Sprite) => x.kill());
+
   const leftBgSpritePos = createPosition(
     "right", 1500, config.levelBgWidth,
     "top", 400, config.levelBgHeight,
