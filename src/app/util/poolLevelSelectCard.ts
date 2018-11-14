@@ -46,7 +46,6 @@ export function createPoolLevelSelectCard(
     slotPool.forEachAlive((slot: Phaser.Sprite) => {
       const slotBounds = slot.getBounds();
       if (! overlap && intersects(cardBounds, slotBounds)) {
-        console.log("TEST");
         slot.frame = 1;
         card.data.hoverSlot = slot;
         overlap = true;

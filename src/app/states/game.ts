@@ -15,9 +15,11 @@ export type LevelSelect = {
   group: Phaser.Group,
   cardPool: Phaser.Group,
   cardSlotPool: Phaser.Group,
+  solBtnPool: Phaser.Group,
   rightBg?: Phaser.Sprite,
   leftBg?: Phaser.Sprite,
   startBtn?: Phaser.Sprite,
+  addSolBtn?: Phaser.Sprite,
   slots: Phaser.Sprite[],
 };
 let levelSelect: LevelSelect;
@@ -38,6 +40,15 @@ const newSaveFile: SaveFileV1 = {
   levelUnlocked: {
     "a1_l1": "unlocked",
   },
+  levelSolutions: {
+    "a1_l1": [{
+      solution: { win: false, },
+      cardIds: [],
+    }],
+  },
+  activeSolutions: {
+    "a1_l1": 0,
+  },
 }
 
 export default class Game extends Phaser.State {
@@ -49,6 +60,7 @@ export default class Game extends Phaser.State {
       group: new Phaser.Group(this.game),
       cardSlotPool: new Phaser.Group(this.game),
       cardPool: new Phaser.Group(this.game),
+      solBtnPool: new Phaser.Group(this.game),
       slots: [],
     };
     gameScreen = {
@@ -90,9 +102,7 @@ export function gameScreenToLevelSelect(
 ) {
   setGameScreenVisible(false);
   if (unlock !== undefined) {
-    console.log(`UNLOCK: ${unlock}`);
     gameRefs.saveFile = applyUnlocks(gameRefs.saveFile, unlock);
-    console.log(gameRefs.saveFile);
     actSelect_Main(game, gameRefs, levelSelect);
   }
   setSelectScreenVisible(true);

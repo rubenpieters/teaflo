@@ -78,7 +78,7 @@ export function levelSelect_Main(
     let button: Phaser.Sprite;
     if (levelAvailable(gameRefs.saveFile, levelId)) {
       button = createPoolButton(game, gameRefs.levelSelectBtnPool, pos, btnString, "btn_level",
-        () => levelSelect_Info(game, levelSelect, gameRefs.hoverViewPool, levelId)
+        () => levelSelect_Info(game, gameRefs, levelSelect, gameRefs.hoverViewPool, levelId)
       );
     } else {
       button = createLockedPoolButton(game, gameRefs.levelSelectBtnPool, pos, btnString, "btn_level");
@@ -111,6 +111,7 @@ export const levelDataMap: { [key: string]: LevelData } = {
 
 export function levelSelect_Info(
   game: Phaser.Game,
+  gameRefs: GameRefs,
   levelSelect: LevelSelect,
   hoverViewPool: Phaser.Group,
   levelId: string,
@@ -126,6 +127,36 @@ export function levelSelect_Info(
     const leftBgSprite = game.add.sprite(leftBgSpritePos.xMin, leftBgSpritePos.yMin, "bg_level", undefined, levelSelect.group);
     levelSelect.leftBg = leftBgSprite;
   }
+
+  let i = 0;
+  let active: Phaser.Sprite | undefined = undefined;
+  for (const sol of gameRefs.saveFile.levelSolutions[levelId]) {
+    const solBtnPos = createPosition(
+      "right", 1250, config.levelButtonWidth,
+      "top", 500 + 250 * i, config.levelButtonHeight,
+    );
+    const solBtn = createPoolButton(game, levelSelect.solBtnPool, solBtnPos, `sol ${i}`, "btn_level",
+      () => console.log("choose sol")
+    );
+    if (i === gameRefs.saveFile.activeSolutions[levelId]) {
+      active = solBtn;
+    }
+    i += 1;
+  }
+  if (active !== undefined) {
+    active.events.onInputUp.dispatch({ force: true });
+  }
+  if (levelSelect.addSolBtn !== undefined) {
+    levelSelect.addSolBtn.destroy();
+  }
+  const addSolBtnPos = createPosition(
+    "right", 1250, config.levelButtonWidth,
+    "top", 500 + 250 * i, config.levelButtonHeight,
+  );
+  const addSolBtn = createButton(game, levelSelect.group, addSolBtnPos, "+", "btn_level",
+    () => console.log("ADD")
+  );
+  levelSelect.addSolBtn = addSolBtn;
 
   const rightBgSpritePos = createPosition(
     "right", 250, config.levelBgWidth,
@@ -158,8 +189,7 @@ export function levelSelect_Info(
   );
   levelSelect.startBtn = startBtn;
 
-  levelSelect.cardPool.forEachAlive((x: Phaser.Sprite) => x.kill());
-  let i = 0;
+  i = 0;
   for (const cardId of levelDataMap[levelId].cardIds) {
     const cardSlotPos = absoluteIn(
       leftBgSpritePos, config.levelBgWidth, config.levelBgHeight,
