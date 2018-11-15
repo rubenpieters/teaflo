@@ -9,16 +9,14 @@ export type Unlocks = {
 export function applyUnlocks(
   saveFile: SaveFileV1,
   levelId: string,
-): SaveFileV1 {
+): void {
   const unlocks = unlockOrder(levelId);
-  let newSaveFile = saveFile;
   for (const unlockLevelId of unlocks.levels) {
-    newSaveFile = focus(newSaveFile, set(x => x.levelUnlocked[unlockLevelId], "unlocked"));
+    saveFile.levelUnlocked[unlockLevelId] = "unlocked";
   }
   for (const unlockAct of unlocks.acts) {
-    newSaveFile = focus(newSaveFile, set(x => x.actUnlocked[unlockAct], "unlocked"));
+    saveFile.actUnlocked[unlockAct] ="unlocked";
   }
-  return newSaveFile
 }
 
 export function unlockOrder(

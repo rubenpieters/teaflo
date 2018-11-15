@@ -204,6 +204,14 @@ export function levelSelect_LevelSlots(
   levelSelect.solBtnPool.forEachAlive((x: Phaser.Sprite) => x.kill());
 
   let i = 0;
+  // the savefile has no solutions yet, then create one
+  if (gameRefs.saveFile.levelSolutions[levelId] === undefined) {
+    gameRefs.saveFile.levelSolutions[levelId] = [{
+      solution: { win: false, },
+      cardIds: [],
+    }];
+  }
+  // create a button for each solution in the savefile
   let active: Phaser.Sprite | undefined = undefined;
   for (const sol of gameRefs.saveFile.levelSolutions[levelId]) {
     const solBtnPos = createPosition(
@@ -221,6 +229,7 @@ export function levelSelect_LevelSlots(
   if (active !== undefined) {
     active.events.onInputUp.dispatch({ force: true });
   }
+  // create the '+' button to add a solution
   if (levelSelect.addSolBtn !== undefined) {
     levelSelect.addSolBtn.destroy();
     levelSelect.addSolBtn = undefined;

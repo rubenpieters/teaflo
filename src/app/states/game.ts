@@ -102,7 +102,7 @@ export function gameScreenToLevelSelect(
 ) {
   setGameScreenVisible(false);
   if (unlock !== undefined) {
-    gameRefs.saveFile = applyUnlocks(gameRefs.saveFile, unlock);
+    applyUnlocks(gameRefs.saveFile, unlock);
     actSelect_Main(game, gameRefs, levelSelect);
   }
   setSelectScreenVisible(true);
