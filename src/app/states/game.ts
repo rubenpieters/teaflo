@@ -116,6 +116,7 @@ function setSelectScreenVisible(
   levelSelect.group.visible = visible;
   levelSelect.cardPool.visible = visible;
   levelSelect.cardSlotPool.visible = visible;
+  levelSelect.solBtnPool.visible = visible;
 }
 
 function setGameScreenVisible(
