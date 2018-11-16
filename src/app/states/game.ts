@@ -1,4 +1,4 @@
-import { actSelect_Main } from "src/app/screens/actSelect";
+import { actSelect_Main } from "src/app/screens/general";
 import { gameScreen_Main } from "../screens/gameScreen";
 import { SaveFileV1 } from "../savefile/rep";
 import { applyUnlocks } from "../savefile/unlocks";
@@ -49,6 +49,8 @@ const newSaveFile: SaveFileV1 = {
   activeSolutions: {
     "a1_l1": 0,
   },
+  activeAct: 0,
+  activeLevel: "a1_l1",
 }
 
 export default class Game extends Phaser.State {
