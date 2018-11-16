@@ -4,9 +4,11 @@ import { SaveFileV1 } from "../savefile/rep";
 import { applyUnlocks } from "../savefile/unlocks";
 import { ActSelectData } from "../screens/actSelect";
 import { applyScreenEvent, mkChangeAct } from "../util/screenEvents";
+import { LevelSelectData } from "../screens/levelSelect";
 
 export type GameRefs = {
   actSelectData: ActSelectData,
+  levelSelectData: LevelSelectData,
   actSelectBtnPool: Phaser.Group,
   levelSelectBtnPool: Phaser.Group,
   hoverViewPool: Phaser.Group,
@@ -67,6 +69,9 @@ export default class Game extends Phaser.State {
     const actSelectData = {
       btnPool: new Phaser.Group(this.game),
     }
+    const levelSelectData = {
+      btnPool: new Phaser.Group(this.game),
+    }
     const levelSelectBtnPool = new Phaser.Group(this.game);
     levelSelect = {
       group: new Phaser.Group(this.game),
@@ -81,6 +86,7 @@ export default class Game extends Phaser.State {
     }
     gameRefs = {
       actSelectData,
+      levelSelectData,
       actSelectBtnPool,
       levelSelectBtnPool,
       hoverViewPool: new Phaser.Group(this.game),

@@ -1,5 +1,5 @@
 import { GameRefs } from "../states/game";
-import { createPosition, Position } from "../util/position";
+import { createPosition, Position, inPosition } from "../util/position";
 import { config } from "../config";
 import { actAvailable } from "../savefile/rep";
 import { applyScreenEvent, mkChangeAct } from "../util/screenEvents";
@@ -59,36 +59,54 @@ export function createActSelectButton(
   }
   const btnSprite: Phaser.Sprite = gameRefs.actSelectData.btnPool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
   
+  btnSprite.data.selecting = false;
+  btnSprite.data.actNumber = actNumber;
+  btnSprite.data.onDownCb = onDownCb;
+
   if (btnSprite.data.init === undefined || btnSprite.data.init === false) {
+    btnSprite.data.selecting = false;
+
     btnSprite.inputEnabled = true;
     btnSprite.events.onInputDown.add(() => {
       btnSprite.data.selecting = true;
-      if (! btnSprite.data.selected) {
-        btnSprite.frame = DOWN;
-      }
-    });
-    btnSprite.events.onInputUp.add(() => {
-      if (gameRefs.saveFile.activeAct === actNumber) {
+      if (gameRefs.saveFile.activeAct === btnSprite.data.actNumber) {
         // noop
-      } else if (actAvailable(gameRefs.saveFile, actNumber)) {
-        onDownCb();
+      } else if (actAvailable(gameRefs.saveFile, btnSprite.data.actNumber)) {
+        btnSprite.frame = DOWN;
       } else {
         // noop
       }
     });
+    btnSprite.events.onInputUp.add(() => {
+      if (
+        inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
+      ) {
+        if (gameRefs.saveFile.activeAct === btnSprite.data.actNumber) {
+          // noop
+        } else if (actAvailable(gameRefs.saveFile, btnSprite.data.actNumber)) {
+          btnSprite.data.onDownCb();
+        } else {
+          // noop
+        }
+      }
+    });
     btnSprite.events.onInputOver.add(() => {
-      if (gameRefs.saveFile.activeAct === actNumber) {
+      if (gameRefs.saveFile.activeAct === btnSprite.data.actNumber) {
         // noop
-      } else if (actAvailable(gameRefs.saveFile, actNumber)) {
-        btnSprite.frame = OVER;
+      } else if (actAvailable(gameRefs.saveFile, btnSprite.data.actNumber)) {
+        if (btnSprite.data.selecting) {
+          btnSprite.frame = DOWN;
+        } else {
+          btnSprite.frame = OVER;
+        }
       } else {
         // noop
       }
     });
     btnSprite.events.onInputOut.add(() => {
-      if (gameRefs.saveFile.activeAct === actNumber) {
+      if (gameRefs.saveFile.activeAct === btnSprite.data.actNumber) {
         // noop
-      } else if (actAvailable(gameRefs.saveFile, actNumber)) {
+      } else if (actAvailable(gameRefs.saveFile, btnSprite.data.actNumber)) {
         btnSprite.frame = NEUTRAL;
       } else {
         // noop

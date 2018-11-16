@@ -70,6 +70,7 @@ export function applyScreenEvent(
       break;
     }
     case "ChangeLevel": {
+      console.log(`CHANGE LEVEL ${screenEvent.levelId}`);
       gameRefs.saveFile.activeLevel = screenEvent.levelId;
       drawLevelSelect(game, gameRefs, gameRefs.saveFile.activeAct);
       // also change level info
