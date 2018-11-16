@@ -2,8 +2,11 @@ import { actSelect_Main } from "src/app/screens/general";
 import { gameScreen_Main } from "../screens/gameScreen";
 import { SaveFileV1 } from "../savefile/rep";
 import { applyUnlocks } from "../savefile/unlocks";
+import { ActSelectData } from "../screens/actSelect";
+import { applyScreenEvent, mkChangeAct } from "../util/screenEvents";
 
 export type GameRefs = {
+  actSelectData: ActSelectData,
   actSelectBtnPool: Phaser.Group,
   levelSelectBtnPool: Phaser.Group,
   hoverViewPool: Phaser.Group,
@@ -36,9 +39,13 @@ const newSaveFile: SaveFileV1 = {
   version: "V1",
   actUnlocked: {
     0: "unlocked",
+    1: "unlocked",
   },
   levelUnlocked: {
     "a1_l1": "unlocked",
+    "a1_l2": "unlocked",
+    "a2_l1": "unlocked",
+    "a2_l2": "unlocked",
   },
   levelSolutions: {
     "a1_l1": [{
@@ -57,6 +64,9 @@ export default class Game extends Phaser.State {
   public init(): void {
     // NOTE: order of creating these groups determines their z-index
     const actSelectBtnPool = new Phaser.Group(this.game);
+    const actSelectData = {
+      btnPool: new Phaser.Group(this.game),
+    }
     const levelSelectBtnPool = new Phaser.Group(this.game);
     levelSelect = {
       group: new Phaser.Group(this.game),
@@ -70,8 +80,9 @@ export default class Game extends Phaser.State {
       unitPool: new Phaser.Group(this.game),
     }
     gameRefs = {
-      actSelectBtnPool: actSelectBtnPool,
-      levelSelectBtnPool: levelSelectBtnPool,
+      actSelectData,
+      actSelectBtnPool,
+      levelSelectBtnPool,
       hoverViewPool: new Phaser.Group(this.game),
       // TODO: read file from somewhere
       saveFile: newSaveFile,
@@ -81,7 +92,7 @@ export default class Game extends Phaser.State {
   public create(): void {
     this.stage.backgroundColor = 0xDCDCDC;
 
-    actSelect_Main(this.game, gameRefs, levelSelect);
+    applyScreenEvent(mkChangeAct(0), this.game, gameRefs);
   }
 }
 

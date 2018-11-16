@@ -2,6 +2,7 @@ import { SaveFileV1 } from "../savefile/rep";
 import { GameRefs } from "../states/game";
 import { drawActSelect } from "../screens/actSelect";
 import { drawLevelSelect } from "../screens/levelSelect";
+import { levelMap } from "../gameData";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -60,7 +61,12 @@ export function applyScreenEvent(
     case "ChangeAct": {
       gameRefs.saveFile.activeAct = screenEvent.actId;
       drawActSelect(game, gameRefs);
-      // also change level
+      const firstLevelId: string | undefined = levelMap[screenEvent.actId][0]
+      if (firstLevelId === undefined) {
+        console.log(`ERROR (applyScreenEvent): no levels for act ${screenEvent.actId}`);
+        throw `applyScreenEvent: no levels for act ${screenEvent.actId}`;
+      }
+      applyScreenEvent(mkChangeLevel(firstLevelId), game, gameRefs);
       break;
     }
     case "ChangeLevel": {
