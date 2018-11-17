@@ -66,11 +66,15 @@ export default class Game extends Phaser.State {
   public init(): void {
     // NOTE: order of creating these groups determines their z-index
     const actSelectBtnPool = new Phaser.Group(this.game);
-    const actSelectData = {
+    const actSelectData: ActSelectData = {
       btnPool: new Phaser.Group(this.game),
     }
-    const levelSelectData = {
+    const levelSelectData: LevelSelectData = {
       btnPool: new Phaser.Group(this.game),
+      spriteGroup: new Phaser.Group(this.game),
+      cardSlotPool: new Phaser.Group(this.game),
+      cardPool: new Phaser.Group(this.game),
+      solBtnPool: new Phaser.Group(this.game),
     }
     const levelSelectBtnPool = new Phaser.Group(this.game);
     levelSelect = {
@@ -130,6 +134,10 @@ export function gameScreenToLevelSelect(
 function setSelectScreenVisible(
   visible: boolean,
 ) {
+  gameRefs.actSelectData.btnPool.visible = visible;
+  gameRefs.levelSelectData.btnPool.visible = visible;
+  gameRefs.levelSelectData.spriteGroup.visible = visible;
+  //
   gameRefs.actSelectBtnPool.visible = visible;
   gameRefs.levelSelectBtnPool.visible = visible;
   levelSelect.group.visible = visible;

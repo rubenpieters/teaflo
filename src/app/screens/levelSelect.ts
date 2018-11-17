@@ -7,6 +7,14 @@ import { applyScreenEvent, mkChangeLevel } from "../util/screenEvents";
 
 export type LevelSelectData = {
   btnPool: Phaser.Group,
+  cardSlotPool: Phaser.Group,
+  cardPool: Phaser.Group,
+  solBtnPool: Phaser.Group,
+  spriteGroup: Phaser.Group,
+  rightBg?: Phaser.Sprite,
+  leftBg?: Phaser.Sprite,
+  startBtn?: Phaser.Sprite,
+  addSolBtn?: Phaser.Sprite,
 }
 
 const NEUTRAL = 0;
