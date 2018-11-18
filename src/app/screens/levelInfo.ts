@@ -1,17 +1,19 @@
 import { GameRefs, LevelSelect, levelSelectToGameScreen } from "../states/game";
-import { createPosition, absoluteIn } from "../util/position";
+import { createPosition, absoluteIn, Position } from "../util/position";
 import { config } from "../config";
 import { levelSelect_LevelSlots } from "./general";
 import { createButton } from "../util/button";
 import { levelDataMap } from "../gameData";
 import { createPoolCardSlot } from "../util/poolCardSlot";
-import { createPoolLevelSelectCard } from "../util/poolLevelSelectCard";
+import { createPoolHoverCard } from "../util/poolHoverCard";
+import { intersects } from "../../shared/phaser-utils";
+import { applyScreenEvent, mkDeployCard } from "../util/screenEvents";
 
 export function drawLevelInfo(
   game: Phaser.Game,
   gameRefs: GameRefs,
-  hoverViewPool: Phaser.Group,
   levelId: string,
+  solId: number,
 ) {
   gameRefs.levelSelectData.cardSlotPool.killAll();
   gameRefs.levelSelectData.cardPool.killAll();
@@ -59,9 +61,44 @@ export function drawLevelInfo(
   );
   gameRefs.levelSelectData.startBtn = startBtn;
 
+  const supplyPool: (string | undefined)[] = levelDataMap[levelId].cardIds.concat();
+  const supplySize = supplyPool.length;
+
+  // solution card slots
+  const slots: Phaser.Sprite[] = [];
+  for (let i = 0; i < levelDataMap[levelId].slots; i++) {
+    const cardSlotPos = absoluteIn(
+      rightBgSpritePos, config.levelBgWidth, config.levelBgHeight,
+      17 + 20 * i, config.levelSelectCardWidth,
+      17, config.levelSelectCardHeight,
+    );
+    const cardPos = absoluteIn(
+      rightBgSpritePos, config.levelBgWidth, config.levelBgHeight,
+      15 + 20 * i, config.levelSelectCardWidth,
+      15, config.levelSelectCardHeight,
+    );
+
+    const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
+    if (gameRefs.saveFile.levelSolutions[levelId][solId].cardIds[i] !== undefined) {
+      const cardId = gameRefs.saveFile.levelSolutions[levelId][solId].cardIds[i];
+      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, gameRefs.hoverViewPool, cardPos, cardId, cardId);
+      cardSlot.data.card = card;
+      card.data.resetSlot = cardSlot;
+      card.data.levelId = levelId;
+      card.data.cardId = cardId;
+      card.data.solId = solId;
+      // remove this card once from the supply pool
+      const index = supplyPool.indexOf(cardId);
+      if (index !== -1) {
+        supplyPool[index] = undefined;
+      }
+    }
+    cardSlot.data.type = "deploy";
+    cardSlot.data.index = i;
+    slots.push(cardSlot);
+  }
   // level card slots and cards
-  let i = 0;
-  for (const cardId of levelDataMap[levelId].cardIds) {
+  for (let i = 0; i < supplySize; i++) {
     const cardSlotPos = absoluteIn(
       leftBgSpritePos, config.levelBgWidth, config.levelBgHeight,
       17 + 20 * i, config.levelSelectCardWidth,
@@ -73,24 +110,149 @@ export function drawLevelInfo(
       15, config.levelSelectCardHeight,
     );
     const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
-    const card = createPoolLevelSelectCard(gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, hoverViewPool, cardPos, cardId, cardId);
-    cardSlot.data.card = card;
-    card.data.resetSlot = cardSlot;
-
-    i += 1;
-  }
-
-  // solution card slots
-  const slots: Phaser.Sprite[] = [];
-  for (let i = 0; i < levelDataMap[levelId].slots; i++) {
-    const cardSlotPos = absoluteIn(
-      rightBgSpritePos, config.levelBgWidth, config.levelBgHeight,
-      17 + 20 * i, config.levelSelectCardWidth,
-      17, config.levelSelectCardHeight,
-    );
-
-    const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
-    slots.push(cardSlot);
+    if (supplyPool[i] !== undefined) {
+      const cardId = supplyPool[i];
+      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, gameRefs.hoverViewPool, cardPos, cardId, cardId);
+      cardSlot.data.card = card;
+      card.data.resetSlot = cardSlot;
+      card.data.levelId = levelId;
+      card.data.cardId = cardId;
+      card.data.solId = solId;
+    }
+    cardSlot.data.type = "supply";
+    cardSlot.data.index = i;
   }
   //levelSelect.slots = slots;
+}
+
+function createPoolLevelSelectCard(
+  game: Phaser.Game,
+  gameRefs: GameRefs,
+  pool: Phaser.Group,
+  slotPool: Phaser.Group,
+  hoverViewPool: Phaser.Group,
+  pos: Position,
+  key: string,
+  cardId: string,
+): Phaser.Sprite {
+  const card: Phaser.Sprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
+
+  card.data.cardId = cardId;
+
+  card.inputEnabled = true;
+  card.input.enableDrag(false, true);
+
+  if (card.data.init === undefined || card.data.init === false) {
+    card.inputEnabled = true;
+
+    card.events.onInputOver.add(() => {
+      const hoverPos: Position = {
+        xMin: card.x + config.levelSelectCardWidth + 10,
+        xMax: card.x + config.levelSelectCardWidth + 10 + config.hoverCardWidth,
+        yMin: card.y,
+        yMax: card.y + config.hoverCardHeight,
+      };
+      card.data.hoverView = createPoolHoverCard(hoverViewPool, hoverPos, key);
+    });
+    card.events.onInputOut.add(() => {
+      if (card.data.hoverView !== undefined) {
+        card.data.hoverView.kill();
+      }
+    });
+    
+    card.events.onDragStart.add(() => {
+      if (card.data.hoverView !== undefined) {
+        card.data.hoverView.kill();
+      }
+    });
+    card.events.onDragUpdate.add(() => {
+      const cardBounds = card.getBounds();
+      let overlap = false;
+      slotPool.forEachAlive((slot: Phaser.Sprite) => {
+        const slotBounds = slot.getBounds();
+        if (! overlap && intersects(cardBounds, slotBounds)) {
+          slot.frame = 1;
+          card.data.hoverSlot = slot;
+          overlap = true;
+        } else {
+          slot.frame = 0;
+        }
+      });
+      if (! overlap) {
+        card.data.hoverSlot = undefined;
+      }
+    });
+    card.events.onDragStop.add(() => {
+      if (card.data.hoverSlot === undefined) {
+        card.data.resetSlot.data.card = card;
+        moveToSlot(card, card.data.resetSlot);
+      } else {
+        moveToSlot(card, card.data.hoverSlot);
+        if (card.data.hoverSlot.data.type === "deploy") {
+          applyScreenEvent(
+            mkDeployCard(card.data.levelId, card.data.cardId, card.data.solId, card.data.hoverSlot.data.index),
+            game, gameRefs
+          );
+        }
+        if (card.data.hoverSlot.data.card === undefined) {
+          // the hover slot does not contain a card
+          // just place it there
+          card.data.hoverSlot.data.card = card;
+          // reset the card info of its reset slot
+          card.data.resetSlot.data.card = undefined;
+          // its reset slot is now the hover slot
+          card.data.resetSlot = card.data.hoverSlot;
+        } else {
+          // the hover slot does contain a card
+          // alias
+          const replacedCard = card.data.hoverSlot.data.card;
+          // swap it with the currently dropped card
+          // - first replaced card to drop slot
+          card.data.resetSlot.data.card = replacedCard;
+          replacedCard.data.resetSlot = card.data.resetSlot;
+          // - then this card to hover slot
+          card.data.hoverSlot.data.card = card;
+          card.data.resetSlot = card.data.hoverSlot;
+          // move replaced card
+          moveToSlot(replacedCard, replacedCard.data.resetSlot);
+        }
+      }
+      slotPool.forEachAlive((slot: Phaser.Sprite) => {
+        slot.frame = 0;
+      });
+    });
+
+    card.data.init = true;
+  }
+  
+  card.events.onKilled.removeAll();
+  card.events.onKilled.add(() => {
+    if (card.data.hoverView !== undefined) {
+      card.data.hoverView.kill();
+    }
+    card.data.hoverSlot = undefined;
+    card.data.resetSlot = undefined;
+    card.data.cardId = undefined;
+    card.data.hoverView = undefined;
+  });
+  card.events.onDestroy.removeAll();
+  card.events.onDestroy.add(() => {
+    if (card.data.hoverView !== undefined) {
+      card.data.hoverView.kill();
+    }
+    card.data.hoverSlot = undefined;
+    card.data.resetSlot = undefined;
+    card.data.cardId = undefined;
+    card.data.hoverView = undefined;
+  });
+
+  return card;
+}
+
+function moveToSlot(
+  card: Phaser.Sprite,
+  slot: Phaser.Sprite,
+) {
+  card.x = slot.x - (2 * config.levelBgWidth / 100);
+  card.y = slot.y - (2 * config.levelBgHeight / 100);
 }

@@ -4,6 +4,7 @@ import { drawActSelect } from "../screens/actSelect";
 import { drawLevelSelect } from "../screens/levelSelect";
 import { levelMap } from "../gameData";
 import { drawSolutionSelect } from "../screens/solutionSelect";
+import { drawLevelInfo } from "../screens/levelInfo";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -78,12 +79,36 @@ export function mkChangeSolution(
   }
 }
 
+type DeployCard = {
+  tag: "DeployCard",
+  levelId: string,
+  cardId: string,
+  solId: number,
+  position: number,
+}
+
+export function mkDeployCard(
+  levelId: string,
+  cardId: string,
+  solId: number,
+  position: number,
+): DeployCard {
+  return {
+    tag: "DeployCard",
+    levelId,
+    cardId,
+    solId,
+    position,
+  }
+}
+
 type ScreenEvent
   = ChangeAct
   | ChangeLevel
   | StartLevel
   | AddSolution
   | ChangeSolution
+  | DeployCard
   ;
 
 export function applyScreenEvent(
@@ -108,13 +133,13 @@ export function applyScreenEvent(
       gameRefs.saveFile.activeLevel = screenEvent.levelId;
       // if the savefile has no solutions yet, then create one
       if (gameRefs.saveFile.levelSolutions[screenEvent.levelId] === undefined) {
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId] = [newSolution];
+        gameRefs.saveFile.levelSolutions[screenEvent.levelId] = [newSolution()];
         // make it the active solution
         gameRefs.saveFile.activeSolutions[screenEvent.levelId] = 0;
       }
 
       drawLevelSelect(game, gameRefs, gameRefs.saveFile.activeAct);
-      // also change level info
+      drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
       drawSolutionSelect(game, gameRefs, gameRefs.saveFile.activeLevel);
       return;
     }
@@ -125,24 +150,36 @@ export function applyScreenEvent(
       if (gameRefs.saveFile.levelSolutions[screenEvent.levelId] === undefined) {
         // A solution should have been added already, but if not we can still add one
         console.log(`WARNING (applyScreenEvent AddSolution): no solutions for level ${screenEvent.levelId}`);
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId] = [newSolution];
+        gameRefs.saveFile.levelSolutions[screenEvent.levelId] = [newSolution()];
       } else {
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId].push(newSolution);
+        gameRefs.saveFile.levelSolutions[screenEvent.levelId].push(newSolution());
       }
+      // change solution
+      gameRefs.saveFile.activeSolutions[screenEvent.levelId] = gameRefs.saveFile.levelSolutions[screenEvent.levelId].length - 1;
 
       drawSolutionSelect(game, gameRefs, gameRefs.saveFile.activeLevel);
+      drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
       return;
     }
     case "ChangeSolution": {
       gameRefs.saveFile.activeSolutions[screenEvent.levelId] = screenEvent.solId;
 
       drawSolutionSelect(game, gameRefs, gameRefs.saveFile.activeLevel);
+      drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
+      return;
+    }
+    case "DeployCard": {
+      gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.position] = screenEvent.cardId;
+
+      // no need to redraw, this is handled by the sprites themselves
       return;
     }
   }
 }
 
-const newSolution = {
-  solution: { win: false, },
-  cardIds: [],
+function newSolution() {
+  return {
+    solution: { win: false, },
+    cardIds: [],
+  }
 }
