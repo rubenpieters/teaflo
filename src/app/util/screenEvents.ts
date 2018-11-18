@@ -84,21 +84,24 @@ type DeployCard = {
   levelId: string,
   cardId: string,
   solId: number,
-  position: number,
+  from: { pos: number, type: "supply" | "deploy" },
+  to: { pos: number, type: "supply" | "deploy" },
 }
 
 export function mkDeployCard(
   levelId: string,
   cardId: string,
   solId: number,
-  position: number,
+  from: { pos: number, type: "supply" | "deploy" },
+  to: { pos: number, type: "supply" | "deploy" },
 ): DeployCard {
   return {
     tag: "DeployCard",
     levelId,
     cardId,
     solId,
-    position,
+    from,
+    to,
   }
 }
 
@@ -169,7 +172,20 @@ export function applyScreenEvent(
       return;
     }
     case "DeployCard": {
-      gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.position] = screenEvent.cardId;
+      if (screenEvent.from.type === "supply" && screenEvent.to.type === "supply") {
+        // noop
+      } else if (screenEvent.from.type === "deploy" && screenEvent.to.type === "deploy") {
+        // swap
+        const original: string | undefined = gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.to.pos];
+        gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.from.pos] = original;
+        gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.to.pos] = screenEvent.cardId;
+      } else if (screenEvent.from.type === "supply" && screenEvent.to.type === "deploy") {
+        // put
+        gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.to.pos] = screenEvent.cardId;
+      } else if (screenEvent.from.type === "deploy" && screenEvent.to.type === "supply") {
+        // remove
+        gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.to.pos] = undefined;
+      }
 
       // no need to redraw, this is handled by the sprites themselves
       return;

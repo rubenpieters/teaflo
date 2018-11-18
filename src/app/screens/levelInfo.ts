@@ -57,6 +57,7 @@ export function drawLevelInfo(
         }
       });
       levelSelectToGameScreen(game, cards, levelId);*/
+      console.log(JSON.stringify(gameRefs.saveFile.levelSolutions));
     }
   );
   gameRefs.levelSelectData.startBtn = startBtn;
@@ -79,8 +80,8 @@ export function drawLevelInfo(
     );
 
     const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
-    if (gameRefs.saveFile.levelSolutions[levelId][solId].cardIds[i] !== undefined) {
-      const cardId = gameRefs.saveFile.levelSolutions[levelId][solId].cardIds[i];
+    const cardId = gameRefs.saveFile.levelSolutions[levelId][solId].cardIds[i];
+    if (cardId !== undefined) {
       const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, gameRefs.hoverViewPool, cardPos, cardId, cardId);
       cardSlot.data.card = card;
       card.data.resetSlot = cardSlot;
@@ -110,8 +111,8 @@ export function drawLevelInfo(
       15, config.levelSelectCardHeight,
     );
     const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
-    if (supplyPool[i] !== undefined) {
-      const cardId = supplyPool[i];
+    const cardId = supplyPool[i];
+    if (cardId !== undefined) {
       const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, gameRefs.hoverViewPool, cardPos, cardId, cardId);
       cardSlot.data.card = card;
       card.data.resetSlot = cardSlot;
@@ -188,12 +189,12 @@ function createPoolLevelSelectCard(
         moveToSlot(card, card.data.resetSlot);
       } else {
         moveToSlot(card, card.data.hoverSlot);
-        if (card.data.hoverSlot.data.type === "deploy") {
-          applyScreenEvent(
-            mkDeployCard(card.data.levelId, card.data.cardId, card.data.solId, card.data.hoverSlot.data.index),
-            game, gameRefs
-          );
-        }
+        let from = { pos: card.data.resetSlot.data.index, type: card.data.resetSlot.data.type };
+        let to = { pos: card.data.hoverSlot.data.index, type: card.data.hoverSlot.data.type };
+        applyScreenEvent(
+          mkDeployCard(card.data.levelId, card.data.cardId, card.data.solId, from, to),
+          game, gameRefs
+        );
         if (card.data.hoverSlot.data.card === undefined) {
           // the hover slot does not contain a card
           // just place it there
