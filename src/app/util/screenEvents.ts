@@ -1,10 +1,11 @@
 import { SaveFileV1 } from "../savefile/rep";
-import { GameRefs } from "../states/game";
+import { GameRefs, setSelectScreenVisible, setGameScreenVisible } from "../states/game";
 import { drawActSelect } from "../screens/actSelect";
 import { drawLevelSelect } from "../screens/levelSelect";
 import { levelMap } from "../gameData";
 import { drawSolutionSelect } from "../screens/solutionSelect";
 import { drawLevelInfo } from "../screens/levelInfo";
+import { drawGameScreen } from "../screens/gameScreen";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -105,6 +106,17 @@ export function mkDeployCard(
   }
 }
 
+type GoToMenu = {
+  tag: "GoToMenu",
+}
+
+export function mkGoToMenu(
+): GoToMenu {
+  return {
+    tag: "GoToMenu",
+  }
+}
+
 type ScreenEvent
   = ChangeAct
   | ChangeLevel
@@ -112,6 +124,7 @@ type ScreenEvent
   | AddSolution
   | ChangeSolution
   | DeployCard
+  | GoToMenu
   ;
 
 export function applyScreenEvent(
@@ -147,6 +160,9 @@ export function applyScreenEvent(
       return;
     }
     case "StartLevel": {
+      drawGameScreen(game, gameRefs, screenEvent.levelId);
+      setSelectScreenVisible(false);
+      setGameScreenVisible(true);
       return;
     }
     case "AddSolution": {
@@ -188,6 +204,11 @@ export function applyScreenEvent(
       }
 
       // no need to redraw, this is handled by the sprites themselves
+      return;
+    }
+    case "GoToMenu": {
+      setGameScreenVisible(false);
+      setSelectScreenVisible(true);
       return;
     }
   }

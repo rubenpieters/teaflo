@@ -1,7 +1,5 @@
-import { actSelect_Main } from "src/app/screens/general";
-import { gameScreen_Main, GameScreenData } from "../screens/gameScreen";
+import { GameScreenData } from "../screens/gameScreen";
 import { SaveFileV1 } from "../savefile/rep";
-import { applyUnlocks } from "../savefile/unlocks";
 import { ActSelectData } from "../screens/actSelect";
 import { applyScreenEvent, mkChangeAct } from "../util/screenEvents";
 import { LevelSelectData } from "../screens/levelSelect";
@@ -99,7 +97,7 @@ export function gameScreenToLevelSelect(
   setSelectScreenVisible(true);
 }*/
 
-function setSelectScreenVisible(
+export function setSelectScreenVisible(
   visible: boolean,
 ) {
   gameRefs.actSelectData.btnPool.visible = visible;
@@ -110,7 +108,7 @@ function setSelectScreenVisible(
   gameRefs.levelSelectData.solBtnPool.visible = visible;
 }
 
-function setGameScreenVisible(
+export function setGameScreenVisible(
   visible: boolean,
 ) {
   gameRefs.gameScreenData.spriteGroup.visible = visible;

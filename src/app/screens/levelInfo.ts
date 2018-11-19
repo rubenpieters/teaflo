@@ -6,7 +6,7 @@ import { levelDataMap } from "../gameData";
 import { createPoolCardSlot } from "../util/poolCardSlot";
 import { createPoolHoverCard } from "../util/poolHoverCard";
 import { intersects, GSprite } from "../../shared/phaser-util";
-import { applyScreenEvent, mkDeployCard } from "../util/screenEvents";
+import { applyScreenEvent, mkDeployCard, mkStartLevel } from "../util/screenEvents";
 
 export function drawLevelInfo(
   game: Phaser.Game,
@@ -56,7 +56,7 @@ export function drawLevelInfo(
         }
       });
       levelSelectToGameScreen(game, cards, levelId);*/
-      console.log(JSON.stringify(gameRefs.saveFile.levelSolutions));
+      applyScreenEvent(mkStartLevel(levelId), game, gameRefs);
     }
   );
   gameRefs.levelSelectData.startBtn = startBtn;

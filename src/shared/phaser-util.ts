@@ -9,3 +9,11 @@ export function intersects(
 }
 
 export type GSprite<A> = Overwrite<Phaser.Sprite, { data: A }>;
+
+export function mkGSprite<A>(
+  sprite: Phaser.Sprite,
+  a: A,
+): GSprite<A> {
+  sprite.data = a;
+  return sprite;
+}
