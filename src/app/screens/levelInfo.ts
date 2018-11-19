@@ -56,7 +56,7 @@ export function drawLevelInfo(
         }
       });
       levelSelectToGameScreen(game, cards, levelId);*/
-      applyScreenEvent(mkStartLevel(levelId), game, gameRefs);
+      applyScreenEvent(mkStartLevel(levelId, solId), game, gameRefs);
     }
   );
   gameRefs.levelSelectData.startBtn = startBtn;

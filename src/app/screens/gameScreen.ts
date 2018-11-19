@@ -23,8 +23,11 @@ export function drawGameScreen(
       "top", 400, config.levelButtonHeight,
     );
     const exitBtn = createButton(game, gameRefs.gameScreenData.spriteGroup, exitBtnPos, "Exit", "btn_level",
-      () => applyScreenEvent(mkGoToMenu(), game, gameRefs)
+      () => {
+        applyScreenEvent(mkGoToMenu(exitBtn.data.levelId), game, gameRefs)
+      }
     );
     gameRefs.gameScreenData.exitBtn = exitBtn;
   }
+  gameRefs.gameScreenData.exitBtn.data.levelId = levelId;
 }

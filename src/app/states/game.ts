@@ -17,13 +17,9 @@ const newSaveFile: SaveFileV1 = {
   version: "V1",
   actUnlocked: {
     0: "unlocked",
-    1: "unlocked",
   },
   levelUnlocked: {
     "a1_l1": "unlocked",
-    "a1_l2": "unlocked",
-    "a2_l1": "unlocked",
-    "a2_l2": "unlocked",
   },
   levelSolutions: {
     "a1_l1": [{
@@ -71,31 +67,6 @@ export default class Game extends Phaser.State {
     applyScreenEvent(mkChangeAct(0), this.game, gameRefs);
   }
 }
-
-/*export function levelSelectToGameScreen(
-  game: Phaser.Game,
-  cards: string[],
-  levelId: string,
-) {
-  setSelectScreenVisible(false);
-  setGameScreenVisible(true);
-  const gameState = {
-    cardIds: cards,
-  }
-  gameScreen_Main(game, gameState, gameScreen, levelId);
-}
-
-export function gameScreenToLevelSelect(
-  game: Phaser.Game,
-  unlock: string | undefined,
-) {
-  setGameScreenVisible(false);
-  if (unlock !== undefined) {
-    applyUnlocks(gameRefs.saveFile, unlock);
-    actSelect_Main(game, gameRefs, levelSelect);
-  }
-  setSelectScreenVisible(true);
-}*/
 
 export function setSelectScreenVisible(
   visible: boolean,

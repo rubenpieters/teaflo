@@ -6,6 +6,7 @@ import { levelMap } from "../gameData";
 import { drawSolutionSelect } from "../screens/solutionSelect";
 import { drawLevelInfo } from "../screens/levelInfo";
 import { drawGameScreen } from "../screens/gameScreen";
+import { applyUnlocks } from "../savefile/unlocks";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -38,14 +39,17 @@ export function mkChangeLevel(
 type StartLevel = {
   tag: "StartLevel",
   levelId: string,
+  solId: number,
 }
 
 export function mkStartLevel(
   levelId: string,
+  solId: number,
 ): StartLevel {
   return {
     tag: "StartLevel",
     levelId,
+    solId,
   }
 }
 
@@ -108,12 +112,15 @@ export function mkDeployCard(
 
 type GoToMenu = {
   tag: "GoToMenu",
+  levelId: string,
 }
 
 export function mkGoToMenu(
+  levelId: string,
 ): GoToMenu {
   return {
     tag: "GoToMenu",
+    levelId,
   }
 }
 
@@ -160,6 +167,9 @@ export function applyScreenEvent(
       return;
     }
     case "StartLevel": {
+      // TODO: temporary
+      gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].solution.win = true;
+
       drawGameScreen(game, gameRefs, screenEvent.levelId);
       setSelectScreenVisible(false);
       setGameScreenVisible(true);
@@ -207,6 +217,12 @@ export function applyScreenEvent(
       return;
     }
     case "GoToMenu": {
+      applyUnlocks(gameRefs);
+
+      drawActSelect(game, gameRefs);
+      drawLevelSelect(game, gameRefs, gameRefs.saveFile.activeAct);
+      drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
+      drawSolutionSelect(game, gameRefs, gameRefs.saveFile.activeLevel);
       setGameScreenVisible(false);
       setSelectScreenVisible(true);
       return;
