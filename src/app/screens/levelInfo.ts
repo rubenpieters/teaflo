@@ -1,12 +1,11 @@
-import { GameRefs, LevelSelect, levelSelectToGameScreen } from "../states/game";
+import { GameRefs } from "../states/game";
 import { createPosition, absoluteIn, Position } from "../util/position";
 import { config } from "../config";
-import { levelSelect_LevelSlots } from "./general";
 import { createButton } from "../util/button";
 import { levelDataMap } from "../gameData";
 import { createPoolCardSlot } from "../util/poolCardSlot";
 import { createPoolHoverCard } from "../util/poolHoverCard";
-import { intersects } from "../../shared/phaser-utils";
+import { intersects, GSprite } from "../../shared/phaser-util";
 import { applyScreenEvent, mkDeployCard } from "../util/screenEvents";
 
 export function drawLevelInfo(
@@ -126,6 +125,19 @@ export function drawLevelInfo(
   //levelSelect.slots = slots;
 }
 
+type LevelSelectCard = GSprite<{
+  init: boolean,
+  selecting: boolean,
+  cardId: string,
+  levelId: string,
+  solId: number,
+  onDownCb: (() => void),
+  btnText: Phaser.Text,
+  hoverView: Phaser.Sprite | undefined,
+  hoverSlot: Phaser.Sprite | undefined,
+  resetSlot: Phaser.Sprite,
+}>;
+
 function createPoolLevelSelectCard(
   game: Phaser.Game,
   gameRefs: GameRefs,
@@ -135,8 +147,8 @@ function createPoolLevelSelectCard(
   pos: Position,
   key: string,
   cardId: string,
-): Phaser.Sprite {
-  const card: Phaser.Sprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
+): LevelSelectCard {
+  const card: LevelSelectCard = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
 
   card.data.cardId = cardId;
 
@@ -232,8 +244,6 @@ function createPoolLevelSelectCard(
       card.data.hoverView.kill();
     }
     card.data.hoverSlot = undefined;
-    card.data.resetSlot = undefined;
-    card.data.cardId = undefined;
     card.data.hoverView = undefined;
   });
   card.events.onDestroy.removeAll();
@@ -242,8 +252,6 @@ function createPoolLevelSelectCard(
       card.data.hoverView.kill();
     }
     card.data.hoverSlot = undefined;
-    card.data.resetSlot = undefined;
-    card.data.cardId = undefined;
     card.data.hoverView = undefined;
   });
 

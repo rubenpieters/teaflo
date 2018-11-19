@@ -4,6 +4,7 @@ import { config } from "../config";
 import { actAvailable } from "../savefile/rep";
 import { applyScreenEvent, mkChangeAct } from "../util/screenEvents";
 import { actNumberMap } from "../gameData";
+import { GSprite } from "src/shared/phaser-util";
 
 export type ActSelectData = {
   btnPool: Phaser.Group,
@@ -37,6 +38,14 @@ export function drawActSelect(
   }
 }
 
+type ActSelectButton = GSprite<{
+  init: boolean,
+  selecting: boolean,
+  actNumber: number,
+  onDownCb: (() => void),
+  btnText: Phaser.Text,
+}>;
+
 export function createActSelectButton(
   game: Phaser.Game,
   gameRefs: GameRefs,
@@ -44,7 +53,7 @@ export function createActSelectButton(
   pos: Position,
   key: string,
   onDownCb: (() => void),
-): Phaser.Sprite {
+): ActSelectButton {
   let frame: number;
   let txtColor: string;
   if (gameRefs.saveFile.activeAct === actNumber) {
@@ -57,8 +66,8 @@ export function createActSelectButton(
     txtColor = "#AAAAAA",
     frame = NEUTRAL;
   }
-  const btnSprite: Phaser.Sprite = gameRefs.actSelectData.btnPool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
-  
+  const btnSprite: ActSelectButton = gameRefs.actSelectData.btnPool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
+
   btnSprite.data.selecting = false;
   btnSprite.data.actNumber = actNumber;
   btnSprite.data.onDownCb = onDownCb;

@@ -4,6 +4,7 @@ import { createPosition, Position, inPosition } from "../util/position";
 import { config } from "../config";
 import { levelAvailable } from "../savefile/rep";
 import { applyScreenEvent, mkChangeLevel } from "../util/screenEvents";
+import { GSprite } from "src/shared/phaser-util";
 
 export type LevelSelectData = {
   btnPool: Phaser.Group,
@@ -43,6 +44,14 @@ export function drawLevelSelect(
   }
 }
 
+type LevelSelectButton = GSprite<{
+  init: boolean,
+  selecting: boolean,
+  levelId: string,
+  onDownCb: (() => void),
+  btnText: Phaser.Text,
+}>;
+
 export function createLevelSelectButton(
   game: Phaser.Game,
   gameRefs: GameRefs,
@@ -50,7 +59,7 @@ export function createLevelSelectButton(
   pos: Position,
   key: string,
   onDownCb: (() => void),
-): Phaser.Sprite {
+): LevelSelectButton {
   let frame: number;
   let txtColor: string;
   if (gameRefs.saveFile.activeLevel === levelId) {
@@ -63,7 +72,7 @@ export function createLevelSelectButton(
     txtColor = "#AAAAAA",
     frame = NEUTRAL;
   }
-  const btnSprite: Phaser.Sprite = gameRefs.levelSelectData.btnPool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
+  const btnSprite: LevelSelectButton = gameRefs.levelSelectData.btnPool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
   
   btnSprite.data.selecting = false;
   btnSprite.data.levelId = levelId;
