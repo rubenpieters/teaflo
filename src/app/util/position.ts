@@ -63,3 +63,46 @@ export function inPosition(
 ) {
   return x >= pos.xMin && x <= pos.xMax && y >= pos.yMin && y <= pos.yMax;
 }
+
+export function relativeTo(
+  parentPos: Position,
+  relativeType: "below" | "above" | "right" | "left",
+  relativeAmt: number,
+  width: number,
+  height: number,
+): Position {
+  switch (relativeType) {
+    case "below": {
+      return {
+        xMin: parentPos.xMin,
+        xMax: parentPos.xMin + width,
+        yMin: parentPos.yMax + relativeAmt,
+        yMax: parentPos.yMax + relativeAmt + height,
+      }
+    }
+    case "above": {
+      return {
+        xMin: parentPos.xMin,
+        xMax: parentPos.xMin + width,
+        yMin: parentPos.yMin - relativeAmt - height,
+        yMax: parentPos.yMin - relativeAmt,
+      }
+    }
+    case "right": {
+      return {
+        xMin: parentPos.xMax + relativeAmt,
+        xMax: parentPos.xMax + relativeAmt + width,
+        yMin: parentPos.yMin,
+        yMax: parentPos.yMin + height,
+      }
+    }
+    case "left": {
+      return {
+        xMin: parentPos.xMin - relativeAmt - width,
+        xMax: parentPos.xMax - relativeAmt,
+        yMin: parentPos.yMin,
+        yMax: parentPos.yMin + height,
+      }
+    }
+  }
+}

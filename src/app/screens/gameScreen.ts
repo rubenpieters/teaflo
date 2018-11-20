@@ -1,12 +1,16 @@
 import { GameRefs } from "src/app/states/game";
 import { config } from "../config";
 import { createButton } from "../util/button";
-import { createPosition } from "../util/position";
+import { createPosition, Position, relativeTo } from "../util/position";
 import { mkGoToMenu, applyScreenEvent } from "../util/screenEvents";
+import { GSprite } from "src/shared/phaser-util";
+import { unitMap } from "src/shared/data/units/units";
+import { levelEnUnitMap } from "../gameData";
 
 export type GameScreenData = {
   spriteGroup: Phaser.Group,
   unitPool: Phaser.Group,
+  unitHpPool: Phaser.Group,
   exitBtn?: Phaser.Sprite,
   victoryBtn?: Phaser.Sprite,
 }
@@ -16,7 +20,9 @@ export function drawGameScreen(
   gameRefs: GameRefs,
   levelId: string,
 ) {
-  console.log(JSON.stringify(gameRefs.saveFile.levelSolutions[levelId][gameRefs.saveFile.activeSolutions[levelId]]));
+  gameRefs.gameScreenData.unitPool.killAll();
+  gameRefs.gameScreenData.unitHpPool.killAll();
+
   if (gameRefs.gameScreenData.exitBtn === undefined) {
     const exitBtnPos = createPosition(
       "right", 250, config.levelButtonWidth,

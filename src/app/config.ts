@@ -16,4 +16,7 @@ export const config = {
 
   hoverCardWidth: 300,
   hoverCardHeight: 600,
+
+  unitHpBarWidth: 150,
+  unitHpBarHeight: 50,
 };

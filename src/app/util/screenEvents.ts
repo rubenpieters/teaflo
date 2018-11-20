@@ -7,6 +7,7 @@ import { drawSolutionSelect } from "../screens/solutionSelect";
 import { drawLevelInfo } from "../screens/levelInfo";
 import { drawGameScreen } from "../screens/gameScreen";
 import { applyUnlocks } from "../savefile/unlocks";
+import { drawSolution } from "../screens/solutionRep";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -171,6 +172,7 @@ export function applyScreenEvent(
       gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].solution.win = true;
 
       drawGameScreen(game, gameRefs, screenEvent.levelId);
+      drawSolution(game, gameRefs, screenEvent.levelId);
       setSelectScreenVisible(false);
       setGameScreenVisible(true);
       return;

@@ -23,3 +23,12 @@ export const levelDataMap: { [key: string]: LevelData } = {
   "a2_l2": { cardIds: ["card1", "card2", "card3"], slots: 4 },
   "a2_l3": { cardIds: ["card1", "card2", "card3"], slots: 4 },
 }
+
+// level id -> enemy unit id mapping
+export const levelEnUnitMap: { [key: string]: (string | undefined)[] } = {
+  "a1_l1": ["card1"],
+  "a1_l2": ["card1"],
+  "a2_l1": ["card1"],
+  "a2_l2": ["card1"],
+  "a2_l3": ["card1"],
+}

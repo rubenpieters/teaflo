@@ -65,7 +65,6 @@ export function drawLevelInfo(
   const supplySize = supplyPool.length;
 
   // solution card slots
-  const slots: Phaser.Sprite[] = [];
   for (let i = 0; i < levelDataMap[levelId].slots; i++) {
     const cardSlotPos = absoluteIn(
       rightBgSpritePos, config.levelBgWidth, config.levelBgHeight,
@@ -95,7 +94,6 @@ export function drawLevelInfo(
     }
     cardSlot.data.type = "deploy";
     cardSlot.data.index = i;
-    slots.push(cardSlot);
   }
   // level card slots and cards
   for (let i = 0; i < supplySize; i++) {

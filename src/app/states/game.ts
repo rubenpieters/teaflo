@@ -17,6 +17,7 @@ const newSaveFile: SaveFileV1 = {
   version: "V1",
   actUnlocked: {
     0: "unlocked",
+    1: "unlocked",
   },
   levelUnlocked: {
     "a1_l1": "unlocked",
@@ -50,6 +51,7 @@ export default class Game extends Phaser.State {
     const gameScreenData: GameScreenData = {
       spriteGroup: new Phaser.Group(this.game),
       unitPool: new Phaser.Group(this.game),
+      unitHpPool: new Phaser.Group(this.game),
     }
     gameRefs = {
       actSelectData,
