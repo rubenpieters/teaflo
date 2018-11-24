@@ -1,4 +1,5 @@
 import { Solution } from "src/shared/game/solution";
+import { Location } from "src/shared/tree";
 
 type LockStatus = "locked" | "unlocked";
 
@@ -6,7 +7,7 @@ export type SaveFileV1 = {
   version: "V1",
   actUnlocked: { [key: number]: LockStatus | undefined },
   levelUnlocked: { [key: string]: LockStatus | undefined },
-  levelSolutions: { [key: string]: { solution: Solution, cardIds: (string | undefined)[] }[], },
+  levelSolutions: { [key: string]: { solution: Solution, cardIds: (string | undefined)[], loc: Location }[], },
   activeSolutions: { [key: string]: number, },
   activeAct: number,
   activeLevel: string,

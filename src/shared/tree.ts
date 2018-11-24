@@ -32,20 +32,42 @@ export function extendTree<A>(
   tree: Tree<A>,
   loc: Location,
   a: A,
-): Tree<A> {
+): {
+  tree: Tree<A>,
+  loc: Location,
+} {
+  return _extendTree(check, tree, loc, loc, a);
+}
+
+function _extendTree<A>(
+  check: (a1: A, a2: A) => boolean,
+  tree: Tree<A>,
+  loc: Location,
+  fullLoc: Location,
+  a: A,
+): {
+  tree: Tree<A>,
+  loc: Location,
+} {
   if (loc.length === 0) {
-    const checkResult = tree.nodes.filter(x => check(a, x.v));
-    if (checkResult.length === 0) {
-      return focus(tree,
-        over(x => x.nodes, x => x.concat(emptyNode(a))),
-      );
+    const checkResult = tree.nodes.findIndex(x => check(a, x.v));
+    if (checkResult === -1) {
+      return {
+        tree: focus(tree, over(x => x.nodes, x => x.concat(emptyNode(a)))),
+        loc: fullLoc.concat(tree.nodes.length),
+      }
     } else {
-      return tree;
+      return {
+        tree,
+        loc: fullLoc.concat(checkResult),
+      };
     }
   } else {
-    return focus(tree,
-      over(x => x.nodes[loc[0]].tree, x => extendTree(check, x, loc.slice(1), a)),
-    );
+    const newValues = _extendTree(check, tree.nodes[loc[0]].tree, loc.slice(1), fullLoc, a);
+    return {
+      tree: focus(tree, set(x => x.nodes[loc[0]].tree, newValues.tree)),
+      loc: newValues.loc,
+    }
   }
 }
 

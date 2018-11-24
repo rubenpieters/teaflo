@@ -150,11 +150,9 @@ function createPoolLevelSelectCard(
 
   card.data.cardId = cardId;
 
-  card.inputEnabled = true;
-  card.input.enableDrag(false, true);
-
   if (card.data.init === undefined || card.data.init === false) {
     card.inputEnabled = true;
+    card.input.enableDrag(false, true);
 
     card.events.onInputOver.add(() => {
       const hoverPos: Position = {

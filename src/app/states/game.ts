@@ -3,6 +3,9 @@ import { SaveFileV1 } from "../savefile/rep";
 import { ActSelectData } from "../screens/actSelect";
 import { applyScreenEvent, mkChangeAct } from "../util/screenEvents";
 import { LevelSelectData } from "../screens/levelSelect";
+import { Solution } from "src/shared/game/solution";
+import { emptyTree, Location } from "src/shared/tree";
+import { SpritePool } from "../util/pool";
 
 export type GameRefs = {
   actSelectData: ActSelectData,
@@ -23,10 +26,7 @@ const newSaveFile: SaveFileV1 = {
     "a1_l1": "unlocked",
   },
   levelSolutions: {
-    "a1_l1": [{
-      solution: { win: false, },
-      cardIds: [],
-    }],
+    "a1_l1": [newSolution()],
   },
   activeSolutions: {
     "a1_l1": 0,
@@ -39,10 +39,10 @@ export default class Game extends Phaser.State {
   public init(): void {
     // NOTE: order of creating these groups determines their z-index
     const actSelectData: ActSelectData = {
-      btnPool: new Phaser.Group(this.game),
+      btnPool: new SpritePool(this.game),
     }
     const levelSelectData: LevelSelectData = {
-      btnPool: new Phaser.Group(this.game),
+      btnPool: new SpritePool(this.game),
       spriteGroup: new Phaser.Group(this.game),
       cardSlotPool: new Phaser.Group(this.game),
       cardPool: new Phaser.Group(this.game),
@@ -52,6 +52,8 @@ export default class Game extends Phaser.State {
       spriteGroup: new Phaser.Group(this.game),
       unitPool: new Phaser.Group(this.game),
       unitHpPool: new Phaser.Group(this.game),
+      unitAbilityPool: new Phaser.Group(this.game),
+      solTreePool: [],
     }
     gameRefs = {
       actSelectData,
@@ -86,4 +88,21 @@ export function setGameScreenVisible(
 ) {
   gameRefs.gameScreenData.spriteGroup.visible = visible;
   gameRefs.gameScreenData.unitPool.visible = visible;
+  gameRefs.gameScreenData.unitHpPool.visible = visible;
+  gameRefs.gameScreenData.unitAbilityPool.visible = visible;
+}
+
+export function newSolution(): {
+  solution: Solution,
+  cardIds: (string | undefined)[],
+  loc: Location,
+} {
+  return {
+    solution: {
+      win: false,
+      tree: emptyTree()
+    },
+    cardIds: [],
+    loc: [],
+  };
 }

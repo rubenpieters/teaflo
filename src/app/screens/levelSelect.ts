@@ -5,9 +5,11 @@ import { config } from "../config";
 import { levelAvailable } from "../savefile/rep";
 import { applyScreenEvent, mkChangeLevel } from "../util/screenEvents";
 import { GSprite } from "src/shared/phaser-util";
+import { createButtonInPool, addText } from "../util/btn";
+import { SpritePool } from "../util/pool";
 
 export type LevelSelectData = {
-  btnPool: Phaser.Group,
+  btnPool: SpritePool<LevelSelectButton>,
   cardSlotPool: Phaser.Group,
   cardPool: Phaser.Group,
   solBtnPool: Phaser.Group,
@@ -36,9 +38,7 @@ export function drawLevelSelect(
       "top", 400 + (config.levelButtonHeight + 50) * i, config.levelButtonHeight,
     );
 
-    createLevelSelectButton(game, gameRefs, levelId, pos, "btn_level",
-      () => applyScreenEvent(mkChangeLevel(levelId), game, gameRefs)
-    );
+    createLevelSelectButton(game, gameRefs, levelId, pos, "btn_level");
 
     i += 1;
   }
@@ -48,7 +48,6 @@ type LevelSelectButton = GSprite<{
   init: boolean,
   selecting: boolean,
   levelId: string,
-  onDownCb: (() => void),
   btnText: Phaser.Text,
 }>;
 
@@ -58,7 +57,6 @@ export function createLevelSelectButton(
   levelId: string,
   pos: Position,
   key: string,
-  onDownCb: (() => void),
 ): LevelSelectButton {
   let frame: number;
   let txtColor: string;
@@ -72,81 +70,60 @@ export function createLevelSelectButton(
     txtColor = "#AAAAAA",
     frame = NEUTRAL;
   }
-  const btnSprite: LevelSelectButton = gameRefs.levelSelectData.btnPool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
   
-  btnSprite.data.selecting = false;
-  btnSprite.data.levelId = levelId;
-  btnSprite.data.onDownCb = onDownCb;
-
-  if (btnSprite.data.init === undefined || btnSprite.data.init === false) {
-    btnSprite.inputEnabled = true;
-    btnSprite.events.onInputDown.add(() => {
-      btnSprite.data.selecting = true;
-      if (gameRefs.saveFile.activeLevel === btnSprite.data.levelId) {
+  const btn = createButtonInPool(
+    game,
+    gameRefs.levelSelectData.btnPool,
+    pos,
+    { levelId },
+    key,
+    frame,
+    // onInputDown
+    () => {
+      if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
         // noop
-      } else if (levelAvailable(gameRefs.saveFile, btnSprite.data.levelId)) {
-        btnSprite.frame = DOWN;
+      } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
+        btn.frame = DOWN;
       } else {
         // noop
       }
-    });
-    btnSprite.events.onInputUp.add(() => {
-      if (
-        inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
-      ) {
-        if (gameRefs.saveFile.activeLevel === btnSprite.data.levelId) {
-          // noop
-        } else if (levelAvailable(gameRefs.saveFile, btnSprite.data.levelId)) {
-          btnSprite.data.onDownCb();
-        } else {
-          // noop
-        }
-      }
-    });
-    btnSprite.events.onInputOver.add(() => {
-      if (gameRefs.saveFile.activeLevel === btnSprite.data.levelId) {
+    },
+    // onInputUp
+    () => {
+      if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
         // noop
-      } else if (levelAvailable(gameRefs.saveFile, btnSprite.data.levelId)) {
-        if (btnSprite.data.selecting) {
-          btnSprite.frame = DOWN;
+      } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
+        applyScreenEvent(mkChangeLevel(btn.data.levelId), game, gameRefs);
+      } else {
+        // noop
+      }
+    },
+    // onInputOver
+    () => {
+      if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
+        // noop
+      } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
+        if (btn.data.selecting) {
+          btn.frame = DOWN;
         } else {
-          btnSprite.frame = OVER;
+          btn.frame = OVER;
         }
       } else {
         // noop
       }
-    });
-    btnSprite.events.onInputOut.add(() => {
-      if (gameRefs.saveFile.activeLevel === btnSprite.data.levelId) {
+    },
+    // onInputOut
+    () => {
+      if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
         // noop
-      } else if (levelAvailable(gameRefs.saveFile, btnSprite.data.levelId)) {
-        btnSprite.frame = NEUTRAL;
+      } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
+        btn.frame = NEUTRAL;
       } else {
         // noop
       }
-    });
-  
-    btnSprite.events.onKilled.add(() => {
-      btnSprite.data.btnText.destroy();
-    });
-    btnSprite.events.onDestroy.add(() => {
-      btnSprite.data.btnText.destroy();
-    });
-
-    btnSprite.data.init = true;
-  }
-  const btnString = levelId;
-  const btnText = game.add.text(
-    0, 0, btnString, {
-      fill: txtColor,
-      fontSize: 100,
-      boundsAlignH: "center",
-      boundsAlignV: "middle",
-    }
+    },
   );
-  btnText.setTextBounds(0, 0, pos.xMax - pos.xMin, pos.yMax - pos.yMin);
-  btnSprite.addChild(btnText);
-  btnSprite.data.btnText = btnText;
 
-  return btnSprite;
+  const btnString = levelId;
+  return addText(game, btn, pos, btnString, txtColor);
 }

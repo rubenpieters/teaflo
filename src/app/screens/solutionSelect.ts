@@ -1,7 +1,7 @@
 import { GameRefs } from "../states/game";
 import { createPosition, Position, inPosition } from "../util/position";
 import { config } from "../config";
-import { applyScreenEvent, mkAddSolution, mkChangeSolution } from "../util/screenEvents";
+import { applyScreenEvent, mkAddSolution, mkChangeActiveSolution } from "../util/screenEvents";
 
 const NEUTRAL = 0;
 const DOWN = 1;
@@ -73,7 +73,7 @@ export function createSolButton(
         if (gameRefs.saveFile.activeSolutions[btnSprite.data.levelId] === index) {
           // noop
         } else if (gameRefs.saveFile.levelSolutions[btnSprite.data.levelId].length > btnSprite.data.index) {
-          applyScreenEvent(mkChangeSolution(btnSprite.data.levelId, btnSprite.data.index), game, gameRefs);
+          applyScreenEvent(mkChangeActiveSolution(btnSprite.data.levelId, btnSprite.data.index), game, gameRefs);
         } else {
           applyScreenEvent(mkAddSolution(btnSprite.data.levelId), game, gameRefs);
         }

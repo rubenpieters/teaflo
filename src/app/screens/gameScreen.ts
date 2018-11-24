@@ -11,6 +11,8 @@ export type GameScreenData = {
   spriteGroup: Phaser.Group,
   unitPool: Phaser.Group,
   unitHpPool: Phaser.Group,
+  unitAbilityPool: Phaser.Group,
+  solTreePool: Phaser.Graphics[],
   exitBtn?: Phaser.Sprite,
   victoryBtn?: Phaser.Sprite,
 }
@@ -20,9 +22,6 @@ export function drawGameScreen(
   gameRefs: GameRefs,
   levelId: string,
 ) {
-  gameRefs.gameScreenData.unitPool.killAll();
-  gameRefs.gameScreenData.unitHpPool.killAll();
-
   if (gameRefs.gameScreenData.exitBtn === undefined) {
     const exitBtnPos = createPosition(
       "right", 250, config.levelButtonWidth,

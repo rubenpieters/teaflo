@@ -5,9 +5,11 @@ import { actAvailable } from "../savefile/rep";
 import { applyScreenEvent, mkChangeAct } from "../util/screenEvents";
 import { actNumberMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
+import { createButtonInPool, Button, addText } from "../util/btn";
+import { SpritePool } from "../util/pool";
 
 export type ActSelectData = {
-  btnPool: Phaser.Group,
+  btnPool: SpritePool<ActSelectButton>,
 }
 
 const NEUTRAL = 0;
@@ -30,9 +32,7 @@ export function drawActSelect(
       "bot", 0, config.actButtonHeight,
     );
     
-    createActSelectButton(game, gameRefs, actNumber, pos, "btn_act",
-      () => applyScreenEvent(mkChangeAct(actNumber), game, gameRefs)
-    );
+    createActSelectButton(game, gameRefs, actNumber, pos, "btn_act");
 
     i += 1;
   }
@@ -42,7 +42,6 @@ type ActSelectButton = GSprite<{
   init: boolean,
   selecting: boolean,
   actNumber: number,
-  onDownCb: (() => void),
   btnText: Phaser.Text,
 }>;
 
@@ -52,97 +51,73 @@ export function createActSelectButton(
   actNumber: number,
   pos: Position,
   key: string,
-  onDownCb: (() => void),
 ): ActSelectButton {
   let frame: number;
   let txtColor: string;
   if (gameRefs.saveFile.activeAct === actNumber) {
-    txtColor = "#FF0000",
+    txtColor = "#FF0000";
     frame = DOWN;
   } else if (actAvailable(gameRefs.saveFile, actNumber)) {
-    txtColor = "#FF0000",
+    txtColor = "#FF0000";
     frame = NEUTRAL;
   } else {
-    txtColor = "#AAAAAA",
+    txtColor = "#AAAAAA";
     frame = NEUTRAL;
   }
-  const btnSprite: ActSelectButton = gameRefs.actSelectData.btnPool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
-
-  btnSprite.data.selecting = false;
-  btnSprite.data.actNumber = actNumber;
-  btnSprite.data.onDownCb = onDownCb;
-
-  if (btnSprite.data.init === undefined || btnSprite.data.init === false) {
-    btnSprite.data.selecting = false;
-
-    btnSprite.inputEnabled = true;
-    btnSprite.events.onInputDown.add(() => {
-      btnSprite.data.selecting = true;
-      if (gameRefs.saveFile.activeAct === btnSprite.data.actNumber) {
-        // noop
-      } else if (actAvailable(gameRefs.saveFile, btnSprite.data.actNumber)) {
-        btnSprite.frame = DOWN;
-      } else {
-        // noop
-      }
-    });
-    btnSprite.events.onInputUp.add(() => {
-      if (
-        inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
-      ) {
-        if (gameRefs.saveFile.activeAct === btnSprite.data.actNumber) {
-          // noop
-        } else if (actAvailable(gameRefs.saveFile, btnSprite.data.actNumber)) {
-          btnSprite.data.onDownCb();
-        } else {
-          // noop
-        }
-      }
-    });
-    btnSprite.events.onInputOver.add(() => {
-      if (gameRefs.saveFile.activeAct === btnSprite.data.actNumber) {
-        // noop
-      } else if (actAvailable(gameRefs.saveFile, btnSprite.data.actNumber)) {
-        if (btnSprite.data.selecting) {
-          btnSprite.frame = DOWN;
-        } else {
-          btnSprite.frame = OVER;
-        }
-      } else {
-        // noop
-      }
-    });
-    btnSprite.events.onInputOut.add(() => {
-      if (gameRefs.saveFile.activeAct === btnSprite.data.actNumber) {
-        // noop
-      } else if (actAvailable(gameRefs.saveFile, btnSprite.data.actNumber)) {
-        btnSprite.frame = NEUTRAL;
-      } else {
-        // noop
-      }
-    });
   
-    btnSprite.events.onKilled.add(() => {
-      btnSprite.data.btnText.destroy();
-    });
-    btnSprite.events.onDestroy.add(() => {
-      btnSprite.data.btnText.destroy();
-    });
-
-    btnSprite.data.init = true;
-  }
-  const btnString = actNumberMap[actNumber];
-  const btnText = game.add.text(
-    0, 0, btnString, {
-      fill: txtColor,
-      fontSize: 100,
-      boundsAlignH: "center",
-      boundsAlignV: "middle",
-    }
+  const btn = createButtonInPool(
+    game,
+    gameRefs.actSelectData.btnPool,
+    pos,
+    { actNumber },
+    key,
+    frame,
+    // onInputDown
+    () => {
+      if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
+        // noop
+      } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
+        btn.frame = DOWN;
+      } else {
+        // noop
+      }
+    },
+    // onInputUp
+    () => {
+      if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
+        // noop
+      } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
+        applyScreenEvent(mkChangeAct(btn.data.actNumber), game, gameRefs)
+      } else {
+        // noop
+      }
+    },
+    // onInputOver
+    () => {
+      if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
+        // noop
+      } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
+        if (btn.data.selecting) {
+          btn.frame = DOWN;
+        } else {
+          btn.frame = OVER;
+        }
+      } else {
+        // noop
+      }
+    },
+    // onInputOut
+    () => {
+      if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
+        // noop
+      } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
+        btn.frame = NEUTRAL;
+      } else {
+        // noop
+      }
+    },
   );
-  btnText.setTextBounds(0, 0, pos.xMax - pos.xMin, pos.yMax - pos.yMin);
-  btnSprite.addChild(btnText);
-  btnSprite.data.btnText = btnText;
 
-  return btnSprite;
+  const btnString = actNumberMap[actNumber];
+  return addText(game, btn, pos, btnString, txtColor);
 }

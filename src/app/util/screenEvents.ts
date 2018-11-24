@@ -1,5 +1,5 @@
 import { SaveFileV1 } from "../savefile/rep";
-import { GameRefs, setSelectScreenVisible, setGameScreenVisible } from "../states/game";
+import { GameRefs, setSelectScreenVisible, setGameScreenVisible, newSolution } from "../states/game";
 import { drawActSelect } from "../screens/actSelect";
 import { drawLevelSelect } from "../screens/levelSelect";
 import { levelMap } from "../gameData";
@@ -8,6 +8,9 @@ import { drawLevelInfo } from "../screens/levelInfo";
 import { drawGameScreen } from "../screens/gameScreen";
 import { applyUnlocks } from "../savefile/unlocks";
 import { drawSolution } from "../screens/solutionRep";
+import { Solution, extendSolution } from "src/shared/game/solution";
+import { Ability } from "src/shared/game/ability";
+import { Location } from "src/shared/tree";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -68,18 +71,18 @@ export function mkAddSolution(
   }
 }
 
-type ChangeSolution = {
-  tag: "ChangeSolution",
+type ChangeActiveSolution = {
+  tag: "ChangeActiveSolution",
   levelId: string,
   solId: number,
 }
 
-export function mkChangeSolution(
+export function mkChangeActiveSolution(
   levelId: string,
   solId: number,
-): ChangeSolution {
+): ChangeActiveSolution {
   return {
-    tag: "ChangeSolution",
+    tag: "ChangeActiveSolution",
     levelId,
     solId,
   }
@@ -125,14 +128,68 @@ export function mkGoToMenu(
   }
 }
 
+type ExtendLevelSolution = {
+  tag: "ExtendLevelSolution",
+  ability: Ability,
+  levelId: string,
+}
+
+export function mkExtendLevelSolution(
+  ability: Ability,
+  levelId: string,
+): ExtendLevelSolution {
+  return {
+    tag: "ExtendLevelSolution",
+    ability,
+    levelId,
+  }
+}
+
+type ChangeTreeLoc = {
+  tag: "ChangeTreeLoc",
+  loc: Location,
+  levelId: string,
+}
+
+export function mkChangeTreeLoc(
+  loc: Location,
+  levelId: string,
+): ChangeTreeLoc {
+  return {
+    tag: "ChangeTreeLoc",
+    loc,
+    levelId,
+  }
+}
+
+type CutTreeLoc = {
+  tag: "CutTreeLoc",
+  loc: Location,
+  levelId: string,
+}
+
+export function mkCutTreeLoc(
+  loc: Location,
+  levelId: string,
+): CutTreeLoc {
+  return {
+    tag: "CutTreeLoc",
+    loc,
+    levelId,
+  }
+}
+
 type ScreenEvent
   = ChangeAct
   | ChangeLevel
   | StartLevel
   | AddSolution
-  | ChangeSolution
+  | ChangeActiveSolution
   | DeployCard
   | GoToMenu
+  | ExtendLevelSolution
+  | ChangeTreeLoc
+  | CutTreeLoc
   ;
 
 export function applyScreenEvent(
@@ -192,7 +249,7 @@ export function applyScreenEvent(
       drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
       return;
     }
-    case "ChangeSolution": {
+    case "ChangeActiveSolution": {
       gameRefs.saveFile.activeSolutions[screenEvent.levelId] = screenEvent.solId;
 
       drawSolutionSelect(game, gameRefs, gameRefs.saveFile.activeLevel);
@@ -229,12 +286,27 @@ export function applyScreenEvent(
       setSelectScreenVisible(true);
       return;
     }
-  }
-}
+    case "ExtendLevelSolution": {
+      const solId = gameRefs.saveFile.activeSolutions[screenEvent.levelId];
+      const currentSolution = gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].solution;
+      const currentLoc = gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc;
+      const newSolution = extendSolution(screenEvent.ability, currentSolution, currentLoc);
+      gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].solution = newSolution.solution;
+      gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc = newSolution.loc;
+      // TODO: change state
 
-function newSolution() {
-  return {
-    solution: { win: false, },
-    cardIds: [],
+      drawSolution(game, gameRefs, screenEvent.levelId);
+      return;
+    }
+    case "ChangeTreeLoc": {
+      const solId = gameRefs.saveFile.activeSolutions[screenEvent.levelId];
+      gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc = screenEvent.loc;
+
+      drawSolution(game, gameRefs, screenEvent.levelId);
+      return;
+    }
+    case "CutTreeLoc": {
+
+    }
   }
 }
