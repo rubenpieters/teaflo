@@ -1,5 +1,4 @@
 import { GameRefs } from "../states/game";
-import { unitMap } from "src/shared/data/units/units";
 import { createPosition, relativeTo, Position, inPosition } from "../util/position";
 import { config } from "../config";
 import { levelEnUnitMap } from "../gameData";
@@ -10,6 +9,8 @@ import { applyScreenEvent, mkExtendLevelSolution, mkChangeTreeLoc } from "../uti
 import { Location, Tree } from "src/shared/tree";
 import { Game } from "phaser-ce";
 import { mkGameState } from "src/shared/game/state";
+import { Action } from "../../shared/game/action";
+import { createButtonInPool, addText } from "../util/btn";
 
 export function drawSolution(
   game: Phaser.Game,
@@ -27,17 +28,38 @@ export function drawSolution(
   const frUnits = gameRefs.saveFile.levelSolutions[levelId][solId].cardIds;
   const enUnits = levelEnUnitMap[levelId];
   const initState = mkGameState(frUnits, enUnits);
-  const solState = runSolution(sol.solution, sol.loc, initState);
+  const solResult = runSolution(sol.solution, sol.loc, initState);
+  const solState = solResult.state;
+  const solLog = solResult.log;
 
   // draw solution tree
   mkTree(game, gameRefs, levelId);
+
+  // draw action log
+  let logIndex = 0;
+  solLog.frAction.forEach((action, actionIndex) => {
+    const actionBtnPos = createPosition(
+      "left", 250, config.levelButtonWidth,
+      "bot", 1200 - config.levelButtonHeight * logIndex, config.levelButtonHeight,
+    );
+    createActionLogButton(game, gameRefs, action, actionBtnPos, "btn_level");
+    logIndex += 1;
+  });
+  solLog.enAction.forEach((action, actionIndex) => {
+    const actionBtnPos = createPosition(
+      "left", 250, config.levelButtonWidth,
+      "bot", 1200 - config.levelButtonHeight * logIndex, config.levelButtonHeight,
+    );
+    createActionLogButton(game, gameRefs, action, actionBtnPos, "btn_level");
+    logIndex += 1;
+  });
 
   // draw friendly units
   solState.frUnits.forEach((unit, unitIndex) => {
     if (unit !== undefined) {
 
       const unitPos = createPosition(
-        "left", 250 + 200 * unitIndex, config.levelSelectCardWidth,
+        "left", 750 + 200 * unitIndex, config.levelSelectCardWidth,
         "bot", 750, config.levelSelectCardHeight,
       );
       createUnit(game, gameRefs, unitPos, unit.cardId);
@@ -64,7 +86,7 @@ export function drawSolution(
     if (unit !== undefined) {
 
       const unitPos = createPosition(
-        "left", 1500, config.levelSelectCardWidth,
+        "left", 2200, config.levelSelectCardWidth,
         "bot", 750, config.levelSelectCardHeight,
       );
       createUnit(game, gameRefs, unitPos, unit.cardId);
@@ -263,4 +285,50 @@ function mkTree(
   const sprites: Phaser.Graphics[] = drawTree(game, gameRefs, currentSolution.tree, [], x, y, levelId);
 
   gameRefs.gameScreenData.solTreePool = [sprite].concat(sprites);
+}
+
+type ActionLogButton = GSprite<{
+  init: boolean,
+  selecting: boolean,
+  action: Action,
+  btnText: Phaser.Text,
+}>;
+
+export function createActionLogButton(
+  game: Phaser.Game,
+  gameRefs: GameRefs,
+  action: Action,
+  pos: Position,
+  key: string,
+): ActionLogButton {
+  const frame: number = 0;
+  const txtColor: string = "#FF0000";
+  
+  const btn = createButtonInPool(
+    game,
+    gameRefs.gameScreenData.logBtnPool,
+    pos,
+    { action },
+    key,
+    frame,
+    // onInputDown
+    () => {
+      //
+    },
+    // onInputUp
+    () => {
+      //
+    },
+    // onInputOver
+    () => {
+      //
+    },
+    // onInputOut
+    () => {
+      //
+    },
+  );
+
+  const btnString = action.tag;
+  return addText(game, btn, pos, btnString, txtColor);
 }

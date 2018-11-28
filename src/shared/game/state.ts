@@ -1,10 +1,12 @@
-import { unitMap } from "../data/units/units";
+import { enUnitMap, frUnitMap } from "../data/units/units";
 import { HasId } from "./hasId";
-import { Unit } from "./unit";
+import { Unit, FrUnit, EnUnit } from "./unit";
+import { HasAbilities } from "./ability";
+import { HasAI } from "./ai";
 
 export type GameState = {
-  frUnits: (Unit & HasId & { cardId: string } | undefined)[],
-  enUnits: (Unit & HasId & { cardId: string } | undefined)[],
+  frUnits: (Unit & HasId & { cardId: string } & HasAbilities | undefined)[],
+  enUnits: (Unit & HasId & { cardId: string } & HasAI | undefined)[],
   nextId: number,
 }
 
@@ -13,19 +15,19 @@ export function mkGameState(
   enUnits: (string | undefined)[],
 ): GameState {
   let frLastId = 0;
-  const frUnitsWithId: (Unit & HasId & { cardId: string } | undefined)[] = frUnits.map((x, i) => {
+  const frUnitsWithId: (FrUnit & HasId & { cardId: string } | undefined)[] = frUnits.map((x, i) => {
     if (x !== undefined) {
       frLastId = i;
-      return {...unitMap[x], ...{ id: i, cardId: x }}
+      return {...frUnitMap[x], ...{ id: i, cardId: x }}
     } else {
       return undefined;
     }
   });
   let enLastId = 0;
-  const enUnitsWithId: (Unit & HasId & { cardId: string } | undefined)[] = enUnits.map((x, i) => {
+  const enUnitsWithId: (EnUnit & HasId & { cardId: string } | undefined)[] = enUnits.map((x, i) => {
     if (x !== undefined) {
       enLastId = i;
-      return {...unitMap[x], ...{ id: i + frLastId, cardId: x }}
+      return {...enUnitMap[x], ...{ id: i + frLastId, cardId: x }}
     } else {
       return undefined;
     }

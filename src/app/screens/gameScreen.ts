@@ -1,16 +1,16 @@
 import { GameRefs } from "src/app/states/game";
 import { config } from "../config";
 import { createButton } from "../util/button";
-import { createPosition, Position, relativeTo } from "../util/position";
+import { createPosition } from "../util/position";
 import { mkGoToMenu, applyScreenEvent } from "../util/screenEvents";
-import { GSprite } from "src/shared/phaser-util";
-import { unitMap } from "src/shared/data/units/units";
-import { levelEnUnitMap } from "../gameData";
+import { Button } from "../util/btn";
+import { SpritePool } from "../util/pool";
 
 export type GameScreenData = {
   spriteGroup: Phaser.Group,
   unitPool: Phaser.Group,
   unitHpPool: Phaser.Group,
+  logBtnPool: SpritePool<Button>,
   unitAbilityPool: Phaser.Group,
   solTreePool: Phaser.Graphics[],
   exitBtn?: Phaser.Sprite,

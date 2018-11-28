@@ -53,6 +53,7 @@ export default class Game extends Phaser.State {
       unitPool: new Phaser.Group(this.game),
       unitHpPool: new Phaser.Group(this.game),
       unitAbilityPool: new Phaser.Group(this.game),
+      logBtnPool: new SpritePool(this.game),
       solTreePool: [],
     }
     gameRefs = {
@@ -90,6 +91,7 @@ export function setGameScreenVisible(
   gameRefs.gameScreenData.unitPool.visible = visible;
   gameRefs.gameScreenData.unitHpPool.visible = visible;
   gameRefs.gameScreenData.unitAbilityPool.visible = visible;
+  gameRefs.gameScreenData.logBtnPool.visible = visible;
 }
 
 export function newSolution(): {

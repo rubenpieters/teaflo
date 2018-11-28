@@ -1,9 +1,12 @@
-import { Ability } from "./ability";
+import { Ability, HasAbilities } from "./ability";
+import { HasAI } from "./ai";
 
 export type Unit = {
   hp: number,
   maxHp: number,
   charges: number,
   maxCharges: number,
-  abilities: Ability[],
 }
+
+export type FrUnit = Unit & HasAbilities
+export type EnUnit = Unit & HasAI
