@@ -1,6 +1,8 @@
 import { FrUnit, EnUnit } from "src/shared/game/unit";
 import { mkDamage } from "src/shared/game/action";
 import { ai1 } from "../ai/ai";
+import { mkDamageI, mkStatic } from "../../game/intent";
+import { mkPositionId } from "../../game/entityId";
 
 export const unit1 = {
   hp: 10,
@@ -8,7 +10,13 @@ export const unit1 = {
   charges: 5,
   maxCharges: 5,
   abilities: [
-    mkDamage({ tag: "PositionId", type: "enemy", id: 0 }, 1),
+    {
+      intent: mkDamageI(
+        mkStatic(mkPositionId(0, "enemy")),
+        mkStatic(1),
+      ),
+      inputs: [],
+    }
   ]
 }
 

@@ -6,7 +6,7 @@ type Damage = {
   tag: "Damage",
   target: UnitId,
   value: number,
-}
+};
 
 export function mkDamage(
   target: UnitId,
@@ -23,7 +23,7 @@ type Heal = {
   tag: "Heal",
   target: UnitId,
   value: number,
-}
+};
 
 export function mkHeal(
   target: UnitId,

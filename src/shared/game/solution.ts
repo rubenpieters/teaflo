@@ -5,6 +5,7 @@ import { GameState } from "./state";
 import { applyAction, Action } from "./action";
 import { nextAI } from "./ai";
 import { Log, emptyLog } from "./log";
+import { intentToAction } from "./intent";
 
 export type Solution = {
   win: boolean,
@@ -45,7 +46,8 @@ export function _runSolution(
   }
   // Action (Fr) Phase
   const frLog: Action[] = [];
-  const frAction = solution.tree.nodes[loc[0]].v
+  const frAbility: Ability = solution.tree.nodes[loc[0]].v
+  const frAction = intentToAction({ state, input: [] }, frAbility.intent);
   state = applyAction(frAction, state);
   frLog.push(frAction);
 

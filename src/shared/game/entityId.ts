@@ -12,12 +12,34 @@ type GlobalId<A> = {
   tag: "GlobalId",
   id: number,
   type: A,
+};
+
+export function mkGlobalId<A extends TargetType>(
+  id: number,
+  type: A,
+): GlobalId<A> {
+  return {
+    tag: "GlobalId",
+    id,
+    type,
+  };
 }
 
 type PositionId<A> = {
   tag: "PositionId",
   id: number,
   type: A,
+};
+
+export function mkPositionId<A extends TargetType>(
+  id: number,
+  type: A,
+): PositionId<A> {
+  return {
+    tag: "PositionId",
+    id,
+    type,
+  };
 }
 
 export type EntityId<A>
