@@ -8,9 +8,10 @@ import { drawLevelInfo } from "../screens/levelInfo";
 import { drawGameScreen } from "../screens/gameScreen";
 import { applyUnlocks } from "../savefile/unlocks";
 import { drawSolution } from "../screens/solutionRep";
-import { Solution, extendSolution } from "src/shared/game/solution";
+import { Solution, extendSolution, SolutionData } from "src/shared/game/solution";
 import { Ability } from "src/shared/game/ability";
 import { Location } from "src/shared/tree";
+import { ClickState } from "./clickState";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -130,17 +131,17 @@ export function mkGoToMenu(
 
 type ExtendLevelSolution = {
   tag: "ExtendLevelSolution",
-  ability: Ability,
+  solData: SolutionData,
   levelId: string,
 }
 
 export function mkExtendLevelSolution(
-  ability: Ability,
+  solData: SolutionData,
   levelId: string,
 ): ExtendLevelSolution {
   return {
     tag: "ExtendLevelSolution",
-    ability,
+    solData,
     levelId,
   }
 }
@@ -179,6 +180,37 @@ export function mkCutTreeLoc(
   }
 }
 
+type SetClickState = {
+  tag: "SetClickState",
+  clickState: ClickState,
+}
+
+export function mkSetClickState(
+  ability: Ability,
+): SetClickState {
+  return {
+    tag: "SetClickState",
+    clickState: {
+      ability,
+      currentInputs: [],
+    },
+  }
+}
+
+type AdvanceClickState = {
+  tag: "AdvanceClickState",
+  input: any,
+}
+
+export function mkAdvanceClickState(
+  input: any,
+): AdvanceClickState {
+  return {
+    tag: "AdvanceClickState",
+    input,
+  }
+}
+
 type ScreenEvent
   = ChangeAct
   | ChangeLevel
@@ -190,6 +222,8 @@ type ScreenEvent
   | ExtendLevelSolution
   | ChangeTreeLoc
   | CutTreeLoc
+  | SetClickState
+  | AdvanceClickState
   ;
 
 export function applyScreenEvent(
@@ -225,8 +259,10 @@ export function applyScreenEvent(
       return;
     }
     case "StartLevel": {
-      // TODO: temporary
+      gameRefs.gameScreenData.levelId = screenEvent.levelId;
+      // TODO: temporary --
       gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].solution.win = true;
+      // ------------------
 
       drawGameScreen(game, gameRefs, screenEvent.levelId);
       drawSolution(game, gameRefs, screenEvent.levelId);
@@ -290,7 +326,7 @@ export function applyScreenEvent(
       const solId = gameRefs.saveFile.activeSolutions[screenEvent.levelId];
       const currentSolution = gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].solution;
       const currentLoc = gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc;
-      const newSolution = extendSolution(screenEvent.ability, currentSolution, currentLoc);
+      const newSolution = extendSolution(screenEvent.solData, currentSolution, currentLoc);
       gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].solution = newSolution.solution;
       gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc = newSolution.loc;
       // TODO: change state
@@ -306,7 +342,32 @@ export function applyScreenEvent(
       return;
     }
     case "CutTreeLoc": {
+      return;
+    }
+    case "SetClickState": {
+      gameRefs.gameScreenData.clickState = screenEvent.clickState;
 
+      drawSolution(game, gameRefs, gameRefs.gameScreenData.levelId);
+      return;
+    }
+    case "AdvanceClickState": {
+      if (gameRefs.gameScreenData.clickState === undefined) {
+        console.log(`ERROR (applyScreenEvent AdvanceClickState): cannot advance undefined clickState`);
+        throw `applyScreenEvent AdvanceClickState: cannot advance undefined clickState`;
+      }
+      const clickState = gameRefs.gameScreenData.clickState;
+      clickState.currentInputs.push(screenEvent.input);
+      if (clickState.currentInputs.length >= clickState.ability.inputs.length) {
+        // click state is finished, extend solution
+        gameRefs.gameScreenData.clickState = undefined;
+        applyScreenEvent(mkExtendLevelSolution({
+            ability: clickState.ability,
+            inputs: clickState.currentInputs,
+          }, gameRefs.gameScreenData.levelId), game, gameRefs);
+      } else {
+        drawSolution(game, gameRefs, gameRefs.gameScreenData.levelId);
+      }
+      return;
     }
   }
 }

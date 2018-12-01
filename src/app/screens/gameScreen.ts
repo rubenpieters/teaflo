@@ -5,16 +5,19 @@ import { createPosition } from "../util/position";
 import { mkGoToMenu, applyScreenEvent } from "../util/screenEvents";
 import { Button } from "../util/btn";
 import { SpritePool } from "../util/pool";
+import { ClickState } from "../util/clickState";
 
 export type GameScreenData = {
   spriteGroup: Phaser.Group,
-  unitPool: Phaser.Group,
+  unitPool: SpritePool<Button>,
   unitHpPool: Phaser.Group,
   logBtnPool: SpritePool<Button>,
   unitAbilityPool: Phaser.Group,
   solTreePool: Phaser.Graphics[],
   exitBtn?: Phaser.Sprite,
   victoryBtn?: Phaser.Sprite,
+  clickState?: ClickState,
+  levelId: string,
 }
 
 export function drawGameScreen(

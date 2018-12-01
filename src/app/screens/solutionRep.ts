@@ -5,12 +5,13 @@ import { levelEnUnitMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
 import { Ability } from "src/shared/game/ability";
 import { extendSolution, Solution, runSolution } from "src/shared/game/solution";
-import { applyScreenEvent, mkExtendLevelSolution, mkChangeTreeLoc } from "../util/screenEvents";
+import { applyScreenEvent, mkExtendLevelSolution, mkChangeTreeLoc, mkSetClickState, mkAdvanceClickState } from "../util/screenEvents";
 import { Location, Tree } from "src/shared/tree";
-import { Game } from "phaser-ce";
+import { Game, Button } from "phaser-ce";
 import { mkGameState } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
+import { mkPositionId, TargetType } from "../../shared/game/entityId";
 
 export function drawSolution(
   game: Phaser.Game,
@@ -62,7 +63,7 @@ export function drawSolution(
         "left", 750 + 200 * unitIndex, config.levelSelectCardWidth,
         "bot", 750, config.levelSelectCardHeight,
       );
-      createUnit(game, gameRefs, unitPos, unit.cardId);
+      createUnit(game, gameRefs, unitPos, unit.cardId, unitIndex, "friendly");
 
       const unitHpPos = relativeTo(unitPos,
         "below", 50,
@@ -89,7 +90,7 @@ export function drawSolution(
         "left", 2200, config.levelSelectCardWidth,
         "bot", 750, config.levelSelectCardHeight,
       );
-      createUnit(game, gameRefs, unitPos, unit.cardId);
+      createUnit(game, gameRefs, unitPos, unit.cardId, unitIndex, "enemy");
 
       const unitHpPos = relativeTo(unitPos,
         "below", 50,
@@ -103,6 +104,9 @@ export function drawSolution(
 
 type UnitSprite = GSprite<{
   init: boolean,
+  selecting: boolean,
+  id: number,
+  type: TargetType,
 }>;
 
 export function createUnit(
@@ -110,13 +114,35 @@ export function createUnit(
   gameRefs: GameRefs,
   pos: Position,
   key: string,
+  id: number,
+  type: TargetType,
 ): UnitSprite {
-  const unit: UnitSprite = gameRefs.gameScreenData.unitPool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
-  
-  if (unit.data.init === undefined || unit.data.init === false) {
-
-    unit.data.init = true;
-  }
+  const unit: UnitSprite = createButtonInPool(
+    game,
+    gameRefs.gameScreenData.unitPool,
+    pos,
+    { id, type },
+    key,
+    undefined,
+    // onInputDown
+    () => {
+      //
+    },
+    // onInputUp
+    () => {
+      if (gameRefs.gameScreenData.clickState !== undefined) {
+        applyScreenEvent(mkAdvanceClickState(mkPositionId(id, type)), game, gameRefs);
+      }
+    },
+    // onInputOver
+    () => {
+      //
+    },
+    // onInputOut
+    () => {
+      //
+    },
+  );
 
   return unit;
 }
@@ -167,7 +193,14 @@ export function createUnitAbility(
       if (
         inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
       ) {
-        applyScreenEvent(mkExtendLevelSolution(unit.data.ability, unit.data.levelId), game, gameRefs);
+        if (unit.data.ability.inputs.length === 0) {
+          applyScreenEvent(mkExtendLevelSolution({
+            ability: unit.data.ability,
+            inputs: []
+          }, unit.data.levelId), game, gameRefs);
+        } else {
+          applyScreenEvent(mkSetClickState(ability), game, gameRefs);
+        }
       }
     });
 
@@ -191,10 +224,10 @@ function locToPos(
   return { x, y };
 }
 
-function drawTree(
+function drawTree<A>(
   game: Game,
   gameRefs: GameRefs,
-  tree: Tree<Ability>,
+  tree: Tree<A>,
   loc: Location,
   x: number,
   y: number,

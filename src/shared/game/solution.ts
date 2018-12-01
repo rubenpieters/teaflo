@@ -7,20 +7,25 @@ import { nextAI } from "./ai";
 import { Log, emptyLog } from "./log";
 import { intentToAction } from "./intent";
 
+export type SolutionData = {
+  ability: Ability,
+  inputs: any[],
+}
+
 export type Solution = {
   win: boolean,
-  tree: Tree<Ability>,
+  tree: Tree<SolutionData>,
 }
 
 export function extendSolution(
-  ability: Ability,
+  solData: SolutionData,
   solution: Solution,
   loc: Location,
 ): {
   solution: Solution,
   loc: Location,
 } {
-  const newTree = extendTree((a1, a2) => false, solution.tree, loc, ability);
+  const newTree = extendTree((a1, a2) => false, solution.tree, loc, solData);
   return {
     solution: focus(solution, set(x => x.tree, newTree.tree)),
     loc: newTree.loc,
@@ -46,8 +51,10 @@ export function _runSolution(
   }
   // Action (Fr) Phase
   const frLog: Action[] = [];
-  const frAbility: Ability = solution.tree.nodes[loc[0]].v
-  const frAction = intentToAction({ state, input: [] }, frAbility.intent);
+  const solData: SolutionData = solution.tree.nodes[loc[0]].v;
+  const frAbility: Ability = solData.ability;
+  const frInputs: any[] = solData.inputs;
+  const frAction = intentToAction({ state, input: frInputs }, frAbility.intent);
   state = applyAction(frAction, state);
   frLog.push(frAction);
 
