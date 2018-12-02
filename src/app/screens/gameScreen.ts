@@ -28,7 +28,7 @@ export function drawGameScreen(
   if (gameRefs.gameScreenData.exitBtn === undefined) {
     const exitBtnPos = createPosition(
       "right", 250, config.levelButtonWidth,
-      "top", 400, config.levelButtonHeight,
+      "bot", 250, config.levelButtonHeight,
     );
     const exitBtn = createButton(game, gameRefs.gameScreenData.spriteGroup, exitBtnPos, "Exit", "btn_level",
       () => {

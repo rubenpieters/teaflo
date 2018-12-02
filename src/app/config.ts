@@ -19,4 +19,7 @@ export const config = {
 
   unitHpBarWidth: 150,
   unitHpBarHeight: 50,
+
+  logButtonWidth: 960,
+  logButtonHeight: 100,
 };

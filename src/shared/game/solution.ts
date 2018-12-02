@@ -4,7 +4,7 @@ import { Ability } from "./ability";
 import { GameState } from "./state";
 import { applyAction, Action } from "./action";
 import { nextAI } from "./ai";
-import { Log, emptyLog } from "./log";
+import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction } from "./intent";
 
 export type SolutionData = {
@@ -50,16 +50,16 @@ export function _runSolution(
     return { state, log };
   }
   // Action (Fr) Phase
-  const frLog: Action[] = [];
+  const frLog: LogEntry[] = [];
   const solData: SolutionData = solution.tree.nodes[loc[0]].v;
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
   const frAction = intentToAction({ state, input: frInputs }, frAbility.intent);
   state = applyAction(frAction, state);
-  frLog.push(frAction);
+  frLog.push({ action: frAction, state });
 
   // Action (En) Phase
-  const enLog: Action[] = [];
+  const enLog: LogEntry[] = [];
   state.enUnits.forEach((enUnit, i) => {
     if (enUnit !== undefined) {
       const enAction = enUnit.ai[enUnit.currentAI].action;
@@ -69,7 +69,7 @@ export function _runSolution(
       // NOTE: cast is safe here if there is no way that a unit has been removed due to an action (eg. deaths)
       // TODO: do this via position id
       state = focus(state, over(x => x.enUnits[i], x => nextAI(state, <any>x)));
-      enLog.push(enAction);
+      enLog.push({ action: enAction, state });
     }
   });
 

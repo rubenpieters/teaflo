@@ -12,11 +12,33 @@ import { mkGameState } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
 import { mkPositionId, TargetType } from "../../shared/game/entityId";
+import { OVER, NEUTRAL } from "../util/button";
+import { Log, LogEntry } from "../../shared/game/log";
 
-export function drawSolution(
+export type IntermediateSol = {
+  type: "frAction" | "enAction",
+  index: number,
+}
+
+function pickIntermediateSol(
+  intermediateSol: IntermediateSol,
+  log: Log,
+): LogEntry {
+  switch (intermediateSol.type) {
+    case "frAction": {
+      return log.frAction[intermediateSol.index];
+    }
+    case "enAction": {
+      return log.enAction[intermediateSol.index];
+    }
+  }
+}
+
+export function drawSolutionRep(
   game: Phaser.Game,
   gameRefs: GameRefs,
   levelId: string,
+  intermediateSol?: IntermediateSol,
 ) {
   gameRefs.gameScreenData.unitPool.killAll();
   gameRefs.gameScreenData.unitHpPool.killAll();
@@ -30,38 +52,18 @@ export function drawSolution(
   const enUnits = levelEnUnitMap[levelId];
   const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solution, sol.loc, initState);
-  const solState = solResult.state;
-  const solLog = solResult.log;
-
-  // draw solution tree
-  mkTree(game, gameRefs, levelId);
-
-  // draw action log
-  let logIndex = 0;
-  solLog.frAction.forEach((action, actionIndex) => {
-    const actionBtnPos = createPosition(
-      "left", 250, config.levelButtonWidth,
-      "bot", 1200 - config.levelButtonHeight * logIndex, config.levelButtonHeight,
-    );
-    createActionLogButton(game, gameRefs, action, actionBtnPos, "btn_level");
-    logIndex += 1;
-  });
-  solLog.enAction.forEach((action, actionIndex) => {
-    const actionBtnPos = createPosition(
-      "left", 250, config.levelButtonWidth,
-      "bot", 1200 - config.levelButtonHeight * logIndex, config.levelButtonHeight,
-    );
-    createActionLogButton(game, gameRefs, action, actionBtnPos, "btn_level");
-    logIndex += 1;
-  });
+  let solState = solResult.state;
+  if (intermediateSol !== undefined) {
+    solState = pickIntermediateSol(intermediateSol, solResult.log).state;
+  }
 
   // draw friendly units
   solState.frUnits.forEach((unit, unitIndex) => {
     if (unit !== undefined) {
 
       const unitPos = createPosition(
-        "left", 750 + 200 * unitIndex, config.levelSelectCardWidth,
-        "bot", 750, config.levelSelectCardHeight,
+        "left", 1050 + 200 * unitIndex, config.levelSelectCardWidth,
+        "top", 600, config.levelSelectCardHeight,
       );
       createUnit(game, gameRefs, unitPos, unit.cardId, unitIndex, "friendly");
 
@@ -87,8 +89,8 @@ export function drawSolution(
     if (unit !== undefined) {
 
       const unitPos = createPosition(
-        "left", 2200, config.levelSelectCardWidth,
-        "bot", 750, config.levelSelectCardHeight,
+        "left", 2300 + 200 * unitIndex, config.levelSelectCardWidth,
+        "top", 600, config.levelSelectCardHeight,
       );
       createUnit(game, gameRefs, unitPos, unit.cardId, unitIndex, "enemy");
 
@@ -208,160 +210,4 @@ export function createUnitAbility(
   }
 
   return unit;
-}
-
-
-
-function locToPos(
-  loc: Location,
-): { x: number, y: number } {
-  let x = 0;
-  let y = 0;
-  for (const number of loc) {
-    x = x + 50;
-    y = y + 50 * number;
-  }
-  return { x, y };
-}
-
-function drawTree<A>(
-  game: Game,
-  gameRefs: GameRefs,
-  tree: Tree<A>,
-  loc: Location,
-  x: number,
-  y: number,
-  levelId: string,
-): Phaser.Graphics[] {
-  let sprites: Phaser.Graphics[] = [];
-  let i = 0;
-  const oldPos = locToPos(loc);
-  for (const node of tree.nodes) {
-    const newLoc = loc.concat(i);
-
-    const pos = locToPos(newLoc);
-
-    const line: Phaser.Graphics = game.add.graphics(x + oldPos.x + 20, y + oldPos.y + 20, gameRefs.gameScreenData.spriteGroup);
-    line.beginFill(0x4477CC);
-    line.lineStyle(5, 0x4477CC, 1);
-    line.lineTo(pos.x - oldPos.x, pos.y - oldPos.y);
-    line.endFill();
-
-    const sprite: Phaser.Graphics = game.add.graphics(x + pos.x, y + pos.y, gameRefs.gameScreenData.spriteGroup);
-    const solId = gameRefs.saveFile.activeSolutions[levelId];
-    const currentLoc = gameRefs.saveFile.levelSolutions[levelId][solId].loc;
-    if (newLoc.toString() === currentLoc.toString()) {
-      sprite.beginFill(0xFF77CC);
-    } else {
-      sprite.beginFill(0x4477CC);
-    }
-    sprite.drawRect(0, 0, 40, 40);
-    sprite.endFill();
-    sprite.inputEnabled = true;
-    sprite.events.onInputDown.add((obj: any, pointer: Phaser.Pointer) => {
-      if (pointer.leftButton.isDown) {
-        //changeLoc(board, newLoc)
-        applyScreenEvent(mkChangeTreeLoc(newLoc, levelId), game, gameRefs);
-      } else if (pointer.rightButton.isDown) {
-        //board.loc = loc;
-        //board.solution = cutTree(board.solution, loc);
-        //mkSolution(board);
-      }
-    });
-
-    sprites.push(line);
-    sprites.push(sprite);
-    const result = drawTree(game, gameRefs, node.tree, newLoc, x, y, levelId);
-    sprites = sprites.concat(result);
-
-    i += 1;
-  }
-  return sprites
-}
-
-function mkTree(
-  game: Game,
-  gameRefs: GameRefs,
-  levelId: string,
-) {
-  // clear old
-  for (const sprite of gameRefs.gameScreenData.solTreePool) {
-    sprite.destroy();
-  }
-  const solId = gameRefs.saveFile.activeSolutions[levelId];
-  const currentLoc = gameRefs.saveFile.levelSolutions[levelId][solId].loc;
-
-  const x = 220;
-  const y = 100;
-  const sprite: Phaser.Graphics = game.add.graphics(x, y, gameRefs.gameScreenData.spriteGroup);
-  if (currentLoc.length === 0) {
-    sprite.beginFill(0xFF77CC);
-  } else {
-    sprite.beginFill(0x4477CC);
-  }
-  sprite.drawRect(0, 0, 40, 40);
-  sprite.endFill();
-  sprite.inputEnabled = true;
-  sprite.events.onInputDown.add((obj: any, pointer: Phaser.Pointer) => {
-    if (pointer.leftButton.isDown) {
-      //changeLoc(board, [])
-      applyScreenEvent(mkChangeTreeLoc([], levelId), game, gameRefs);
-    } else if (pointer.rightButton.isDown) {
-      //board.loc = [];
-      //board.solution = cutTree(board.solution, []);
-      //mkTree(board);
-    }
-  });
-
-  // create new
-  const currentSolution = gameRefs.saveFile.levelSolutions[levelId][solId].solution;
-  const sprites: Phaser.Graphics[] = drawTree(game, gameRefs, currentSolution.tree, [], x, y, levelId);
-
-  gameRefs.gameScreenData.solTreePool = [sprite].concat(sprites);
-}
-
-type ActionLogButton = GSprite<{
-  init: boolean,
-  selecting: boolean,
-  action: Action,
-  btnText: Phaser.Text,
-}>;
-
-export function createActionLogButton(
-  game: Phaser.Game,
-  gameRefs: GameRefs,
-  action: Action,
-  pos: Position,
-  key: string,
-): ActionLogButton {
-  const frame: number = 0;
-  const txtColor: string = "#FF0000";
-  
-  const btn = createButtonInPool(
-    game,
-    gameRefs.gameScreenData.logBtnPool,
-    pos,
-    { action },
-    key,
-    frame,
-    // onInputDown
-    () => {
-      //
-    },
-    // onInputUp
-    () => {
-      //
-    },
-    // onInputOver
-    () => {
-      //
-    },
-    // onInputOut
-    () => {
-      //
-    },
-  );
-
-  const btnString = action.tag;
-  return addText(game, btn, pos, btnString, txtColor);
 }

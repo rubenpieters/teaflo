@@ -1,8 +1,8 @@
 import { Position, inPosition } from "src/app/util/position";
 
-const NEUTRAL = 0;
-const DOWN = 1;
-const OVER = 2;
+export const NEUTRAL = 0;
+export const DOWN = 1;
+export const OVER = 2;
 
 export function createButton(
   game: Phaser.Game,

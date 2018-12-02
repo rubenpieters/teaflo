@@ -7,11 +7,12 @@ import { drawSolutionSelect } from "../screens/solutionSelect";
 import { drawLevelInfo } from "../screens/levelInfo";
 import { drawGameScreen } from "../screens/gameScreen";
 import { applyUnlocks } from "../savefile/unlocks";
-import { drawSolution } from "../screens/solutionRep";
+import { drawSolutionRep } from "../screens/solutionRep";
 import { Solution, extendSolution, SolutionData } from "src/shared/game/solution";
 import { Ability } from "src/shared/game/ability";
 import { Location } from "src/shared/tree";
 import { ClickState } from "./clickState";
+import { drawSolutionInfo } from "../screens/solutionInfo";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -211,6 +212,34 @@ export function mkAdvanceClickState(
   }
 }
 
+type ShowIntermediateSol = {
+  tag: "ShowIntermediateSol",
+  type: "frAction" | "enAction",
+  index: number,
+}
+
+export function mkShowIntermediateSol(
+  type: "frAction" | "enAction",
+  index: number,
+): ShowIntermediateSol {
+  return {
+    tag: "ShowIntermediateSol",
+    type,
+    index,
+  }
+}
+
+type ClearIntermediateSol = {
+  tag: "ClearIntermediateSol",
+}
+
+export function mkClearIntermediateSol(
+): ClearIntermediateSol {
+  return {
+    tag: "ClearIntermediateSol",
+  }
+}
+
 type ScreenEvent
   = ChangeAct
   | ChangeLevel
@@ -224,6 +253,8 @@ type ScreenEvent
   | CutTreeLoc
   | SetClickState
   | AdvanceClickState
+  | ShowIntermediateSol
+  | ClearIntermediateSol
   ;
 
 export function applyScreenEvent(
@@ -260,12 +291,10 @@ export function applyScreenEvent(
     }
     case "StartLevel": {
       gameRefs.gameScreenData.levelId = screenEvent.levelId;
-      // TODO: temporary --
-      gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].solution.win = true;
-      // ------------------
 
       drawGameScreen(game, gameRefs, screenEvent.levelId);
-      drawSolution(game, gameRefs, screenEvent.levelId);
+      drawSolutionRep(game, gameRefs, screenEvent.levelId);
+      drawSolutionInfo(game, gameRefs, screenEvent.levelId);
       setSelectScreenVisible(false);
       setGameScreenVisible(true);
       return;
@@ -331,14 +360,16 @@ export function applyScreenEvent(
       gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc = newSolution.loc;
       // TODO: change state
 
-      drawSolution(game, gameRefs, screenEvent.levelId);
+      drawSolutionRep(game, gameRefs, screenEvent.levelId);
+      drawSolutionInfo(game, gameRefs, screenEvent.levelId);
       return;
     }
     case "ChangeTreeLoc": {
       const solId = gameRefs.saveFile.activeSolutions[screenEvent.levelId];
       gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc = screenEvent.loc;
 
-      drawSolution(game, gameRefs, screenEvent.levelId);
+      drawSolutionRep(game, gameRefs, screenEvent.levelId);
+      drawSolutionInfo(game, gameRefs, screenEvent.levelId);
       return;
     }
     case "CutTreeLoc": {
@@ -347,7 +378,7 @@ export function applyScreenEvent(
     case "SetClickState": {
       gameRefs.gameScreenData.clickState = screenEvent.clickState;
 
-      drawSolution(game, gameRefs, gameRefs.gameScreenData.levelId);
+      drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
       return;
     }
     case "AdvanceClickState": {
@@ -365,8 +396,19 @@ export function applyScreenEvent(
             inputs: clickState.currentInputs,
           }, gameRefs.gameScreenData.levelId), game, gameRefs);
       } else {
-        drawSolution(game, gameRefs, gameRefs.gameScreenData.levelId);
+        drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
       }
+      return;
+    }
+    case "ShowIntermediateSol": {
+      drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId, {
+        type: screenEvent.type,
+        index: screenEvent.index,
+      });
+      return;
+    }
+    case "ClearIntermediateSol": {
+      drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
       return;
     }
   }
