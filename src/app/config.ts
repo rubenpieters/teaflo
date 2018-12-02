@@ -14,8 +14,7 @@ export const config = {
   levelSelectCardWidth: 150,
   levelSelectCardHeight: 300,
 
-  hoverCardWidth: 300,
-  hoverCardHeight: 600,
+  hoverCardWidth: 600,
 
   unitHpBarWidth: 150,
   unitHpBarHeight: 50,

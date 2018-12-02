@@ -4,9 +4,9 @@ import { config } from "../config";
 import { createButton } from "../util/button";
 import { levelDataMap } from "../gameData";
 import { createPoolCardSlot } from "../util/poolCardSlot";
-import { createPoolHoverCard } from "../util/poolHoverCard";
 import { intersects, GSprite } from "../../shared/phaser-util";
-import { applyScreenEvent, mkDeployCard, mkStartLevel } from "../util/screenEvents";
+import { applyScreenEvent, mkDeployCard, mkStartLevel, mkShowHoverCard, mkClearHoverCard } from "../util/screenEvents";
+import { TargetType } from "../../shared/game/entityId";
 
 export function drawLevelInfo(
   game: Phaser.Game,
@@ -48,14 +48,6 @@ export function drawLevelInfo(
   );
   const startBtn = createButton(game, gameRefs.levelSelectData.spriteGroup, startBtnPos, "Start", "btn_level",
     () => {
-      /*const cards = levelSelect.slots.map(x => {
-        if (x.data.card !== undefined) {
-          return x.data.card.data.cardId
-        } else {
-          return undefined;
-        }
-      });
-      levelSelectToGameScreen(game, cards, levelId);*/
       applyScreenEvent(mkStartLevel(levelId, solId), game, gameRefs);
     }
   );
@@ -80,7 +72,7 @@ export function drawLevelInfo(
     const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
     const cardId = gameRefs.saveFile.levelSolutions[levelId][solId].cardIds[i];
     if (cardId !== undefined) {
-      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, gameRefs.hoverViewPool, cardPos, cardId, cardId);
+      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, cardPos, cardId, cardId, "friendly");
       cardSlot.data.card = card;
       card.data.resetSlot = cardSlot;
       card.data.levelId = levelId;
@@ -110,7 +102,7 @@ export function drawLevelInfo(
     const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
     const cardId = supplyPool[i];
     if (cardId !== undefined) {
-      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, gameRefs.hoverViewPool, cardPos, cardId, cardId);
+      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, cardPos, cardId, cardId, "friendly");
       cardSlot.data.card = card;
       card.data.resetSlot = cardSlot;
       card.data.levelId = levelId;
@@ -127,11 +119,11 @@ type LevelSelectCard = GSprite<{
   init: boolean,
   selecting: boolean,
   cardId: string,
+  type: TargetType,
   levelId: string,
   solId: number,
   onDownCb: (() => void),
   btnText: Phaser.Text,
-  hoverView: Phaser.Sprite | undefined,
   hoverSlot: Phaser.Sprite | undefined,
   resetSlot: Phaser.Sprite,
 }>;
@@ -141,38 +133,31 @@ function createPoolLevelSelectCard(
   gameRefs: GameRefs,
   pool: Phaser.Group,
   slotPool: Phaser.Group,
-  hoverViewPool: Phaser.Group,
   pos: Position,
   key: string,
   cardId: string,
+  type: TargetType,
 ): LevelSelectCard {
   const card: LevelSelectCard = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
 
   card.data.cardId = cardId;
+  card.data.type = type;
 
   if (card.data.init === undefined || card.data.init === false) {
     card.inputEnabled = true;
     card.input.enableDrag(false, true);
 
     card.events.onInputOver.add(() => {
-      const hoverPos: Position = {
-        xMin: card.x + config.levelSelectCardWidth + 10,
-        xMax: card.x + config.levelSelectCardWidth + 10 + config.hoverCardWidth,
-        yMin: card.y,
-        yMax: card.y + config.hoverCardHeight,
-      };
-      card.data.hoverView = createPoolHoverCard(hoverViewPool, hoverPos, key);
+      const x = card.x + config.levelSelectCardWidth + 10;
+      const y = card.y;
+      applyScreenEvent(mkShowHoverCard(card.data.type, card.data.cardId, x, y), game, gameRefs);
     });
     card.events.onInputOut.add(() => {
-      if (card.data.hoverView !== undefined) {
-        card.data.hoverView.kill();
-      }
+      applyScreenEvent(mkClearHoverCard(), game, gameRefs);
     });
     
     card.events.onDragStart.add(() => {
-      if (card.data.hoverView !== undefined) {
-        card.data.hoverView.kill();
-      }
+      applyScreenEvent(mkClearHoverCard(), game, gameRefs);
     });
     card.events.onDragUpdate.add(() => {
       const cardBounds = card.getBounds();
@@ -236,19 +221,11 @@ function createPoolLevelSelectCard(
   
   card.events.onKilled.removeAll();
   card.events.onKilled.add(() => {
-    if (card.data.hoverView !== undefined) {
-      card.data.hoverView.kill();
-    }
     card.data.hoverSlot = undefined;
-    card.data.hoverView = undefined;
   });
   card.events.onDestroy.removeAll();
   card.events.onDestroy.add(() => {
-    if (card.data.hoverView !== undefined) {
-      card.data.hoverView.kill();
-    }
     card.data.hoverSlot = undefined;
-    card.data.hoverView = undefined;
   });
 
   return card;

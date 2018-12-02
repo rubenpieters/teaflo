@@ -13,6 +13,8 @@ import { Ability } from "src/shared/game/ability";
 import { Location } from "src/shared/tree";
 import { ClickState } from "./clickState";
 import { drawSolutionInfo } from "../screens/solutionInfo";
+import { TargetType } from "../../shared/game/entityId";
+import { drawHoverCard } from "../screens/hoverCard";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -240,6 +242,40 @@ export function mkClearIntermediateSol(
   }
 }
 
+type ShowHoverCard = {
+  tag: "ShowHoverCard",
+  type: TargetType,
+  id: string,
+  x: number,
+  y: number,
+}
+
+export function mkShowHoverCard(
+  type: TargetType,
+  id: string,
+  x: number,
+  y: number,
+): ShowHoverCard {
+  return {
+    tag: "ShowHoverCard",
+    type,
+    id,
+    x,
+    y,
+  }
+}
+
+type ClearHoverCard = {
+  tag: "ClearHoverCard",
+}
+
+export function mkClearHoverCard(
+): ClearHoverCard {
+  return {
+    tag: "ClearHoverCard",
+  }
+}
+
 type ScreenEvent
   = ChangeAct
   | ChangeLevel
@@ -255,6 +291,8 @@ type ScreenEvent
   | AdvanceClickState
   | ShowIntermediateSol
   | ClearIntermediateSol
+  | ShowHoverCard
+  | ClearHoverCard
   ;
 
 export function applyScreenEvent(
@@ -409,6 +447,14 @@ export function applyScreenEvent(
     }
     case "ClearIntermediateSol": {
       drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
+      return;
+    }
+    case "ShowHoverCard": {
+      drawHoverCard(game, gameRefs, screenEvent.type, screenEvent.id, screenEvent.x, screenEvent.y);
+      return;
+    }
+    case "ClearHoverCard": {
+      gameRefs.hoverViewPool.killAll();
       return;
     }
   }

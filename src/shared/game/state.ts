@@ -1,8 +1,10 @@
-import { enUnitMap, frUnitMap } from "../data/units/units";
+
 import { HasId } from "./hasId";
 import { Unit, FrUnit, EnUnit } from "./unit";
 import { HasAbilities } from "./ability";
 import { HasAI } from "./ai";
+import { frUnitMap } from "../data/units/friendly";
+import { enUnitMap } from "../data/units/enemy";
 
 export type GameState = {
   frUnits: (Unit & HasId & { cardId: string } & HasAbilities | undefined)[],
