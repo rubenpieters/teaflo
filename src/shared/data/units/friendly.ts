@@ -1,5 +1,5 @@
 import { FrUnit } from "src/shared/game/unit";
-import { mkDamageI, mkStatic } from "../../game/intent";
+import { mkDamageI, mkStatic, mkFromInput } from "../../game/intent";
 import { mkPositionId } from "../../game/entityId";
 import { mkTargetInput } from "../../game/ability";
 
@@ -11,12 +11,13 @@ export const fr_unit_a1_l1_01: FrUnit = {
   abilities: [
     {
       intent: mkDamageI(
-        mkStatic(mkPositionId(0, "enemy")),
+        mkFromInput(0),
         mkStatic(1),
       ),
       inputs: [
         mkTargetInput(),
       ],
+      spriteId: "fr_unit_a1_l1_01_ab1",
     }
   ]
 }
@@ -35,6 +36,7 @@ export const unit1: FrUnit = {
       inputs: [
         mkTargetInput(),
       ],
+      spriteId: "fr_unit_a1_l1_01_ab1",
     }
   ]
 }

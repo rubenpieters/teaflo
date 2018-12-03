@@ -116,3 +116,16 @@ function evaluateIntentVar<A>(
     }
   }
 }
+
+export function intentVarText<A>(
+  intentVar: IntentVar<A>,
+): string {
+  switch (intentVar.tag) {
+    case "Static": {
+      return JSON.stringify(intentVar.a);
+    }
+    case "FromInput": {
+      return `<Input${intentVar.input}>`;
+    }
+  }
+}

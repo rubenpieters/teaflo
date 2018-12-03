@@ -1,5 +1,5 @@
 import { Action } from "./action";
-import { Intent } from "./intent";
+import { Intent, intentVarText } from "./intent";
 
 export type HasAbilities = {
   abilities: Ability[],
@@ -8,6 +8,7 @@ export type HasAbilities = {
 export type Ability = {
   intent: Intent,
   inputs: UserInput[],
+  spriteId: string,
 };
 
 type NumberInput = {
@@ -36,3 +37,16 @@ export type UserInput
   = NumberInput
   | TargetInput
   ;
+
+export function abilityText(
+  ability: Ability,
+) {
+  switch (ability.intent.tag) {
+    case "DamageI": {
+      return `DMG ${intentVarText(ability.intent.value)} to ${intentVarText(ability.intent.target)}`;
+    }
+    case "HealI": {
+      return `HEAL ${intentVarText(ability.intent.value)} to ${intentVarText(ability.intent.target)}`;
+    }
+  }
+}

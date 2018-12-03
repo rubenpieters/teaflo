@@ -14,7 +14,7 @@ import { Location } from "src/shared/tree";
 import { ClickState } from "./clickState";
 import { drawSolutionInfo } from "../screens/solutionInfo";
 import { TargetType } from "../../shared/game/entityId";
-import { drawHoverCard } from "../screens/hoverCard";
+import { drawHoverCardFriendly, clearHoverCard } from "../screens/hoverCard";
 
 export type ChangeAct = {
   tag: "ChangeAct",
@@ -450,11 +450,20 @@ export function applyScreenEvent(
       return;
     }
     case "ShowHoverCard": {
-      drawHoverCard(game, gameRefs, screenEvent.type, screenEvent.id, screenEvent.x, screenEvent.y);
+      switch (screenEvent.type) {
+        case "friendly": {
+          drawHoverCardFriendly(game, gameRefs, screenEvent.id, screenEvent.x, screenEvent.y);
+          return;
+        }
+        case "enemy": {
+          // drawHoverCard(game, gameRefs, screenEvent.id, screenEvent.x, screenEvent.y);
+          return;
+        }
+      }
       return;
     }
     case "ClearHoverCard": {
-      gameRefs.hoverViewPool.killAll();
+      clearHoverCard(gameRefs);
       return;
     }
   }

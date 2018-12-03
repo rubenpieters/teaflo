@@ -6,12 +6,13 @@ import { LevelSelectData } from "../screens/levelSelect";
 import { Solution } from "src/shared/game/solution";
 import { emptyTree, Location } from "src/shared/tree";
 import { SpritePool } from "../util/pool";
+import { HoverScreenData } from "../screens/hoverCard";
 
 export type GameRefs = {
   actSelectData: ActSelectData,
   levelSelectData: LevelSelectData,
   gameScreenData: GameScreenData,
-  hoverViewPool: Phaser.Group,
+  hoverScreenData: HoverScreenData,
   saveFile: SaveFileV1,
 }
 let gameRefs: GameRefs;
@@ -58,11 +59,15 @@ export default class Game extends Phaser.State {
       // TODO: what should initial levelId be?
       levelId: "",
     }
+    const hoverScreenData: HoverScreenData = {
+      hoverViewPool: new Phaser.Group(this.game),
+      hoverAbilityPool: new Phaser.Group(this.game),
+    }
     gameRefs = {
       actSelectData,
       levelSelectData,
       gameScreenData,
-      hoverViewPool: new Phaser.Group(this.game),
+      hoverScreenData,
       // TODO: read file from somewhere
       saveFile: newSaveFile,
     }
