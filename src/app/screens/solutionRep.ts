@@ -133,7 +133,7 @@ export function createUnit(
     // onInputUp
     () => {
       if (gameRefs.gameScreenData.clickState !== undefined) {
-        applyScreenEvent(mkAdvanceClickState(mkPositionId(id, type)), game, gameRefs);
+        applyScreenEvent(mkAdvanceClickState(mkPositionId(unit.data.id, unit.data.type)), game, gameRefs);
       }
     },
     // onInputOver

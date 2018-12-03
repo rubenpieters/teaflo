@@ -396,7 +396,6 @@ export function applyScreenEvent(
       const newSolution = extendSolution(screenEvent.solData, currentSolution, currentLoc);
       gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].solution = newSolution.solution;
       gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc = newSolution.loc;
-      // TODO: change state
 
       drawSolutionRep(game, gameRefs, screenEvent.levelId);
       drawSolutionInfo(game, gameRefs, screenEvent.levelId);

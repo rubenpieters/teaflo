@@ -37,11 +37,12 @@ export function runSolution(
   loc: Location,
   state: GameState,
 ): { state: GameState, log: Log } {
-  return _runSolution(solution, loc, state, emptyLog());
+  console.log(solution);
+  return _runSolution(solution.tree, loc, state, emptyLog());
 }
 
 export function _runSolution(
-  solution: Solution,
+  tree: Tree<SolutionData>,
   loc: Location,
   state: GameState,
   log: Log,
@@ -51,7 +52,7 @@ export function _runSolution(
   }
   // Action (Fr) Phase
   const frLog: LogEntry[] = [];
-  const solData: SolutionData = solution.tree.nodes[loc[0]].v;
+  const solData: SolutionData = tree.nodes[loc[0]].v;
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
   const frAction = intentToAction({ state, input: frInputs }, frAbility.intent);
@@ -77,5 +78,5 @@ export function _runSolution(
     frAction: frLog,
     enAction: enLog,
   }
-  return _runSolution(solution, loc.slice(1), state, currentLog);
+  return _runSolution(tree.nodes[loc[0]].tree, loc.slice(1), state, currentLog);
 }
