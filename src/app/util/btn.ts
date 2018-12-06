@@ -16,8 +16,18 @@ export function createButtonInPool<A extends {}>(
   onInputOut?: () => void,
 ): GSprite<ButtonValues & A> {
   let btnSprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
-  btnSprite.data = {...btnSprite.data, ...<any>a};
+  btnSprite.data = {
+    ...<any>a,
+    ...{ selecting: false },
+    // only copy init property from old data
+    ...{ init: btnSprite.data.init },
+  }
 
+  // clear old onKilled/onDestroy events
+  btnSprite.events.onKilled.removeAll();
+  btnSprite.events.onDestroy.removeAll();
+
+  // initialize if not initialized yuet
   btnSprite = initialize(game, btnSprite, pos,
     onInputDown === undefined ? () => { return; } : onInputDown,
     onInputUp === undefined ? () => { return; } : onInputUp,
@@ -47,8 +57,6 @@ function initialize(
   onInputOver: () => void,
   onInputOut: () => void,
 ): Button {
-  btnSprite.data.selecting = false;
-
   if (btnSprite.data.init === undefined || btnSprite.data.init === false) {
 
     btnSprite.inputEnabled = true;
@@ -83,7 +91,7 @@ export function addText<A>(
   btnString: string,
   txtColor: string,
 ): GSprite<A & { btnText: Phaser.Text}> {
-  const btnSpriteWTxt = (<GSprite<A & { btnText: Phaser.Text}>>btnSprite);
+  const btnSpriteWTxt = (<GSprite<A & { btnText?: Phaser.Text}>>btnSprite);
   const btnText = game.add.text(
     0, 0, btnString, {
       fill: txtColor,
@@ -97,11 +105,17 @@ export function addText<A>(
   btnSpriteWTxt.data.btnText = btnText;
   
   btnSprite.events.onKilled.add(() => {
-    btnSpriteWTxt.data.btnText.destroy();
+    if (btnSpriteWTxt.data.btnText !== undefined) {
+      btnSpriteWTxt.data.btnText.destroy();
+      btnSpriteWTxt.data.btnText = undefined;
+    }
   });
   btnSprite.events.onDestroy.add(() => {
-    btnSpriteWTxt.data.btnText.destroy();
+    if (btnSpriteWTxt.data.btnText !== undefined) {
+      btnSpriteWTxt.data.btnText.destroy();
+      btnSpriteWTxt.data.btnText = undefined;
+    }
   });
 
-  return btnSpriteWTxt;
+  return <GSprite<A & { btnText: Phaser.Text}>>btnSpriteWTxt;
 }
