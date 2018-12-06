@@ -16,7 +16,6 @@ import { OVER, NEUTRAL } from "../util/button";
 import { Log, LogEntry } from "../../shared/game/log";
 
 export type IntermediateSol = {
-  type: "frAction" | "enAction",
   index: number,
 }
 
@@ -24,14 +23,7 @@ function pickIntermediateSol(
   intermediateSol: IntermediateSol,
   log: Log,
 ): LogEntry {
-  switch (intermediateSol.type) {
-    case "frAction": {
-      return log.frAction[intermediateSol.index];
-    }
-    case "enAction": {
-      return log.enAction[intermediateSol.index];
-    }
-  }
+  return log[intermediateSol.index];
 }
 
 export function drawSolutionRep(

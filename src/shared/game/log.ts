@@ -6,14 +6,8 @@ export type LogEntry = {
   state: GameState,
 }
 
-export type Log = {
-  frAction: LogEntry[],
-  enAction: LogEntry[],
-}
+export type Log = LogEntry[];
 
 export function emptyLog() {
-  return {
-    frAction: [],
-    enAction: [],
-  }
+  return [];
 }

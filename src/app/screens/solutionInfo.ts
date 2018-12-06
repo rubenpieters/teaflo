@@ -1,5 +1,5 @@
 import { GameRefs } from "../states/game";
-import { createPosition, relativeTo, Position, inPosition } from "../util/position";
+import { createPosition, Position, inPosition } from "../util/position";
 import { config } from "../config";
 import { levelEnUnitMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
@@ -36,22 +36,12 @@ export function drawSolutionInfo(
   mkTree(game, gameRefs, levelId);
 
   // draw action log
-  let logIndex = 0;
-  solLog.frAction.forEach((entry, actionIndex) => {
+  solLog.forEach((entry, actionIndex) => {
     const actionBtnPos = createPosition(
       "left", 50, config.logButtonWidth,
-      "top", 600 + config.logButtonHeight * logIndex, config.logButtonHeight,
+      "top", 600 + config.logButtonHeight * actionIndex, config.logButtonHeight,
     );
-    createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", "frAction", actionIndex);
-    logIndex += 1;
-  });
-  solLog.enAction.forEach((entry, actionIndex) => {
-    const actionBtnPos = createPosition(
-      "left", 50, config.logButtonWidth,
-      "top", 600 + config.logButtonHeight * logIndex, config.logButtonHeight,
-    );
-    createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", "enAction", actionIndex);
-    logIndex += 1;
+    createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", actionIndex);
   });
 }
 
@@ -176,7 +166,6 @@ export function createActionLogButton(
   action: Action,
   pos: Position,
   key: string,
-  type: "frAction" | "enAction",
   index: number,
 ): ActionLogButton {
   const frame: number = 0;
@@ -200,7 +189,7 @@ export function createActionLogButton(
     // onInputOver
     () => {
       btn.frame = OVER;
-      applyScreenEvent(mkShowIntermediateSol(type, index), game, gameRefs);
+      applyScreenEvent(mkShowIntermediateSol(index), game, gameRefs);
     },
     // onInputOut
     () => {

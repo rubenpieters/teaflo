@@ -74,7 +74,7 @@ export type Intent
   | HealI
   ;
 
-type Context = {
+export type Context = {
   state: GameState,
   input?: any[],
 }

@@ -216,17 +216,14 @@ export function mkAdvanceClickState(
 
 type ShowIntermediateSol = {
   tag: "ShowIntermediateSol",
-  type: "frAction" | "enAction",
   index: number,
 }
 
 export function mkShowIntermediateSol(
-  type: "frAction" | "enAction",
   index: number,
 ): ShowIntermediateSol {
   return {
     tag: "ShowIntermediateSol",
-    type,
     index,
   }
 }
@@ -439,7 +436,6 @@ export function applyScreenEvent(
     }
     case "ShowIntermediateSol": {
       drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId, {
-        type: screenEvent.type,
         index: screenEvent.index,
       });
       return;
