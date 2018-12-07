@@ -51,13 +51,14 @@ export function _runSolution(
   if (loc.length === 0) {
     return { state, log };
   }
+  let newLog: LogEntry[] = [];
   // Action (Fr) Phase
   const solData: SolutionData = tree.nodes[loc[0]].v;
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
   const frActionResult = applyIntentToSolution(frAbility.intent, { input: frInputs }, state);
   state = frActionResult.state;
-  log = log.concat(frActionResult.log);
+  newLog = newLog.concat(frActionResult.log);
 
   // Action (En) Phase
   state.enUnits.forEach((enUnit, i) => {
@@ -70,11 +71,11 @@ export function _runSolution(
       // NOTE: cast is safe here if there is no way that a unit has been removed due to an action (eg. deaths)
       // TODO: do this via position id
       state = focus(state, over(x => x.enUnits[i], x => nextAI(state, <any>x)));
-      log = log.concat(enActionResult.log);
+      newLog = newLog.concat(enActionResult.log);
     }
   });
 
-  return _runSolution(tree.nodes[loc[0]].tree, loc.slice(1), state, log);
+  return _runSolution(tree.nodes[loc[0]].tree, loc.slice(1), state, newLog);
 }
 
 function applyIntentToSolution(
