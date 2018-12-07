@@ -25,6 +25,12 @@ export function mkGlobalId<A extends TargetType>(
   };
 }
 
+export function isGlobalId<A>(
+  a: any
+): a is GlobalId<A> {
+  return a.tag === "GlobalId";
+}
+
 type PositionId<A> = {
   tag: "PositionId",
   id: number,
@@ -40,6 +46,12 @@ export function mkPositionId<A extends TargetType>(
     id,
     type,
   };
+}
+
+export function isPositionId<A>(
+  a: any
+): a is PositionId<A> {
+  return a.tag === "PositionId";
 }
 
 export type EntityId<A>
