@@ -1,5 +1,5 @@
 import { FrUnit } from "src/shared/game/unit";
-import { mkDamageI, mkStatic, mkFromInput } from "../../game/intent";
+import { mkDamageI, mkStatic, mkFromInput, mkCombinedIntent, mkUseChargeI } from "../../game/intent";
 import { mkPositionId } from "../../game/entityId";
 import { mkTargetInput } from "../../game/ability";
 
@@ -10,9 +10,15 @@ export const fr_unit_a1_l1_01: FrUnit = {
   maxCharges: 5,
   abilities: [
     {
-      intent: mkDamageI(
-        mkFromInput(0),
-        mkStatic(1),
+      intent: mkCombinedIntent(
+        mkUseChargeI(
+          mkStatic(mkPositionId(0, "friendly")),
+          mkStatic(1),
+        ),
+        mkDamageI(
+          mkFromInput(0),
+          mkStatic(1),
+        ),
       ),
       inputs: [
         mkTargetInput(),
@@ -30,7 +36,7 @@ export const unit1: FrUnit = {
   abilities: [
     {
       intent: mkDamageI(
-        mkStatic(mkPositionId(0, "enemy")),
+        mkFromInput(0),
         mkStatic(1),
       ),
       inputs: [

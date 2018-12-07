@@ -1,6 +1,6 @@
 import { UnitId } from "./entityId";
 import { GameState } from "./state";
-import { Action, mkDamage, mkHeal } from "./action";
+import { Action, mkDamage, mkHeal, mkUseCharge, mkCombinedAction } from "./action";
 
 type Static<A> = {
   tag: "Static",
@@ -39,7 +39,7 @@ type DamageI = {
   tag: "DamageI",
   target: IntentVar<UnitId>,
   value: IntentVar<number>,
-}
+};
 
 export function mkDamageI(
   target: IntentVar<UnitId>,
@@ -56,7 +56,7 @@ type HealI = {
   tag: "HealI",
   target: IntentVar<UnitId>,
   value: IntentVar<number>,
-}
+};
 
 export function mkHealI(
   target: IntentVar<UnitId>,
@@ -69,9 +69,42 @@ export function mkHealI(
   }
 }
 
+type UseChargeI = {
+  tag: "UseChargeI",
+  target: IntentVar<UnitId>,
+  value: IntentVar<number>,
+}
+
+export function mkUseChargeI(
+  target: IntentVar<UnitId>,
+  value: IntentVar<number>,
+): UseChargeI {
+  return {
+    tag: "UseChargeI",
+    target,
+    value,
+  }
+}
+
+type CombinedIntent = {
+  tag: "CombinedIntent",
+  intents: Intent[],
+}
+
+export function mkCombinedIntent(
+  ...intents: Intent[]
+): CombinedIntent {
+  return {
+    tag: "CombinedIntent",
+    intents,
+  }
+}
+
 export type Intent
   = DamageI
   | HealI
+  | UseChargeI
+  | CombinedIntent
   ;
 
 export type Context = {
@@ -95,6 +128,16 @@ export function intentToAction(
         evaluateIntentVar(context, intent.target),
         evaluateIntentVar(context, intent.value),
       );
+    }
+    case "UseChargeI": {
+      return mkUseCharge(
+        evaluateIntentVar(context, intent.target),
+        evaluateIntentVar(context, intent.value),
+      );
+    }
+    case "CombinedIntent": {
+      const actions = intent.intents.map(x => intentToAction(context, x));
+      return mkCombinedAction(actions);
     }
   }
 }

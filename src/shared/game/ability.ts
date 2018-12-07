@@ -40,13 +40,26 @@ export type UserInput
 
 export function abilityText(
   ability: Ability,
-) {
-  switch (ability.intent.tag) {
+): string {
+  return intentText(ability.intent);
+}
+
+function intentText(
+  intent: Intent
+): string {
+  switch (intent.tag) {
     case "DamageI": {
-      return `DMG ${intentVarText(ability.intent.value)} to ${intentVarText(ability.intent.target)}`;
+      return `DMG ${intentVarText(intent.value)} to ${intentVarText(intent.target)}`;
     }
     case "HealI": {
-      return `HEAL ${intentVarText(ability.intent.value)} to ${intentVarText(ability.intent.target)}`;
+      return `HEAL ${intentVarText(intent.value)} to ${intentVarText(intent.target)}`;
+    }
+    case "UseChargeI": {
+      return `USE CH ${intentVarText(intent.value)} to ${intentVarText(intent.target)}`;
+    }
+    case "CombinedIntent": {
+      const texts = intent.intents.map(intentText);
+      return texts.join(" && ");
     }
   }
 }
