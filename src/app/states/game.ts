@@ -58,6 +58,11 @@ export default class Game extends Phaser.State {
       solTreePool: [],
       // TODO: what should initial levelId be?
       levelId: "",
+      statsScreenData: {
+        spriteGroup: new Phaser.Group(this.game),
+        texts: [],
+      },
+      state: <any>undefined,
     }
     const hoverScreenData: HoverScreenData = {
       hoverViewPool: new Phaser.Group(this.game),

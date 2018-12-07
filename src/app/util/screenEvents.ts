@@ -12,7 +12,7 @@ import { Solution, extendSolution, SolutionData } from "src/shared/game/solution
 import { Ability } from "src/shared/game/ability";
 import { Location } from "src/shared/tree";
 import { ClickState } from "./clickState";
-import { drawSolutionInfo } from "../screens/solutionInfo";
+import { drawSolutionInfo, drawCardInfo, clearCardInfo } from "../screens/solutionInfo";
 import { TargetType } from "../../shared/game/entityId";
 import { drawHoverCardFriendly, clearHoverCard } from "../screens/hoverCard";
 
@@ -273,6 +273,34 @@ export function mkClearHoverCard(
   }
 }
 
+type ShowCardInfo = {
+  tag: "ShowCardInfo",
+  id: number,
+  type: TargetType,
+}
+
+export function mkShowCardInfo(
+  id: number,
+  type: TargetType,
+): ShowCardInfo {
+  return {
+    tag: "ShowCardInfo",
+    id,
+    type,
+  }
+}
+
+type ClearCardInfo = {
+  tag: "ClearCardInfo",
+}
+
+export function mkClearCardInfo(
+): ClearCardInfo {
+  return {
+    tag: "ClearCardInfo",
+  }
+}
+
 type ScreenEvent
   = ChangeAct
   | ChangeLevel
@@ -290,6 +318,8 @@ type ScreenEvent
   | ClearIntermediateSol
   | ShowHoverCard
   | ClearHoverCard
+  | ShowCardInfo
+  | ClearCardInfo
   ;
 
 export function applyScreenEvent(
@@ -396,6 +426,7 @@ export function applyScreenEvent(
 
       drawSolutionRep(game, gameRefs, screenEvent.levelId);
       drawSolutionInfo(game, gameRefs, screenEvent.levelId);
+      clearCardInfo(gameRefs);
       return;
     }
     case "ChangeTreeLoc": {
@@ -404,6 +435,7 @@ export function applyScreenEvent(
 
       drawSolutionRep(game, gameRefs, screenEvent.levelId);
       drawSolutionInfo(game, gameRefs, screenEvent.levelId);
+      clearCardInfo(gameRefs);
       return;
     }
     case "CutTreeLoc": {
@@ -438,10 +470,12 @@ export function applyScreenEvent(
       drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId, {
         index: screenEvent.index,
       });
+      clearCardInfo(gameRefs);
       return;
     }
     case "ClearIntermediateSol": {
       drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
+      clearCardInfo(gameRefs);
       return;
     }
     case "ShowHoverCard": {
@@ -459,6 +493,16 @@ export function applyScreenEvent(
     }
     case "ClearHoverCard": {
       clearHoverCard(gameRefs);
+      return;
+    }
+    case "ShowCardInfo": {
+      drawCardInfo(game, gameRefs, screenEvent.id, screenEvent.type, gameRefs.gameScreenData.state);
+
+      return;
+    }
+    case "ClearCardInfo": {
+      clearCardInfo(gameRefs);
+
       return;
     }
   }

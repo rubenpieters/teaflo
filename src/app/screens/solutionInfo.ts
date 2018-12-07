@@ -8,11 +8,19 @@ import { extendSolution, Solution, runSolution } from "src/shared/game/solution"
 import { applyScreenEvent, mkExtendLevelSolution, mkChangeTreeLoc, mkSetClickState, mkAdvanceClickState, mkShowIntermediateSol, mkClearIntermediateSol } from "../util/screenEvents";
 import { Location, Tree } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
-import { mkGameState } from "src/shared/game/state";
+import { mkGameState, GameState } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
 import { mkPositionId, TargetType } from "../../shared/game/entityId";
 import { OVER, NEUTRAL } from "../util/button";
+import { Unit } from "../../shared/game/unit";
+
+export type StatsScreenData = {
+  spriteGroup: Phaser.Group,
+  statsLabel?: Phaser.Text,
+  abilitiesLabel?: Phaser.Text,
+  texts: Phaser.Text[],
+}
 
 export function drawSolutionInfo(
   game: Phaser.Game,
@@ -43,6 +51,93 @@ export function drawSolutionInfo(
     );
     createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", actionIndex);
   });
+
+  // draw stats screen headers
+  if (gameRefs.gameScreenData.statsScreenData.statsLabel === undefined) {
+    const statsLblPos = createPosition(
+      "left", 1000, 720,
+      "bot", 540, 100,
+    );
+    const statsLbl = game.add.text(
+      statsLblPos.xMin, statsLblPos.yMin, "Stats", {
+        fill: "#000000",
+        fontSize: 70,
+        boundsAlignH: "center",
+        boundsAlignV: "middle",
+      }
+    );
+    statsLbl.setTextBounds(0, 0, statsLblPos.xMax - statsLblPos.xMin, statsLblPos.yMax - statsLblPos.yMin);
+  }
+  if (gameRefs.gameScreenData.statsScreenData.abilitiesLabel === undefined) {
+    const statsLblPos = createPosition(
+      "left", 1720, 720,
+      "bot", 540, 100,
+    );
+    const statsLbl = game.add.text(
+      statsLblPos.xMin, statsLblPos.yMin, "Abilities", {
+        fill: "#000000",
+        fontSize: 70,
+        boundsAlignH: "center",
+        boundsAlignV: "middle",
+      }
+    );
+    statsLbl.setTextBounds(0, 0, statsLblPos.xMax - statsLblPos.xMin, statsLblPos.yMax - statsLblPos.yMin);
+  }
+}
+
+export function drawCardInfo(
+  game: Phaser.Game,
+  gameRefs: GameRefs,
+  id: number,
+  type: TargetType,
+  state: GameState,
+) {
+  gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.destroy());
+
+  let arr: (Unit | undefined)[];
+  if (type === "friendly") {
+    arr = state.frUnits;
+  } else {
+    arr = state.enUnits;
+  }
+  const unit = arr[id];
+  if (unit !== undefined) {
+    const hpPos = createPosition(
+      "left", 1000, 720,
+      "bot", 440, 100,
+    );
+    const hpLbl = game.add.text(
+      hpPos.xMin, hpPos.yMin, `${unit.hp}/${unit.maxHp} HP`, {
+        fill: "#000000",
+        fontSize: 70,
+        boundsAlignH: "center",
+        boundsAlignV: "middle",
+      }
+    );
+    hpLbl.setTextBounds(0, 0, hpPos.xMax - hpPos.xMin, hpPos.yMax - hpPos.yMin);
+    gameRefs.gameScreenData.statsScreenData.texts.push(hpLbl);
+  
+    const chPos = createPosition(
+      "left", 1000, 720,
+      "bot", 340, 100,
+    );
+    const chLbl = game.add.text(
+      chPos.xMin, chPos.yMin, `${unit.charges}/${unit.maxCharges} CH`, {
+        fill: "#000000",
+        fontSize: 70,
+        boundsAlignH: "center",
+        boundsAlignV: "middle",
+      }
+    );
+    chLbl.setTextBounds(0, 0, chPos.xMax - chPos.xMin, chPos.yMax - chPos.yMin);
+    gameRefs.gameScreenData.statsScreenData.texts.push(chLbl);
+  }
+}
+
+export function clearCardInfo(
+  gameRefs: GameRefs,
+) {
+  gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.destroy());
 }
 
 function locToPos(

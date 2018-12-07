@@ -6,6 +6,9 @@ import { mkGoToMenu, applyScreenEvent } from "../util/screenEvents";
 import { Button } from "../util/btn";
 import { SpritePool } from "../util/pool";
 import { ClickState } from "../util/clickState";
+import { StatsScreenData } from "./solutionInfo";
+import { Solution } from "../../shared/game/solution";
+import { GameState } from "../../shared/game/state";
 
 export type GameScreenData = {
   spriteGroup: Phaser.Group,
@@ -18,6 +21,8 @@ export type GameScreenData = {
   victoryBtn?: Phaser.Sprite,
   clickState?: ClickState,
   levelId: string,
+  state: GameState,
+  statsScreenData: StatsScreenData,
 }
 
 export function drawGameScreen(

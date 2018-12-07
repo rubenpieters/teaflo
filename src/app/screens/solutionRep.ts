@@ -5,7 +5,7 @@ import { levelEnUnitMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
 import { Ability } from "src/shared/game/ability";
 import { extendSolution, Solution, runSolution } from "src/shared/game/solution";
-import { applyScreenEvent, mkExtendLevelSolution, mkChangeTreeLoc, mkSetClickState, mkAdvanceClickState } from "../util/screenEvents";
+import { applyScreenEvent, mkExtendLevelSolution, mkChangeTreeLoc, mkSetClickState, mkAdvanceClickState, mkShowCardInfo, mkClearCardInfo } from "../util/screenEvents";
 import { Location, Tree } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
 import { mkGameState } from "src/shared/game/state";
@@ -40,10 +40,12 @@ export function drawSolutionRep(
   const sol = gameRefs.saveFile.levelSolutions[levelId][solId];
 
   // make initial state
+  // TODO: move to applyScreenEvent?
   const frUnits = gameRefs.saveFile.levelSolutions[levelId][solId].cardIds;
   const enUnits = levelEnUnitMap[levelId];
   const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solution, sol.loc, initState);
+  gameRefs.gameScreenData.state = solResult.state;
   let solState = solResult.state;
   if (intermediateSol !== undefined) {
     solState = pickIntermediateSol(intermediateSol, solResult.log).state;
@@ -130,11 +132,11 @@ export function createUnit(
     },
     // onInputOver
     () => {
-      //
+      applyScreenEvent(mkShowCardInfo(unit.data.id, unit.data.type), game, gameRefs);
     },
     // onInputOut
     () => {
-      //
+      applyScreenEvent(mkClearCardInfo(), game, gameRefs);
     },
   );
 
