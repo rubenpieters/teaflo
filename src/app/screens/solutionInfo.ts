@@ -3,7 +3,7 @@ import { createPosition, Position, inPosition } from "../util/position";
 import { config } from "../config";
 import { levelEnUnitMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
-import { Ability } from "src/shared/game/ability";
+import { Ability, HasAbilities } from "src/shared/game/ability";
 import { extendSolution, Solution, runSolution } from "src/shared/game/solution";
 import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
@@ -15,12 +15,14 @@ import { createButtonInPool, addText } from "../util/btn";
 import { TargetType } from "../../shared/game/entityId";
 import { OVER, NEUTRAL } from "../util/button";
 import { Unit } from "../../shared/game/unit";
+import { SpritePool } from "../util/pool";
 
 export type StatsScreenData = {
   spriteGroup: Phaser.Group,
   statsLabel?: Phaser.Text,
   abilitiesLabel?: Phaser.Text,
   texts: Phaser.Text[],
+  abilitiesPool: SpritePool<AbilitySprite>,
 }
 
 export function drawSolutionInfo(
@@ -68,21 +70,23 @@ export function drawSolutionInfo(
       }
     );
     statsLbl.setTextBounds(0, 0, statsLblPos.xMax - statsLblPos.xMin, statsLblPos.yMax - statsLblPos.yMin);
+    gameRefs.gameScreenData.statsScreenData.statsLabel = statsLbl;
   }
   if (gameRefs.gameScreenData.statsScreenData.abilitiesLabel === undefined) {
-    const statsLblPos = createPosition(
+    const ablsLblPos = createPosition(
       "left", 1720, 720,
       "bot", 540, 100,
     );
-    const statsLbl = game.add.text(
-      statsLblPos.xMin, statsLblPos.yMin, "Abilities", {
+    const ablsLbl = game.add.text(
+      ablsLblPos.xMin, ablsLblPos.yMin, "Abilities", {
         fill: "#000000",
         fontSize: 70,
         boundsAlignH: "center",
         boundsAlignV: "middle",
       }
     );
-    statsLbl.setTextBounds(0, 0, statsLblPos.xMax - statsLblPos.xMin, statsLblPos.yMax - statsLblPos.yMin);
+    ablsLbl.setTextBounds(0, 0, ablsLblPos.xMax - ablsLblPos.xMin, ablsLblPos.yMax - ablsLblPos.yMin);
+    gameRefs.gameScreenData.statsScreenData.abilitiesLabel = ablsLbl;
   }
 }
 
@@ -94,6 +98,8 @@ export function drawCardInfo(
   state: GameState,
 ) {
   gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.destroy());
+  gameRefs.gameScreenData.statsScreenData.texts = [];
+  gameRefs.gameScreenData.statsScreenData.abilitiesPool.killAll();
 
   let arr: (Unit | undefined)[];
   if (type === "friendly") {
@@ -132,6 +138,21 @@ export function drawCardInfo(
     );
     chLbl.setTextBounds(0, 0, chPos.xMax - chPos.xMin, chPos.yMax - chPos.yMin);
     gameRefs.gameScreenData.statsScreenData.texts.push(chLbl);
+
+    if (type === "friendly") {
+      const frUnit = <HasAbilities>(<any>unit);
+      frUnit.abilities.forEach((ability, abilityIndex) => {
+        const ablPos = createPosition(
+          "left", 2080, config.abilityIconWidth,
+          "bot", 400, config.abilityIconHeight - 170 * (abilityIndex),
+        );
+        const abilityIcon = createUnitAbility(
+          game, gameRefs, ablPos, ability.spriteId, gameRefs.gameScreenData.levelId,
+          gameRefs.saveFile.activeSolutions[gameRefs.gameScreenData.levelId],
+          ability
+        )
+      });
+    }
   }
 }
 
@@ -139,6 +160,53 @@ export function clearCardInfo(
   gameRefs: GameRefs,
 ) {
   gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.destroy());
+  gameRefs.gameScreenData.statsScreenData.abilitiesPool.killAll();
+}
+
+type AbilitySprite = GSprite<{
+  init: boolean,
+  levelId: string,
+  solId: number,
+  ability: Ability,
+}>;
+
+export function createUnitAbility(
+  game: Phaser.Game,
+  gameRefs: GameRefs,
+  pos: Position,
+  key: string,
+  levelId: string,
+  solId: number,
+  ability: Ability,
+): AbilitySprite {
+  const unit: AbilitySprite =
+    gameRefs.gameScreenData.statsScreenData.abilitiesPool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
+  
+  unit.data.levelId = levelId;
+  unit.data.solId = solId;
+  unit.data.ability = ability;
+
+  if (unit.data.init === undefined || unit.data.init === false) {
+    unit.inputEnabled = true;
+    unit.events.onInputUp.add(() => {
+      if (
+        inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
+      ) {
+        if (unit.data.ability.inputs.length === 0) {
+          applyScreenEvent(new SE.ExtendLevelSolution({
+            ability: unit.data.ability,
+            inputs: []
+          }, unit.data.levelId), game, gameRefs);
+        } else {
+          applyScreenEvent(new SE.SetClickState({ ability, currentInputs: [] }), game, gameRefs);
+        }
+      }
+    });
+
+    unit.data.init = true;
+  }
+
+  return unit;
 }
 
 function locToPos(

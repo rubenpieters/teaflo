@@ -15,7 +15,7 @@ export const fr_unit_a1_l1_01: FrUnit = {
           new I.Static(new PositionId(0, "friendly")),
           new I.Static(1),
         ),
-        new I.UseChargeI(
+        new I.DamageI(
           new I.FromInput(0),
           new I.Static(1),
         ),

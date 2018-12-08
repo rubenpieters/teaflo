@@ -21,4 +21,7 @@ export const config = {
 
   logButtonWidth: 960,
   logButtonHeight: 100,
+
+  abilityIconWidth: 150,
+  abilityIconHeight: 150,
 };

@@ -67,14 +67,6 @@ export function drawSolutionRep(
       );
       unitHpPos.xMax = unitHpPos.xMin + (unitHpPos.xMax - unitHpPos.xMin) * (unit.hp / unit.maxHp);
       createUnitHp(game, gameRefs, unitHpPos, "hp");
-
-      unit.abilities.forEach((ability, abilityIndex) => {
-        const abilityPos = relativeTo(unitHpPos,
-          "below", 50 + 110 * abilityIndex,
-          config.unitHpBarWidth, config.unitHpBarHeight,
-        );
-        createUnitAbility(game, gameRefs, abilityPos, "ability", levelId, solId, ability);
-      });
     }
   });
 
@@ -156,51 +148,6 @@ export function createUnitHp(
   unit.width = pos.xMax - pos.xMin;
   
   if (unit.data.init === undefined || unit.data.init === false) {
-
-    unit.data.init = true;
-  }
-
-  return unit;
-}
-
-type AbilitySprite = GSprite<{
-  init: boolean,
-  levelId: string,
-  solId: number,
-  ability: Ability,
-}>;
-
-export function createUnitAbility(
-  game: Phaser.Game,
-  gameRefs: GameRefs,
-  pos: Position,
-  key: string,
-  levelId: string,
-  solId: number,
-  ability: Ability,
-): AbilitySprite {
-  const unit: AbilitySprite = gameRefs.gameScreenData.unitAbilityPool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
-  
-  unit.data.levelId = levelId;
-  unit.data.solId = solId;
-  unit.data.ability = ability;
-
-  if (unit.data.init === undefined || unit.data.init === false) {
-    unit.inputEnabled = true;
-    unit.events.onInputUp.add(() => {
-      if (
-        inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
-      ) {
-        if (unit.data.ability.inputs.length === 0) {
-          applyScreenEvent(new SE.ExtendLevelSolution({
-            ability: unit.data.ability,
-            inputs: []
-          }, unit.data.levelId), game, gameRefs);
-        } else {
-          applyScreenEvent(new SE.SetClickState({ ability, currentInputs: [] }), game, gameRefs);
-        }
-      }
-    });
 
     unit.data.init = true;
   }

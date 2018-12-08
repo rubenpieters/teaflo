@@ -396,6 +396,7 @@ export function applyScreenEvent(
         type: screenEvent.type
       };
 
+      drawCardInfo(game, gameRefs, screenEvent.id, screenEvent.type, gameRefs.gameScreenData.state);
       return;
     }
     case "UnlockCardInfo": {

@@ -45,13 +45,14 @@ module.exports = {
   ],
   module: {
     rules: [
-      { test: /\.ts$/,
+      // disabled tslint to improve dev-loop
+      /*{ test: /\.ts$/,
         enforce: "pre",
         loader: "tslint-loader",
         options: {
           typeCheck: true,
         },
-      },
+      },*/
       { test: /assets(\/|\\)/,
         loader: "file-loader?name=assets/[hash].[ext]",
       },

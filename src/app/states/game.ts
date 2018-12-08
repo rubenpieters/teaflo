@@ -46,9 +46,9 @@ export default class Game extends Phaser.State {
     const levelSelectData: LevelSelectData = {
       btnPool: new SpritePool(this.game),
       spriteGroup: new Phaser.Group(this.game),
+      solBtnPool: new Phaser.Group(this.game),
       cardSlotPool: new Phaser.Group(this.game),
       cardPool: new Phaser.Group(this.game),
-      solBtnPool: new Phaser.Group(this.game),
     }
     const gameScreenData: GameScreenData = {
       spriteGroup: new Phaser.Group(this.game),
@@ -61,6 +61,7 @@ export default class Game extends Phaser.State {
       levelId: "",
       statsScreenData: {
         spriteGroup: new Phaser.Group(this.game),
+        abilitiesPool: new SpritePool(this.game),
         texts: [],
       },
       state: <any>undefined,
@@ -106,6 +107,13 @@ export function setGameScreenVisible(
   gameRefs.gameScreenData.unitAbilityPool.visible = visible;
   gameRefs.gameScreenData.logBtnPool.visible = visible;
   gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.visible = visible);
+  gameRefs.gameScreenData.statsScreenData.abilitiesPool.visible = visible;
+  if (gameRefs.gameScreenData.statsScreenData.abilitiesLabel !== undefined) {
+    gameRefs.gameScreenData.statsScreenData.abilitiesLabel.visible = visible;
+  }
+  if (gameRefs.gameScreenData.statsScreenData.statsLabel !== undefined) {
+    gameRefs.gameScreenData.statsScreenData.statsLabel.visible = visible;
+  }
 }
 
 export function newSolution(): {
