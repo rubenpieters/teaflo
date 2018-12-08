@@ -11,29 +11,17 @@ export type AI = { action: Action, outs: Outs }[];
 
 type Outs = { aiOut: AIOut, condition: Condition }[];
 
-type ToX = {
-  tag: "ToX",
-  x: number,
+export class ToX {
+  constructor(
+    public readonly x: number,
+    public readonly tag: "ToX" = "ToX",
+  ) {}
 }
 
-export function mkToX(
-  x: number,
-): ToX {
-  return {
-    tag: "ToX",
-    x,
-  }
-}
-
-type ToSelf = {
-  tag: "ToSelf",
-}
-
-export function mkToSelf(
-): ToSelf {
-  return {
-    tag: "ToSelf",
-  }
+export class ToSelf {
+  constructor(
+    public readonly tag: "ToSelf" = "ToSelf",
+  ) {}
 }
 
 type AIOut

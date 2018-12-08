@@ -1,7 +1,7 @@
 import { FrUnit } from "src/shared/game/unit";
-import { mkDamageI, mkStatic, mkFromInput, mkCombinedIntent, mkUseChargeI } from "../../game/intent";
-import { mkPositionId } from "../../game/entityId";
-import { mkTargetInput } from "../../game/ability";
+import * as I from "../../game/intent";
+import { PositionId } from "../../game/entityId";
+import { TargetInput } from "../../game/ability";
 
 export const fr_unit_a1_l1_01: FrUnit = {
   hp: 20,
@@ -10,18 +10,18 @@ export const fr_unit_a1_l1_01: FrUnit = {
   maxCharges: 5,
   abilities: [
     {
-      intent: mkCombinedIntent(
-        mkUseChargeI(
-          mkStatic(mkPositionId(0, "friendly")),
-          mkStatic(1),
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          new I.Static(new PositionId(0, "friendly")),
+          new I.Static(1),
         ),
-        mkDamageI(
-          mkFromInput(0),
-          mkStatic(1),
+        new I.UseChargeI(
+          new I.FromInput(0),
+          new I.Static(1),
         ),
-      ),
+      ]),
       inputs: [
-        mkTargetInput(),
+        new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
     }
@@ -35,12 +35,12 @@ export const unit1: FrUnit = {
   maxCharges: 5,
   abilities: [
     {
-      intent: mkDamageI(
-        mkFromInput(0),
-        mkStatic(1),
+      intent: new I.DamageI(
+        new I.FromInput(0),
+        new I.Static(1),
       ),
       inputs: [
-        mkTargetInput(),
+        new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
     }

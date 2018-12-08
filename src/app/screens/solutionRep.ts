@@ -5,14 +5,14 @@ import { levelEnUnitMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
 import { Ability } from "src/shared/game/ability";
 import { extendSolution, Solution, runSolution } from "src/shared/game/solution";
-import { applyScreenEvent, mkExtendLevelSolution, mkChangeTreeLoc, mkSetClickState, mkAdvanceClickState, mkShowCardInfo, mkClearCardInfo } from "../util/screenEvents";
+import { applyScreenEvent } from "../util/screenEvents";
+import * as SE from "../util/screenEvents";
 import { Location, Tree } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
 import { mkGameState } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
-import { mkPositionId, TargetType } from "../../shared/game/entityId";
-import { OVER, NEUTRAL } from "../util/button";
+import { TargetType, PositionId } from "../../shared/game/entityId";
 import { Log, LogEntry } from "../../shared/game/log";
 
 export type IntermediateSol = {
@@ -127,16 +127,16 @@ export function createUnit(
     // onInputUp
     () => {
       if (gameRefs.gameScreenData.clickState !== undefined) {
-        applyScreenEvent(mkAdvanceClickState(mkPositionId(unit.data.id, unit.data.type)), game, gameRefs);
+        applyScreenEvent(new SE.AdvanceClickState(new PositionId(unit.data.id, unit.data.type)), game, gameRefs);
       }
     },
     // onInputOver
     () => {
-      applyScreenEvent(mkShowCardInfo(unit.data.id, unit.data.type), game, gameRefs);
+      applyScreenEvent(new SE.ShowCardInfo(unit.data.id, unit.data.type), game, gameRefs);
     },
     // onInputOut
     () => {
-      applyScreenEvent(mkClearCardInfo(), game, gameRefs);
+      applyScreenEvent(new SE.ClearCardInfo(), game, gameRefs);
     },
   );
 
@@ -190,12 +190,12 @@ export function createUnitAbility(
         inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
       ) {
         if (unit.data.ability.inputs.length === 0) {
-          applyScreenEvent(mkExtendLevelSolution({
+          applyScreenEvent(new SE.ExtendLevelSolution({
             ability: unit.data.ability,
             inputs: []
           }, unit.data.levelId), game, gameRefs);
         } else {
-          applyScreenEvent(mkSetClickState(ability), game, gameRefs);
+          applyScreenEvent(new SE.SetClickState({ ability, currentInputs: [] }), game, gameRefs);
         }
       }
     });

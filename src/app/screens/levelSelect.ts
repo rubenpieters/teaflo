@@ -3,7 +3,8 @@ import { levelMap } from "../gameData";
 import { createPosition, Position, inPosition } from "../util/position";
 import { config } from "../config";
 import { levelAvailable } from "../savefile/rep";
-import { applyScreenEvent, mkChangeLevel } from "../util/screenEvents";
+import { applyScreenEvent } from "../util/screenEvents";
+import * as SE from "../util/screenEvents";
 import { GSprite } from "src/shared/phaser-util";
 import { createButtonInPool, addText } from "../util/btn";
 import { SpritePool } from "../util/pool";
@@ -93,7 +94,7 @@ export function createLevelSelectButton(
       if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
         // noop
       } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
-        applyScreenEvent(mkChangeLevel(btn.data.levelId), game, gameRefs);
+        applyScreenEvent(new SE.ChangeLevel(btn.data.levelId), game, gameRefs);
       } else {
         // noop
       }

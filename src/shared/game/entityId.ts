@@ -8,53 +8,35 @@ export type TargetType
   | "enemy"
   ;
 
-type GlobalId<A> = {
-  tag: "GlobalId",
-  id: number,
-  type: A,
-};
-
-export function mkGlobalId<A extends TargetType>(
-  id: number,
-  type: A,
-): GlobalId<A> {
-  return {
-    tag: "GlobalId",
-    id,
-    type,
-  };
+export class GlobalId<A extends TargetType>{
+  constructor(
+    public readonly id: number,
+    public readonly type: A,
+    public readonly tag: "GlobalId" = "GlobalId",
+  ) {}
 }
 
-export function isGlobalId<A>(
+export class PositionId<A extends TargetType>{
+  constructor(
+    public readonly id: number,
+    public readonly type: A,
+    public readonly tag: "PositionId" = "PositionId",
+  ) {}
+}
+
+export function isGlobalId<A extends TargetType>(
   a: any
 ): a is GlobalId<A> {
   return a.tag === "GlobalId";
 }
 
-type PositionId<A> = {
-  tag: "PositionId",
-  id: number,
-  type: A,
-};
-
-export function mkPositionId<A extends TargetType>(
-  id: number,
-  type: A,
-): PositionId<A> {
-  return {
-    tag: "PositionId",
-    id,
-    type,
-  };
-}
-
-export function isPositionId<A>(
+export function isPositionId<A extends TargetType>(
   a: any
 ): a is PositionId<A> {
   return a.tag === "PositionId";
 }
 
-export type EntityId<A>
+export type EntityId<A extends TargetType>
   = GlobalId<A>
   | PositionId<A>
   ;
@@ -124,7 +106,7 @@ export function findIndex<A extends TargetType>(
   throw `findIndex: unknown type ${id.type}`;
 }
 
-function findI<E extends HasId, A>(
+function findI<E extends HasId, A extends TargetType>(
   coll: (E | undefined)[],
   id: EntityId<A>,
 ): number {

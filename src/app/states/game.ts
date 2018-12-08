@@ -1,7 +1,8 @@
 import { GameScreenData } from "../screens/gameScreen";
 import { SaveFileV1 } from "../savefile/rep";
 import { ActSelectData } from "../screens/actSelect";
-import { applyScreenEvent, mkChangeAct } from "../util/screenEvents";
+import { applyScreenEvent } from "../util/screenEvents";
+import * as SE from "../util/screenEvents";
 import { LevelSelectData } from "../screens/levelSelect";
 import { Solution } from "src/shared/game/solution";
 import { emptyTree, Location } from "src/shared/tree";
@@ -81,7 +82,7 @@ export default class Game extends Phaser.State {
   public create(): void {
     this.stage.backgroundColor = 0xDCDCDC;
 
-    applyScreenEvent(mkChangeAct(0), this.game, gameRefs);
+    applyScreenEvent(new SE.ChangeAct(0), this.game, gameRefs);
   }
 }
 

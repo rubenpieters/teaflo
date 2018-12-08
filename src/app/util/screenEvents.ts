@@ -16,289 +16,140 @@ import { drawSolutionInfo, drawCardInfo, clearCardInfo } from "../screens/soluti
 import { TargetType } from "../../shared/game/entityId";
 import { drawHoverCardFriendly, clearHoverCard } from "../screens/hoverCard";
 
-export type ChangeAct = {
-  tag: "ChangeAct",
-  actId: number,
+export class ChangeAct {
+  constructor(
+    public readonly actId: number,
+    public readonly tag: "ChangeAct" = "ChangeAct",
+  ) {}
 }
 
-export function mkChangeAct(
-  actId: number,
-): ChangeAct {
-  return {
-    tag: "ChangeAct",
-    actId,
-  }
+export class ChangeLevel {
+  constructor(
+    public readonly levelId: string,
+    public readonly tag: "ChangeLevel" = "ChangeLevel",
+  ) {}
 }
 
-type ChangeLevel = {
-  tag: "ChangeLevel",
-  levelId: string,
+export class StartLevel {
+  constructor(
+    public readonly levelId: string,
+    public readonly solId: number,
+    public readonly tag: "StartLevel" = "StartLevel",
+  ) {}
 }
 
-export function mkChangeLevel(
-  levelId: string,
-): ChangeLevel {
-  return {
-    tag: "ChangeLevel",
-    levelId,
-  }
+export class AddSolution {
+  constructor(
+    public readonly levelId: string,
+    public readonly tag: "AddSolution" = "AddSolution",
+  ) {}
 }
 
-type StartLevel = {
-  tag: "StartLevel",
-  levelId: string,
-  solId: number,
+export class ChangeActiveSolution {
+  constructor(
+    public readonly levelId: string,
+    public readonly solId: number,
+    public readonly tag: "ChangeActiveSolution" = "ChangeActiveSolution",
+  ) {}
 }
 
-export function mkStartLevel(
-  levelId: string,
-  solId: number,
-): StartLevel {
-  return {
-    tag: "StartLevel",
-    levelId,
-    solId,
-  }
+export class DeployCard {
+  constructor(
+    public readonly levelId: string,
+    public readonly cardId: string,
+    public readonly solId: number,
+    public readonly from: { pos: number, type: "supply" | "deploy" },
+    public readonly to: { pos: number, type: "supply" | "deploy" },
+    public readonly tag: "DeployCard" = "DeployCard",
+  ) {}
 }
 
-type AddSolution = {
-  tag: "AddSolution",
-  levelId: string,
+export class GoToMenu {
+  constructor(
+    public readonly levelId: string,
+    public readonly tag: "GoToMenu" = "GoToMenu",
+  ) {}
 }
 
-export function mkAddSolution(
-  levelId: string,
-): AddSolution {
-  return {
-    tag: "AddSolution",
-    levelId,
-  }
+export class ExtendLevelSolution {
+  constructor(
+    public readonly solData: SolutionData,
+    public readonly levelId: string,
+    public readonly tag: "ExtendLevelSolution" = "ExtendLevelSolution",
+  ) {}
 }
 
-type ChangeActiveSolution = {
-  tag: "ChangeActiveSolution",
-  levelId: string,
-  solId: number,
+export class ChangeTreeLoc {
+  constructor(
+    public readonly loc: Location,
+    public readonly levelId: string,
+    public readonly tag: "ChangeTreeLoc" = "ChangeTreeLoc",
+  ) {}
 }
 
-export function mkChangeActiveSolution(
-  levelId: string,
-  solId: number,
-): ChangeActiveSolution {
-  return {
-    tag: "ChangeActiveSolution",
-    levelId,
-    solId,
-  }
+export class CutTreeLoc {
+  constructor(
+    public readonly loc: Location,
+    public readonly levelId: string,
+    public readonly tag: "CutTreeLoc" = "CutTreeLoc",
+  ) {}
 }
 
-type DeployCard = {
-  tag: "DeployCard",
-  levelId: string,
-  cardId: string,
-  solId: number,
-  from: { pos: number, type: "supply" | "deploy" },
-  to: { pos: number, type: "supply" | "deploy" },
+export class SetClickState {
+  constructor(
+    public readonly clickState: ClickState,
+    public readonly tag: "SetClickState" = "SetClickState",
+  ) {}
 }
 
-export function mkDeployCard(
-  levelId: string,
-  cardId: string,
-  solId: number,
-  from: { pos: number, type: "supply" | "deploy" },
-  to: { pos: number, type: "supply" | "deploy" },
-): DeployCard {
-  return {
-    tag: "DeployCard",
-    levelId,
-    cardId,
-    solId,
-    from,
-    to,
-  }
+export class AdvanceClickState {
+  constructor(
+    public readonly input: any,
+    public readonly tag: "AdvanceClickState" = "AdvanceClickState",
+  ) {}
 }
 
-type GoToMenu = {
-  tag: "GoToMenu",
-  levelId: string,
+export class ShowIntermediateSol {
+  constructor(
+    public readonly index: number,
+    public readonly tag: "ShowIntermediateSol" = "ShowIntermediateSol",
+  ) {}
 }
 
-export function mkGoToMenu(
-  levelId: string,
-): GoToMenu {
-  return {
-    tag: "GoToMenu",
-    levelId,
-  }
+export class ClearIntermediateSol {
+  constructor(
+    public readonly tag: "ClearIntermediateSol" = "ClearIntermediateSol",
+  ) {}
 }
 
-type ExtendLevelSolution = {
-  tag: "ExtendLevelSolution",
-  solData: SolutionData,
-  levelId: string,
+export class ShowHoverCard {
+  constructor(
+    public readonly type: TargetType,
+    public readonly id: string,
+    public readonly x: number,
+    public readonly y: number,
+    public readonly tag: "ShowHoverCard" = "ShowHoverCard",
+  ) {}
 }
 
-export function mkExtendLevelSolution(
-  solData: SolutionData,
-  levelId: string,
-): ExtendLevelSolution {
-  return {
-    tag: "ExtendLevelSolution",
-    solData,
-    levelId,
-  }
+export class ClearHoverCard {
+  constructor(
+    public readonly tag: "ClearHoverCard" = "ClearHoverCard",
+  ) {}
 }
 
-type ChangeTreeLoc = {
-  tag: "ChangeTreeLoc",
-  loc: Location,
-  levelId: string,
+export class ShowCardInfo {
+  constructor(
+    public readonly id: number,
+    public readonly type: TargetType,
+    public readonly tag: "ShowCardInfo" = "ShowCardInfo",
+  ) {}
 }
 
-export function mkChangeTreeLoc(
-  loc: Location,
-  levelId: string,
-): ChangeTreeLoc {
-  return {
-    tag: "ChangeTreeLoc",
-    loc,
-    levelId,
-  }
-}
-
-type CutTreeLoc = {
-  tag: "CutTreeLoc",
-  loc: Location,
-  levelId: string,
-}
-
-export function mkCutTreeLoc(
-  loc: Location,
-  levelId: string,
-): CutTreeLoc {
-  return {
-    tag: "CutTreeLoc",
-    loc,
-    levelId,
-  }
-}
-
-type SetClickState = {
-  tag: "SetClickState",
-  clickState: ClickState,
-}
-
-export function mkSetClickState(
-  ability: Ability,
-): SetClickState {
-  return {
-    tag: "SetClickState",
-    clickState: {
-      ability,
-      currentInputs: [],
-    },
-  }
-}
-
-type AdvanceClickState = {
-  tag: "AdvanceClickState",
-  input: any,
-}
-
-export function mkAdvanceClickState(
-  input: any,
-): AdvanceClickState {
-  return {
-    tag: "AdvanceClickState",
-    input,
-  }
-}
-
-type ShowIntermediateSol = {
-  tag: "ShowIntermediateSol",
-  index: number,
-}
-
-export function mkShowIntermediateSol(
-  index: number,
-): ShowIntermediateSol {
-  return {
-    tag: "ShowIntermediateSol",
-    index,
-  }
-}
-
-type ClearIntermediateSol = {
-  tag: "ClearIntermediateSol",
-}
-
-export function mkClearIntermediateSol(
-): ClearIntermediateSol {
-  return {
-    tag: "ClearIntermediateSol",
-  }
-}
-
-type ShowHoverCard = {
-  tag: "ShowHoverCard",
-  type: TargetType,
-  id: string,
-  x: number,
-  y: number,
-}
-
-export function mkShowHoverCard(
-  type: TargetType,
-  id: string,
-  x: number,
-  y: number,
-): ShowHoverCard {
-  return {
-    tag: "ShowHoverCard",
-    type,
-    id,
-    x,
-    y,
-  }
-}
-
-type ClearHoverCard = {
-  tag: "ClearHoverCard",
-}
-
-export function mkClearHoverCard(
-): ClearHoverCard {
-  return {
-    tag: "ClearHoverCard",
-  }
-}
-
-type ShowCardInfo = {
-  tag: "ShowCardInfo",
-  id: number,
-  type: TargetType,
-}
-
-export function mkShowCardInfo(
-  id: number,
-  type: TargetType,
-): ShowCardInfo {
-  return {
-    tag: "ShowCardInfo",
-    id,
-    type,
-  }
-}
-
-type ClearCardInfo = {
-  tag: "ClearCardInfo",
-}
-
-export function mkClearCardInfo(
-): ClearCardInfo {
-  return {
-    tag: "ClearCardInfo",
-  }
+export class ClearCardInfo {
+  constructor(
+    public readonly tag: "ClearCardInfo" = "ClearCardInfo",
+  ) {}
 }
 
 type ScreenEvent
@@ -337,7 +188,7 @@ export function applyScreenEvent(
         console.log(`ERROR (applyScreenEvent ChangeAct): no levels for act ${screenEvent.actId}`);
         throw `applyScreenEvent ChangeAct: no levels for act ${screenEvent.actId}`;
       }
-      applyScreenEvent(mkChangeLevel(firstLevelId), game, gameRefs);
+      applyScreenEvent(new ChangeLevel(firstLevelId), game, gameRefs);
       return;
     }
     case "ChangeLevel": {
@@ -457,7 +308,7 @@ export function applyScreenEvent(
       if (clickState.currentInputs.length >= clickState.ability.inputs.length) {
         // click state is finished, extend solution
         gameRefs.gameScreenData.clickState = undefined;
-        applyScreenEvent(mkExtendLevelSolution({
+        applyScreenEvent(new ExtendLevelSolution({
             ability: clickState.ability,
             inputs: clickState.currentInputs,
           }, gameRefs.gameScreenData.levelId), game, gameRefs);

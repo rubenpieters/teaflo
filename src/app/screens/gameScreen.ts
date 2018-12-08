@@ -2,7 +2,8 @@ import { GameRefs } from "src/app/states/game";
 import { config } from "../config";
 import { createButton } from "../util/button";
 import { createPosition } from "../util/position";
-import { mkGoToMenu, applyScreenEvent } from "../util/screenEvents";
+import { applyScreenEvent } from "../util/screenEvents";
+import * as SE from "../util/screenEvents";
 import { Button } from "../util/btn";
 import { SpritePool } from "../util/pool";
 import { ClickState } from "../util/clickState";
@@ -37,7 +38,7 @@ export function drawGameScreen(
     );
     const exitBtn = createButton(game, gameRefs.gameScreenData.spriteGroup, exitBtnPos, "Exit", "btn_level",
       () => {
-        applyScreenEvent(mkGoToMenu(exitBtn.data.levelId), game, gameRefs)
+        applyScreenEvent(new SE.GoToMenu(exitBtn.data.levelId), game, gameRefs)
       }
     );
     gameRefs.gameScreenData.exitBtn = exitBtn;

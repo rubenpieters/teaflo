@@ -5,7 +5,8 @@ import { createButton } from "../util/button";
 import { levelDataMap } from "../gameData";
 import { createPoolCardSlot } from "../util/poolCardSlot";
 import { intersects, GSprite } from "../../shared/phaser-util";
-import { applyScreenEvent, mkDeployCard, mkStartLevel, mkShowHoverCard, mkClearHoverCard } from "../util/screenEvents";
+import { applyScreenEvent } from "../util/screenEvents";
+import * as SE from "../util/screenEvents";
 import { TargetType } from "../../shared/game/entityId";
 
 export function drawLevelInfo(
@@ -48,7 +49,7 @@ export function drawLevelInfo(
   );
   const startBtn = createButton(game, gameRefs.levelSelectData.spriteGroup, startBtnPos, "Start", "btn_level",
     () => {
-      applyScreenEvent(mkStartLevel(levelId, solId), game, gameRefs);
+      applyScreenEvent(new SE.StartLevel(levelId, solId), game, gameRefs);
     }
   );
   gameRefs.levelSelectData.startBtn = startBtn;
@@ -150,14 +151,14 @@ function createPoolLevelSelectCard(
     card.events.onInputOver.add(() => {
       const x = card.x + config.levelSelectCardWidth + 10;
       const y = card.y;
-      applyScreenEvent(mkShowHoverCard(card.data.type, card.data.cardId, x, y), game, gameRefs);
+      applyScreenEvent(new SE.ShowHoverCard(card.data.type, card.data.cardId, x, y), game, gameRefs);
     });
     card.events.onInputOut.add(() => {
-      applyScreenEvent(mkClearHoverCard(), game, gameRefs);
+      applyScreenEvent(new SE.ClearHoverCard(), game, gameRefs);
     });
     
     card.events.onDragStart.add(() => {
-      applyScreenEvent(mkClearHoverCard(), game, gameRefs);
+      applyScreenEvent(new SE.ClearHoverCard(), game, gameRefs);
     });
     card.events.onDragUpdate.add(() => {
       const cardBounds = card.getBounds();
@@ -185,7 +186,7 @@ function createPoolLevelSelectCard(
         let from = { pos: card.data.resetSlot.data.index, type: card.data.resetSlot.data.type };
         let to = { pos: card.data.hoverSlot.data.index, type: card.data.hoverSlot.data.type };
         applyScreenEvent(
-          mkDeployCard(card.data.levelId, card.data.cardId, card.data.solId, from, to),
+          new SE.DeployCard(card.data.levelId, card.data.cardId, card.data.solId, from, to),
           game, gameRefs
         );
         if (card.data.hoverSlot.data.card === undefined) {

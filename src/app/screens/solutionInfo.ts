@@ -5,13 +5,14 @@ import { levelEnUnitMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
 import { Ability } from "src/shared/game/ability";
 import { extendSolution, Solution, runSolution } from "src/shared/game/solution";
-import { applyScreenEvent, mkExtendLevelSolution, mkChangeTreeLoc, mkSetClickState, mkAdvanceClickState, mkShowIntermediateSol, mkClearIntermediateSol } from "../util/screenEvents";
+import { applyScreenEvent } from "../util/screenEvents";
+import * as SE from "../util/screenEvents";
 import { Location, Tree } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
 import { mkGameState, GameState } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
-import { mkPositionId, TargetType } from "../../shared/game/entityId";
+import { TargetType } from "../../shared/game/entityId";
 import { OVER, NEUTRAL } from "../util/button";
 import { Unit } from "../../shared/game/unit";
 
@@ -189,7 +190,7 @@ function drawTree<A>(
     sprite.events.onInputDown.add((obj: any, pointer: Phaser.Pointer) => {
       if (pointer.leftButton.isDown) {
         //changeLoc(board, newLoc)
-        applyScreenEvent(mkChangeTreeLoc(newLoc, levelId), game, gameRefs);
+        applyScreenEvent(new SE.ChangeTreeLoc(newLoc, levelId), game, gameRefs);
       } else if (pointer.rightButton.isDown) {
         //board.loc = loc;
         //board.solution = cutTree(board.solution, loc);
@@ -233,7 +234,7 @@ function mkTree(
   sprite.events.onInputDown.add((obj: any, pointer: Phaser.Pointer) => {
     if (pointer.leftButton.isDown) {
       //changeLoc(board, [])
-      applyScreenEvent(mkChangeTreeLoc([], levelId), game, gameRefs);
+      applyScreenEvent(new SE.ChangeTreeLoc([], levelId), game, gameRefs);
     } else if (pointer.rightButton.isDown) {
       //board.loc = [];
       //board.solution = cutTree(board.solution, []);
@@ -284,12 +285,12 @@ export function createActionLogButton(
     // onInputOver
     () => {
       btn.frame = OVER;
-      applyScreenEvent(mkShowIntermediateSol(index), game, gameRefs);
+      applyScreenEvent(new SE.ShowIntermediateSol(index), game, gameRefs);
     },
     // onInputOut
     () => {
       btn.frame = NEUTRAL;
-      applyScreenEvent(mkClearIntermediateSol(), game, gameRefs);
+      applyScreenEvent(new SE.ClearIntermediateSol(), game, gameRefs);
     },
   );
 

@@ -1,33 +1,20 @@
 import { UnitId, isGlobalId, isPositionId, TargetType } from "./entityId";
 import { GameState } from "./state";
-import { Action, mkDamage, mkHeal, mkUseCharge, mkCombinedAction } from "./action";
+import { Action } from "./action";
+import * as A from "./action";
 
-type Static<A> = {
-  tag: "Static",
-  a: A,
-};
-
-export function mkStatic<A>(
-  a: A,
-): Static<A> {
-  return {
-    tag: "Static",
-    a,
-  }
+export class Static<A> {
+  constructor(
+    public readonly a: A,
+    public readonly tag: "Static" = "Static",
+  ) {}
 }
 
-type FromInput = {
-  tag: "FromInput",
-  input: number,
-}
-
-export function mkFromInput(
-  input: number,
-): FromInput {
-  return {
-    tag: "FromInput",
-    input,
-  }
+export class FromInput {
+  constructor(
+    public readonly input: number,
+    public readonly tag: "FromInput" = "FromInput",
+  ) {}
 }
 
 export type IntentVar<A>
@@ -35,69 +22,35 @@ export type IntentVar<A>
   | FromInput
   ;
 
-type DamageI = {
-  tag: "DamageI",
-  target: IntentVar<UnitId>,
-  value: IntentVar<number>,
-};
-
-export function mkDamageI(
-  target: IntentVar<UnitId>,
-  value: IntentVar<number>,
-): DamageI {
-  return {
-    tag: "DamageI",
-    target,
-    value,
-  }
+export class DamageI {
+  constructor(
+    public readonly target: IntentVar<UnitId>,
+    public readonly value: IntentVar<number>,
+    public readonly tag: "DamageI" = "DamageI",
+  ) {}
 }
 
-type HealI = {
-  tag: "HealI",
-  target: IntentVar<UnitId>,
-  value: IntentVar<number>,
-};
-
-export function mkHealI(
-  target: IntentVar<UnitId>,
-  value: IntentVar<number>,
-): HealI {
-  return {
-    tag: "HealI",
-    target,
-    value,
-  }
+export class HealI {
+  constructor(
+    public readonly target: IntentVar<UnitId>,
+    public readonly value: IntentVar<number>,
+    public readonly tag: "HealI" = "HealI",
+  ) {}
 }
 
-type UseChargeI = {
-  tag: "UseChargeI",
-  target: IntentVar<UnitId>,
-  value: IntentVar<number>,
+export class UseChargeI {
+  constructor(
+    public readonly target: IntentVar<UnitId>,
+    public readonly value: IntentVar<number>,
+    public readonly tag: "UseChargeI" = "UseChargeI",
+  ) {}
 }
 
-export function mkUseChargeI(
-  target: IntentVar<UnitId>,
-  value: IntentVar<number>,
-): UseChargeI {
-  return {
-    tag: "UseChargeI",
-    target,
-    value,
-  }
-}
-
-type CombinedIntent = {
-  tag: "CombinedIntent",
-  intents: Intent[],
-}
-
-export function mkCombinedIntent(
-  ...intents: Intent[]
-): CombinedIntent {
-  return {
-    tag: "CombinedIntent",
-    intents,
-  }
+export class CombinedIntent {
+  constructor(
+    public readonly intents: Intent[],
+    public readonly tag: "CombinedIntent" = "CombinedIntent",
+  ) {}
 }
 
 export type Intent
@@ -118,26 +71,26 @@ export function intentToAction(
 ): Action {
   switch (intent.tag) {
     case "DamageI": {
-      return mkDamage(
+      return new A.Damage(
         evaluateIntentVar(context, intent.target),
         evaluateIntentVar(context, intent.value),
       );
     }
     case "HealI": {
-      return mkHeal(
+      return new A.Heal(
         evaluateIntentVar(context, intent.target),
         evaluateIntentVar(context, intent.value),
       );
     }
     case "UseChargeI": {
-      return mkUseCharge(
+      return new A.UseCharge(
         evaluateIntentVar(context, intent.target),
         evaluateIntentVar(context, intent.value),
       );
     }
     case "CombinedIntent": {
       const actions = intent.intents.map(x => intentToAction(context, x));
-      return mkCombinedAction(actions);
+      return new A.CombinedAction(actions);
     }
   }
 }

@@ -2,7 +2,8 @@ import { GameRefs } from "../states/game";
 import { createPosition, Position, inPosition } from "../util/position";
 import { config } from "../config";
 import { actAvailable } from "../savefile/rep";
-import { applyScreenEvent, mkChangeAct } from "../util/screenEvents";
+import { applyScreenEvent } from "../util/screenEvents";
+import * as SE from "../util/screenEvents";
 import { actNumberMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
 import { createButtonInPool, Button, addText } from "../util/btn";
@@ -87,7 +88,7 @@ export function createActSelectButton(
       if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
         // noop
       } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
-        applyScreenEvent(mkChangeAct(btn.data.actNumber), game, gameRefs)
+        applyScreenEvent(new SE.ChangeAct(btn.data.actNumber), game, gameRefs)
       } else {
         // noop
       }

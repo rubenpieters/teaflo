@@ -1,8 +1,7 @@
 import { EnUnit } from "src/shared/game/unit";
 import { ai1 } from "../ai/ai";
-import { mkDamageI, mkStatic } from "../../game/intent";
-import { mkPositionId } from "../../game/entityId";
-import { mkTargetInput } from "../../game/ability";
+import * as I from "../../game/intent";
+import { PositionId } from "../../game/entityId";
 
 export const en_unit_a1_l1_01 = {
   hp: 10,

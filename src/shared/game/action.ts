@@ -2,69 +2,35 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { UnitId, overUnit } from "./entityId";
 import { GameState } from "./state";
 
-type Damage = {
-  tag: "Damage",
-  target: UnitId,
-  value: number,
-};
-
-export function mkDamage(
-  target: UnitId,
-  value: number,
-): Damage {
-  return {
-    tag: "Damage",
-    target,
-    value,
-  }
+export class Damage {
+  constructor(
+    public target: UnitId,
+    public value: number,
+    public tag: "Damage" = "Damage",
+  ) {}
 }
 
-type Heal = {
-  tag: "Heal",
-  target: UnitId,
-  value: number,
-};
-
-export function mkHeal(
-  target: UnitId,
-  value: number,
-): Heal {
-  return {
-    tag: "Heal",
-    target,
-    value,
-  }
+export class Heal {
+  constructor(
+    public target: UnitId,
+    public value: number,
+    public tag: "Heal" = "Heal",
+  ) {}
 }
 
-type UseCharge = {
-  tag: "UseCharge",
-  target: UnitId,
-  value: number,
+export class UseCharge {
+  constructor(
+    public target: UnitId,
+    public value: number,
+    public tag: "UseCharge" = "UseCharge",
+  ) {}
 }
 
-export function mkUseCharge(
-  target: UnitId,
-  value: number,
-): UseCharge {
-  return {
-    tag: "UseCharge",
-    target,
-    value,
-  }
-}
-
-type CombinedAction = {
-  tag: "CombinedAction",
-  actions: Action[],
-}
-
-export function mkCombinedAction(
-  actions: Action[],
-): CombinedAction {
-  return {
-    tag: "CombinedAction",
-    actions,
-  }
+export class CombinedAction {
+  constructor(
+    public actions: Action[],
+    public tag: "CombinedAction" = "CombinedAction",
+  ) {}
 }
 
 export type Action
