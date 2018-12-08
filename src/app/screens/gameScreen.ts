@@ -10,6 +10,7 @@ import { ClickState } from "../util/clickState";
 import { StatsScreenData } from "./solutionInfo";
 import { Solution } from "../../shared/game/solution";
 import { GameState } from "../../shared/game/state";
+import { TargetType } from "src/shared/game/entityId";
 
 export type GameScreenData = {
   spriteGroup: Phaser.Group,
@@ -24,6 +25,12 @@ export type GameScreenData = {
   levelId: string,
   state: GameState,
   statsScreenData: StatsScreenData,
+  lockInfo?: LockInfo,
+}
+
+export type LockInfo = {
+  id: number,
+  type: TargetType,
 }
 
 export function drawGameScreen(

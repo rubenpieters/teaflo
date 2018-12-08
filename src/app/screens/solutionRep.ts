@@ -45,11 +45,11 @@ export function drawSolutionRep(
   const enUnits = levelEnUnitMap[levelId];
   const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solution, sol.loc, initState);
-  gameRefs.gameScreenData.state = solResult.state;
   let solState = solResult.state;
   if (intermediateSol !== undefined) {
     solState = pickIntermediateSol(intermediateSol, solResult.log).state;
   }
+  gameRefs.gameScreenData.state = solState;
 
   // draw friendly units
   solState.frUnits.forEach((unit, unitIndex) => {
@@ -128,6 +128,8 @@ export function createUnit(
     () => {
       if (gameRefs.gameScreenData.clickState !== undefined) {
         applyScreenEvent(new SE.AdvanceClickState(new PositionId(unit.data.id, unit.data.type)), game, gameRefs);
+      } else {
+        applyScreenEvent(new SE.LockCardInfo(unit.data.id, unit.data.type), game, gameRefs);
       }
     },
     // onInputOver

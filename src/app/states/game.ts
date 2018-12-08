@@ -105,6 +105,7 @@ export function setGameScreenVisible(
   gameRefs.gameScreenData.unitHpPool.visible = visible;
   gameRefs.gameScreenData.unitAbilityPool.visible = visible;
   gameRefs.gameScreenData.logBtnPool.visible = visible;
+  gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.visible = visible);
 }
 
 export function newSolution(): {

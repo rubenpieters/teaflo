@@ -152,6 +152,20 @@ export class ClearCardInfo {
   ) {}
 }
 
+export class LockCardInfo {
+  constructor(
+    public readonly id: number,
+    public readonly type: TargetType,
+    public readonly tag: "LockCardInfo" = "LockCardInfo",
+  ) {}
+}
+
+export class UnlockCardInfo {
+  constructor(
+    public readonly tag: "UnlockCardInfo" = "UnlockCardInfo",
+  ) {}
+}
+
 type ScreenEvent
   = ChangeAct
   | ChangeLevel
@@ -171,6 +185,8 @@ type ScreenEvent
   | ClearHoverCard
   | ShowCardInfo
   | ClearCardInfo
+  | LockCardInfo
+  | UnlockCardInfo
   ;
 
 export function applyScreenEvent(
@@ -277,7 +293,11 @@ export function applyScreenEvent(
 
       drawSolutionRep(game, gameRefs, screenEvent.levelId);
       drawSolutionInfo(game, gameRefs, screenEvent.levelId);
-      clearCardInfo(gameRefs);
+      if (gameRefs.gameScreenData.lockInfo === undefined) {
+        applyScreenEvent(new ClearCardInfo(), game, gameRefs);
+      } else {
+        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.lockInfo.id, gameRefs.gameScreenData.lockInfo.type, gameRefs.gameScreenData.state);
+      }
       return;
     }
     case "ChangeTreeLoc": {
@@ -286,7 +306,11 @@ export function applyScreenEvent(
 
       drawSolutionRep(game, gameRefs, screenEvent.levelId);
       drawSolutionInfo(game, gameRefs, screenEvent.levelId);
-      clearCardInfo(gameRefs);
+      if (gameRefs.gameScreenData.lockInfo === undefined) {
+        applyScreenEvent(new ClearCardInfo(), game, gameRefs);
+      } else {
+        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.lockInfo.id, gameRefs.gameScreenData.lockInfo.type, gameRefs.gameScreenData.state);
+      }
       return;
     }
     case "CutTreeLoc": {
@@ -321,12 +345,20 @@ export function applyScreenEvent(
       drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId, {
         index: screenEvent.index,
       });
-      clearCardInfo(gameRefs);
+      if (gameRefs.gameScreenData.lockInfo === undefined) {
+        applyScreenEvent(new ClearCardInfo(), game, gameRefs);
+      } else {
+        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.lockInfo.id, gameRefs.gameScreenData.lockInfo.type, gameRefs.gameScreenData.state);
+      }
       return;
     }
     case "ClearIntermediateSol": {
       drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
-      clearCardInfo(gameRefs);
+      if (gameRefs.gameScreenData.lockInfo === undefined) {
+        applyScreenEvent(new ClearCardInfo(), game, gameRefs);
+      } else {
+        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.lockInfo.id, gameRefs.gameScreenData.lockInfo.type, gameRefs.gameScreenData.state);
+      }
       return;
     }
     case "ShowHoverCard": {
@@ -347,12 +379,27 @@ export function applyScreenEvent(
       return;
     }
     case "ShowCardInfo": {
-      drawCardInfo(game, gameRefs, screenEvent.id, screenEvent.type, gameRefs.gameScreenData.state);
-
+      if (gameRefs.gameScreenData.lockInfo === undefined) {
+        drawCardInfo(game, gameRefs, screenEvent.id, screenEvent.type, gameRefs.gameScreenData.state);
+      }
       return;
     }
     case "ClearCardInfo": {
-      clearCardInfo(gameRefs);
+      if (gameRefs.gameScreenData.lockInfo === undefined) {
+        clearCardInfo(gameRefs);
+      }
+      return;
+    }
+    case "LockCardInfo": {
+      gameRefs.gameScreenData.lockInfo = {
+        id: screenEvent.id,
+        type: screenEvent.type
+      };
+
+      return;
+    }
+    case "UnlockCardInfo": {
+      gameRefs.gameScreenData.lockInfo = undefined;
 
       return;
     }
