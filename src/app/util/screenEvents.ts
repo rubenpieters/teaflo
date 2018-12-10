@@ -12,7 +12,7 @@ import { Solution, extendSolution, SolutionData } from "src/shared/game/solution
 import { Ability } from "src/shared/game/ability";
 import { Location } from "src/shared/tree";
 import { ClickState } from "./clickState";
-import { drawSolutionInfo, drawCardInfo, clearCardInfo } from "../screens/solutionInfo";
+import { drawSolutionInfo, drawCardInfo } from "../screens/solutionInfo";
 import { TargetType } from "../../shared/game/entityId";
 import { drawHoverCardFriendly, clearHoverCard } from "../screens/hoverCard";
 
@@ -296,7 +296,7 @@ export function applyScreenEvent(
       if (gameRefs.gameScreenData.lockInfo === undefined) {
         applyScreenEvent(new ClearCardInfo(), game, gameRefs);
       } else {
-        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.lockInfo.id, gameRefs.gameScreenData.lockInfo.type, gameRefs.gameScreenData.state);
+        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       }
       return;
     }
@@ -309,7 +309,7 @@ export function applyScreenEvent(
       if (gameRefs.gameScreenData.lockInfo === undefined) {
         applyScreenEvent(new ClearCardInfo(), game, gameRefs);
       } else {
-        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.lockInfo.id, gameRefs.gameScreenData.lockInfo.type, gameRefs.gameScreenData.state);
+        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       }
       return;
     }
@@ -348,7 +348,7 @@ export function applyScreenEvent(
       if (gameRefs.gameScreenData.lockInfo === undefined) {
         applyScreenEvent(new ClearCardInfo(), game, gameRefs);
       } else {
-        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.lockInfo.id, gameRefs.gameScreenData.lockInfo.type, gameRefs.gameScreenData.state);
+        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       }
       return;
     }
@@ -357,7 +357,7 @@ export function applyScreenEvent(
       if (gameRefs.gameScreenData.lockInfo === undefined) {
         applyScreenEvent(new ClearCardInfo(), game, gameRefs);
       } else {
-        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.lockInfo.id, gameRefs.gameScreenData.lockInfo.type, gameRefs.gameScreenData.state);
+        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       }
       return;
     }
@@ -379,15 +379,18 @@ export function applyScreenEvent(
       return;
     }
     case "ShowCardInfo": {
-      if (gameRefs.gameScreenData.lockInfo === undefined) {
-        drawCardInfo(game, gameRefs, screenEvent.id, screenEvent.type, gameRefs.gameScreenData.state);
-      }
+      gameRefs.gameScreenData.hoverInfo = {
+        id: screenEvent.id,
+        type: screenEvent.type
+      };
+
+      drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       return;
     }
     case "ClearCardInfo": {
-      if (gameRefs.gameScreenData.lockInfo === undefined) {
-        clearCardInfo(gameRefs);
-      }
+      gameRefs.gameScreenData.hoverInfo = undefined;
+
+      drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       return;
     }
     case "LockCardInfo": {
@@ -396,12 +399,13 @@ export function applyScreenEvent(
         type: screenEvent.type
       };
 
-      drawCardInfo(game, gameRefs, screenEvent.id, screenEvent.type, gameRefs.gameScreenData.state);
+      drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       return;
     }
     case "UnlockCardInfo": {
       gameRefs.gameScreenData.lockInfo = undefined;
 
+      drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       return;
     }
   }

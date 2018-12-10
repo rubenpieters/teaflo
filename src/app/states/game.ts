@@ -63,6 +63,7 @@ export default class Game extends Phaser.State {
         spriteGroup: new Phaser.Group(this.game),
         abilitiesPool: new SpritePool(this.game),
         texts: [],
+        arrowPool: new SpritePool(this.game),
       },
       state: <any>undefined,
     }
@@ -114,6 +115,7 @@ export function setGameScreenVisible(
   if (gameRefs.gameScreenData.statsScreenData.statsLabel !== undefined) {
     gameRefs.gameScreenData.statsScreenData.statsLabel.visible = visible;
   }
+  gameRefs.gameScreenData.statsScreenData.arrowPool.visible = visible;
 }
 
 export function newSolution(): {

@@ -25,10 +25,11 @@ export type GameScreenData = {
   levelId: string,
   state: GameState,
   statsScreenData: StatsScreenData,
-  lockInfo?: LockInfo,
+  lockInfo?: CardInfo,
+  hoverInfo?: CardInfo,
 }
 
-export type LockInfo = {
+export type CardInfo = {
   id: number,
   type: TargetType,
 }

@@ -24,4 +24,7 @@ export const config = {
 
   abilityIconWidth: 150,
   abilityIconHeight: 150,
+
+  selectArrowWidth: 150,
+  selectArrowHeight: 100,
 };

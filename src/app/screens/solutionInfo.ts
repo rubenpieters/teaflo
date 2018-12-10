@@ -23,6 +23,7 @@ export type StatsScreenData = {
   abilitiesLabel?: Phaser.Text,
   texts: Phaser.Text[],
   abilitiesPool: SpritePool<AbilitySprite>,
+  arrowPool: SpritePool<Phaser.Sprite>,
 }
 
 export function drawSolutionInfo(
@@ -93,74 +94,111 @@ export function drawSolutionInfo(
 export function drawCardInfo(
   game: Phaser.Game,
   gameRefs: GameRefs,
-  id: number,
-  type: TargetType,
   state: GameState,
 ) {
   gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.destroy());
   gameRefs.gameScreenData.statsScreenData.texts = [];
   gameRefs.gameScreenData.statsScreenData.abilitiesPool.killAll();
+  gameRefs.gameScreenData.statsScreenData.arrowPool.killAll();
 
-  let arr: (Unit | undefined)[];
-  if (type === "friendly") {
-    arr = state.frUnits;
-  } else {
-    arr = state.enUnits;
+  // draw selection arrow for locked
+  const lockInfo = gameRefs.gameScreenData.lockInfo;
+  if (lockInfo !== undefined) {
+    const id = lockInfo.id;
+    const arrowPos: Position = lockInfo.type === "friendly"
+    ? createPosition(
+      "left", 1050 + 200 * id, config.selectArrowWidth,
+      "top", 450, config.selectArrowHeight,
+    )
+    : createPosition(
+      "left", 2300 + 200 * id, config.selectArrowWidth,
+      "top", 450, config.selectArrowHeight,
+    );
+    gameRefs.gameScreenData.statsScreenData.arrowPool.getFirstExists(
+      false, true, arrowPos.xMin, arrowPos.yMin, "arrow", 1
+    );
   }
-  const unit = arr[id];
-  if (unit !== undefined) {
-    const hpPos = createPosition(
-      "left", 1000, 720,
-      "bot", 440, 100,
-    );
-    const hpLbl = game.add.text(
-      hpPos.xMin, hpPos.yMin, `${unit.hp}/${unit.maxHp} HP`, {
-        fill: "#000000",
-        fontSize: 70,
-        boundsAlignH: "center",
-        boundsAlignV: "middle",
-      }
-    );
-    hpLbl.setTextBounds(0, 0, hpPos.xMax - hpPos.xMin, hpPos.yMax - hpPos.yMin);
-    gameRefs.gameScreenData.statsScreenData.texts.push(hpLbl);
-  
-    const chPos = createPosition(
-      "left", 1000, 720,
-      "bot", 340, 100,
-    );
-    const chLbl = game.add.text(
-      chPos.xMin, chPos.yMin, `${unit.charges}/${unit.maxCharges} CH`, {
-        fill: "#000000",
-        fontSize: 70,
-        boundsAlignH: "center",
-        boundsAlignV: "middle",
-      }
-    );
-    chLbl.setTextBounds(0, 0, chPos.xMax - chPos.xMin, chPos.yMax - chPos.yMin);
-    gameRefs.gameScreenData.statsScreenData.texts.push(chLbl);
 
+  // show hover info, if not available show lock info, if not available show nothing
+  const info = gameRefs.gameScreenData.hoverInfo !== undefined
+    ? gameRefs.gameScreenData.hoverInfo
+    : gameRefs.gameScreenData.lockInfo !== undefined
+    ? gameRefs.gameScreenData.lockInfo : undefined;
+  if (info !== undefined) {
+    const type = info.type;
+    const id = info.id;
+    let arr: (Unit | undefined)[];
     if (type === "friendly") {
-      const frUnit = <HasAbilities>(<any>unit);
-      frUnit.abilities.forEach((ability, abilityIndex) => {
-        const ablPos = createPosition(
-          "left", 2080, config.abilityIconWidth,
-          "bot", 400, config.abilityIconHeight - 170 * (abilityIndex),
-        );
-        const abilityIcon = createUnitAbility(
-          game, gameRefs, ablPos, ability.spriteId, gameRefs.gameScreenData.levelId,
-          gameRefs.saveFile.activeSolutions[gameRefs.gameScreenData.levelId],
-          ability
+      arr = state.frUnits;
+    } else {
+      arr = state.enUnits;
+    }
+    const unit = arr[id];
+    if (unit !== undefined) {
+      // draw selection arrow for hover
+      // only if lock info is not equal to hover info
+      if (!(lockInfo !== undefined && info.id === lockInfo.id && info.type === lockInfo.type)) {
+        const arrowPos: Position = type === "friendly"
+        ? createPosition(
+          "left", 1050 + 200 * id, config.selectArrowWidth,
+          "top", 450, config.selectArrowHeight,
         )
-      });
+        : createPosition(
+          "left", 2300 + 200 * id, config.selectArrowWidth,
+          "top", 450, config.selectArrowHeight,
+        );
+        gameRefs.gameScreenData.statsScreenData.arrowPool.getFirstExists(
+          false, true, arrowPos.xMin, arrowPos.yMin, "arrow", 0
+        );
+      }
+  
+      // draw stats text
+      const hpPos = createPosition(
+        "left", 1000, 720,
+        "bot", 440, 100,
+      );
+      const hpLbl = game.add.text(
+        hpPos.xMin, hpPos.yMin, `${unit.hp}/${unit.maxHp} HP`, {
+          fill: "#000000",
+          fontSize: 70,
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }
+      );
+      hpLbl.setTextBounds(0, 0, hpPos.xMax - hpPos.xMin, hpPos.yMax - hpPos.yMin);
+      gameRefs.gameScreenData.statsScreenData.texts.push(hpLbl);
+    
+      const chPos = createPosition(
+        "left", 1000, 720,
+        "bot", 340, 100,
+      );
+      const chLbl = game.add.text(
+        chPos.xMin, chPos.yMin, `${unit.charges}/${unit.maxCharges} CH`, {
+          fill: "#000000",
+          fontSize: 70,
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }
+      );
+      chLbl.setTextBounds(0, 0, chPos.xMax - chPos.xMin, chPos.yMax - chPos.yMin);
+      gameRefs.gameScreenData.statsScreenData.texts.push(chLbl);
+  
+      if (type === "friendly") {
+        const frUnit = <HasAbilities>(<any>unit);
+        frUnit.abilities.forEach((ability, abilityIndex) => {
+          const ablPos = createPosition(
+            "left", 2080, config.abilityIconWidth,
+            "bot", 400, config.abilityIconHeight - 170 * (abilityIndex),
+          );
+          const abilityIcon = createUnitAbility(
+            game, gameRefs, ablPos, ability.spriteId, gameRefs.gameScreenData.levelId,
+            gameRefs.saveFile.activeSolutions[gameRefs.gameScreenData.levelId],
+            ability
+          )
+        });
+      }
     }
   }
-}
-
-export function clearCardInfo(
-  gameRefs: GameRefs,
-) {
-  gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.destroy());
-  gameRefs.gameScreenData.statsScreenData.abilitiesPool.killAll();
 }
 
 type AbilitySprite = GSprite<{
