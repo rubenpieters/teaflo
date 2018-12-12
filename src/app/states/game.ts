@@ -66,6 +66,7 @@ export default class Game extends Phaser.State {
         arrowPool: new SpritePool(this.game),
       },
       state: <any>undefined,
+      intermediateActionTexts: [],
     }
     const hoverScreenData: HoverScreenData = {
       hoverViewPool: new Phaser.Group(this.game),

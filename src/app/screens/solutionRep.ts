@@ -35,6 +35,7 @@ export function drawSolutionRep(
   gameRefs.gameScreenData.unitPool.killAll();
   gameRefs.gameScreenData.unitHpPool.killAll();
   gameRefs.gameScreenData.unitAbilityPool.killAll();
+  gameRefs.gameScreenData.intermediateActionTexts.forEach(x => x.destroy());
 
   const solId = gameRefs.saveFile.activeSolutions[levelId];
   const sol = gameRefs.saveFile.levelSolutions[levelId][solId];
@@ -46,8 +47,11 @@ export function drawSolutionRep(
   const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solution, sol.loc, initState);
   let solState = solResult.state;
+  let intermediateAction: Action | undefined = undefined;
   if (intermediateSol !== undefined) {
-    solState = pickIntermediateSol(intermediateSol, solResult.log).state;
+    const sol = pickIntermediateSol(intermediateSol, solResult.log);
+    solState = sol.state;
+    intermediateAction = sol.action;
   }
   gameRefs.gameScreenData.state = solState;
 
@@ -66,7 +70,14 @@ export function drawSolutionRep(
         config.unitHpBarWidth, config.unitHpBarHeight,
       );
       unitHpPos.xMax = unitHpPos.xMin + (unitHpPos.xMax - unitHpPos.xMin) * (unit.hp / unit.maxHp);
-      createUnitHp(game, gameRefs, unitHpPos, "hp");
+      createUnitResource(game, gameRefs, unitHpPos, "hp");
+
+      const unitChPos = relativeTo(unitPos,
+        "below", 150,
+        config.unitHpBarWidth, config.unitHpBarHeight,
+      );
+      unitChPos.xMax = unitChPos.xMin + (unitChPos.xMax - unitChPos.xMin) * (unit.charges / unit.maxCharges);
+      createUnitResource(game, gameRefs, unitChPos, "ch");
     }
   });
 
@@ -85,9 +96,87 @@ export function drawSolutionRep(
         config.unitHpBarWidth, config.unitHpBarHeight,
       );
       unitHpPos.xMax = unitHpPos.xMin + (unitHpPos.xMax - unitHpPos.xMin) * (unit.hp / unit.maxHp);
-      createUnitHp(game, gameRefs, unitHpPos, "hp");
+      createUnitResource(game, gameRefs, unitHpPos, "hp");
+
+      const unitChPos = relativeTo(unitPos,
+        "below", 150,
+        config.unitHpBarWidth, config.unitHpBarHeight,
+      );
+      unitChPos.xMax = unitChPos.xMin + (unitChPos.xMax - unitChPos.xMin) * (unit.charges / unit.maxCharges);
+      createUnitResource(game, gameRefs, unitChPos, "ch");
     }
   });
+
+  // draw intermediate action if defined
+  if (intermediateAction !== undefined) {
+    drawAction(game, gameRefs, intermediateAction);
+  }
+}
+
+function drawAction(
+  game: Game,
+  gameRefs: GameRefs,
+  action: Action,
+) {
+  switch (action.tag) {
+    case "CombinedAction": {
+      return;
+    }
+    case "Damage": {
+      const offset = action.target.type === "friendly" ? 0 : 1250;
+      const lblPos = createPosition(
+        "left", offset + 1050 + 200 * action.target.id, 150,
+        "top", 750, 70,
+      );
+      const lbl = game.add.text(
+        lblPos.xMin, lblPos.yMin, `-${action.value} HP`, {
+          fill: "#FF0000",
+          fontSize: 70,
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }
+      );
+      lbl.setTextBounds(0, 0, lblPos.xMax - lblPos.xMin, lblPos.yMax - lblPos.yMin);
+      gameRefs.gameScreenData.intermediateActionTexts.push(lbl);
+      return;
+    }
+    case "Heal": {
+      const offset = action.target.type === "friendly" ? 0 : 1250;
+      const lblPos = createPosition(
+        "left", offset + 1050 + 200 * action.target.id, 150,
+        "top", 750, 70,
+      );
+      const lbl = game.add.text(
+        lblPos.xMin, lblPos.yMin, `+${action.value} HP`, {
+          fill: "#00FF00",
+          fontSize: 70,
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }
+      );
+      lbl.setTextBounds(0, 0, lblPos.xMax - lblPos.xMin, lblPos.yMax - lblPos.yMin);
+      gameRefs.gameScreenData.intermediateActionTexts.push(lbl);
+      return;
+    }
+    case "UseCharge": {
+      const offset = action.target.type === "friendly" ? 0 : 1250;
+      const lblPos = createPosition(
+        "left", offset + 1050 + 200 * action.target.id, 150,
+        "top", 750, 70,
+      );
+      const lbl = game.add.text(
+        lblPos.xMin, lblPos.yMin, `-${action.value} CH`, {
+          fill: "#00AAAA",
+          fontSize: 70,
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }
+      );
+      lbl.setTextBounds(0, 0, lblPos.xMax - lblPos.xMin, lblPos.yMax - lblPos.yMin);
+      gameRefs.gameScreenData.intermediateActionTexts.push(lbl);
+      return;
+    }
+  }
 }
 
 type UnitSprite = GSprite<{
@@ -137,7 +226,7 @@ export function createUnit(
   return unit;
 }
 
-export function createUnitHp(
+export function createUnitResource(
   game: Phaser.Game,
   gameRefs: GameRefs,
   pos: Position,

@@ -27,6 +27,7 @@ export type GameScreenData = {
   statsScreenData: StatsScreenData,
   lockInfo?: CardInfo,
   hoverInfo?: CardInfo,
+  intermediateActionTexts: Phaser.Text[],
 }
 
 export type CardInfo = {
