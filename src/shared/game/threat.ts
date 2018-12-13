@@ -15,5 +15,5 @@ export function addThreat<U extends HasThreatMap>(
   value: number,
 ): U {
   const globalId = toGlobalId(state, atEnemy);
-  return focus(u, over(x => x.threatMap[globalId.id], x => x === undefined ? x : x + value));
+  return focus(u, over(x => x.threatMap[globalId.id], x => x === undefined ? value : x + value));
 }

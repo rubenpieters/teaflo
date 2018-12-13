@@ -187,6 +187,24 @@ function drawAction(
       gameRefs.gameScreenData.intermediateActionTexts.push(lbl);
       return;
     }
+    case "AddThreat": {
+      const offset = action.toFriendly.type === "friendly" ? 0 : 1250;
+      const lblPos = createPosition(
+        "left", offset + 1050 + 200 * action.toFriendly.id, 150,
+        "top", 750, 70,
+      );
+      const lbl = game.add.text(
+        lblPos.xMin, lblPos.yMin, `+${action.value} TH`, {
+          fill: "#000000",
+          fontSize: 70,
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }
+      );
+      lbl.setTextBounds(0, 0, lblPos.xMax - lblPos.xMin, lblPos.yMax - lblPos.yMin);
+      gameRefs.gameScreenData.intermediateActionTexts.push(lbl);
+      return;
+    }
   }
 }
 
