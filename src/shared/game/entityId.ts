@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState } from "./state";
+import { GameState, units, FrStUnit, EnStUnit } from "./state";
 import { HasId } from "./hasId";
 import { Unit } from "./unit";
 
@@ -74,6 +74,27 @@ export function overUnit(
   }
 }
 
+// TODO: only accept EntityId<"friendly">
+export function overFriendly(
+  target: UnitId,
+  state: GameState,
+  f: (unit: FrStUnit) => FrStUnit,
+  onEmpty: (state: GameState) => GameState,
+) {
+  if (target.type !== "friendly") {
+    throw `overFriendly: wrong target type ${JSON.stringify(target)}`;
+  }
+  const id = findIndex(state, target);
+  if (state.frUnits[id] === undefined) {
+    return onEmpty(state);
+  } else {
+    // state.frUnits[id] is checked before
+    return focus(state,
+      over(x => x.frUnits[id], <any>f),
+    );
+  }
+}
+
 export function toPositionId<A extends TargetType>(
   state: GameState,
   id: EntityId<A>,
@@ -81,12 +102,24 @@ export function toPositionId<A extends TargetType>(
   switch (id.tag) {
     case "PositionId": return id;
     case "GlobalId": {
-      return {
-        tag: "PositionId",
-        id: findIndex(state, id),
-        type: id.type,
-      }
+      return new PositionId(findIndex(state, id), id.type);
     }
+  }
+}
+
+export function toGlobalId<A extends TargetType>(
+  state: GameState,
+  id: EntityId<A>,
+) {
+  switch (id.tag) {
+    case "PositionId": {
+      const unit = units(state, id.type)[id.id];
+      if (unit === undefined) {
+        throw `unit at position ${JSON.stringify(id)} is undefined`;
+      }
+      return new GlobalId(unit.id, id.type);
+    };
+    case "GlobalId": return id;
   }
 }
 

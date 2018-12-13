@@ -1,5 +1,6 @@
 import { Ability, HasAbilities } from "./ability";
 import { HasAI } from "./ai";
+import { HasThreatMap } from "./threat";
 
 export type Unit = {
   hp: number,

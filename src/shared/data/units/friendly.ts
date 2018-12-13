@@ -12,12 +12,12 @@ export const fr_unit_a1_l1_01: FrUnit = {
     {
       intent: new I.CombinedIntent([
         new I.UseChargeI(
-          new I.Static(new PositionId(0, "friendly")),
+          I.mkSelf(),
           new I.Static(1),
         ),
-        new I.DamageI(
+        I.thDamage(
           new I.FromInput(0),
-          new I.Static(1),
+          new I.Static(5),
         ),
       ]),
       inputs: [

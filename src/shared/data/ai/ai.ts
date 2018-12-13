@@ -4,7 +4,7 @@ import { GameState } from "../../game/state";
 
 export const ai1: AI = [
     {
-      action: new A.Damage({ tag: "PositionId", type: "friendly", id: 0 }, 2),
+      action: { tag: "Damage", target: { tag: "PositionId", type: "friendly", id: 0 }, value: 2 },
       outs: [
           {
             aiOut: new ToSelf(),

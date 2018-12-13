@@ -7,9 +7,11 @@ import { nextAI } from "./ai";
 import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction, Intent, Context } from "./intent";
 import { Omit } from "../type-util";
+import { UnitId } from "./entityId";
 
 export type SolutionData = {
   ability: Ability,
+  origin: UnitId | undefined;
   inputs: any[],
 }
 
@@ -56,7 +58,7 @@ export function _runSolution(
   const solData: SolutionData = tree.nodes[loc[0]].v;
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
-  const frActionResult = applyIntentToSolution(frAbility.intent, { input: frInputs }, state);
+  const frActionResult = applyIntentToSolution(frAbility.intent, { input: frInputs, self: solData.origin }, state);
   state = frActionResult.state;
   newLog = newLog.concat(frActionResult.log);
 
@@ -65,7 +67,8 @@ export function _runSolution(
     if (enUnit !== undefined) {
       const enAction = enUnit.ai[enUnit.currentAI].action;
       // apply action
-      const enActionResult = applyActionsToSolution([enAction], { }, state, []);
+      const enUnitSelf: UnitId = { tag: "GlobalId", type: "enemy", id: enUnit.id };
+      const enActionResult = applyActionsToSolution([enAction], { self: enUnitSelf }, state, []);
       state = enActionResult.state;
       // forward enUnit AI
       // NOTE: cast is safe here if there is no way that a unit has been removed due to an action (eg. deaths)

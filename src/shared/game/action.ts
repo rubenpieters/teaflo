@@ -1,35 +1,45 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { UnitId, overUnit } from "./entityId";
+import { UnitId, overUnit, overFriendly } from "./entityId";
 import { GameState } from "./state";
+import { addThreat } from "./threat";
 
 export class Damage {
   constructor(
-    public target: UnitId,
-    public value: number,
-    public tag: "Damage" = "Damage",
+    public readonly target: UnitId,
+    public readonly value: number,
+    public readonly tag: "Damage" = "Damage",
   ) {}
 }
 
 export class Heal {
   constructor(
-    public target: UnitId,
-    public value: number,
-    public tag: "Heal" = "Heal",
+    public readonly target: UnitId,
+    public readonly value: number,
+    public readonly tag: "Heal" = "Heal",
   ) {}
 }
 
 export class UseCharge {
   constructor(
-    public target: UnitId,
-    public value: number,
-    public tag: "UseCharge" = "UseCharge",
+    public readonly target: UnitId,
+    public readonly value: number,
+    public readonly tag: "UseCharge" = "UseCharge",
   ) {}
 }
 
 export class CombinedAction {
   constructor(
-    public actions: Action[],
-    public tag: "CombinedAction" = "CombinedAction",
+    public readonly actions: Action[],
+    public readonly tag: "CombinedAction" = "CombinedAction",
+  ) {}
+}
+
+export class AddThreat {
+  constructor(
+    public readonly toFriendly: UnitId,
+    public readonly atEnemy: UnitId,
+    public readonly value: number,
+    public readonly tag: "AddThreat" = "AddThreat",
   ) {}
 }
 
@@ -38,6 +48,7 @@ export type Action
   | Heal
   | UseCharge
   | CombinedAction
+  | AddThreat
   ;
 
 export function applyAction(
@@ -83,6 +94,16 @@ export function applyAction(
         state,
         actions: action.actions,
       }
+    }
+    case "AddThreat": {
+      return {
+        state: overFriendly(action.toFriendly,
+          state,
+          x => addThreat(x, state, action.atEnemy, action.value),
+          x => x,
+        ),
+        actions: [],
+      };
     }
   }
 }

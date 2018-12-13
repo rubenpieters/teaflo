@@ -15,6 +15,7 @@ import { ClickState } from "./clickState";
 import { drawSolutionInfo, drawCardInfo } from "../screens/solutionInfo";
 import { TargetType } from "../../shared/game/entityId";
 import { drawHoverCardFriendly, clearHoverCard } from "../screens/hoverCard";
+import { Omit } from "src/shared/type-util";
 
 export class ChangeAct {
   constructor(
@@ -317,7 +318,14 @@ export function applyScreenEvent(
       return;
     }
     case "SetClickState": {
-      gameRefs.gameScreenData.clickState = screenEvent.clickState;
+      let cs;
+      if (gameRefs.gameScreenData.clickState === undefined) {
+        cs = {...screenEvent.clickState, ...{ origin: undefined }};
+      } else {
+
+      }
+      const x = {...gameRefs.gameScreenData.clickState, ...screenEvent.clickState};
+      gameRefs.gameScreenData.clickState = {...gameRefs.gameScreenData.clickState, ...screenEvent.clickState};
 
       drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
       return;
@@ -334,6 +342,7 @@ export function applyScreenEvent(
         gameRefs.gameScreenData.clickState = undefined;
         applyScreenEvent(new ExtendLevelSolution({
             ability: clickState.ability,
+            origin: clickState.origin,
             inputs: clickState.currentInputs,
           }, gameRefs.gameScreenData.levelId), game, gameRefs);
       } else {

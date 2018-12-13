@@ -12,7 +12,7 @@ import { Game, Button } from "phaser-ce";
 import { mkGameState, GameState } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
-import { TargetType } from "../../shared/game/entityId";
+import { TargetType, GlobalId } from "../../shared/game/entityId";
 import { OVER, NEUTRAL } from "../util/button";
 import { Unit } from "../../shared/game/unit";
 import { SpritePool } from "../util/pool";
@@ -193,7 +193,7 @@ export function drawCardInfo(
           const abilityIcon = createUnitAbility(
             game, gameRefs, ablPos, ability.spriteId, gameRefs.gameScreenData.levelId,
             gameRefs.saveFile.activeSolutions[gameRefs.gameScreenData.levelId],
-            ability
+            ability, id, type
           )
         });
       }
@@ -206,6 +206,8 @@ type AbilitySprite = GSprite<{
   levelId: string,
   solId: number,
   ability: Ability,
+  id: number,
+  type: TargetType,
 }>;
 
 export function createUnitAbility(
@@ -216,6 +218,8 @@ export function createUnitAbility(
   levelId: string,
   solId: number,
   ability: Ability,
+  id: number,
+  type: TargetType,
 ): AbilitySprite {
   const unit: AbilitySprite =
     gameRefs.gameScreenData.statsScreenData.abilitiesPool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
@@ -223,6 +227,8 @@ export function createUnitAbility(
   unit.data.levelId = levelId;
   unit.data.solId = solId;
   unit.data.ability = ability;
+  unit.data.id = id;
+  unit.data.type = type;
 
   if (unit.data.init === undefined || unit.data.init === false) {
     unit.inputEnabled = true;
@@ -233,10 +239,13 @@ export function createUnitAbility(
         if (unit.data.ability.inputs.length === 0) {
           applyScreenEvent(new SE.ExtendLevelSolution({
             ability: unit.data.ability,
-            inputs: []
+            origin: new GlobalId(unit.data.id, unit.data.type),
+            inputs: [],
           }, unit.data.levelId), game, gameRefs);
         } else {
-          applyScreenEvent(new SE.SetClickState({ ability, currentInputs: [] }), game, gameRefs);
+          applyScreenEvent(new SE.SetClickState({
+            ability, currentInputs: [], origin: new GlobalId(unit.data.id, unit.data.type),
+          }), game, gameRefs);
         }
       }
     });

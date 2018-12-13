@@ -17,9 +17,20 @@ export class FromInput {
   ) {}
 }
 
+export class Self {
+  constructor(
+    public readonly tag: "Self" = "Self",
+  ) {}
+}
+
+export function mkSelf(): IntentVar<UnitId> {
+  return new Self;
+}
+
 export type IntentVar<A>
   = Static<A>
   | FromInput
+  | Self
   ;
 
 export class DamageI {
@@ -53,16 +64,37 @@ export class CombinedIntent {
   ) {}
 }
 
+export class AddThreatI {
+  constructor(
+    public readonly toFriendly: IntentVar<UnitId>,
+    public readonly atEnemy: IntentVar<UnitId>,
+    public readonly value: IntentVar<number>,
+    public readonly tag: "AddThreatI" = "AddThreatI",
+  ) {}
+}
+
 export type Intent
   = DamageI
   | HealI
   | UseChargeI
   | CombinedIntent
+  | AddThreatI
   ;
+
+export function thDamage(
+  target: IntentVar<UnitId>,
+  value: IntentVar<number>,
+) {
+  return new CombinedIntent([
+    new DamageI(target, value),
+    new AddThreatI(mkSelf(), target, value),
+  ]);
+}
 
 export type Context = {
   state: GameState,
   input?: any[],
+  self?: UnitId,
 }
 
 export function intentToAction(
@@ -92,6 +124,13 @@ export function intentToAction(
       const actions = intent.intents.map(x => intentToAction(context, x));
       return new A.CombinedAction(actions);
     }
+    case "AddThreatI": {
+      return new A.AddThreat(
+        evaluateIntentVar(context, intent.toFriendly),
+        evaluateIntentVar(context, intent.atEnemy),
+        evaluateIntentVar(context, intent.value),
+      );
+    }
   }
 }
 
@@ -109,6 +148,13 @@ function evaluateIntentVar<A>(
         throw "evaluateIntentVar: no input given";
       }
       return context.input[intentVar.input];
+    }
+    case "Self": {
+      if (context.self === undefined) {
+        console.log("evaluateIntentVar: no self given");
+        throw "evaluateIntentVar: no self given";
+      }
+      return <A>(<any>context.self);
     }
   }
 }
@@ -128,6 +174,9 @@ export function intentVarText<A>(
     }
     case "FromInput": {
       return `<Input${intentVar.input}>`;
+    }
+    case "Self": {
+      return `<Self>`;
     }
   }
 }

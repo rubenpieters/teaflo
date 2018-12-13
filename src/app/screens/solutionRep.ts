@@ -78,6 +78,17 @@ export function drawSolutionRep(
       );
       unitChPos.xMax = unitChPos.xMin + (unitChPos.xMax - unitChPos.xMin) * (unit.charges / unit.maxCharges);
       createUnitResource(game, gameRefs, unitChPos, "ch");
+
+      let i = 0;
+      for (const enId in unit.threatMap) {
+        const unitThPos = relativeTo(unitPos,
+          "below", 250 + 100 * i,
+          config.unitHpBarWidth, config.unitHpBarHeight,
+        );
+        unitThPos.xMax = unitThPos.xMin + (unitThPos.xMax - unitThPos.xMin) * (unit.threatMap[enId] / 100);
+        createUnitResource(game, gameRefs, unitThPos, "th");
+        i += 1;
+      }
     }
   });
 
