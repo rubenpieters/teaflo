@@ -9,7 +9,7 @@ import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
 import { Location, Tree } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
-import { mkGameState } from "src/shared/game/state";
+import { mkGameState, EnStUnit, FrStUnit } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
 import { TargetType, PositionId } from "../../shared/game/entityId";
@@ -55,6 +55,18 @@ export function drawSolutionRep(
   }
   gameRefs.gameScreenData.state = solState;
 
+  const enIds = (solState.enUnits
+    .filter(x => x !== undefined) as EnStUnit[])
+    .map(x => x.id)
+    ;
+
+  const maxThreat = (solState.frUnits
+    .filter(x => x !== undefined) as FrStUnit[])
+    .map(x => Object.values(x.threatMap))
+    .reduce((acc, curr) => Math.max(...curr.concat(acc)), 1)
+    ;
+
+
   // draw friendly units
   solState.frUnits.forEach((unit, unitIndex) => {
     if (unit !== undefined) {
@@ -80,12 +92,12 @@ export function drawSolutionRep(
       createUnitResource(game, gameRefs, unitChPos, "ch");
 
       let i = 0;
-      for (const enId in unit.threatMap) {
+      for (const enId of enIds) {
         const unitThPos = relativeTo(unitPos,
           "below", 250 + 100 * i,
           config.unitHpBarWidth, config.unitHpBarHeight,
         );
-        unitThPos.xMax = unitThPos.xMin + (unitThPos.xMax - unitThPos.xMin) * (unit.threatMap[enId] / 100);
+        unitThPos.xMax = unitThPos.xMin + (unitThPos.xMax - unitThPos.xMin) * (unit.threatMap[enId] / maxThreat);
         createUnitResource(game, gameRefs, unitThPos, "th");
         i += 1;
       }

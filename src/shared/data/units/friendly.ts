@@ -29,13 +29,13 @@ export const fr_unit_a1_l1_01: FrUnit = {
 }
 
 export const unit1: FrUnit = {
-  hp: 10,
-  maxHp: 10,
+  hp: 100,
+  maxHp: 100,
   charges: 5,
   maxCharges: 5,
   abilities: [
     {
-      intent: new I.DamageI(
+      intent: I.thDamage(
         new I.FromInput(0),
         new I.Static(1),
       ),
