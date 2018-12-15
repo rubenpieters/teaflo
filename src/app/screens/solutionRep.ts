@@ -1,3 +1,4 @@
+import { focus, over, set } from "src/shared/iassign-util";
 import { GameRefs } from "../states/game";
 import { createPosition, relativeTo, Position, inPosition } from "../util/position";
 import { config } from "../config";
@@ -9,7 +10,7 @@ import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
 import { Location, Tree } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
-import { mkGameState, EnStUnit, FrStUnit } from "src/shared/game/state";
+import { mkGameState, EnStUnit, FrStUnit, filteredFr, filteredEn } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
 import { TargetType, PositionId } from "../../shared/game/entityId";
@@ -55,17 +56,22 @@ export function drawSolutionRep(
   }
   gameRefs.gameScreenData.state = solState;
 
-  const enIds = (solState.enUnits
-    .filter(x => x !== undefined) as EnStUnit[])
+  // mark this solution with a win
+  if (solResult.win) {
+    const activeLevel = gameRefs.saveFile.activeSolutions[levelId];
+    gameRefs.saveFile = focus(gameRefs.saveFile,
+      set(x => x.levelSolutions[levelId][activeLevel].solution.win, true)
+    );
+  }
+
+  // calculate max threat value
+  const enIds = filteredEn(solState)
     .map(x => x.id)
     ;
-
-  const maxThreat = (solState.frUnits
-    .filter(x => x !== undefined) as FrStUnit[])
+  const maxThreat = filteredFr(solState)
     .map(x => Object.values(x.threatMap))
     .reduce((acc, curr) => Math.max(...curr.concat(acc)), 1)
     ;
-
 
   // draw friendly units
   solState.frUnits.forEach((unit, unitIndex) => {

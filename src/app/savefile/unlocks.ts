@@ -14,7 +14,7 @@ export function applyUnlocks(
     gameRefs.saveFile.levelSolutions["a1_l1"] !== undefined &&
     gameRefs.saveFile.levelSolutions["a1_l1"][gameRefs.saveFile.activeSolutions["a1_l1"]].solution.win
   ) {
-    gameRefs.saveFile.levelUnlocked["a1_l2"] = "unlocked";
+    gameRefs.saveFile = focus(gameRefs.saveFile, set(x => x.levelUnlocked["a1_l2"], "unlocked"));
   }
   // act 2
   if (
@@ -22,8 +22,10 @@ export function applyUnlocks(
     gameRefs.saveFile.levelSolutions["a1_l2"][gameRefs.saveFile.activeSolutions["a1_l2"]].solution.win
   ) {
     gameRefs.saveFile.actUnlocked[1] = "unlocked";
-    gameRefs.saveFile.levelUnlocked["a2_l1"] = "unlocked";
-    gameRefs.saveFile.levelUnlocked["a2_l2"] = "unlocked";
-    gameRefs.saveFile.levelUnlocked["a2_l3"] = "unlocked";
+    gameRefs.saveFile = focus(gameRefs.saveFile,
+      set(x => x.levelUnlocked["a2_l1"], "unlocked"),
+      set(x => x.levelUnlocked["a2_l2"], "unlocked"),
+      set(x => x.levelUnlocked["a2_l3"], "unlocked"),
+    );
   }
 }

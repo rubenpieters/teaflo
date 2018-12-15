@@ -17,6 +17,18 @@ export type GameState = {
   nextId: number,
 }
 
+export function filteredEn(
+  state: GameState,
+): EnStUnit[] {
+  return <EnStUnit[]>state.enUnits.filter(x => x !== undefined);
+}
+
+export function filteredFr(
+  state: GameState,
+): FrStUnit[] {
+  return <FrStUnit[]>state.frUnits.filter(x => x !== undefined);
+}
+
 export function mkGameState(
   frUnits: (string | undefined)[],
   enUnits: (string | undefined)[],

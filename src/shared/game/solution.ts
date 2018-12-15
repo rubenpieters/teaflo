@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Tree, extendTree, Location } from "../tree";
 import { Ability } from "./ability";
-import { GameState } from "./state";
+import { GameState, filteredEn } from "./state";
 import { applyAction, Action } from "./action";
 import { nextAI } from "./ai";
 import { Log, emptyLog, LogEntry } from "./log";
@@ -39,9 +39,9 @@ export function runSolution(
   solution: Solution,
   loc: Location,
   state: GameState,
-): { state: GameState, log: Log } {
+): { state: GameState, log: Log, win: boolean } {
   console.log(solution);
-  return _runSolution(solution.tree, loc, state, emptyLog());
+  return _runSolution(solution.tree, loc, state, emptyLog(), false);
 }
 
 export function _runSolution(
@@ -49,18 +49,46 @@ export function _runSolution(
   loc: Location,
   state: GameState,
   log: Log,
-): { state: GameState, log: Log } {
+  win: boolean,
+): { state: GameState, log: Log, win: boolean } {
   if (loc.length === 0) {
-    return { state, log };
+    return { state, log, win };
   }
-  let newLog: LogEntry[] = [];
-  // Action (Fr) Phase
   const solData: SolutionData = tree.nodes[loc[0]].v;
+
+  const phasesResult = runPhases(state, solData);
+
+  return _runSolution(tree.nodes[loc[0]].tree, loc.slice(1), phasesResult.state, phasesResult.log, phasesResult.win);
+}
+
+export function findWin(
+  tree: Tree<SolutionData>,
+  state: GameState,
+): boolean {
+  for (const node of tree.nodes) {
+    const solData = node.v;
+
+    const phasesResult = runPhases(state, solData);
+    const rec = findWin(node.tree, phasesResult.state);
+    if (rec) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function runPhases(
+  state: GameState,
+  solData: SolutionData,
+) {
+
+  let log: LogEntry[] = [];
+  // Action (Fr) Phase
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
   const frActionResult = applyIntentToSolution(frAbility.intent, { input: frInputs, self: solData.origin }, state);
   state = frActionResult.state;
-  newLog = newLog.concat(frActionResult.log);
+  log = log.concat(frActionResult.log);
 
   // Action (En) Phase
   state.enUnits.forEach((enUnit, i) => {
@@ -74,11 +102,21 @@ export function _runSolution(
       // NOTE: cast is safe here if there is no way that a unit has been removed due to an action (eg. deaths)
       // TODO: do this via position id
       state = focus(state, over(x => x.enUnits[i], x => nextAI(state, <any>x)));
-      newLog = newLog.concat(enActionResult.log);
+      log = log.concat(enActionResult.log);
     }
   });
 
-  return _runSolution(tree.nodes[loc[0]].tree, loc.slice(1), state, newLog);
+  // Check Win
+  const enHps = filteredEn(state)
+    .map(x => x.hp)
+    ;
+  const countAllBelow0 = enHps
+    .filter(x => x <= 0)
+    .length
+    ;
+  
+  const win = countAllBelow0 === filteredEn(state).length;
+  return { state, log: log, win: win };
 }
 
 function applyIntentToSolution(
