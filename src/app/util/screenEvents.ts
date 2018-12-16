@@ -213,9 +213,9 @@ export function applyScreenEvent(
     case "ChangeLevel": {
       gameRefs.saveFile = initializeLevel(gameRefs.saveFile, screenEvent.levelId);
 
-      drawLevelSelect(game, gameRefs, gameRefs.saveFile.activeAct);
-      drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
-      drawSolutionSelect(game, gameRefs, gameRefs.saveFile.activeLevel);
+      drawLevelSelect(game, gameRefs, activeAct(gameRefs.saveFile));
+      drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
+      drawSolutionSelect(game, gameRefs, activeLevel(gameRefs.saveFile));
       return;
     }
     case "StartLevel": {
@@ -262,11 +262,15 @@ export function applyScreenEvent(
     case "GoToMenu": {
       gameRefs.saveFile = changeScreen(gameRefs.saveFile, "menu");
       applyUnlocks(gameRefs);
+      // reset hover/lock info
+      gameRefs.gameScreenData.hoverInfo = undefined;
+      gameRefs.gameScreenData.lockInfo = undefined;
 
       drawActSelect(game, gameRefs);
       drawLevelSelect(game, gameRefs, activeAct(gameRefs.saveFile));
       drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
       drawSolutionSelect(game, gameRefs, activeLevel(gameRefs.saveFile));
+      drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       setGameScreenVisible(false);
       setSelectScreenVisible(true);
       return;
