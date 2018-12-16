@@ -95,6 +95,27 @@ export function overFriendly(
   }
 }
 
+// TODO: only accept EntityId<"enemy">
+export function overEnemy(
+  target: UnitId,
+  state: GameState,
+  f: (unit: EnStUnit) => EnStUnit,
+  onEmpty: (state: GameState) => GameState,
+) {
+  if (target.type !== "enemy") {
+    throw `overEnemy: wrong target type ${JSON.stringify(target)}`;
+  }
+  const id = findIndex(state, target);
+  if (state.enUnits[id] === undefined) {
+    return onEmpty(state);
+  } else {
+    // state.enUnits[id] is checked before
+    return focus(state,
+      over(x => x.enUnits[id], <any>f),
+    );
+  }
+}
+
 export function toPositionId<A extends TargetType>(
   state: GameState,
   id: EntityId<A>,

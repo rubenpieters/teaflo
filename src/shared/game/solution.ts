@@ -7,7 +7,7 @@ import { nextAI } from "./ai";
 import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction, Intent, Context } from "./intent";
 import { Omit } from "../type-util";
-import { UnitId } from "./entityId";
+import { UnitId, overEnemy } from "./entityId";
 
 export type SolutionData = {
   ability: Ability,
@@ -123,9 +123,10 @@ function runPhases(
       const enActionResult = applyActionsToSolution([enAction], { self: enUnitSelf }, state, []);
       state = enActionResult.state;
       // forward enUnit AI
-      // NOTE: cast is safe here if there is no way that a unit has been removed due to an action (eg. deaths)
-      // TODO: do this via position id
-      state = focus(state, over(x => x.enUnits[i], x => nextAI(state, <any>x)));
+      state = overEnemy(enUnitSelf, state,
+        x => nextAI(state, x),
+        x => x,
+      );
       log = log.concat(enActionResult.log);
     }
   });
