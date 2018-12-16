@@ -100,3 +100,31 @@ export function getLocation<A>(
   }
   return getLocation(tree.nodes[i].tree, loc.slice(1));
 }
+
+export function drawPositions<A>(
+  tree: Tree<A>,
+): { a: A, x: number, y: number, loc: Location }[] {
+  return _drawPositions(tree, 0, 0, [], []).result;
+}
+
+export function _drawPositions<A>(
+  tree: Tree<A>,
+  currentX: number,
+  currentY: number,
+  loc: Location,
+  acc: { a: A, x: number, y: number, loc: Location }[],
+): { maxY: number, result: { a: A, x: number, y: number, loc: Location }[] } {
+  let newAcc = acc;
+  let sum = 0;
+  tree.nodes.forEach((node, nodeIndex) => {
+    const newLoc: Location = loc.concat(nodeIndex);
+    newAcc = newAcc.concat({ a: node.v, x: currentX, y: currentY, loc: newLoc });
+    const { maxY, result } = _drawPositions(node.tree, currentX + 1, currentY, newLoc, newAcc);
+    currentY = maxY;
+    newAcc = result;
+  });
+  if (tree.nodes.length === 0) {
+    currentY += 1
+  }
+  return { maxY: currentY, result: newAcc };
+}

@@ -85,7 +85,6 @@ export class ExtendLevelSolution {
 export class ChangeTreeLoc {
   constructor(
     public readonly loc: Location,
-    public readonly levelId: string,
     public readonly tag: "ChangeTreeLoc" = "ChangeTreeLoc",
   ) {}
 }
