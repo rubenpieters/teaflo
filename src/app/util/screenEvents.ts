@@ -303,13 +303,6 @@ export function applyScreenEvent(
       return;
     }
     case "SetClickState": {
-      let cs;
-      if (gameRefs.gameScreenData.clickState === undefined) {
-        cs = {...screenEvent.clickState, ...{ origin: undefined }};
-      } else {
-
-      }
-      const x = {...gameRefs.gameScreenData.clickState, ...screenEvent.clickState};
       gameRefs.gameScreenData.clickState = {...gameRefs.gameScreenData.clickState, ...screenEvent.clickState};
 
       drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
