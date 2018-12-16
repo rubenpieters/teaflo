@@ -51,7 +51,7 @@ export function cutSolution(
       loc: [],
     };
   } else {
-    const newTree = cutTree(solution.tree, loc.slice(0, -1));
+    const newTree = cutTree(solution.tree, loc);
     return {
       solution: focus(solution, set(x => x.tree, newTree)),
       loc: loc.slice(0, -1),

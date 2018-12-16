@@ -302,11 +302,12 @@ export function applyScreenEvent(
       return;
     }
     case "CutTreeLoc": {
+      console.log(`CUT: ${JSON.stringify(screenEvent.loc)}`);
       const solInfo = activeSolInfo(gameRefs.saveFile);
       const currentSolution = solInfo.solution;
       const newSolution = cutSolution(currentSolution, screenEvent.loc);
       gameRefs.saveFile = changeSolInfo(gameRefs.saveFile, newSolution.solution, newSolution.loc);
-      
+
       drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
       drawSolutionInfo(game, gameRefs, activeLevel(gameRefs.saveFile));
       if (gameRefs.gameScreenData.lockInfo === undefined) {

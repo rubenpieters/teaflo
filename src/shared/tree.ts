@@ -77,6 +77,10 @@ export function cutTree<A>(
 ): Tree<A> {
   if (loc.length === 0) {
     return emptyTree();
+  } else if (loc.length === 1) {
+    return focus(tree,
+      over(x => x.nodes, x => x.slice(0, loc[0]).concat(x.slice(loc[0] + 1, x.length))),
+    );
   } else {
     return focus(tree,
       over(x => x.nodes[loc[0]].tree, x => cutTree(x, loc.slice(1))),

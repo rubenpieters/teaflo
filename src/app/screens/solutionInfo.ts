@@ -282,7 +282,6 @@ function mkTree(
 
   const sprites: Phaser.Graphics[] = [sprite];
   for (const drawPos of drawPosList) {
-    console.log(`TEST: ${JSON.stringify(drawPos.loc)}`);
     const sprite: Phaser.Graphics = game.add.graphics(x + drawPos.x * 50, y + drawPos.y * 50, gameRefs.gameScreenData.spriteGroup);
     if (solInfo.loc.toString() === drawPos.loc.toString()) {
       sprite.beginFill(0xFF77CC);
