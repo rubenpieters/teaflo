@@ -115,7 +115,6 @@ export function _drawPositions<A>(
   acc: { a: A, x: number, y: number, loc: Location }[],
 ): { maxY: number, result: { a: A, x: number, y: number, loc: Location }[] } {
   let newAcc = acc;
-  let sum = 0;
   tree.nodes.forEach((node, nodeIndex) => {
     const newLoc: Location = loc.concat(nodeIndex);
     newAcc = newAcc.concat({ a: node.v, x: currentX, y: currentY, loc: newLoc });

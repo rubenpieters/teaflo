@@ -9,9 +9,9 @@ import { drawLevelInfo } from "../screens/levelInfo";
 import { drawGameScreen } from "../screens/gameScreen";
 import { applyUnlocks } from "../savefile/unlocks";
 import { drawSolutionRep } from "../screens/solutionRep";
-import { Solution, extendSolution, SolutionData } from "src/shared/game/solution";
+import { Solution, extendSolution, SolutionData, cutSolution } from "src/shared/game/solution";
 import { Ability } from "src/shared/game/ability";
-import { Location } from "src/shared/tree";
+import { Location, cutTree } from "src/shared/tree";
 import { ClickState } from "./clickState";
 import { drawSolutionInfo, drawCardInfo } from "../screens/solutionInfo";
 import { TargetType } from "../../shared/game/entityId";
@@ -92,7 +92,6 @@ export class ChangeTreeLoc {
 export class CutTreeLoc {
   constructor(
     public readonly loc: Location,
-    public readonly levelId: string,
     public readonly tag: "CutTreeLoc" = "CutTreeLoc",
   ) {}
 }
@@ -303,6 +302,18 @@ export function applyScreenEvent(
       return;
     }
     case "CutTreeLoc": {
+      const solInfo = activeSolInfo(gameRefs.saveFile);
+      const currentSolution = solInfo.solution;
+      const newSolution = cutSolution(currentSolution, screenEvent.loc);
+      gameRefs.saveFile = changeSolInfo(gameRefs.saveFile, newSolution.solution, newSolution.loc);
+      
+      drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
+      drawSolutionInfo(game, gameRefs, activeLevel(gameRefs.saveFile));
+      if (gameRefs.gameScreenData.lockInfo === undefined) {
+        applyScreenEvent(new ClearCardInfo(), game, gameRefs);
+      } else {
+        drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
+      }
       return;
     }
     case "SetClickState": {

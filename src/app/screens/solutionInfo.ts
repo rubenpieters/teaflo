@@ -254,10 +254,7 @@ function mkTree(
   solInfo: SolInfo,
 ) {
   // clear old
-  for (const sprite of gameRefs.gameScreenData.solTreePool) {
-    sprite.destroy();
-  }
-
+  gameRefs.gameScreenData.solTreePool.forEach(x => x.destroy());
 
   const x = 220;
   const y = 100;
@@ -276,9 +273,7 @@ function mkTree(
     if (pointer.leftButton.isDown) {
       applyScreenEvent(new SE.ChangeTreeLoc([]), game, gameRefs);
     } else if (pointer.rightButton.isDown) {
-      //board.loc = [];
-      //board.solution = cutTree(board.solution, []);
-      //mkTree(board);
+      applyScreenEvent(new SE.CutTreeLoc([]), game, gameRefs);
     }
   });
 
@@ -287,7 +282,7 @@ function mkTree(
 
   const sprites: Phaser.Graphics[] = [sprite];
   for (const drawPos of drawPosList) {
-    console.log(`TEST ${JSON.stringify(drawPos.loc)}`);
+    console.log(`TEST: ${JSON.stringify(drawPos.loc)}`);
     const sprite: Phaser.Graphics = game.add.graphics(x + drawPos.x * 50, y + drawPos.y * 50, gameRefs.gameScreenData.spriteGroup);
     if (solInfo.loc.toString() === drawPos.loc.toString()) {
       sprite.beginFill(0xFF77CC);
@@ -301,9 +296,7 @@ function mkTree(
       if (pointer.leftButton.isDown) {
         applyScreenEvent(new SE.ChangeTreeLoc(drawPos.loc), game, gameRefs);
       } else if (pointer.rightButton.isDown) {
-        //board.loc = [];
-        //board.solution = cutTree(board.solution, []);
-        //mkTree(board);
+        applyScreenEvent(new SE.CutTreeLoc(drawPos.loc), game, gameRefs);
       }
     });
     sprites.push(sprite);

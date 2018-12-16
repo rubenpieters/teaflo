@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Tree, extendTree, Location } from "../tree";
+import { Tree, extendTree, Location, cutTree, emptyTree } from "../tree";
 import { Ability } from "./ability";
 import { GameState, filteredEn } from "./state";
 import { applyAction, Action } from "./action";
@@ -35,12 +35,36 @@ export function extendSolution(
   };
 }
 
+export function cutSolution(
+  solution: Solution,
+  loc: Location,
+): {
+  solution: Solution,
+  loc: Location,
+} {
+  if (loc.length === 0) {
+    return {
+      solution: {
+        tree: emptyTree(),
+        win: false,
+      },
+      loc: [],
+    };
+  } else {
+    const newTree = cutTree(solution.tree, loc.slice(0, -1));
+    return {
+      solution: focus(solution, set(x => x.tree, newTree)),
+      loc: loc.slice(0, -1),
+    };
+  }
+}
+
 export function runSolution(
   solution: Solution,
   loc: Location,
   state: GameState,
 ): { state: GameState, log: Log, win: boolean } {
-  console.log(solution);
+  // console.log(solution);
   return _runSolution(solution.tree, loc, state, emptyLog(), false);
 }
 
