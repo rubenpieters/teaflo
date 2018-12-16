@@ -35,6 +35,7 @@ const newSaveFile: SaveFileV1 = {
   },
   activeAct: 0,
   activeLevel: "a1_l1",
+  activeScreen: "menu",
 }
 
 export default class Game extends Phaser.State {
@@ -57,8 +58,6 @@ export default class Game extends Phaser.State {
       unitAbilityPool: new Phaser.Group(this.game),
       logBtnPool: new SpritePool(this.game),
       solTreePool: [],
-      // TODO: what should initial levelId be?
-      levelId: "",
       statsScreenData: {
         spriteGroup: new Phaser.Group(this.game),
         abilitiesPool: new SpritePool(this.game),

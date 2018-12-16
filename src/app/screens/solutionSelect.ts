@@ -74,9 +74,9 @@ export function createSolButton(
         if (gameRefs.saveFile.activeSolutions[btnSprite.data.levelId] === index) {
           // noop
         } else if (gameRefs.saveFile.levelSolutions[btnSprite.data.levelId].length > btnSprite.data.index) {
-          applyScreenEvent(new SE.ChangeActiveSolution(btnSprite.data.levelId, btnSprite.data.index), game, gameRefs);
+          applyScreenEvent(new SE.ChangeActiveSolution(btnSprite.data.index), game, gameRefs);
         } else {
-          applyScreenEvent(new SE.AddSolution(btnSprite.data.levelId), game, gameRefs);
+          applyScreenEvent(new SE.AddSolution(), game, gameRefs);
         }
       }
     });

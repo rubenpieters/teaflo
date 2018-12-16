@@ -22,7 +22,6 @@ export type GameScreenData = {
   exitBtn?: Phaser.Sprite,
   victoryBtn?: Phaser.Sprite,
   clickState?: ClickState,
-  levelId: string,
   state: GameState,
   statsScreenData: StatsScreenData,
   lockInfo?: CardInfo,
@@ -38,7 +37,6 @@ export type CardInfo = {
 export function drawGameScreen(
   game: Phaser.Game,
   gameRefs: GameRefs,
-  levelId: string,
 ) {
   if (gameRefs.gameScreenData.exitBtn === undefined) {
     const exitBtnPos = createPosition(
@@ -47,10 +45,9 @@ export function drawGameScreen(
     );
     const exitBtn = createButton(game, gameRefs.gameScreenData.spriteGroup, exitBtnPos, "Exit", "btn_level",
       () => {
-        applyScreenEvent(new SE.GoToMenu(exitBtn.data.levelId), game, gameRefs)
+        applyScreenEvent(new SE.GoToMenu(), game, gameRefs)
       }
     );
     gameRefs.gameScreenData.exitBtn = exitBtn;
   }
-  gameRefs.gameScreenData.exitBtn.data.levelId = levelId;
 }

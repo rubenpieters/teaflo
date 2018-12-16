@@ -191,10 +191,7 @@ export function drawCardInfo(
             "bot", 400, config.abilityIconHeight - 170 * (abilityIndex),
           );
           const abilityIcon = createUnitAbility(
-            game, gameRefs, ablPos, ability.spriteId, gameRefs.gameScreenData.levelId,
-            gameRefs.saveFile.activeSolutions[gameRefs.gameScreenData.levelId],
-            ability, id, type
-          )
+            game, gameRefs, ablPos, ability.spriteId, ability, id, type);
         });
       }
     }
@@ -203,8 +200,6 @@ export function drawCardInfo(
 
 type AbilitySprite = GSprite<{
   init: boolean,
-  levelId: string,
-  solId: number,
   ability: Ability,
   id: number,
   type: TargetType,
@@ -215,8 +210,6 @@ export function createUnitAbility(
   gameRefs: GameRefs,
   pos: Position,
   key: string,
-  levelId: string,
-  solId: number,
   ability: Ability,
   id: number,
   type: TargetType,
@@ -224,8 +217,6 @@ export function createUnitAbility(
   const unit: AbilitySprite =
     gameRefs.gameScreenData.statsScreenData.abilitiesPool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
   
-  unit.data.levelId = levelId;
-  unit.data.solId = solId;
   unit.data.ability = ability;
   unit.data.id = id;
   unit.data.type = type;
@@ -241,7 +232,7 @@ export function createUnitAbility(
             ability: unit.data.ability,
             origin: new GlobalId(unit.data.id, unit.data.type),
             inputs: [],
-          }, unit.data.levelId), game, gameRefs);
+          }), game, gameRefs);
         } else {
           applyScreenEvent(new SE.SetClickState({
             ability, currentInputs: [], origin: new GlobalId(unit.data.id, unit.data.type),

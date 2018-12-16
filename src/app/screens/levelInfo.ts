@@ -49,7 +49,7 @@ export function drawLevelInfo(
   );
   const startBtn = createButton(game, gameRefs.levelSelectData.spriteGroup, startBtnPos, "Start", "btn_level",
     () => {
-      applyScreenEvent(new SE.StartLevel(levelId, solId), game, gameRefs);
+      applyScreenEvent(new SE.StartLevel(), game, gameRefs);
     }
   );
   gameRefs.levelSelectData.startBtn = startBtn;
@@ -186,7 +186,7 @@ function createPoolLevelSelectCard(
         let from = { pos: card.data.resetSlot.data.index, type: card.data.resetSlot.data.type };
         let to = { pos: card.data.hoverSlot.data.index, type: card.data.hoverSlot.data.type };
         applyScreenEvent(
-          new SE.DeployCard(card.data.levelId, card.data.cardId, card.data.solId, from, to),
+          new SE.DeployCard(card.data.cardId, card.data.solId, from, to),
           game, gameRefs
         );
         if (card.data.hoverSlot.data.card === undefined) {

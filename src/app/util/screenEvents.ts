@@ -1,4 +1,5 @@
-import { SaveFileV1 } from "../savefile/rep";
+import { focus, over, set } from "src/shared/iassign-util";
+import { SaveFileV1, changeAct, changeLevel, changeScreen, initializeLevel, addSolution, addAndActivateSolution, activeLevel, activeSolId, changeSolId, swapDeployed, toDeploy, toSupply, activeAct, activeSolInfo, changeSolInfo, changeLoc } from "../savefile/rep";
 import { GameRefs, setSelectScreenVisible, setGameScreenVisible, newSolution } from "../states/game";
 import { drawActSelect } from "../screens/actSelect";
 import { drawLevelSelect } from "../screens/levelSelect";
@@ -17,6 +18,10 @@ import { TargetType } from "../../shared/game/entityId";
 import { drawHoverCardFriendly, clearHoverCard } from "../screens/hoverCard";
 import { Omit } from "src/shared/type-util";
 
+/**
+ * Changes the currently active act.
+ * The active act is the act selected on the menu.
+ */
 export class ChangeAct {
   constructor(
     public readonly actId: number,
@@ -24,6 +29,10 @@ export class ChangeAct {
   ) {}
 }
 
+/**
+ * Changes the currently active level.
+ * The active level is the level selected on the menu.
+ */
 export class ChangeLevel {
   constructor(
     public readonly levelId: string,
@@ -33,22 +42,18 @@ export class ChangeLevel {
 
 export class StartLevel {
   constructor(
-    public readonly levelId: string,
-    public readonly solId: number,
     public readonly tag: "StartLevel" = "StartLevel",
   ) {}
 }
 
 export class AddSolution {
   constructor(
-    public readonly levelId: string,
     public readonly tag: "AddSolution" = "AddSolution",
   ) {}
 }
 
 export class ChangeActiveSolution {
   constructor(
-    public readonly levelId: string,
     public readonly solId: number,
     public readonly tag: "ChangeActiveSolution" = "ChangeActiveSolution",
   ) {}
@@ -56,7 +61,6 @@ export class ChangeActiveSolution {
 
 export class DeployCard {
   constructor(
-    public readonly levelId: string,
     public readonly cardId: string,
     public readonly solId: number,
     public readonly from: { pos: number, type: "supply" | "deploy" },
@@ -67,7 +71,6 @@ export class DeployCard {
 
 export class GoToMenu {
   constructor(
-    public readonly levelId: string,
     public readonly tag: "GoToMenu" = "GoToMenu",
   ) {}
 }
@@ -75,7 +78,6 @@ export class GoToMenu {
 export class ExtendLevelSolution {
   constructor(
     public readonly solData: SolutionData,
-    public readonly levelId: string,
     public readonly tag: "ExtendLevelSolution" = "ExtendLevelSolution",
   ) {}
 }
@@ -197,7 +199,7 @@ export function applyScreenEvent(
 ): void {
   switch (screenEvent.tag) {
     case "ChangeAct": {
-      gameRefs.saveFile.activeAct = screenEvent.actId;
+      gameRefs.saveFile = changeAct(gameRefs.saveFile, screenEvent.actId);
 
       drawActSelect(game, gameRefs);
       const firstLevelId: string | undefined = levelMap[screenEvent.actId][0];
@@ -209,13 +211,7 @@ export function applyScreenEvent(
       return;
     }
     case "ChangeLevel": {
-      gameRefs.saveFile.activeLevel = screenEvent.levelId;
-      // if the savefile has no solutions yet, then create one
-      if (gameRefs.saveFile.levelSolutions[screenEvent.levelId] === undefined) {
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId] = [newSolution()];
-        // make it the active solution
-        gameRefs.saveFile.activeSolutions[screenEvent.levelId] = 0;
-      }
+      gameRefs.saveFile = initializeLevel(gameRefs.saveFile, screenEvent.levelId);
 
       drawLevelSelect(game, gameRefs, gameRefs.saveFile.activeAct);
       drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
@@ -223,35 +219,27 @@ export function applyScreenEvent(
       return;
     }
     case "StartLevel": {
-      gameRefs.gameScreenData.levelId = screenEvent.levelId;
+      gameRefs.saveFile = changeScreen(gameRefs.saveFile, "game");
 
-      drawGameScreen(game, gameRefs, screenEvent.levelId);
-      drawSolutionRep(game, gameRefs, screenEvent.levelId);
-      drawSolutionInfo(game, gameRefs, screenEvent.levelId);
+      drawGameScreen(game, gameRefs);
+      drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
+      drawSolutionInfo(game, gameRefs, activeLevel(gameRefs.saveFile));
       setSelectScreenVisible(false);
       setGameScreenVisible(true);
       return;
     }
     case "AddSolution": {
-      if (gameRefs.saveFile.levelSolutions[screenEvent.levelId] === undefined) {
-        // A solution should have been added already, but if not we can still add one
-        console.log(`WARNING (applyScreenEvent AddSolution): no solutions for level ${screenEvent.levelId}`);
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId] = [newSolution()];
-      } else {
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId].push(newSolution());
-      }
-      // change solution
-      gameRefs.saveFile.activeSolutions[screenEvent.levelId] = gameRefs.saveFile.levelSolutions[screenEvent.levelId].length - 1;
+      gameRefs.saveFile = addAndActivateSolution(gameRefs.saveFile);
 
-      drawSolutionSelect(game, gameRefs, gameRefs.saveFile.activeLevel);
-      drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
+      drawSolutionSelect(game, gameRefs, activeLevel(gameRefs.saveFile));
+      drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
       return;
     }
     case "ChangeActiveSolution": {
-      gameRefs.saveFile.activeSolutions[screenEvent.levelId] = screenEvent.solId;
+      gameRefs.saveFile = changeSolId(gameRefs.saveFile, screenEvent.solId);
 
-      drawSolutionSelect(game, gameRefs, gameRefs.saveFile.activeLevel);
-      drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
+      drawSolutionSelect(game, gameRefs, activeLevel(gameRefs.saveFile));
+      drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
       return;
     }
     case "DeployCard": {
@@ -259,41 +247,39 @@ export function applyScreenEvent(
         // noop
       } else if (screenEvent.from.type === "deploy" && screenEvent.to.type === "deploy") {
         // swap
-        const original: string | undefined = gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.to.pos];
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.from.pos] = original;
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.to.pos] = screenEvent.cardId;
+        gameRefs.saveFile = swapDeployed(gameRefs.saveFile, screenEvent.from.pos, screenEvent.to.pos, screenEvent.cardId);
       } else if (screenEvent.from.type === "supply" && screenEvent.to.type === "deploy") {
         // put
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.to.pos] = screenEvent.cardId;
+        gameRefs.saveFile = toDeploy(gameRefs.saveFile, screenEvent.to.pos, screenEvent.cardId);
       } else if (screenEvent.from.type === "deploy" && screenEvent.to.type === "supply") {
         // remove
-        gameRefs.saveFile.levelSolutions[screenEvent.levelId][screenEvent.solId].cardIds[screenEvent.to.pos] = undefined;
+        gameRefs.saveFile = toSupply(gameRefs.saveFile, screenEvent.to.pos);
       }
 
       // no need to redraw, this is handled by the sprites themselves
       return;
     }
     case "GoToMenu": {
+      gameRefs.saveFile = changeScreen(gameRefs.saveFile, "menu");
       applyUnlocks(gameRefs);
 
       drawActSelect(game, gameRefs);
-      drawLevelSelect(game, gameRefs, gameRefs.saveFile.activeAct);
-      drawLevelInfo(game, gameRefs, gameRefs.saveFile.activeLevel, gameRefs.saveFile.activeSolutions[screenEvent.levelId]);
-      drawSolutionSelect(game, gameRefs, gameRefs.saveFile.activeLevel);
+      drawLevelSelect(game, gameRefs, activeAct(gameRefs.saveFile));
+      drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
+      drawSolutionSelect(game, gameRefs, activeLevel(gameRefs.saveFile));
       setGameScreenVisible(false);
       setSelectScreenVisible(true);
       return;
     }
     case "ExtendLevelSolution": {
-      const solId = gameRefs.saveFile.activeSolutions[screenEvent.levelId];
-      const currentSolution = gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].solution;
-      const currentLoc = gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc;
+      const solInfo = activeSolInfo(gameRefs.saveFile);
+      const currentSolution = solInfo.solution;
+      const currentLoc = solInfo.loc;
       const newSolution = extendSolution(screenEvent.solData, currentSolution, currentLoc);
-      gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].solution = newSolution.solution;
-      gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc = newSolution.loc;
+      gameRefs.saveFile = changeSolInfo(gameRefs.saveFile, newSolution.solution, newSolution.loc);
 
-      drawSolutionRep(game, gameRefs, screenEvent.levelId);
-      drawSolutionInfo(game, gameRefs, screenEvent.levelId);
+      drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
+      drawSolutionInfo(game, gameRefs, activeLevel(gameRefs.saveFile));
       if (gameRefs.gameScreenData.lockInfo === undefined) {
         applyScreenEvent(new ClearCardInfo(), game, gameRefs);
       } else {
@@ -302,11 +288,10 @@ export function applyScreenEvent(
       return;
     }
     case "ChangeTreeLoc": {
-      const solId = gameRefs.saveFile.activeSolutions[screenEvent.levelId];
-      gameRefs.saveFile.levelSolutions[screenEvent.levelId][solId].loc = screenEvent.loc;
+      gameRefs.saveFile = changeLoc(gameRefs.saveFile, screenEvent.loc);
 
-      drawSolutionRep(game, gameRefs, screenEvent.levelId);
-      drawSolutionInfo(game, gameRefs, screenEvent.levelId);
+      drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
+      drawSolutionInfo(game, gameRefs, activeLevel(gameRefs.saveFile));
       if (gameRefs.gameScreenData.lockInfo === undefined) {
         applyScreenEvent(new ClearCardInfo(), game, gameRefs);
       } else {
@@ -327,7 +312,7 @@ export function applyScreenEvent(
       const x = {...gameRefs.gameScreenData.clickState, ...screenEvent.clickState};
       gameRefs.gameScreenData.clickState = {...gameRefs.gameScreenData.clickState, ...screenEvent.clickState};
 
-      drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
+      drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
       return;
     }
     case "AdvanceClickState": {
@@ -344,14 +329,14 @@ export function applyScreenEvent(
             ability: clickState.ability,
             origin: clickState.origin,
             inputs: clickState.currentInputs,
-          }, gameRefs.gameScreenData.levelId), game, gameRefs);
+          }), game, gameRefs);
       } else {
-        drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
+        drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
       }
       return;
     }
     case "ShowIntermediateSol": {
-      drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId, {
+      drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile), {
         index: screenEvent.index,
       });
       if (gameRefs.gameScreenData.lockInfo === undefined) {
@@ -362,7 +347,7 @@ export function applyScreenEvent(
       return;
     }
     case "ClearIntermediateSol": {
-      drawSolutionRep(game, gameRefs, gameRefs.gameScreenData.levelId);
+      drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
       if (gameRefs.gameScreenData.lockInfo === undefined) {
         applyScreenEvent(new ClearCardInfo(), game, gameRefs);
       } else {
