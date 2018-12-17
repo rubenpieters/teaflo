@@ -78,3 +78,12 @@ export function applyTrigger(
     }
   }
 }
+
+export function triggerSprite(
+  trigger: Trigger
+): string {
+  switch (trigger.tag) {
+    case "Strong": return "tr_strong";
+    case "Weak": return "tr_weak";
+  }
+}

@@ -15,6 +15,7 @@ import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
 import { TargetType, PositionId } from "../../shared/game/entityId";
 import { Log, LogEntry } from "../../shared/game/log";
+import { triggerSprite, Trigger } from "../../shared/game/trigger";
 
 export type IntermediateSol = {
   index: number,
@@ -83,6 +84,7 @@ export function drawSolutionRep(
       );
       createUnit(game, gameRefs, unitPos, unit.cardId, unitIndex, "friendly");
 
+      // HP
       const unitHpPos = relativeTo(unitPos,
         "below", 50,
         config.unitHpBarWidth, config.unitHpBarHeight,
@@ -90,6 +92,7 @@ export function drawSolutionRep(
       unitHpPos.xMax = unitHpPos.xMin + (unitHpPos.xMax - unitHpPos.xMin) * (unit.hp / unit.maxHp);
       createUnitResource(game, gameRefs, unitHpPos, "hp");
 
+      // CH
       const unitChPos = relativeTo(unitPos,
         "below", 150,
         config.unitHpBarWidth, config.unitHpBarHeight,
@@ -97,10 +100,20 @@ export function drawSolutionRep(
       unitChPos.xMax = unitChPos.xMin + (unitChPos.xMax - unitChPos.xMin) * (unit.charges / unit.maxCharges);
       createUnitResource(game, gameRefs, unitChPos, "ch");
 
+      // Triggers
+      unit.triggers.forEach((trigger, triggerIndex) => {
+        const trPos = createPosition(
+          "left", 1050 + 75 * triggerIndex, config.triggerWidth,
+          "top", 1150, config.triggerHeight,
+        );
+        createUnitTrigger(game, gameRefs, trPos, trigger);
+      });
+
+      // TH
       let i = 0;
       for (const enId of enIds) {
         const unitThPos = relativeTo(unitPos,
-          "below", 250 + 100 * i,
+          "below", 350 + 100 * i,
           config.unitHpBarWidth, config.unitHpBarHeight,
         );
         unitThPos.xMax = unitThPos.xMin + (unitThPos.xMax - unitThPos.xMin) * (unit.threatMap[enId] / maxThreat);
@@ -120,6 +133,7 @@ export function drawSolutionRep(
       );
       createUnit(game, gameRefs, unitPos, unit.cardId, unitIndex, "enemy");
 
+      // HP
       const unitHpPos = relativeTo(unitPos,
         "below", 50,
         config.unitHpBarWidth, config.unitHpBarHeight,
@@ -127,12 +141,22 @@ export function drawSolutionRep(
       unitHpPos.xMax = unitHpPos.xMin + (unitHpPos.xMax - unitHpPos.xMin) * (unit.hp / unit.maxHp);
       createUnitResource(game, gameRefs, unitHpPos, "hp");
 
+      // CH
       const unitChPos = relativeTo(unitPos,
         "below", 150,
         config.unitHpBarWidth, config.unitHpBarHeight,
       );
       unitChPos.xMax = unitChPos.xMin + (unitChPos.xMax - unitChPos.xMin) * (unit.charges / unit.maxCharges);
       createUnitResource(game, gameRefs, unitChPos, "ch");
+
+      // Triggers
+      unit.triggers.forEach((trigger, triggerIndex) => {
+        const trPos = createPosition(
+          "left", 2300 + 75 * triggerIndex, config.triggerWidth,
+          "top", 1150, config.triggerHeight,
+        );
+        createUnitTrigger(game, gameRefs, trPos, trigger);
+      });
     }
   });
 
@@ -289,4 +313,43 @@ export function createUnitResource(
   }
 
   return unit;
+}
+
+type TriggerSprite = GSprite<{
+  init: boolean,
+  selecting: boolean,
+}>;
+
+export function createUnitTrigger(
+  game: Phaser.Game,
+  gameRefs: GameRefs,
+  pos: Position,
+  trigger: Trigger,
+): TriggerSprite {
+  const sprite: TriggerSprite = createButtonInPool(
+    game,
+    gameRefs.gameScreenData.unitTriggerPool,
+    pos,
+    {  },
+    triggerSprite(trigger),
+    undefined,
+    // onInputDown
+    () => {
+      //
+    },
+    // onInputUp
+    () => {
+      //
+    },
+    // onInputOver
+    () => {
+      //
+    },
+    // onInputOut
+    () => {
+      //
+    },
+  );
+
+  return sprite;
 }

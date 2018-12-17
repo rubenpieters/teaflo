@@ -16,6 +16,7 @@ export type GameScreenData = {
   spriteGroup: Phaser.Group,
   unitPool: SpritePool<Button>,
   unitHpPool: Phaser.Group,
+  unitTriggerPool: Phaser.Group,
   logBtnPool: SpritePool<Button>,
   unitAbilityPool: Phaser.Group,
   solTreePool: Phaser.Graphics[],

@@ -27,4 +27,7 @@ export const config = {
 
   selectArrowWidth: 150,
   selectArrowHeight: 100,
+
+  triggerWidth: 50,
+  triggerHeight: 50,
 };

@@ -2,6 +2,7 @@ import { EnUnit } from "src/shared/game/unit";
 import { ai1 } from "../ai/ai";
 import * as I from "../../game/intent";
 import { PositionId } from "../../game/entityId";
+import { Weak } from "../../game/trigger";
 
 export const en_unit_a1_l1_01: EnUnit = {
   hp: 10,
@@ -10,7 +11,9 @@ export const en_unit_a1_l1_01: EnUnit = {
   maxCharges: 5,
   ai: ai1,
   currentAI: 0,
-  triggers: [],
+  triggers: [
+    new Weak(100),
+  ],
 }
 
 export const enUnitMap: {

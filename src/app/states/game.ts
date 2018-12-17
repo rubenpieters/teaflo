@@ -55,6 +55,7 @@ export default class Game extends Phaser.State {
       spriteGroup: new Phaser.Group(this.game),
       unitPool: new SpritePool(this.game),
       unitHpPool: new Phaser.Group(this.game),
+      unitTriggerPool: new Phaser.Group(this.game),
       unitAbilityPool: new Phaser.Group(this.game),
       logBtnPool: new SpritePool(this.game),
       solTreePool: [],
