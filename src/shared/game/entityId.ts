@@ -177,3 +177,11 @@ function findI<E extends HasId, A extends TargetType>(
     }
   }
 }
+
+export function eqUnitId(
+  state: GameState,
+  a: UnitId,
+  b: UnitId,
+) {
+  throw "TODO";
+}

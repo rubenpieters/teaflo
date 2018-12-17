@@ -92,49 +92,50 @@ export function thDamage(
 }
 
 export type Context = {
-  state: GameState,
   input?: any[],
   self?: UnitId,
 }
 
 export function intentToAction(
+  state: GameState,
   context: Context,
   intent: Intent,
 ): Action {
   switch (intent.tag) {
     case "DamageI": {
       return new A.Damage(
-        evaluateIntentVar(context, intent.target),
-        evaluateIntentVar(context, intent.value),
+        evaluateIntentVar(state, context, intent.target),
+        evaluateIntentVar(state, context, intent.value),
       );
     }
     case "HealI": {
       return new A.Heal(
-        evaluateIntentVar(context, intent.target),
-        evaluateIntentVar(context, intent.value),
+        evaluateIntentVar(state, context, intent.target),
+        evaluateIntentVar(state, context, intent.value),
       );
     }
     case "UseChargeI": {
       return new A.UseCharge(
-        evaluateIntentVar(context, intent.target),
-        evaluateIntentVar(context, intent.value),
+        evaluateIntentVar(state, context, intent.target),
+        evaluateIntentVar(state, context, intent.value),
       );
     }
     case "CombinedIntent": {
-      const actions = intent.intents.map(x => intentToAction(context, x));
+      const actions = intent.intents.map(x => intentToAction(state, context, x));
       return new A.CombinedAction(actions);
     }
     case "AddThreatI": {
       return new A.AddThreat(
-        evaluateIntentVar(context, intent.toFriendly),
-        evaluateIntentVar(context, intent.atEnemy),
-        evaluateIntentVar(context, intent.value),
+        evaluateIntentVar(state, context, intent.toFriendly),
+        evaluateIntentVar(state, context, intent.atEnemy),
+        evaluateIntentVar(state, context, intent.value),
       );
     }
   }
 }
 
 function evaluateIntentVar<A>(
+  state: GameState,
   context: Context,
   intentVar: IntentVar<A>,
 ): A {

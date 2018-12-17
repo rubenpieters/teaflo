@@ -8,6 +8,7 @@ import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction, Intent, Context } from "./intent";
 import { Omit } from "../type-util";
 import { UnitId, overEnemy } from "./entityId";
+import { applyTransforms } from "./transform";
 
 export type SolutionData = {
   ability: Ability,
@@ -146,19 +147,19 @@ function runPhases(
 
 function applyIntentToSolution(
   intent: Intent,
-  context: Omit<Context, "state">,
+  context: Context,
   state: GameState,
 ): {
   state: GameState,
   log: LogEntry[],
 } {
-  const action = intentToAction({ ...context, ...{ state: state } }, intent);
+  const action = intentToAction(state, context, intent);
   return applyActionsToSolution([action], context, state, []);
 }
 
 function applyActionsToSolution(
   actions: Action[],
-  context: Omit<Context, "state">,
+  context: Context,
   state: GameState,
   log: LogEntry[],
 ): {
@@ -168,10 +169,11 @@ function applyActionsToSolution(
   let newQueue: Action[] = [];
   const addLog: LogEntry[] = [];
   actions.forEach((action) => {
-    const actionResult = applyAction(action, state);
+    const transformedAction = applyTransforms(state, action, context);
+    const actionResult = applyAction(transformedAction, state);
     state = actionResult.state;
     newQueue = newQueue.concat(actionResult.actions);
-    addLog.push({ action, state, })
+    addLog.push({ action, state, });
   });
   if (newQueue.length === 0) {
     return { state, log: log.concat(addLog) };
