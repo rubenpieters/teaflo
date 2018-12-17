@@ -8,7 +8,7 @@ import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction, Intent, Context } from "./intent";
 import { Omit } from "../type-util";
 import { UnitId, overEnemy } from "./entityId";
-import { applyTransforms } from "./transform";
+import { applyTriggers } from "./trigger";
 
 export type SolutionData = {
   ability: Ability,
@@ -169,7 +169,7 @@ function applyActionsToSolution(
   let newQueue: Action[] = [];
   const addLog: LogEntry[] = [];
   actions.forEach((action) => {
-    const transformedAction = applyTransforms(state, action, context);
+    const transformedAction = applyTriggers(state, action, context);
     const actionResult = applyAction(transformedAction, state);
     state = actionResult.state;
     newQueue = newQueue.concat(actionResult.actions);

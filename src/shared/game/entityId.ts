@@ -178,10 +178,18 @@ function findI<E extends HasId, A extends TargetType>(
   }
 }
 
-export function eqUnitId(
+export function eqUnitId<A extends TargetType>(
   state: GameState,
-  a: UnitId,
-  b: UnitId,
-) {
-  throw "TODO";
+  id1: EntityId<A>,
+  id2: EntityId<A>,
+): boolean {
+  if (id1.tag === "PositionId" && id2.tag === "PositionId") {
+    return id1.type === id2.type && id1.id === id2.id;
+  } else if (id1.tag === "GlobalId" && id2.tag === "GlobalId") {
+    return id1.type === id2.type && id1.id === id2.id;
+  } else {
+    const positionId1 = toPositionId(state, id1);
+    const positionId2 = toPositionId(state, id2);
+    return eqUnitId(state, positionId1, positionId2);
+  }
 }
