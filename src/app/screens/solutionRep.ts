@@ -105,10 +105,9 @@ export function drawSolutionRep(
       // Triggers
       unit.triggers.forEach((trigger, triggerIndex) => {
         const trPos = createPosition(
-          "left", 1050 + 75 * triggerIndex, config.triggerWidth,
+          "left", 1050 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
           "top", 1150, config.triggerHeight,
         );
-        console.log(`TRIGGER: ${JSON.stringify(trigger)}`);
         createUnitTrigger(game, gameRefs, trPos, trigger);
       });
 
@@ -155,7 +154,7 @@ export function drawSolutionRep(
       // Triggers
       unit.triggers.forEach((trigger, triggerIndex) => {
         const trPos = createPosition(
-          "left", 2300 + 75 * triggerIndex, config.triggerWidth,
+          "left", 2300 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
           "top", 1150, config.triggerHeight,
         );
         createUnitTrigger(game, gameRefs, trPos, trigger);

@@ -116,7 +116,6 @@ export function applyAction(
       };
     }
     case "AddTrigger": {
-      console.log(`TARGET: ${JSON.stringify(action.target)}`);
       return {
         state: overUnit(action.target,
           state,

@@ -200,6 +200,7 @@ export function drawCardInfo(
 }
 
 type AbilitySprite = GSprite<{
+  selecting: boolean,
   init: boolean,
   ability: Ability,
   id: number,
@@ -215,35 +216,42 @@ export function createUnitAbility(
   id: number,
   type: TargetType,
 ): AbilitySprite {
-  const unit: AbilitySprite =
-    gameRefs.gameScreenData.statsScreenData.abilitiesPool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
-  
-  unit.data.ability = ability;
-  unit.data.id = id;
-  unit.data.type = type;
-
-  if (unit.data.init === undefined || unit.data.init === false) {
-    unit.inputEnabled = true;
-    unit.events.onInputUp.add(() => {
-      if (
-        inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
-      ) {
-        if (unit.data.ability.inputs.length === 0) {
-          applyScreenEvent(new SE.ExtendLevelSolution({
-            ability: unit.data.ability,
-            origin: new GlobalId(unit.data.id, unit.data.type),
-            inputs: [],
-          }), game, gameRefs);
-        } else {
-          applyScreenEvent(new SE.SetClickState({
-            ability, currentInputs: [], origin: new GlobalId(unit.data.id, unit.data.type),
-          }), game, gameRefs);
-        }
+  const unit: AbilitySprite = createButtonInPool(
+    game,
+    gameRefs.gameScreenData.statsScreenData.abilitiesPool,
+    pos,
+    { ability, id, type },
+    key,
+    undefined,
+    // onInputDown
+    () => {
+      //
+    },
+    // onInputUp
+    () => {
+      if (unit.data.ability.inputs.length === 0) {
+        applyScreenEvent(new SE.ExtendLevelSolution({
+          ability: unit.data.ability,
+          origin: new GlobalId(unit.data.id, unit.data.type),
+          inputs: [],
+        }), game, gameRefs);
+      } else {
+        applyScreenEvent(new SE.SetClickState({
+          ability: unit.data.ability,
+          currentInputs: [],
+          origin: new GlobalId(unit.data.id, unit.data.type),
+        }), game, gameRefs);
       }
-    });
-
-    unit.data.init = true;
-  }
+    },
+    // onInputOver
+    () => {
+      //
+    },
+    // onInputOut
+    () => {
+      //
+    },
+  );
 
   return unit;
 }
