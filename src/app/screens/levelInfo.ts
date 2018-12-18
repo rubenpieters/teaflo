@@ -8,6 +8,7 @@ import { intersects, GSprite } from "../../shared/phaser-util";
 import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
 import { TargetType } from "../../shared/game/entityId";
+import { spriteMap } from "../../shared/data/units/spriteMap";
 
 export function drawLevelInfo(
   game: Phaser.Game,
@@ -139,7 +140,7 @@ function createPoolLevelSelectCard(
   cardId: string,
   type: TargetType,
 ): LevelSelectCard {
-  const card: LevelSelectCard = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key);
+  const card: LevelSelectCard = pool.getFirstExists(false, true, pos.xMin, pos.yMin, spriteMap[key]);
 
   card.data.cardId = cardId;
   card.data.type = type;

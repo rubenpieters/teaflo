@@ -16,6 +16,7 @@ import { createButtonInPool, addText } from "../util/btn";
 import { TargetType, PositionId } from "../../shared/game/entityId";
 import { Log, LogEntry } from "../../shared/game/log";
 import { triggerSprite, Trigger } from "../../shared/game/trigger";
+import { spriteMap } from "../../shared/data/units/spriteMap";
 
 export type IntermediateSol = {
   index: number,
@@ -36,6 +37,7 @@ export function drawSolutionRep(
 ) {
   gameRefs.gameScreenData.unitPool.killAll();
   gameRefs.gameScreenData.unitHpPool.killAll();
+  gameRefs.gameScreenData.unitTriggerPool.killAll();
   gameRefs.gameScreenData.unitAbilityPool.killAll();
   gameRefs.gameScreenData.intermediateActionTexts.forEach(x => x.destroy());
 
@@ -270,7 +272,7 @@ export function createUnit(
     gameRefs.gameScreenData.unitPool,
     pos,
     { id, type },
-    key,
+    spriteMap[key],
     undefined,
     // onInputDown
     () => {

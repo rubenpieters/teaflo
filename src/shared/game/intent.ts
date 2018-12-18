@@ -1,5 +1,5 @@
-import { UnitId, isGlobalId, isPositionId, TargetType } from "./entityId";
-import { GameState } from "./state";
+import { UnitId, isGlobalId, isPositionId, TargetType, GlobalId } from "./entityId";
+import { GameState, filteredEn } from "./state";
 import { Action } from "./action";
 import * as A from "./action";
 
@@ -27,10 +27,21 @@ export function mkSelf(): IntentVar<UnitId> {
   return new Self;
 }
 
+export class AllEnemy {
+  constructor(
+    public readonly tag: "AllEnemy" = "AllEnemy",
+  ) {}
+}
+
+export function mkAllEnemy(): IntentVar<UnitId> {
+  return new AllEnemy;
+}
+
 export type IntentVar<A>
   = Static<A>
   | FromInput
   | Self
+  | AllEnemy
   ;
 
 export class DamageI {
@@ -103,21 +114,39 @@ export function intentToAction(
 ): Action {
   switch (intent.tag) {
     case "DamageI": {
-      return new A.Damage(
-        evaluateIntentVar(state, context, intent.target),
-        evaluateIntentVar(state, context, intent.value),
+      return evaluateTargets(
+        state,
+        intent.target,
+        tgt => {
+          return new A.Damage(
+            evaluateIntentVar(state, context, tgt),
+            evaluateIntentVar(state, context, intent.value),
+          );
+        }
       );
     }
     case "HealI": {
-      return new A.Heal(
-        evaluateIntentVar(state, context, intent.target),
-        evaluateIntentVar(state, context, intent.value),
+      return evaluateTargets(
+        state,
+        intent.target,
+        tgt => {
+          return new A.Heal(
+            evaluateIntentVar(state, context, tgt),
+            evaluateIntentVar(state, context, intent.value),
+          );
+        }
       );
     }
     case "UseChargeI": {
-      return new A.UseCharge(
-        evaluateIntentVar(state, context, intent.target),
-        evaluateIntentVar(state, context, intent.value),
+      return evaluateTargets(
+        state,
+        intent.target,
+        tgt => {
+          return new A.UseCharge(
+            evaluateIntentVar(state, context, tgt),
+            evaluateIntentVar(state, context, intent.value),
+          );
+        }
       );
     }
     case "CombinedIntent": {
@@ -125,12 +154,32 @@ export function intentToAction(
       return new A.CombinedAction(actions);
     }
     case "AddThreatI": {
-      return new A.AddThreat(
-        evaluateIntentVar(state, context, intent.toFriendly),
-        evaluateIntentVar(state, context, intent.atEnemy),
-        evaluateIntentVar(state, context, intent.value),
+      return evaluateTargets(
+        state,
+        intent.atEnemy,
+        tgt => {
+          return new A.AddThreat(
+            evaluateIntentVar(state, context, intent.toFriendly),
+            evaluateIntentVar(state, context, tgt),
+            evaluateIntentVar(state, context, intent.value),
+          );
+        }
       );
     }
+  }
+}
+
+function evaluateTargets(
+  state: GameState,
+  target: IntentVar<UnitId>,
+  create: (target: IntentVar<UnitId>) => Action,
+) {
+  if (target.tag === "AllEnemy") {
+    const actions = filteredEn(state)
+      .map(x => create(new Static(new GlobalId(x.id, "enemy"))));
+    return new A.CombinedAction(actions)
+  } else {
+    return create(target);
   }
 }
 
@@ -157,6 +206,10 @@ function evaluateIntentVar<A>(
       }
       return <A>(<any>context.self);
     }
+    case "AllEnemy": {
+      console.log("AllEnemy: Internal Intent Var");
+      throw "AllEnemy: Internal Intent Var";
+    }
   }
 }
 
@@ -178,6 +231,9 @@ export function intentVarText<A>(
     }
     case "Self": {
       return `<Self>`;
+    }
+    case "AllEnemy": {
+      return `<All Enemy>`;
     }
   }
 }

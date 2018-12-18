@@ -26,6 +26,7 @@ const newSaveFile: SaveFileV1 = {
   },
   levelUnlocked: {
     "a1_l1": "unlocked",
+    "a1_l2": "unlocked",
   },
   levelSolutions: {
     "a1_l1": [newSolution()],
@@ -106,6 +107,7 @@ export function setGameScreenVisible(
   gameRefs.gameScreenData.spriteGroup.visible = visible;
   gameRefs.gameScreenData.unitPool.visible = visible;
   gameRefs.gameScreenData.unitHpPool.visible = visible;
+  gameRefs.gameScreenData.unitTriggerPool.visible = visible;
   gameRefs.gameScreenData.unitAbilityPool.visible = visible;
   gameRefs.gameScreenData.logBtnPool.visible = visible;
   gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.visible = visible);
