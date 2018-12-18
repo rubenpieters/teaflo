@@ -54,5 +54,8 @@ function intentText(
     case "AddThreatI": {
       return `ADD ${intentVarText(intent.value)} TH to ${intentVarText(intent.toFriendly)} at ${intentVarText(intent.atEnemy)}`
     }
+    case "AddTriggerI": {
+      return `STA ${intentVarText(intent.trigger)} to ${intentVarText(intent.target)}`;
+    }
   }
 }

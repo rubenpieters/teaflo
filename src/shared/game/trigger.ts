@@ -17,9 +17,17 @@ export class Strong {
   ) {}
 }
 
+export class Armor {
+  constructor(
+    public readonly fragments: number,
+    public readonly tag: "Armor" = "Armor",
+  ) {}
+}
+
 export type Trigger
   = Weak
   | Strong
+  | Armor
   ;
 
 export function applyTriggers(
@@ -76,6 +84,17 @@ export function applyTrigger(
         return action;
       }
     }
+    case "Armor": {
+      if (action.tag === "Damage" && eqUnitId(state, action.target, transformSelf)) {
+        const newValue = action.value - Math.round((trigger.fragments / 100) - 0.5);
+        return new Damage(
+          action.target,
+          newValue,
+        );
+      } else {
+        return action;
+      }
+    }
   }
 }
 
@@ -85,5 +104,6 @@ export function triggerSprite(
   switch (trigger.tag) {
     case "Strong": return "tr_strong";
     case "Weak": return "tr_weak";
+    case "Armor": return "tr_armor";
   }
 }

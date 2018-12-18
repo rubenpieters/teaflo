@@ -2,6 +2,7 @@ import { UnitId, isGlobalId, isPositionId, TargetType, GlobalId } from "./entity
 import { GameState, filteredEn } from "./state";
 import { Action } from "./action";
 import * as A from "./action";
+import { Trigger } from "./trigger";
 
 export class Static<A> {
   constructor(
@@ -84,12 +85,21 @@ export class AddThreatI {
   ) {}
 }
 
+export class AddTriggerI {
+  constructor(
+    public readonly target: IntentVar<UnitId>,
+    public readonly trigger: IntentVar<Trigger>,
+    public readonly tag: "AddTriggerI" = "AddTriggerI",
+  ) {}
+}
+
 export type Intent
   = DamageI
   | HealI
   | UseChargeI
   | CombinedIntent
   | AddThreatI
+  | AddTriggerI
   ;
 
 export function thDamage(
@@ -162,6 +172,18 @@ export function intentToAction(
             evaluateIntentVar(state, context, intent.toFriendly),
             evaluateIntentVar(state, context, tgt),
             evaluateIntentVar(state, context, intent.value),
+          );
+        }
+      );
+    }
+    case "AddTriggerI": {
+      return evaluateTargets(
+        state,
+        intent.target,
+        tgt => {
+          return new A.AddTrigger(
+            evaluateIntentVar(state, context, tgt),
+            evaluateIntentVar(state, context, intent.trigger),
           );
         }
       );

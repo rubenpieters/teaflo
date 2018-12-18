@@ -11,11 +11,10 @@ function wrapPopupOver(
   f: (() => void) | undefined,
   game: Phaser.Game,
   self: Phaser.Sprite,
-  popupInfo?: PopupInfo,
 ) {
   return function() {
-    if (popupInfo !== undefined) {
-      self.data.popup = popupInfo.f(game);
+    if (self.data.popupInfo !== undefined) {
+      self.data.popup = self.data.popupInfo.f(game);
     }
     if (f !== undefined) {
       f();
@@ -27,7 +26,6 @@ function wrapPopupOut(
   f: (() => void) | undefined,
   game: Phaser.Game,
   self: Phaser.Sprite,
-  popupInfo?: PopupInfo,
 ) {
   return function() {
     if (self.data.popup !== undefined) {
@@ -56,7 +54,7 @@ export function createButtonInPool<A extends {}>(
   let btnSprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
   btnSprite.data = {
     ...<any>a,
-    ...{ selecting: false },
+    ...{ selecting: false, popupInfo },
     // only copy init property from old data
     ...{ init: btnSprite.data.init },
   }
@@ -69,8 +67,8 @@ export function createButtonInPool<A extends {}>(
   btnSprite = initialize(game, btnSprite, pos,
     onInputDown === undefined ? () => { return; } : onInputDown,
     onInputUp === undefined ? () => { return; } : onInputUp,
-    wrapPopupOver(onInputOver, game, btnSprite, popupInfo),
-    wrapPopupOut(onInputOut, game, btnSprite, popupInfo),
+    wrapPopupOver(onInputOver, game, btnSprite),
+    wrapPopupOut(onInputOut, game, btnSprite),
   );
 
   return (<GSprite<ButtonValues & A>>btnSprite);
@@ -80,6 +78,7 @@ type ButtonValues = {
   init: boolean,
   selecting: boolean,
   popup?: Phaser.Sprite,
+  popupInfo?: PopupInfo,
 };
 
 export type Button = GSprite<{

@@ -2,6 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { UnitId, overUnit, overFriendly } from "./entityId";
 import { GameState } from "./state";
 import { addThreat } from "./threat";
+import { Trigger } from "./trigger";
 
 export class Damage {
   constructor(
@@ -43,12 +44,21 @@ export class AddThreat {
   ) {}
 }
 
+export class AddTrigger {
+  constructor(
+    public readonly target: UnitId,
+    public readonly trigger: Trigger,
+    public readonly tag: "AddTrigger" = "AddTrigger",
+  ) {}
+}
+
 export type Action
   = Damage
   | Heal
   | UseCharge
   | CombinedAction
   | AddThreat
+  | AddTrigger
   ;
 
 export function applyAction(
@@ -87,7 +97,7 @@ export function applyAction(
           x => x,
         ),
         actions: [],
-      }
+      };
     }
     case "CombinedAction": {
       return {
@@ -100,6 +110,17 @@ export function applyAction(
         state: overFriendly(action.toFriendly,
           state,
           x => addThreat(x, state, action.atEnemy, action.value),
+          x => x,
+        ),
+        actions: [],
+      };
+    }
+    case "AddTrigger": {
+      console.log(`TARGET: ${JSON.stringify(action.target)}`);
+      return {
+        state: overUnit(action.target,
+          state,
+          x => focus(x, over(x => x.triggers, x => x.concat(action.trigger))),
           x => x,
         ),
         actions: [],

@@ -2,7 +2,7 @@ import { FrUnit } from "src/shared/game/unit";
 import * as I from "../../game/intent";
 import { PositionId } from "../../game/entityId";
 import { TargetInput } from "../../game/ability";
-import { Strong } from "../../game/trigger";
+import { Strong, Armor } from "../../game/trigger";
 
 export const fr_unit_a1_l1_01: FrUnit = {
   hp: 20,
@@ -97,9 +97,9 @@ export const fr_unit_a1_l2_03: FrUnit = {
           I.mkSelf(),
           new I.Static(1),
         ),
-        I.thDamage(
+        new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(10),
+          new I.Static(new Armor(2000)),
         ),
       ]),
       inputs: [

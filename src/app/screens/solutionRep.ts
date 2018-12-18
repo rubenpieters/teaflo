@@ -108,6 +108,7 @@ export function drawSolutionRep(
           "left", 1050 + 75 * triggerIndex, config.triggerWidth,
           "top", 1150, config.triggerHeight,
         );
+        console.log(`TRIGGER: ${JSON.stringify(trigger)}`);
         createUnitTrigger(game, gameRefs, trPos, trigger);
       });
 
@@ -358,9 +359,7 @@ export function createUnitTrigger(
           1000, 100,
         );
         const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-        console.log(`${JSON.stringify(hoverPos)}`);
-        console.log(`${trigger.tag.substr(0, 3)} ${trigger.fragments}`);
-        addText(game, sprite, hoverPos, `${trigger.tag} ${trigger.fragments}`, "FF0000", 50);
+        addText(game, sprite, hoverPos, `${trigger.tag} ${trigger.fragments}`, "#FF0000", 50);
         return sprite;
       }
     }
