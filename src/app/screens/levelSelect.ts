@@ -126,5 +126,5 @@ export function createLevelSelectButton(
   );
 
   const btnString = levelId;
-  return addText(game, btn, pos, btnString, txtColor);
+  return addText(game, btn, pos, btnString, txtColor, 100);
 }

@@ -350,5 +350,5 @@ export function createActionLogButton(
   );
 
   const btnString = action.tag;
-  return addText(game, btn, pos, btnString, txtColor);
+  return addText(game, btn, pos, btnString, txtColor, 50);
 }

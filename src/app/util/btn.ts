@@ -3,6 +3,43 @@ import { Position, inPosition } from "./position";
 import { GSprite } from "src/shared/phaser-util";
 import { Game } from "phaser-ce";
 
+export type PopupInfo = {
+  f: (game: Phaser.Game) => Phaser.Sprite,
+}
+
+function wrapPopupOver(
+  f: (() => void) | undefined,
+  game: Phaser.Game,
+  self: Phaser.Sprite,
+  popupInfo?: PopupInfo,
+) {
+  return function() {
+    if (popupInfo !== undefined) {
+      self.data.popup = popupInfo.f(game);
+    }
+    if (f !== undefined) {
+      f();
+    }
+  }
+}
+
+function wrapPopupOut(
+  f: (() => void) | undefined,
+  game: Phaser.Game,
+  self: Phaser.Sprite,
+  popupInfo?: PopupInfo,
+) {
+  return function() {
+    if (self.data.popup !== undefined) {
+      self.data.popup.destroy();
+      self.data.popup = undefined;
+    }
+    if (f !== undefined) {
+      f();
+    }
+  }
+}
+
 export function createButtonInPool<A extends {}>(
   game: Game,
   pool: SpritePool<Button>,
@@ -14,6 +51,7 @@ export function createButtonInPool<A extends {}>(
   onInputUp?: () => void,
   onInputOver?: () => void,
   onInputOut?: () => void,
+  popupInfo?: PopupInfo,
 ): GSprite<ButtonValues & A> {
   let btnSprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
   btnSprite.data = {
@@ -27,12 +65,12 @@ export function createButtonInPool<A extends {}>(
   btnSprite.events.onKilled.removeAll();
   btnSprite.events.onDestroy.removeAll();
 
-  // initialize if not initialized yuet
+  // initialize if not initialized yet
   btnSprite = initialize(game, btnSprite, pos,
     onInputDown === undefined ? () => { return; } : onInputDown,
     onInputUp === undefined ? () => { return; } : onInputUp,
-    onInputOver === undefined ? () => { return; } : onInputOver,
-    onInputOut === undefined ? () => { return; } : onInputOut,
+    wrapPopupOver(onInputOver, game, btnSprite, popupInfo),
+    wrapPopupOut(onInputOut, game, btnSprite, popupInfo),
   );
 
   return (<GSprite<ButtonValues & A>>btnSprite);
@@ -41,6 +79,7 @@ export function createButtonInPool<A extends {}>(
 type ButtonValues = {
   init: boolean,
   selecting: boolean,
+  popup?: Phaser.Sprite,
 };
 
 export type Button = GSprite<{
@@ -90,12 +129,13 @@ export function addText<A>(
   pos: Position,
   btnString: string,
   txtColor: string,
+  fontSize: number,
 ): GSprite<A & { btnText: Phaser.Text}> {
   const btnSpriteWTxt = (<GSprite<A & { btnText?: Phaser.Text}>>btnSprite);
   const btnText = game.add.text(
     0, 0, btnString, {
       fill: txtColor,
-      fontSize: 100,
+      fontSize,
       boundsAlignH: "center",
       boundsAlignV: "middle",
     }

@@ -120,5 +120,5 @@ export function createActSelectButton(
   );
 
   const btnString = actNumberMap[actNumber];
-  return addText(game, btn, pos, btnString, txtColor);
+  return addText(game, btn, pos, btnString, txtColor, 100);
 }

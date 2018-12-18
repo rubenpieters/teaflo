@@ -349,6 +349,19 @@ export function createUnitTrigger(
     () => {
       //
     },
+    {
+      f: (game: Phaser.Game) => {
+        const hoverPos = relativeTo(pos,
+          "right", 50,
+          1000, 100,
+        );
+        const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+        console.log(`${JSON.stringify(hoverPos)}`);
+        console.log(`${trigger.tag.substr(0, 3)} ${trigger.fragments}`);
+        addText(game, sprite, hoverPos, `${trigger.tag} ${trigger.fragments}`, "FF0000", 50);
+        return sprite;
+      }
+    }
   );
 
   return sprite;
