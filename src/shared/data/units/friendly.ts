@@ -2,7 +2,7 @@ import { FrUnit } from "src/shared/game/unit";
 import * as I from "../../game/intent";
 import { PositionId } from "../../game/entityId";
 import { TargetInput } from "../../game/ability";
-import { Strong, Armor } from "../../game/trigger";
+import * as T from "../../game/trigger";
 
 export const fr_unit_a1_l1_01: FrUnit = {
   hp: 20,
@@ -27,9 +27,7 @@ export const fr_unit_a1_l1_01: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab1",
     }
   ],
-  triggers: [
-    new Strong(100),
-  ],
+  triggers: [],
 };
 
 export const fr_unit_a1_l2_01: FrUnit = {
@@ -55,9 +53,7 @@ export const fr_unit_a1_l2_01: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab1",
     }
   ],
-  triggers: [
-    new Strong(100),
-  ],
+  triggers: [],
 };
 
 export const fr_unit_a1_l2_02: FrUnit = {
@@ -99,7 +95,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(new Armor(2000)),
+          new I.Static(new T.Armor(2000)),
         ),
       ]),
       inputs: [

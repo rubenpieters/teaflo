@@ -86,7 +86,8 @@ export function applyTrigger(
     }
     case "Armor": {
       if (action.tag === "Damage" && eqUnitId(state, action.target, transformSelf)) {
-        const newValue = action.value - Math.round((trigger.fragments / 100) - 0.5);
+        let newValue = action.value - Math.round((trigger.fragments / 100) - 0.5);
+        newValue = newValue < 0 ? 0 : newValue;
         return new Damage(
           action.target,
           newValue,

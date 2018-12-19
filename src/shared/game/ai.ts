@@ -1,13 +1,13 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Action } from "./action";
 import { GameState } from "./state";
+import { Intent } from "./intent";
 
 export type HasAI = {
   ai: AI,
   currentAI: number,
 }
 
-export type AI = { action: Action, outs: Outs }[];
+export type AI = { intent: Intent, outs: Outs }[];
 
 type Outs = { aiOut: AIOut, condition: Condition }[];
 

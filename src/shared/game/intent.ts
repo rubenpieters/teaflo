@@ -1,5 +1,5 @@
-import { UnitId, isGlobalId, isPositionId, TargetType, GlobalId } from "./entityId";
-import { GameState, filteredEn } from "./state";
+import { UnitId, isGlobalId, isPositionId, TargetType, GlobalId, PositionId } from "./entityId";
+import { GameState, filteredEn, filteredFr, FrStUnit } from "./state";
 import { Action } from "./action";
 import * as A from "./action";
 import { Trigger } from "./trigger";
@@ -38,11 +38,33 @@ export function mkAllEnemy(): IntentVar<UnitId> {
   return new AllEnemy;
 }
 
+export class AllAlly {
+  constructor(
+    public readonly tag: "AllAlly" = "AllAlly",
+  ) {}
+}
+
+export function mkAllAlly(): IntentVar<UnitId> {
+  return new AllAlly;
+}
+
+export class HighestThreat {
+  constructor(
+    public readonly tag: "HighestThreat" = "HighestThreat",
+  ) {}
+}
+
+export function mkHighestThreat(): IntentVar<UnitId> {
+  return new HighestThreat;
+}
+
 export type IntentVar<A>
   = Static<A>
   | FromInput
   | Self
   | AllEnemy
+  | AllAlly
+  | HighestThreat
   ;
 
 export class DamageI {
@@ -199,7 +221,11 @@ function evaluateTargets(
   if (target.tag === "AllEnemy") {
     const actions = filteredEn(state)
       .map(x => create(new Static(new GlobalId(x.id, "enemy"))));
-    return new A.CombinedAction(actions)
+    return new A.CombinedAction(actions);
+  } else if (target.tag === "AllAlly") {
+    const actions = filteredFr(state)
+      .map(x => create(new Static(new GlobalId(x.id, "friendly"))));
+    return new A.CombinedAction(actions);
   } else {
     return create(target);
   }
@@ -232,6 +258,42 @@ function evaluateIntentVar<A>(
       console.log("AllEnemy: Internal Intent Var");
       throw "AllEnemy: Internal Intent Var";
     }
+    case "AllAlly": {
+      console.log("AllAlly: Internal Intent Var");
+      throw "AllAlly: Internal Intent Var";
+    }
+    case "HighestThreat": {
+      const self = context.self;
+      if (self === undefined) {
+        console.log("evaluateIntentVar: no self given");
+        throw "evaluateIntentVar: no self given";
+      }
+      if (self.type !== "enemy") {
+        console.log("evaluateIntentVar: self not enemy");
+        throw "evaluateIntentVar: self not enemy";
+      }
+      const threat = filteredFr(state)
+        .reduce((prev, curr) => {
+          if (prev === undefined) {
+            return curr;
+          }
+          if (curr.threatMap[self.id] === undefined) {
+            return prev;
+          }
+          if (prev.threatMap[self.id] === undefined) {
+            return curr;
+          }
+          if (curr.threatMap[self.id] > prev.threatMap[self.id]) {
+            return curr;
+          }
+          return prev;
+        }, <FrStUnit | undefined>undefined);
+      if (threat === undefined) {
+        return <A>(<any>new PositionId(0, "friendly"));
+      } else {
+        return <A>(<any>new GlobalId(threat.id, "friendly"));
+      }
+    }
   }
 }
 
@@ -256,6 +318,12 @@ export function intentVarText<A>(
     }
     case "AllEnemy": {
       return `<All Enemy>`;
+    }
+    case "AllAlly": {
+      return `<All Ally>`;
+    }
+    case "HighestThreat": {
+      return `<Threat>`;
     }
   }
 }

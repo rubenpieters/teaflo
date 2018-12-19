@@ -7,7 +7,7 @@ import { nextAI } from "./ai";
 import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction, Intent, Context } from "./intent";
 import { Omit } from "../type-util";
-import { UnitId, overEnemy } from "./entityId";
+import { UnitId, overEnemy, GlobalId } from "./entityId";
 import { applyTriggers } from "./trigger";
 
 export type SolutionData = {
@@ -118,10 +118,10 @@ function runPhases(
   // Action (En) Phase
   state.enUnits.forEach((enUnit, i) => {
     if (enUnit !== undefined) {
-      const enAction = enUnit.ai[enUnit.currentAI].action;
+      const enIntent = enUnit.ai[enUnit.currentAI].intent;
       // apply action
-      const enUnitSelf: UnitId = { tag: "GlobalId", type: "enemy", id: enUnit.id };
-      const enActionResult = applyActionsToSolution([enAction], { self: enUnitSelf }, state, []);
+      const enUnitSelf: UnitId = new GlobalId(enUnit.id, "enemy");
+      const enActionResult = applyIntentToSolution(enIntent, { self: enUnitSelf }, state);
       state = enActionResult.state;
       // forward enUnit AI
       state = overEnemy(enUnitSelf, state,
