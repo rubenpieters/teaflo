@@ -169,10 +169,10 @@ function applyActionsToSolution(
   let newQueue: Action[] = [];
   const addLog: LogEntry[] = [];
   actions.forEach((action) => {
-    const transformedAction = applyTriggers(state, action, context);
-    const actionResult = applyAction(transformedAction, state);
+    const { actions, transformed } = applyTriggers(state, action, context);
+    const actionResult = applyAction(transformed, state);
     state = actionResult.state;
-    newQueue = newQueue.concat(actionResult.actions);
+    newQueue = newQueue.concat(actionResult.actions).concat(actions);
     addLog.push({ action, state, });
   });
   if (newQueue.length === 0) {

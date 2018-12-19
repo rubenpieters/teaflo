@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { UnitId, overUnit, overFriendly } from "./entityId";
 import { GameState } from "./state";
 import { addThreat } from "./threat";
-import { Trigger } from "./trigger";
+import { Trigger, loseFragments } from "./trigger";
 
 export class Damage {
   constructor(
@@ -52,6 +52,15 @@ export class AddTrigger {
   ) {}
 }
 
+export class LoseFragments {
+  constructor(
+    public readonly target: UnitId,
+    public readonly value: number,
+    public readonly triggerTag: Trigger["tag"],
+    public readonly tag: "LoseFragments" = "LoseFragments",
+  ) {}
+}
+
 export type Action
   = Damage
   | Heal
@@ -59,6 +68,7 @@ export type Action
   | CombinedAction
   | AddThreat
   | AddTrigger
+  | LoseFragments
   ;
 
 export function applyAction(
@@ -125,5 +135,14 @@ export function applyAction(
         actions: [],
       };
     }
+    case "LoseFragments": 
+    return {
+      state: overUnit(action.target,
+        state,
+        x => focus(x, over(x => x.triggers, x => loseFragments(x, action.triggerTag, action.value))),
+        x => x,
+      ),
+      actions: [],
+    };
   }
 }
