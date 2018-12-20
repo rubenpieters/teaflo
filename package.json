@@ -9,7 +9,7 @@
   "license": "MIT",
   "author": "rubenpieters",
   "scripts": {
-    "setup": "npm install -g npx@9.7.1 && npm install",
+    "setup": "npm install -g npx@9.7.1 && npm install -g typescript@^2.9.2 && npm install",
     "tslint": "npx tslint -c ./tslint.json --project ./tsconfig.json --format stylish",
     "webpack:dev": "npx webpack --watch --config webpack.dev.config.js",
     "webpack:prod": "npx webpack --config webpack.production.config.js",
