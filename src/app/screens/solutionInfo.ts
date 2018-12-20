@@ -264,18 +264,16 @@ export function createUnitAbility(
     () => {
       //
     },
-    // popupInfo
-    {
-      f: (game: Phaser.Game) => {
-        const hoverPos = relativeTo(pos,
-          "right", 50,
-          1000, 100,
-        );
-        const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-        console.log(`${JSON.stringify(sprite.data)}`);
-        addText(game, sprite, hoverPos, `${abilityText(sprite.data.ability)}`, "#FF0000", 50);
-        return sprite;
-      }
+    // popupF
+    (self: AbilitySprite) => {
+      const hoverPos = relativeTo(pos,
+        "right", 50,
+        1000, 100,
+      );
+      const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+      console.log(`${JSON.stringify(sprite.data)}`);
+      addText(game, sprite, hoverPos, `${abilityText(self.data.ability)}`, "#FF0000", 50);
+      return sprite;
     },
   );
 
@@ -322,17 +320,15 @@ export function createEnIntent(
     () => {
       //
     },
-    // popupInfo
-    {
-      f: (game: Phaser.Game) => {
-        const hoverPos = relativeTo(pos,
-          "right", 50,
-          1000, 100,
-        );
-        const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-        addText(game, sprite, hoverPos, `${intentText(sprite.data.intent)}`, "#FF0000", 50);
-        return sprite;
-      }
+    // popupF
+    (self: EnIntentSprite) => {
+      const hoverPos = relativeTo(pos,
+        "right", 50,
+        1000, 100,
+      );
+      const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+      addText(game, sprite, hoverPos, `${intentText(self.data.intent)}`, "#FF0000", 50);
+      return sprite;
     },
   );
 
