@@ -18,6 +18,8 @@
     "heroku-postbuild": "npm run-script webpack:prod"
   },
   "dependencies": {
+    "@types/express": "^4.16.0",
+    "express": "^4.16.4",
     "immutable-assign": "^2.0.6",
     "phaser-ce": "^2.10.3"
   },
