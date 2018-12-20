@@ -18,6 +18,7 @@ import { Unit } from "../../shared/game/unit";
 import { SpritePool } from "../util/pool";
 import { SolInfo } from "../savefile/rep";
 import { Intent } from "src/shared/game/intent";
+import { AIRoute, routeText } from "src/shared/game/ai";
 
 export type StatsScreenData = {
   spriteGroup: Phaser.Group,
@@ -26,6 +27,7 @@ export type StatsScreenData = {
   texts: Phaser.Text[],
   abilitiesPool: SpritePool<AbilitySprite>,
   intentPool: SpritePool<EnIntentSprite>,
+  outPool: SpritePool<EnOutSprite>,
   arrowPool: SpritePool<Phaser.Sprite>,
 }
 
@@ -103,6 +105,7 @@ export function drawCardInfo(
   gameRefs.gameScreenData.statsScreenData.texts = [];
   gameRefs.gameScreenData.statsScreenData.abilitiesPool.killAll();
   gameRefs.gameScreenData.statsScreenData.intentPool.killAll();
+  gameRefs.gameScreenData.statsScreenData.outPool.killAll();
   gameRefs.gameScreenData.statsScreenData.arrowPool.killAll();
 
   // draw selection arrow for locked
@@ -199,13 +202,24 @@ export function drawCardInfo(
         });
       } else if (type === "enemy") {
         const enUnit = <EnStUnit>(<any>unit);
+        // draw AI intents
         enUnit.ai.forEach((ai, aiIndex) => {
           const intentPos = createPosition(
             "left", 2080, config.abilityIconWidth,
-            "bot", 400, config.abilityIconHeight - 170 * (aiIndex),
+            "bot", 400 - 170 * aiIndex, config.abilityIconHeight,
           );
           const intentIcon = createEnIntent(
             game, gameRefs, intentPos, ai.spriteId, ai.intent, id, type);
+
+          // draw AI routing
+          ai.outs.forEach((route, outIndex) => {
+            const routePos = createPosition(
+              "left", 2280, 40,
+              "bot", 400 - 170 * aiIndex - 50 * outIndex + 100, 40,
+            );
+            const routeIcon = createEnOut(
+              game, gameRefs, routePos, route, id, type);
+          });
         });
       }
     }
@@ -271,7 +285,6 @@ export function createUnitAbility(
         1000, 100,
       );
       const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-      console.log(`${JSON.stringify(sprite.data)}`);
       addText(game, sprite, hoverPos, `${abilityText(self.data.ability)}`, "#FF0000", 50);
       return sprite;
     },
@@ -328,6 +341,60 @@ export function createEnIntent(
       );
       const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
       addText(game, sprite, hoverPos, `${intentText(self.data.intent)}`, "#FF0000", 50);
+      return sprite;
+    },
+  );
+
+  return sprite;
+}
+
+type EnOutSprite = GSprite<{
+  selecting: boolean,
+  init: boolean,
+  route: AIRoute,
+  id: number,
+  type: TargetType,
+}>;
+
+export function createEnOut(
+  game: Phaser.Game,
+  gameRefs: GameRefs,
+  pos: Position,
+  route: AIRoute,
+  id: number,
+  type: TargetType,
+): EnOutSprite {
+  const sprite: EnOutSprite = createButtonInPool(
+    game,
+    gameRefs.gameScreenData.statsScreenData.intentPool,
+    pos,
+    { route, id, type },
+    "route",
+    undefined,
+    // onInputDown
+    () => {
+      //
+    },
+    // onInputUp
+    () => {
+      //
+    },
+    // onInputOver
+    () => {
+      //
+    },
+    // onInputOut
+    () => {
+      //
+    },
+    // popupF
+    (self: EnOutSprite) => {
+      const hoverPos = relativeTo(pos,
+        "right", 50,
+        1000, 100,
+      );
+      const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+      addText(game, sprite, hoverPos, `${routeText(self.data.route)}`, "#FF0000", 50);
       return sprite;
     },
   );

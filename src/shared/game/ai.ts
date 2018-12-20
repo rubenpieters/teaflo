@@ -9,7 +9,25 @@ export type HasAI = {
 
 export type AI = { intent: Intent, spriteId: string, outs: Outs }[];
 
-type Outs = { aiOut: AIOut, condition: Condition }[];
+export type AIRoute = {
+  aiOut: AIOut,
+  condition: Condition,
+};
+
+type Outs = AIRoute[];
+
+export function routeText(
+  route: AIRoute,
+) {
+  switch (route.aiOut.tag) {
+    case "ToSelf": {
+      return `self`;
+    }
+    case "ToX": {
+      return `${route.aiOut.x}`;
+    }
+  }
+}
 
 export class ToX {
   constructor(

@@ -64,6 +64,7 @@ export default class Game extends Phaser.State {
         spriteGroup: new Phaser.Group(this.game),
         abilitiesPool: new SpritePool(this.game),
         intentPool: new SpritePool(this.game),
+        outPool: new SpritePool(this.game),
         texts: [],
         arrowPool: new SpritePool(this.game),
       },
@@ -114,6 +115,7 @@ export function setGameScreenVisible(
   gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.visible = visible);
   gameRefs.gameScreenData.statsScreenData.abilitiesPool.visible = visible;
   gameRefs.gameScreenData.statsScreenData.intentPool.visible = visible;
+  gameRefs.gameScreenData.statsScreenData.outPool.visible = visible;
   if (gameRefs.gameScreenData.statsScreenData.abilitiesLabel !== undefined) {
     gameRefs.gameScreenData.statsScreenData.abilitiesLabel.visible = visible;
   }
