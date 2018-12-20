@@ -9,7 +9,7 @@
   "license": "MIT",
   "author": "rubenpieters",
   "scripts": {
-    "setup": "npm install -g npx@9.7.1 && npm install -g typescript@^2.9.2 && npm install",
+    "setup": "npm install -g npx@9.7.1 && npm install --only=dev && npm install",
     "tslint": "npx tslint -c ./tslint.json --project ./tsconfig.json --format stylish",
     "webpack:dev": "npx webpack --watch --config webpack.dev.config.js",
     "webpack:prod": "npx webpack --config webpack.production.config.js",
@@ -18,13 +18,13 @@
     "heroku-postbuild": "npm run-script webpack:prod"
   },
   "dependencies": {
-    "@types/express": "^4.16.0",
     "express": "^4.16.4",
     "immutable-assign": "^2.0.6",
     "phaser-ce": "^2.10.3"
   },
   "devDependencies": {
     "@types/expect": "^1.20.3",
+    "@types/express": "^4.16.0",
     "@types/node": "^10.1.2",
     "browser-sync": "^2.23.7",
     "browser-sync-webpack-plugin": "^2.2.2",
