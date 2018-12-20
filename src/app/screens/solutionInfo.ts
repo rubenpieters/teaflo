@@ -1,15 +1,15 @@
 import { GameRefs } from "../states/game";
-import { createPosition, Position, inPosition } from "../util/position";
+import { createPosition, Position, inPosition, relativeTo } from "../util/position";
 import { config } from "../config";
 import { levelEnUnitMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
-import { Ability, HasAbilities } from "src/shared/game/ability";
+import { Ability, HasAbilities, abilityText, intentText } from "src/shared/game/ability";
 import { extendSolution, Solution, runSolution } from "src/shared/game/solution";
 import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
 import { Location, Tree, drawPositions } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
-import { mkGameState, GameState } from "src/shared/game/state";
+import { mkGameState, GameState, FrStUnit, EnStUnit } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
 import { TargetType, GlobalId } from "../../shared/game/entityId";
@@ -17,6 +17,7 @@ import { OVER, NEUTRAL } from "../util/button";
 import { Unit } from "../../shared/game/unit";
 import { SpritePool } from "../util/pool";
 import { SolInfo } from "../savefile/rep";
+import { Intent } from "src/shared/game/intent";
 
 export type StatsScreenData = {
   spriteGroup: Phaser.Group,
@@ -24,6 +25,7 @@ export type StatsScreenData = {
   abilitiesLabel?: Phaser.Text,
   texts: Phaser.Text[],
   abilitiesPool: SpritePool<AbilitySprite>,
+  intentPool: SpritePool<EnIntentSprite>,
   arrowPool: SpritePool<Phaser.Sprite>,
 }
 
@@ -100,6 +102,7 @@ export function drawCardInfo(
   gameRefs.gameScreenData.statsScreenData.texts.forEach(x => x.destroy());
   gameRefs.gameScreenData.statsScreenData.texts = [];
   gameRefs.gameScreenData.statsScreenData.abilitiesPool.killAll();
+  gameRefs.gameScreenData.statsScreenData.intentPool.killAll();
   gameRefs.gameScreenData.statsScreenData.arrowPool.killAll();
 
   // draw selection arrow for locked
@@ -185,7 +188,7 @@ export function drawCardInfo(
       gameRefs.gameScreenData.statsScreenData.texts.push(chLbl);
   
       if (type === "friendly") {
-        const frUnit = <HasAbilities>(<any>unit);
+        const frUnit = <FrStUnit>(<any>unit);
         frUnit.abilities.forEach((ability, abilityIndex) => {
           const ablPos = createPosition(
             "left", 2080, config.abilityIconWidth,
@@ -193,6 +196,16 @@ export function drawCardInfo(
           );
           const abilityIcon = createUnitAbility(
             game, gameRefs, ablPos, ability.spriteId, ability, id, type);
+        });
+      } else if (type === "enemy") {
+        const enUnit = <EnStUnit>(<any>unit);
+        enUnit.ai.forEach((ai, aiIndex) => {
+          const intentPos = createPosition(
+            "left", 2080, config.abilityIconWidth,
+            "bot", 400, config.abilityIconHeight - 170 * (aiIndex),
+          );
+          const intentIcon = createEnIntent(
+            game, gameRefs, intentPos, ai.spriteId, ai.intent, id, type);
         });
       }
     }
@@ -216,7 +229,7 @@ export function createUnitAbility(
   id: number,
   type: TargetType,
 ): AbilitySprite {
-  const unit: AbilitySprite = createButtonInPool(
+  const sprite: AbilitySprite = createButtonInPool(
     game,
     gameRefs.gameScreenData.statsScreenData.abilitiesPool,
     pos,
@@ -229,17 +242,17 @@ export function createUnitAbility(
     },
     // onInputUp
     () => {
-      if (unit.data.ability.inputs.length === 0) {
+      if (sprite.data.ability.inputs.length === 0) {
         applyScreenEvent(new SE.ExtendLevelSolution({
-          ability: unit.data.ability,
-          origin: new GlobalId(unit.data.id, unit.data.type),
+          ability: sprite.data.ability,
+          origin: new GlobalId(sprite.data.id, sprite.data.type),
           inputs: [],
         }), game, gameRefs);
       } else {
         applyScreenEvent(new SE.SetClickState({
-          ability: unit.data.ability,
+          ability: sprite.data.ability,
           currentInputs: [],
-          origin: new GlobalId(unit.data.id, unit.data.type),
+          origin: new GlobalId(sprite.data.id, sprite.data.type),
         }), game, gameRefs);
       }
     },
@@ -251,9 +264,79 @@ export function createUnitAbility(
     () => {
       //
     },
+    // popupInfo
+    {
+      f: (game: Phaser.Game) => {
+        const hoverPos = relativeTo(pos,
+          "right", 50,
+          1000, 100,
+        );
+        const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+        console.log(`${JSON.stringify(sprite.data)}`);
+        addText(game, sprite, hoverPos, `${abilityText(sprite.data.ability)}`, "#FF0000", 50);
+        return sprite;
+      }
+    },
   );
 
-  return unit;
+  return sprite;
+}
+
+type EnIntentSprite = GSprite<{
+  selecting: boolean,
+  init: boolean,
+  intent: Intent,
+  id: number,
+  type: TargetType,
+}>;
+
+export function createEnIntent(
+  game: Phaser.Game,
+  gameRefs: GameRefs,
+  pos: Position,
+  key: string,
+  intent: Intent,
+  id: number,
+  type: TargetType,
+): EnIntentSprite {
+  const sprite: EnIntentSprite = createButtonInPool(
+    game,
+    gameRefs.gameScreenData.statsScreenData.intentPool,
+    pos,
+    { intent, id, type },
+    key,
+    undefined,
+    // onInputDown
+    () => {
+      //
+    },
+    // onInputUp
+    () => {
+      //
+    },
+    // onInputOver
+    () => {
+      //
+    },
+    // onInputOut
+    () => {
+      //
+    },
+    // popupInfo
+    {
+      f: (game: Phaser.Game) => {
+        const hoverPos = relativeTo(pos,
+          "right", 50,
+          1000, 100,
+        );
+        const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+        addText(game, sprite, hoverPos, `${intentText(sprite.data.intent)}`, "#FF0000", 50);
+        return sprite;
+      }
+    },
+  );
+
+  return sprite;
 }
 
 function mkTree(

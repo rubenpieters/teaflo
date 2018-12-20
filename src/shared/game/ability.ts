@@ -34,7 +34,7 @@ export function abilityText(
   return intentText(ability.intent);
 }
 
-function intentText(
+export function intentText(
   intent: Intent
 ): string {
   switch (intent.tag) {

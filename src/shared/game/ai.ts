@@ -7,7 +7,7 @@ export type HasAI = {
   currentAI: number,
 }
 
-export type AI = { intent: Intent, outs: Outs }[];
+export type AI = { intent: Intent, spriteId: string, outs: Outs }[];
 
 type Outs = { aiOut: AIOut, condition: Condition }[];
 

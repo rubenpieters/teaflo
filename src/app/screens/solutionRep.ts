@@ -356,6 +356,7 @@ export function createUnitResource(
 type TriggerSprite = GSprite<{
   init: boolean,
   selecting: boolean,
+  trigger: Trigger,
 }>;
 
 export function createUnitTrigger(
@@ -368,7 +369,7 @@ export function createUnitTrigger(
     game,
     gameRefs.gameScreenData.unitTriggerPool,
     pos,
-    {  },
+    { trigger },
     triggerSprite(trigger),
     undefined,
     // onInputDown
@@ -394,7 +395,7 @@ export function createUnitTrigger(
           1000, 100,
         );
         const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-        addText(game, sprite, hoverPos, `${trigger.tag} ${trigger.fragments}`, "#FF0000", 50);
+        addText(game, sprite, hoverPos, `${sprite.data.trigger.tag} ${sprite.data.trigger.fragments}`, "#FF0000", 50);
         return sprite;
       }
     }

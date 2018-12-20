@@ -12,6 +12,7 @@ export const ai1: AI = [
         new I.Static(new PositionId(0, "friendly")),
         new I.Static(2),
       ),
+      spriteId: "fr_unit_a1_l1_01_ab1",
       outs: [
           {
             aiOut: new O.ToSelf(),
@@ -29,6 +30,7 @@ export const ai2: AI = [
           new T.Weak(100)
         ),
       ),
+      spriteId: "fr_unit_a1_l1_01_ab2",
       outs: [
           {
             aiOut: new O.ToX(1),
@@ -41,6 +43,7 @@ export const ai2: AI = [
         I.mkHighestThreat(),
         new I.Static(15),
       ),
+      spriteId: "fr_unit_a1_l1_01_ab1",
       outs: [
           {
             aiOut: new O.ToX(0),
