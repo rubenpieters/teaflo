@@ -49,6 +49,7 @@ export default class Load extends Phaser.State {
     this.game.load.image("ch", "textures/ch.png");
     this.game.load.image("th", "textures/th.png");
     this.game.load.image("route", "textures/slot.jpg");
+    this.game.load.image("current_route", "textures/current_route.png");
     this.game.load.image("tr_weak", "textures/trigger_weak.png");
     this.game.load.image("tr_strong", "textures/trigger_strong.png");
     this.game.load.image("tr_armor", "textures/trigger_armor.png");

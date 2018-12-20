@@ -67,6 +67,7 @@ export default class Game extends Phaser.State {
         outPool: new SpritePool(this.game),
         texts: [],
         arrowPool: new SpritePool(this.game),
+        currRoutePool: new SpritePool(this.game),
       },
       state: <any>undefined,
       intermediateActionTexts: [],

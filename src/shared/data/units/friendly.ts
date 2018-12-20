@@ -31,8 +31,8 @@ export const fr_unit_a1_l1_01: FrUnit = {
 };
 
 export const fr_unit_a1_l2_01: FrUnit = {
-  hp: 20,
-  maxHp: 20,
+  hp: 5,
+  maxHp: 5,
   charges: 5,
   maxCharges: 5,
   abilities: [
@@ -57,8 +57,8 @@ export const fr_unit_a1_l2_01: FrUnit = {
 };
 
 export const fr_unit_a1_l2_02: FrUnit = {
-  hp: 20,
-  maxHp: 20,
+  hp: 11,
+  maxHp: 11,
   charges: 5,
   maxCharges: 5,
   abilities: [
@@ -82,8 +82,8 @@ export const fr_unit_a1_l2_02: FrUnit = {
 };
 
 export const fr_unit_a1_l2_03: FrUnit = {
-  hp: 20,
-  maxHp: 20,
+  hp: 5,
+  maxHp: 5,
   charges: 5,
   maxCharges: 5,
   abilities: [
@@ -95,7 +95,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(new T.Armor(2000)),
+          new I.Static(new T.Armor(1000)),
         ),
       ]),
       inputs: [

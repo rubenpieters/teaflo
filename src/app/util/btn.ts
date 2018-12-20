@@ -64,8 +64,22 @@ export function createButtonInPool<A extends {}>(
     wrapPopupOver(onInputOver, btnSprite),
     wrapPopupOut(onInputOut, btnSprite),
   );
+  
+  const result = (<GSprite<ButtonValues & A>>btnSprite);
+  result.events.onKilled.add(() => {
+    if (result.data.popup !== undefined) {
+      result.data.popup.destroy();
+      result.data.popup = undefined;
+    }
+  });
+  result.events.onDestroy.add(() => {
+    if (result.data.popup !== undefined) {
+      result.data.popup.destroy();
+      result.data.popup = undefined;
+    }
+  });
 
-  return (<GSprite<ButtonValues & A>>btnSprite);
+  return result;
 }
 
 type ButtonValues = {

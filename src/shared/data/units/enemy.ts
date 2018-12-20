@@ -12,8 +12,8 @@ export const en_unit_a1_l1_01: EnUnit = {
 }
 
 export const en_unit_a1_l2_01: EnUnit = {
-  hp: 10,
-  maxHp: 10,
+  hp: 24,
+  maxHp: 24,
   charges: 5,
   maxCharges: 5,
   ai: AI.ai2,

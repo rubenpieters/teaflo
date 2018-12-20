@@ -29,6 +29,7 @@ export type StatsScreenData = {
   intentPool: SpritePool<EnIntentSprite>,
   outPool: SpritePool<EnOutSprite>,
   arrowPool: SpritePool<Phaser.Sprite>,
+  currRoutePool: SpritePool<Phaser.Sprite>,
 }
 
 export function drawSolutionInfo(
@@ -107,6 +108,7 @@ export function drawCardInfo(
   gameRefs.gameScreenData.statsScreenData.intentPool.killAll();
   gameRefs.gameScreenData.statsScreenData.outPool.killAll();
   gameRefs.gameScreenData.statsScreenData.arrowPool.killAll();
+  gameRefs.gameScreenData.statsScreenData.currRoutePool.killAll();
 
   // draw selection arrow for locked
   const lockInfo = gameRefs.gameScreenData.lockInfo;
@@ -218,8 +220,20 @@ export function drawCardInfo(
               "bot", 400 - 170 * aiIndex - 50 * outIndex + 100, 40,
             );
             const routeIcon = createEnOut(
-              game, gameRefs, routePos, route, id, type);
+              game, gameRefs, routePos, route, id, type
+            );
           });
+          
+          // draw current intent arrow
+          if (aiIndex === enUnit.currentAI) {
+            const currRoutePos = createPosition(
+              "left", 1980, 75,
+              "bot", 400 - 170 * aiIndex, 75,
+            );
+            gameRefs.gameScreenData.statsScreenData.currRoutePool.getFirstExists(
+              false, true, currRoutePos.xMin, currRoutePos.yMin, "current_route"
+            );
+          }
         });
       }
     }
