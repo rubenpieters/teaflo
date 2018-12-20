@@ -6,7 +6,7 @@
       "es2017"
     ],
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "es5",
     "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
