@@ -115,6 +115,10 @@ function runPhases(
   state = frActionResult.state;
   log = log.concat(frActionResult.log);
 
+  if (state.state === "invalid") {
+    return { state, log: log, win: false };
+  }
+
   // Action (En) Phase
   state.enUnits.forEach((enUnit, i) => {
     if (enUnit !== undefined) {
@@ -168,13 +172,17 @@ function applyActionsToSolution(
 } {
   let newQueue: Action[] = [];
   const addLog: LogEntry[] = [];
-  actions.forEach((action) => {
+  for (const action of actions) {
     const { actions, transformed } = applyTriggers(state, action, context);
     const actionResult = applyAction(transformed, state);
     state = actionResult.state;
     newQueue = newQueue.concat(actionResult.actions).concat(actions);
     addLog.push({ action, state, });
-  });
+
+    if (state.state === "invalid") {
+      return { state, log: log.concat(addLog) };
+    }
+  }
   if (newQueue.length === 0) {
     return { state, log: log.concat(addLog) };
   } else {
