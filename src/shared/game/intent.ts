@@ -277,13 +277,13 @@ function evaluateIntentVar<A>(
           if (prev === undefined) {
             return curr;
           }
-          if (curr.threatMap[self.id] === undefined) {
-            return prev;
-          }
           if (prev.threatMap[self.id] === undefined) {
             return curr;
           }
-          if (curr.threatMap[self.id] > prev.threatMap[self.id]) {
+          if (curr.threatMap[self.id] === undefined) {
+            return prev;
+          }
+          if (curr.threatMap[self.id] >= prev.threatMap[self.id]) {
             return curr;
           }
           return prev;

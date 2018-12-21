@@ -43,6 +43,40 @@ export type EntityId<A extends TargetType>
 
 export type UnitId = EntityId<"friendly" | "enemy">;
 
+export function killUnit(
+  target: UnitId,
+  state: GameState,
+) {
+  const id = findIndex(state, target);
+  switch (target.type) {
+    case "friendly": {
+      return focus(state,
+        set(x => x.frUnits[id], undefined),
+      );
+    }
+    case "enemy": {
+      return focus(state,
+        set(x => x.enUnits[id], undefined),
+      );
+    }
+  }
+}
+
+export function getUnit(
+  target: UnitId,
+  state: GameState,
+) {
+  const id = findIndex(state, target);
+  switch (target.type) {
+    case "friendly": {
+      return state.frUnits[id];
+    }
+    case "enemy": {
+      return state.enUnits[id];
+    }
+  }
+}
+
 export function overUnit(
   target: UnitId,
   state: GameState,

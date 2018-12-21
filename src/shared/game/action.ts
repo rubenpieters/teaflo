@@ -1,8 +1,9 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { UnitId, overUnit, overFriendly } from "./entityId";
+import { UnitId, overUnit, overFriendly, killUnit, getUnit } from "./entityId";
 import { GameState } from "./state";
 import { addThreat } from "./threat";
 import { Trigger, loseFragments, addFragments } from "./trigger";
+import { damage, heal, useCharge } from "./unit";
 
 export class Damage {
   constructor(
@@ -61,6 +62,13 @@ export class LoseFragments {
   ) {}
 }
 
+export class Death {
+  constructor(
+    public readonly target: UnitId,
+    public readonly tag: "Death" = "Death",
+  ) {}
+}
+
 export type Action
   = Damage
   | Heal
@@ -69,6 +77,7 @@ export type Action
   | AddThreat
   | AddTrigger
   | LoseFragments
+  | Death
   ;
 
 export function applyAction(
@@ -80,20 +89,28 @@ export function applyAction(
 } {
   switch (action.tag) {
     case "Damage": {
+      state = overUnit(action.target,
+        state,
+        x => damage(x, action.value),
+        x => x,
+      );
+      const unit = getUnit(action.target, state);
+      let actions: Action[] = [];
+      if (unit !== undefined && unit.hp <= 0) {
+        actions = [
+          new Death(action.target),
+        ];
+      }
       return {
-        state: overUnit(action.target,
-          state,
-          x => focus(x, over(x => x.hp, x => x - action.value)),
-          x => x,
-        ),
-        actions: [],
+        state,
+        actions,
       };
     }
     case "Heal": {
       return {
         state: overUnit(action.target,
           state,
-          x => focus(x, over(x => x.hp, x => x + action.value)),
+          x => heal(x, action.value),
           x => x,
         ),
         actions: [],
@@ -103,7 +120,7 @@ export function applyAction(
       return {
         state: overUnit(action.target,
           state,
-          x => focus(x, over(x => x.charges, x => x - action.value)),
+          x => useCharge(x, action.value),
           x => x,
         ),
         actions: [],
@@ -135,14 +152,21 @@ export function applyAction(
         actions: [],
       };
     }
-    case "LoseFragments": 
-    return {
-      state: overUnit(action.target,
-        state,
-        x => focus(x, over(x => x.triggers, x => loseFragments(x, action.triggerTag, action.value))),
-        x => x,
-      ),
-      actions: [],
-    };
+    case "LoseFragments": {
+      return {
+        state: overUnit(action.target,
+          state,
+          x => focus(x, over(x => x.triggers, x => loseFragments(x, action.triggerTag, action.value))),
+          x => x,
+        ),
+        actions: [],
+      };
+    }
+    case "Death": {
+      return {
+        state: killUnit(action.target, state),
+        actions: [],
+      }
+    }
   }
 }

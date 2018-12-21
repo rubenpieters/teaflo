@@ -302,7 +302,6 @@ export function applyScreenEvent(
       return;
     }
     case "CutTreeLoc": {
-      console.log(`CUT: ${JSON.stringify(screenEvent.loc)}`);
       const solInfo = activeSolInfo(gameRefs.saveFile);
       const currentSolution = solInfo.solution;
       const newSolution = cutSolution(currentSolution, screenEvent.loc);
