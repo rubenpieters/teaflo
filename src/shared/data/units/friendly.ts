@@ -75,7 +75,7 @@ export const fr_unit_a1_l2_02: FrUnit = {
         ),
       ]),
       inputs: [],
-      spriteId: "fr_unit_a1_l1_01_ab1",
+      spriteId: "fr_unit_a1_l2_01_ab1",
     }
   ],
   triggers: [],
@@ -101,7 +101,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
       inputs: [
         new TargetInput(),
       ],
-      spriteId: "fr_unit_a1_l1_01_ab1",
+      spriteId: "fr_unit_a1_l1_01_ab2",
     }
   ],
   triggers: [],

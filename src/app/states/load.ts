@@ -42,9 +42,13 @@ export default class Load extends Phaser.State {
     this.game.load.image("card2", "textures/card2.png");
     this.game.load.image("card3", "textures/card3.png");
     this.game.load.image("fr_unit_a1_l1_01", "textures/fr_unit_a1_l1_01.png");
+    this.game.load.image("fr_unit_a1_l2_01", "textures/fr_unit_a1_l2_01.png");
+    this.game.load.image("fr_unit_a1_l2_02", "textures/fr_unit_a1_l2_02.png");
+    this.game.load.image("fr_unit_a1_l2_03", "textures/fr_unit_a1_l2_03.png");
     this.game.load.image("en_unit_a1_l1_01", "textures/en_unit_a1_l1_01.png");
     this.game.load.image("fr_unit_a1_l1_01_ab1", "textures/fr_unit_a1_l1_01_ab1.png");
-    this.game.load.image("fr_unit_a1_l1_01_ab2", "textures/fr_unit_a1_l1_01_ab1.png");
+    this.game.load.image("fr_unit_a1_l1_01_ab2", "textures/fr_unit_a1_l1_01_ab2.png");
+    this.game.load.image("fr_unit_a1_l2_01_ab1", "textures/fr_unit_a1_l2_01_ab1.png");
     this.game.load.image("hp", "textures/hp.png");
     this.game.load.image("ch", "textures/ch.png");
     this.game.load.image("th", "textures/th.png");

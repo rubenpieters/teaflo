@@ -30,7 +30,7 @@ export const ai2: AI = [
           new T.Weak(100)
         ),
       ),
-      spriteId: "fr_unit_a1_l1_01_ab2",
+      spriteId: "fr_unit_a1_l2_01_ab1",
       outs: [
           {
             aiOut: new O.ToX(1),

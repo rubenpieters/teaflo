@@ -139,6 +139,20 @@ export function triggerSprite(
   }
 }
 
+export function addFragments(
+  triggers: Trigger[],
+  trigger: Trigger,
+) {
+  const index = triggers.findIndex(x => x.tag === trigger.tag);
+  if (index === -1) {
+    return triggers.concat(trigger);
+  } {
+    return focus(triggers,
+      over(x => x[index].fragments, x => x + trigger.fragments),
+    );
+  }
+}
+
 export function loseFragments(
   triggers: Trigger[],
   triggerTag: Trigger["tag"],

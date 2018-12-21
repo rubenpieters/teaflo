@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { UnitId, overUnit, overFriendly } from "./entityId";
 import { GameState } from "./state";
 import { addThreat } from "./threat";
-import { Trigger, loseFragments } from "./trigger";
+import { Trigger, loseFragments, addFragments } from "./trigger";
 
 export class Damage {
   constructor(
@@ -129,7 +129,7 @@ export function applyAction(
       return {
         state: overUnit(action.target,
           state,
-          x => focus(x, over(x => x.triggers, x => x.concat(action.trigger))),
+          x => focus(x, over(x => x.triggers, x => addFragments(x, action.trigger))),
           x => x,
         ),
         actions: [],
