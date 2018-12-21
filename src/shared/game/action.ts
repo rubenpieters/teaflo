@@ -1,6 +1,6 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { UnitId, overUnit, overFriendly, killUnit, getUnit } from "./entityId";
-import { GameState } from "./state";
+import { GameState, FrStUnit } from "./state";
 import { addThreat } from "./threat";
 import { Trigger, loseFragments, addFragments } from "./trigger";
 import { damage, heal, useCharge } from "./unit";
@@ -69,6 +69,12 @@ export class Death {
   ) {}
 }
 
+export class Invalid {
+  constructor(
+    public readonly tag: "Invalid" = "Invalid",
+  ) {}
+}
+
 export type Action
   = Damage
   | Heal
@@ -78,6 +84,7 @@ export type Action
   | AddTrigger
   | LoseFragments
   | Death
+  | Invalid
   ;
 
 export function applyAction(
@@ -87,6 +94,12 @@ export function applyAction(
   state: GameState,
   actions: Action[],
 } {
+  if (state.state === "invalid" || state.state === "win") {
+    return {
+      state,
+      actions: [],
+    }
+  }
   switch (action.tag) {
     case "Damage": {
       state = overUnit(action.target,
@@ -97,9 +110,7 @@ export function applyAction(
       const unit = getUnit(action.target, state);
       let actions: Action[] = [];
       if (unit !== undefined && unit.hp <= 0) {
-        actions = [
-          new Death(action.target),
-        ];
+        actions = [new Death(action.target)];
       }
       return {
         state,
@@ -163,8 +174,22 @@ export function applyAction(
       };
     }
     case "Death": {
+      const unit = getUnit(action.target, state);
+      if (unit !== undefined && action.target.type === "friendly" && (<FrStUnit>unit).vital === true) {
+        return {
+          state: killUnit(action.target, state),
+          actions: [new Invalid],
+        }
+      } else {
+        return {
+          state: killUnit(action.target, state),
+          actions: [],
+        }
+      }
+    }
+    case "Invalid": {
       return {
-        state: killUnit(action.target, state),
+        state: focus(state, set(x => x.state, "invalid")),
         actions: [],
       }
     }

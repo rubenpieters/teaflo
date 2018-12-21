@@ -15,6 +15,7 @@ export type GameState = {
   frUnits: (FrStUnit | undefined)[],
   enUnits: (EnStUnit | undefined)[],
   nextId: number,
+  state: "invalid" | "win" | "default",
 }
 
 export function filteredEn(
@@ -55,6 +56,7 @@ export function mkGameState(
     frUnits: frUnitsWithId,
     enUnits: enUnitsWithId,
     nextId: enLastId,
+    state: "default",
   }
 }
 

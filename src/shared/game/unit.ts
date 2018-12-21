@@ -12,7 +12,7 @@ export type Unit = {
   triggers: Trigger[],
 };
 
-export type FrUnit = Unit & HasAbilities;
+export type FrUnit = Unit & HasAbilities & { vital: boolean };
 export type EnUnit = Unit & HasAI;
 
 export function damage<U extends Unit>(

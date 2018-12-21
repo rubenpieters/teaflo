@@ -28,6 +28,7 @@ export const fr_unit_a1_l1_01: FrUnit = {
     }
   ],
   triggers: [],
+  vital: true,
 };
 
 export const fr_unit_a1_l2_01: FrUnit = {
@@ -54,6 +55,7 @@ export const fr_unit_a1_l2_01: FrUnit = {
     }
   ],
   triggers: [],
+  vital: true,
 };
 
 export const fr_unit_a1_l2_02: FrUnit = {
@@ -79,6 +81,7 @@ export const fr_unit_a1_l2_02: FrUnit = {
     }
   ],
   triggers: [],
+  vital: true,
 };
 
 export const fr_unit_a1_l2_03: FrUnit = {
@@ -105,6 +108,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
     }
   ],
   triggers: [],
+  vital: true,
 };
 
 export const unit1: FrUnit = {
@@ -125,6 +129,7 @@ export const unit1: FrUnit = {
     }
   ],
   triggers: [],
+  vital: true,
 }
 
 export const frUnitMap: {
