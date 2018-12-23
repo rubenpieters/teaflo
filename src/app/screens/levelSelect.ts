@@ -29,6 +29,7 @@ export function drawLevelSelect(
   game: Phaser.Game,
   gameRefs: GameRefs,
   act: number,
+  animation: boolean,
 ) {
   gameRefs.levelSelectData.btnPool.killAll();
 
@@ -39,7 +40,14 @@ export function drawLevelSelect(
       "top", 400 + (config.levelButtonHeight + 50) * i, config.levelButtonHeight,
     );
 
-    createLevelSelectButton(game, gameRefs, levelId, pos, "btn_level");
+    const button = createLevelSelectButton(game, gameRefs, levelId, pos, "btn_level");
+
+    if (animation) {
+      button.x = pos.xMin - 200 + (30 * i);
+      const introAnim = game.add.tween(button);
+      introAnim.to({ x: pos.xMin }, 130 - (20 * i), Phaser.Easing.Linear.None);
+      introAnim.start();
+    }
 
     i += 1;
   }
@@ -94,7 +102,7 @@ export function createLevelSelectButton(
       if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
         // noop
       } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
-        applyScreenEvent(new SE.ChangeLevel(btn.data.levelId), game, gameRefs);
+        applyScreenEvent(new SE.ChangeLevel(btn.data.levelId, false), game, gameRefs);
       } else {
         // noop
       }

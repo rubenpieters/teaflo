@@ -36,6 +36,7 @@ export class ChangeAct {
 export class ChangeLevel {
   constructor(
     public readonly levelId: string,
+    public readonly animation: boolean,
     public readonly tag: "ChangeLevel" = "ChangeLevel",
   ) {}
 }
@@ -205,13 +206,13 @@ export function applyScreenEvent(
         console.log(`ERROR (applyScreenEvent ChangeAct): no levels for act ${screenEvent.actId}`);
         throw `applyScreenEvent ChangeAct: no levels for act ${screenEvent.actId}`;
       }
-      applyScreenEvent(new ChangeLevel(firstLevelId), game, gameRefs);
+      applyScreenEvent(new ChangeLevel(firstLevelId, true), game, gameRefs);
       return;
     }
     case "ChangeLevel": {
       gameRefs.saveFile = initializeLevel(gameRefs.saveFile, screenEvent.levelId);
 
-      drawLevelSelect(game, gameRefs, activeAct(gameRefs.saveFile));
+      drawLevelSelect(game, gameRefs, activeAct(gameRefs.saveFile), screenEvent.animation);
       drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
       drawSolutionSelect(game, gameRefs, activeLevel(gameRefs.saveFile));
       return;
@@ -265,7 +266,7 @@ export function applyScreenEvent(
       gameRefs.gameScreenData.lockInfo = undefined;
 
       drawActSelect(game, gameRefs);
-      drawLevelSelect(game, gameRefs, activeAct(gameRefs.saveFile));
+      drawLevelSelect(game, gameRefs, activeAct(gameRefs.saveFile), true);
       drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
       drawSolutionSelect(game, gameRefs, activeLevel(gameRefs.saveFile));
       drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
