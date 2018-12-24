@@ -57,5 +57,8 @@ export function intentText(
     case "AddTriggerI": {
       return `STA ${intentVarText(intent.trigger)} to ${intentVarText(intent.target)}`;
     }
+    case "SwapHPWithExcessI": {
+      return `SWAP HP with ${intentVarText(intent.target1)} and ${intentVarText(intent.target2)}, excess is armor`;
+    }
   }
 }

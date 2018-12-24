@@ -270,6 +270,7 @@ export function createUnitAbility(
     },
     // onInputUp
     () => {
+      console.log(`INPUTS: ${JSON.stringify(sprite.data.ability.inputs)}`);
       if (sprite.data.ability.inputs.length === 0) {
         applyScreenEvent(new SE.ExtendLevelSolution({
           ability: sprite.data.ability,

@@ -58,6 +58,16 @@ export function mkHighestThreat(): IntentVar<UnitId> {
   return new HighestThreat;
 }
 
+export class AllExceptSelf {
+  constructor(
+    public readonly tag: "AllExceptSelf" = "AllExceptSelf",
+  ) {}
+}
+
+export function mkAllExceptSelf(): IntentVar<UnitId> {
+  return new AllExceptSelf;
+}
+
 export type IntentVar<A>
   = Static<A>
   | FromInput
@@ -65,6 +75,7 @@ export type IntentVar<A>
   | AllEnemy
   | AllAlly
   | HighestThreat
+  | AllExceptSelf
   ;
 
 export class DamageI {
@@ -115,6 +126,14 @@ export class AddTriggerI {
   ) {}
 }
 
+export class SwapHPWithExcessI {
+  constructor(
+    public readonly target1: IntentVar<UnitId>,
+    public readonly target2: IntentVar<UnitId>,
+    public readonly tag: "SwapHPWithExcessI" = "SwapHPWithExcessI",
+  ) {}
+}
+
 export type Intent
   = DamageI
   | HealI
@@ -122,6 +141,7 @@ export type Intent
   | CombinedIntent
   | AddThreatI
   | AddTriggerI
+  | SwapHPWithExcessI
   ;
 
 export function thDamage(
@@ -148,6 +168,7 @@ export function intentToAction(
     case "DamageI": {
       return evaluateTargets(
         state,
+        context,
         intent.target,
         tgt => {
           return new A.Damage(
@@ -160,6 +181,7 @@ export function intentToAction(
     case "HealI": {
       return evaluateTargets(
         state,
+        context,
         intent.target,
         tgt => {
           return new A.Heal(
@@ -172,6 +194,7 @@ export function intentToAction(
     case "UseChargeI": {
       return evaluateTargets(
         state,
+        context,
         intent.target,
         tgt => {
           return new A.UseCharge(
@@ -188,6 +211,7 @@ export function intentToAction(
     case "AddThreatI": {
       return evaluateTargets(
         state,
+        context,
         intent.atEnemy,
         tgt => {
           return new A.AddThreat(
@@ -201,6 +225,7 @@ export function intentToAction(
     case "AddTriggerI": {
       return evaluateTargets(
         state,
+        context,
         intent.target,
         tgt => {
           return new A.AddTrigger(
@@ -210,11 +235,25 @@ export function intentToAction(
         }
       );
     }
+    case "SwapHPWithExcessI": {
+      return evaluateTargets(
+        state,
+        context,
+        intent.target1,
+        tgt => {
+          return new A.SwapHPWithExcess(
+            evaluateIntentVar(state, context, tgt),
+            evaluateIntentVar(state, context, intent.target2),
+          );
+        }
+      );
+    }
   }
 }
 
 function evaluateTargets(
   state: GameState,
+  context: Context,
   target: IntentVar<UnitId>,
   create: (target: IntentVar<UnitId>) => Action,
 ) {
@@ -226,6 +265,19 @@ function evaluateTargets(
     const actions = filteredFr(state)
       .map(x => create(new Static(new GlobalId(x.id, "friendly"))));
     return new A.CombinedAction(actions);
+  } else if (target.tag === "AllExceptSelf") {
+    const self = context.self;
+    if (self === undefined) {
+      console.log("evaluateTargets: no self given");
+      throw "evaluateTargets: no self given";
+    }
+    const actionsFr = filteredFr(state)
+      .filter(x => x.id !== self.id)
+      .map(x => create(new Static(new GlobalId(x.id, "friendly"))));
+    const actionsEn = filteredEn(state)
+      .filter(x => x.id !== self.id)
+      .map(x => create(new Static(new GlobalId(x.id, "enemy"))));
+    return new A.CombinedAction(actionsFr.concat(actionsEn));
   } else {
     return create(target);
   }
@@ -294,6 +346,10 @@ function evaluateIntentVar<A>(
         return <A>(<any>new GlobalId(threat.id, "friendly"));
       }
     }
+    case "AllExceptSelf": {
+      console.log("AllExceptSelf: Internal Intent Var");
+      throw "AllExceptSelf: Internal Intent Var";
+    }
   }
 }
 
@@ -324,6 +380,9 @@ export function intentVarText<A>(
     }
     case "HighestThreat": {
       return `<Threat>`;
+    }
+    case "AllExceptSelf": {
+      return `<All Except Self>`;
     }
   }
 }

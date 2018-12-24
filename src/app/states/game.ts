@@ -23,6 +23,7 @@ const newSaveFile: SaveFileV1 = {
   actUnlocked: {
     0: "unlocked",
     1: "unlocked",
+    2: "unlocked",
   },
   levelUnlocked: {
     "a1_l1": "unlocked",

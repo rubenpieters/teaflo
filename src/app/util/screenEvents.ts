@@ -319,6 +319,7 @@ export function applyScreenEvent(
     }
     case "SetClickState": {
       gameRefs.gameScreenData.clickState = {...gameRefs.gameScreenData.clickState, ...screenEvent.clickState};
+      console.log(`CLICKSTATE: ${JSON.stringify(gameRefs.gameScreenData.clickState)}`);
 
       drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile));
       return;
@@ -330,6 +331,7 @@ export function applyScreenEvent(
       }
       const clickState = gameRefs.gameScreenData.clickState;
       clickState.currentInputs.push(screenEvent.input);
+      console.log(`CLICKSTATE: ${JSON.stringify(gameRefs.gameScreenData.clickState)}`);
       if (clickState.currentInputs.length >= clickState.ability.inputs.length) {
         // click state is finished, extend solution
         gameRefs.gameScreenData.clickState = undefined;

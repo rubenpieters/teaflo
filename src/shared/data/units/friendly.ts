@@ -25,7 +25,7 @@ export const fr_unit_a1_l1_01: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
-    }
+    },
   ],
   triggers: [],
   vital: true,
@@ -52,7 +52,7 @@ export const fr_unit_a1_l2_01: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
-    }
+    },
   ],
   triggers: [],
   vital: true,
@@ -78,7 +78,7 @@ export const fr_unit_a1_l2_02: FrUnit = {
       ]),
       inputs: [],
       spriteId: "fr_unit_a1_l2_01_ab1",
-    }
+    },
   ],
   triggers: [],
   vital: true,
@@ -105,7 +105,86 @@ export const fr_unit_a1_l2_03: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
-    }
+    },
+  ],
+  triggers: [],
+  vital: true,
+};
+
+export const fr_unit_a2_01: FrUnit = {
+  hp: 40,
+  maxHp: 40,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(1),
+        ),
+        I.thDamage(
+          I.mkAllExceptSelf(),
+          new I.Static(10),
+        ),
+      ]),
+      inputs: [],
+      spriteId: "fr_unit_a1_l1_01_ab1",
+    },
+    {
+      intent: new I.SwapHPWithExcessI(
+        new I.FromInput(0),
+        new I.FromInput(1),
+      ),
+      inputs: [
+        new TargetInput(),
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab1",
+    },
+  ],
+  triggers: [],
+  vital: true,
+};
+
+export const fr_unit_a2_02: FrUnit = {
+  hp: 25,
+  maxHp: 25,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(2),
+        ),
+        new I.AddTriggerI(
+          new I.FromInput(0),
+          new I.Static(new T.Strong(500)),
+        ),
+      ]),
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab2",
+    },
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(2),
+        ),
+        new I.AddTriggerI(
+          new I.FromInput(0),
+          new I.Static(new T.Strong(500)),
+        ),
+      ]),
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab2",
+    },
   ],
   triggers: [],
   vital: true,
@@ -126,7 +205,7 @@ export const unit1: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
-    }
+    },
   ],
   triggers: [],
   vital: true,
@@ -141,6 +220,9 @@ export const frUnitMap: {
   "fr_unit_a1_l2_01": fr_unit_a1_l2_01,
   "fr_unit_a1_l2_02": fr_unit_a1_l2_02,
   "fr_unit_a1_l2_03": fr_unit_a1_l2_03,
+  // act 2
+  "fr_unit_a2_01": fr_unit_a2_01,
+  "fr_unit_a2_02": fr_unit_a2_02,
   "card1": unit1,
   "card2": unit1,
   "card3": unit1,

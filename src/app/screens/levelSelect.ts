@@ -45,8 +45,8 @@ export function drawLevelSelect(
     if (animation) {
       button.x = pos.xMin - 200 + (30 * i);
       const introAnim = game.add.tween(button);
-      introAnim.to({ x: pos.xMin }, 130 - (20 * i), Phaser.Easing.Linear.None);
-      introAnim.start();
+      introAnim.frameBased = true;
+      introAnim.to({ x: pos.xMin }, 26 - (4 * i), Phaser.Easing.Linear.None, true, 50);
     }
 
     i += 1;

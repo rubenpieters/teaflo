@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { UnitId, overUnit, overFriendly, killUnit, getUnit } from "./entityId";
 import { GameState, FrStUnit } from "./state";
 import { addThreat } from "./threat";
-import { Trigger, loseFragments, addFragments } from "./trigger";
+import { Trigger, loseFragments, addFragments, Armor } from "./trigger";
 import { damage, heal, useCharge } from "./unit";
 
 export class Damage {
@@ -75,6 +75,14 @@ export class Invalid {
   ) {}
 }
 
+export class SwapHPWithExcess {
+  constructor(
+    public readonly target1: UnitId,
+    public readonly target2: UnitId,
+    public readonly tag: "SwapHPWithExcess" = "SwapHPWithExcess",
+  ) {}
+}
+
 export type Action
   = Damage
   | Heal
@@ -85,6 +93,7 @@ export type Action
   | LoseFragments
   | Death
   | Invalid
+  | SwapHPWithExcess
   ;
 
 export function applyAction(
@@ -190,6 +199,45 @@ export function applyAction(
     case "Invalid": {
       return {
         state: focus(state, set(x => x.state, "invalid")),
+        actions: [],
+      }
+    }
+    case "SwapHPWithExcess": {
+      if (action.target1.type === "enemy" || action.target2.type === "enemy") {
+        return {
+          state,
+          actions: [new Invalid],
+        }
+      }
+      const unit1 = getUnit(action.target1, state);
+      const unit2 = getUnit(action.target2, state);
+      if (unit1 !== undefined && unit2 !== undefined) {
+        const newUnit1Hp = unit2.hp > unit1.maxHp ? unit1.maxHp : unit2.hp;
+        const newUnit2Hp = unit1.hp > unit2.maxHp ? unit2.maxHp : unit1.hp;
+
+        state = overUnit(action.target1,
+          state,
+          x => focus(x, set(x => x.hp, newUnit1Hp)),
+          x => x,
+        );
+        state = overUnit(action.target2,
+          state,
+          x => focus(x, set(x => x.hp, newUnit2Hp)),
+          x => x,
+        );
+
+        const newUnit1Armor = unit2.hp > unit1.maxHp ?
+          new AddTrigger(action.target1, new Armor(unit2.hp - unit1.maxHp)) : undefined;
+        const newUnit2Armor = unit1.hp > unit2.maxHp ?
+          new AddTrigger(action.target2, new Armor(unit1.hp - unit2.maxHp)) : undefined;
+        
+        return {
+          state,
+          actions: <Action[]>([newUnit1Armor, newUnit2Armor].filter(x => x !== undefined)),
+        }
+      }
+      return {
+        state,
         actions: [],
       }
     }

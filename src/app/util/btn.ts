@@ -111,8 +111,13 @@ function initialize(
       onInputDown();
     });
     btnSprite.events.onInputUp.add(() => {
-      if (
-        inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
+      // TODO: active pointer seems to be scaled, so some buttons wont work when this is activated
+      // console.log("TEST");
+      // console.log(JSON.stringify(game.world.scale));
+      // console.log(JSON.stringify(pos));
+      // console.log(`x: ${game.input.activePointer.x} y: ${game.input.activePointer.y}`);
+      if ( true
+        // inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
       ) {
         onInputUp();
       }
