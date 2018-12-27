@@ -31,6 +31,12 @@ export type Trigger
   | Armor
   ;
 
+export type TriggerLog = {
+  tag: Trigger["tag"],
+  before: Action,
+  after: Action,
+};
+
 export function applyTriggers(
   state: GameState,
   action: Action,
@@ -38,14 +44,19 @@ export function applyTriggers(
 ): {
   actions: Action[],
   transformed: Action,
+  transforms: TriggerLog[],
 } {
   let newActions: Action[] = [];
+  let transforms: TriggerLog[] = [];
   for (const frUnit of state.frUnits) {
     if (frUnit !== undefined) {
       for (const trigger of frUnit.triggers) {
-        const { actions, transformed } = applyTrigger(state, trigger, action, context, new GlobalId(frUnit.id, "friendly"));
+        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, context, new GlobalId(frUnit.id, "friendly"));
         action = transformed;
         newActions = newActions.concat(actions);
+        if (triggerLog !== undefined) {
+          transforms = transforms.concat(triggerLog);
+        }
       }
     }
   }
@@ -53,15 +64,19 @@ export function applyTriggers(
   for (const enUnit of state.enUnits) {
     if (enUnit !== undefined) {
       for (const trigger of enUnit.triggers) {
-        const { actions, transformed } = applyTrigger(state, trigger, action, context, new GlobalId(enUnit.id, "enemy"));
+        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, context, new GlobalId(enUnit.id, "enemy"));
         action = transformed;
         newActions = newActions.concat(actions);
+        if (triggerLog !== undefined) {
+          transforms = transforms.concat(triggerLog);
+        }
       }
     }
   }
   return {
     actions: newActions,
     transformed: action,
+    transforms,
   };
 }
 
@@ -74,18 +89,25 @@ export function applyTrigger(
 ): {
   actions: Action[],
   transformed: Action,
+  triggerLog?: TriggerLog,
 } {
   switch (trigger.tag) {
     case "Weak": {
       if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, transformSelf)) {
         const subtr = action.value - Math.round((trigger.fragments / 100) - 0.5);
         const newValue = subtr > 0 ? subtr : 0;
+        const transformed = new Damage(
+          action.target,
+          newValue,
+        );
         return {
-          transformed: new Damage(
-            action.target,
-            newValue,
-          ),
+          transformed,
           actions: [],
+          triggerLog: {
+            tag: trigger.tag,
+            before: action,
+            after: transformed,
+          },
         };
       } else {
         return { transformed: action, actions: [] };
@@ -94,12 +116,18 @@ export function applyTrigger(
     case "Strong": {
       if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, transformSelf)) {
         const newValue = action.value + Math.round((trigger.fragments / 100) - 0.5);
+        const transformed = new Damage(
+          action.target,
+          newValue,
+        );
         return {
-          transformed: new Damage(
-            action.target,
-            newValue,
-          ),
+          transformed,
           actions: [],
+          triggerLog: {
+            tag: trigger.tag,
+            before: action,
+            after: transformed,
+          },
         };
       } else {
         return { transformed: action, actions: [] };
@@ -109,11 +137,12 @@ export function applyTrigger(
       if (action.tag === "Damage" && eqUnitId(state, action.target, transformSelf)) {
         let newValue = action.value - Math.round((trigger.fragments / 100) - 0.5);
         newValue = newValue < 0 ? 0 : newValue;
+        const transformed = new Damage(
+          action.target,
+          newValue,
+        );
         return {
-          transformed: new Damage(
-            action.target,
-            newValue,
-          ),
+          transformed,
           actions: [
             new LoseFragments(
               action.target,
@@ -121,6 +150,11 @@ export function applyTrigger(
               "Armor",
             ),
           ],
+          triggerLog: {
+            tag: trigger.tag,
+            before: action,
+            after: transformed,
+          },
         };
       } else {
         return { transformed: action, actions: [] };

@@ -174,11 +174,11 @@ function applyActionsToSolution(
   let newQueue: Action[] = [];
   const addLog: LogEntry[] = [];
   for (const action of actions) {
-    const { actions, transformed } = applyTriggers(state, action, context);
+    const { actions, transformed, transforms } = applyTriggers(state, action, context);
     const actionResult = applyAction(transformed, state);
     state = actionResult.state;
     newQueue = newQueue.concat(actionResult.actions).concat(actions);
-    addLog.push({ action, state, });
+    addLog.push({ action: transformed, state, transforms });
 
     if (state.state === "invalid") {
       return { state, log: log.concat(addLog) };

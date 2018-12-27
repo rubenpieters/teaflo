@@ -15,7 +15,7 @@ import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
 import { TargetType, PositionId } from "../../shared/game/entityId";
 import { Log, LogEntry } from "../../shared/game/log";
-import { triggerSprite, Trigger } from "../../shared/game/trigger";
+import { triggerSprite, Trigger, TriggerLog } from "../../shared/game/trigger";
 import { spriteMap } from "../../shared/data/units/spriteMap";
 
 export type IntermediateSol = {
@@ -56,10 +56,12 @@ export function drawSolutionRep(
   const solResult = runSolution(sol.solution, sol.loc, initState);
   let solState = solResult.state;
   let intermediateAction: Action | undefined = undefined;
+  let intermediateTransforms: TriggerLog[] | undefined = undefined;
   if (intermediateSol !== undefined) {
     const sol = pickIntermediateSol(intermediateSol, solResult.log);
     solState = sol.state;
     intermediateAction = sol.action;
+    intermediateTransforms = sol.transforms;
   }
   gameRefs.gameScreenData.state = solState;
 
@@ -169,6 +171,27 @@ export function drawSolutionRep(
   // draw intermediate action if defined
   if (intermediateAction !== undefined) {
     drawAction(game, gameRefs, intermediateAction);
+  }
+
+  // draw intermediate transforms if defined and not empty
+  if (intermediateTransforms !== undefined && intermediateTransforms.length !== 0) {
+    intermediateTransforms.forEach((triggerLog, triggerIndex) => {
+      const lblPos = createPosition(
+        "right", 500, 150,
+        "top", 200 + 75 * triggerIndex, 70,
+      );
+      const lbl = game.add.text(
+        lblPos.xMin, lblPos.yMin, `${triggerLog.tag}: ${triggerLog.before.tag}->${triggerLog.after.tag}`, {
+          fill: "#333333",
+          fontSize: 70,
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }
+      );
+      lbl.setTextBounds(0, 0, lblPos.xMax - lblPos.xMin, lblPos.yMax - lblPos.yMin);
+      console.log(`${JSON.stringify(lblPos)}`);
+      gameRefs.gameScreenData.intermediateActionTexts.push(lbl);
+    });
   }
 }
 
