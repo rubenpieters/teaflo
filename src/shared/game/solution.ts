@@ -106,14 +106,14 @@ function runPhases(
   state: GameState,
   solData: SolutionData,
 ) {
-
-  let log: LogEntry[] = [];
+  let log: Log = emptyLog();
   // Action (Fr) Phase
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
   const frActionResult = applyIntentToSolution(frAbility.intent, { input: frInputs, self: solData.origin }, state);
   state = frActionResult.state;
-  log = log.concat(frActionResult.log);
+  const filteredLog = frActionResult.log.filter(x => x.action.tag !== "CombinedAction");
+  log = focus(log, over(x => x.frLog, x => x.concat(filteredLog)));
 
   if (state.state === "invalid") {
     return { state, log: log, win: false };
@@ -132,7 +132,8 @@ function runPhases(
         x => nextAI(state, x),
         x => x,
       );
-      log = log.concat(enActionResult.log);
+      const filteredLog = enActionResult.log.filter(x => x.action.tag !== "CombinedAction");
+      log = focus(log, over(x => x.enLog, x => x.concat(filteredLog)));
     }
   });
 

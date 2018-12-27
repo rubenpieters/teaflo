@@ -20,13 +20,17 @@ import { spriteMap } from "../../shared/data/units/spriteMap";
 
 export type IntermediateSol = {
   index: number,
+  type: "fr" | "en",
 }
 
 function pickIntermediateSol(
   intermediateSol: IntermediateSol,
   log: Log,
 ): LogEntry {
-  return log[intermediateSol.index];
+  switch (intermediateSol.type) {
+    case "fr": return log.frLog[intermediateSol.index];
+    case "en": return log.enLog[intermediateSol.index];
+  }
 }
 
 export function drawSolutionRep(

@@ -6,8 +6,14 @@ export type LogEntry = {
   state: GameState,
 }
 
-export type Log = LogEntry[];
+export type Log = {
+  frLog: LogEntry[],
+  enLog: LogEntry[],
+};
 
-export function emptyLog() {
-  return [];
+export function emptyLog(): Log {
+  return {
+    frLog: [],
+    enLog: [],
+  };
 }

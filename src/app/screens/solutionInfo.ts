@@ -54,12 +54,21 @@ export function drawSolutionInfo(
   mkTree(game, gameRefs, sol);
 
   // draw action log
-  solLog.forEach((entry, actionIndex) => {
+  // fr action log
+  solLog.frLog.forEach((entry, actionIndex) => {
     const actionBtnPos = createPosition(
       "left", 50, config.logButtonWidth,
       "top", 600 + config.logButtonHeight * actionIndex, config.logButtonHeight,
     );
-    createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", actionIndex);
+    createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", actionIndex, "fr");
+  });
+  // en action log
+  solLog.enLog.forEach((entry, actionIndex) => {
+    const actionBtnPos = createPosition(
+      "left", 50, config.logButtonWidth,
+      "top", 800 + solLog.frLog.length * config.logButtonHeight + config.logButtonHeight * actionIndex, config.logButtonHeight,
+    );
+    createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", actionIndex, "en");
   });
 
   // draw stats screen headers
@@ -270,7 +279,6 @@ export function createUnitAbility(
     },
     // onInputUp
     () => {
-      console.log(`INPUTS: ${JSON.stringify(sprite.data.ability.inputs)}`);
       if (sprite.data.ability.inputs.length === 0) {
         applyScreenEvent(new SE.ExtendLevelSolution({
           ability: sprite.data.ability,
@@ -477,6 +485,8 @@ type ActionLogButton = GSprite<{
   init: boolean,
   selecting: boolean,
   action: Action,
+  index: number,
+  type: "fr" | "en",
   btnText: Phaser.Text,
 }>;
 
@@ -487,6 +497,7 @@ export function createActionLogButton(
   pos: Position,
   key: string,
   index: number,
+  type: "fr" | "en",
 ): ActionLogButton {
   const frame: number = 0;
   const txtColor: string = "#FF0000";
@@ -495,7 +506,7 @@ export function createActionLogButton(
     game,
     gameRefs.gameScreenData.logBtnPool,
     pos,
-    { action },
+    { action, index, type },
     key,
     frame,
     // onInputDown
@@ -509,7 +520,7 @@ export function createActionLogButton(
     // onInputOver
     () => {
       btn.frame = OVER;
-      applyScreenEvent(new SE.ShowIntermediateSol(index), game, gameRefs);
+      applyScreenEvent(new SE.ShowIntermediateSol(btn.data.index, btn.data.type), game, gameRefs);
     },
     // onInputOut
     () => {

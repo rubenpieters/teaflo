@@ -114,6 +114,7 @@ export class AdvanceClickState {
 export class ShowIntermediateSol {
   constructor(
     public readonly index: number,
+    public readonly type: "fr" | "en",
     public readonly tag: "ShowIntermediateSol" = "ShowIntermediateSol",
   ) {}
 }
@@ -348,6 +349,7 @@ export function applyScreenEvent(
     case "ShowIntermediateSol": {
       drawSolutionRep(game, gameRefs, activeLevel(gameRefs.saveFile), {
         index: screenEvent.index,
+        type: screenEvent.type,
       });
       if (gameRefs.gameScreenData.lockInfo === undefined) {
         applyScreenEvent(new ClearCardInfo(), game, gameRefs);
