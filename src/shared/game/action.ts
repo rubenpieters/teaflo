@@ -234,9 +234,9 @@ export function applyAction(
         );
 
         const newUnit1Armor = unit2.hp > unit1.maxHp ?
-          new AddTrigger(action.target1, new Armor(unit2.hp - unit1.maxHp)) : undefined;
+          new AddTrigger(action.target1, new Armor((unit2.hp - unit1.maxHp) * 100)) : undefined;
         const newUnit2Armor = unit1.hp > unit2.maxHp ?
-          new AddTrigger(action.target2, new Armor(unit1.hp - unit2.maxHp)) : undefined;
+          new AddTrigger(action.target2, new Armor((unit1.hp - unit2.maxHp) * 100)) : undefined;
         
         return {
           state,
