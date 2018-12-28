@@ -227,3 +227,22 @@ export function eqUnitId<A extends TargetType>(
     return eqUnitId(state, positionId1, positionId2);
   }
 }
+
+function targetTypeToString<A extends TargetType>(
+  type: A,
+) {
+  switch (type) {
+    case "enemy": return "EN";
+    case "friendly": return "FR";
+  }
+  throw "targetTypeToString: impossible";
+}
+
+export function posToString<A extends TargetType>(
+  id: EntityId<A>,
+) {
+  switch (id.tag) {
+    case "GlobalId": return `GID ${id.id} ${targetTypeToString(id.type)}`;
+    case "PositionId": return `PID ${id.id} ${targetTypeToString(id.type)}`;
+  }
+}

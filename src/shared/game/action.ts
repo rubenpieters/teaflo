@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { UnitId, overUnit, overFriendly, killUnit, getUnit } from "./entityId";
+import { UnitId, overUnit, overFriendly, killUnit, getUnit, posToString } from "./entityId";
 import { GameState, FrStUnit } from "./state";
 import { addThreat } from "./threat";
 import { Trigger, loseFragments, addFragments, Armor } from "./trigger";
@@ -240,6 +240,45 @@ export function applyAction(
         state,
         actions: [],
       }
+    }
+  }
+}
+
+
+export function actionText(
+  action: Action
+): string {
+  switch (action.tag) {
+    case "Damage": {
+      return `DMG ${action.value} to ${posToString(action.target)}`;
+    }
+    case "Heal": {
+      return `HEAL ${action.value} to ${posToString(action.target)}`;
+    }
+    case "UseCharge": {
+      return `USE ${action.value} CH to ${posToString(action.target)}`;
+    }
+    case "CombinedAction": {
+      const texts = action.actions.map(actionText);
+      return texts.join(" && ");
+    }
+    case "AddThreat": {
+      return `ADD ${action.value} TH to ${posToString(action.toFriendly)} at ${posToString(action.atEnemy)}`
+    }
+    case "AddTrigger": {
+      return `+STA ${action.trigger.fragments} ${action.trigger.tag} to ${posToString(action.target)}`;
+    }
+    case "LoseFragments": {
+      return `-STA ${action.value} ${action.triggerTag} to ${posToString(action.target)}`;
+    }
+    case "Death": {
+      return `DEATH ${posToString(action.target)}`;
+    }
+    case "Invalid": {
+      return `INVALID`;
+    }
+    case "SwapHPWithExcess": {
+      return `SWAP HP with ${posToString(action.target1)} and ${posToString(action.target2)}, excess is armor`;
     }
   }
 }

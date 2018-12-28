@@ -11,7 +11,7 @@ import * as SE from "../util/screenEvents";
 import { Location, Tree } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
 import { mkGameState, EnStUnit, FrStUnit, filteredFr, filteredEn } from "src/shared/game/state";
-import { Action } from "../../shared/game/action";
+import { Action, actionText } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
 import { TargetType, PositionId } from "../../shared/game/entityId";
 import { Log, LogEntry } from "../../shared/game/log";
@@ -181,7 +181,7 @@ export function drawSolutionRep(
         "top", 200 + 75 * triggerIndex, 70,
       );
       const lbl = game.add.text(
-        lblPos.xMin, lblPos.yMin, `${triggerLog.tag}: ${triggerLog.before.tag}->${triggerLog.after.tag}`, {
+        lblPos.xMin, lblPos.yMin, `${triggerLog.tag}: ${actionText(triggerLog.before)}->${actionText(triggerLog.after)}`, {
           fill: "#333333",
           fontSize: 70,
           boundsAlignH: "center",
@@ -189,7 +189,6 @@ export function drawSolutionRep(
         }
       );
       lbl.setTextBounds(0, 0, lblPos.xMax - lblPos.xMin, lblPos.yMax - lblPos.yMin);
-      console.log(`${JSON.stringify(lblPos)}`);
       gameRefs.gameScreenData.intermediateActionTexts.push(lbl);
     });
   }

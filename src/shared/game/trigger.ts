@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Action, Damage, LoseFragments } from "./action";
 import { Context } from "./intent";
-import { UnitId, eqUnitId, GlobalId } from "./entityId";
+import { UnitId, eqUnitId, GlobalId, getUnit } from "./entityId";
 import { GameState } from "./state";
 
 export class Weak {
@@ -25,10 +25,18 @@ export class Armor {
   ) {}
 }
 
+export class StrongLowHP {
+  constructor(
+    public readonly fragments: number,
+    public readonly tag: "StrongLowHP" = "StrongLowHP",
+  ) {}
+}
+
 export type Trigger
   = Weak
   | Strong
   | Armor
+  | StrongLowHP
   ;
 
 export type TriggerLog = {
@@ -160,6 +168,31 @@ export function applyTrigger(
         return { transformed: action, actions: [] };
       }
     }
+    case "StrongLowHP": {
+      const self = context.self;
+      if (action.tag === "Damage" && self !== undefined && eqUnitId(state, self, transformSelf)) {
+        const multiplier = Math.round((trigger.fragments / 100) - 0.5);
+        const selfUnit = getUnit(self, state);
+        if (selfUnit !== undefined) {
+          const missingHp = selfUnit.maxHp - selfUnit.hp;
+          const newValue = action.value + missingHp * multiplier * 2;
+          const transformed = new Damage(
+            action.target,
+            newValue,
+          );
+          return {
+            transformed,
+            actions: [],
+            triggerLog: {
+              tag: trigger.tag,
+              before: action,
+              after: transformed,
+            },
+          };
+        }
+      }
+      return { transformed: action, actions: [] };
+    }
   }
 }
 
@@ -170,6 +203,7 @@ export function triggerSprite(
     case "Strong": return "tr_strong";
     case "Weak": return "tr_weak";
     case "Armor": return "tr_armor";
+    case "StrongLowHP": return "tr_strong";
   }
 }
 
