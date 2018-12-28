@@ -19,6 +19,7 @@ import { SpritePool } from "../util/pool";
 import { SolInfo } from "../savefile/rep";
 import { Intent } from "src/shared/game/intent";
 import { AIRoute, routeText } from "src/shared/game/ai";
+import { LogKeys } from "src/shared/game/log";
 
 export type StatsScreenData = {
   spriteGroup: Phaser.Group,
@@ -54,19 +55,27 @@ export function drawSolutionInfo(
   mkTree(game, gameRefs, sol);
 
   // draw action log
-  // fr action log
-  solLog.frLog.forEach((entry, actionIndex) => {
+  // st action log
+  solLog.st.forEach((entry, actionIndex) => {
     const actionBtnPos = createPosition(
       "left", 50, config.logButtonWidth,
       "top", 600 + config.logButtonHeight * actionIndex, config.logButtonHeight,
     );
+    createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", actionIndex, "st");
+  });
+  // fr action log
+  solLog.fr.forEach((entry, actionIndex) => {
+    const actionBtnPos = createPosition(
+      "left", 50, config.logButtonWidth,
+      "top", 700 + solLog.st.length * config.logButtonHeight + config.logButtonHeight * actionIndex, config.logButtonHeight,
+    );
     createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", actionIndex, "fr");
   });
   // en action log
-  solLog.enLog.forEach((entry, actionIndex) => {
+  solLog.en.forEach((entry, actionIndex) => {
     const actionBtnPos = createPosition(
       "left", 50, config.logButtonWidth,
-      "top", 800 + solLog.frLog.length * config.logButtonHeight + config.logButtonHeight * actionIndex, config.logButtonHeight,
+      "top", 800 + solLog.st.length * config.logButtonHeight + solLog.fr.length * config.logButtonHeight + config.logButtonHeight * actionIndex, config.logButtonHeight,
     );
     createActionLogButton(game, gameRefs, entry.action, actionBtnPos, "btn_log", actionIndex, "en");
   });
@@ -486,7 +495,7 @@ type ActionLogButton = GSprite<{
   selecting: boolean,
   action: Action,
   index: number,
-  type: "fr" | "en",
+  type: LogKeys,
   btnText: Phaser.Text,
 }>;
 
@@ -497,7 +506,7 @@ export function createActionLogButton(
   pos: Position,
   key: string,
   index: number,
-  type: "fr" | "en",
+  type: LogKeys,
 ): ActionLogButton {
   const frame: number = 0;
   const txtColor: string = "#FF0000";

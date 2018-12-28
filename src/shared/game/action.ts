@@ -83,6 +83,12 @@ export class SwapHPWithExcess {
   ) {}
 }
 
+export class StartTurn {
+  constructor(
+    public readonly tag: "StartTurn" = "StartTurn",
+  ) {}
+}
+
 export type Action
   = Damage
   | Heal
@@ -94,6 +100,7 @@ export type Action
   | Death
   | Invalid
   | SwapHPWithExcess
+  | StartTurn
   ;
 
 export function applyAction(
@@ -241,6 +248,12 @@ export function applyAction(
         actions: [],
       }
     }
+    case "StartTurn": {
+      return {
+        state,
+        actions: [],
+      }
+    }
   }
 }
 
@@ -279,6 +292,9 @@ export function actionText(
     }
     case "SwapHPWithExcess": {
       return `SWAP HP with ${posToString(action.target1)} and ${posToString(action.target2)}, excess is armor`;
+    }
+    case "StartTurn": {
+      return `StartTurn`;
     }
   }
 }

@@ -8,14 +8,16 @@ export type LogEntry = {
   transforms: TriggerLog[],
 }
 
+export type LogKeys = "st" | "fr" | "en";
+
 export type Log = {
-  frLog: LogEntry[],
-  enLog: LogEntry[],
+  [K in LogKeys]: LogEntry[]
 };
 
 export function emptyLog(): Log {
   return {
-    frLog: [],
-    enLog: [],
+    st: [],
+    fr: [],
+    en: [],
   };
 }

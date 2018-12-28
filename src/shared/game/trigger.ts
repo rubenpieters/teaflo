@@ -1,8 +1,9 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Action, Damage, LoseFragments } from "./action";
+import { Action, Damage, LoseFragments, AddTrigger } from "./action";
 import { Context } from "./intent";
 import { UnitId, eqUnitId, GlobalId, getUnit } from "./entityId";
 import { GameState } from "./state";
+import { Omit } from "../type-util";
 
 export class Weak {
   constructor(
@@ -32,11 +33,20 @@ export class StrongLowHP {
   ) {}
 }
 
+export class Grow {
+  constructor(
+    public readonly fragments: number,
+    public readonly trigger: Trigger,
+    public readonly tag: "Grow" = "Grow",
+  ) {}
+}
+
 export type Trigger
   = Weak
   | Strong
   | Armor
   | StrongLowHP
+  | Grow
   ;
 
 export type TriggerLog = {
@@ -59,7 +69,8 @@ export function applyTriggers(
   for (const frUnit of state.frUnits) {
     if (frUnit !== undefined) {
       for (const trigger of frUnit.triggers) {
-        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, context, new GlobalId(frUnit.id, "friendly"));
+        const extendedContext = {...context, triggerOwner: new GlobalId(frUnit.id, "friendly")};
+        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(frUnit.id, "friendly"));
         action = transformed;
         newActions = newActions.concat(actions);
         if (triggerLog !== undefined) {
@@ -72,7 +83,8 @@ export function applyTriggers(
   for (const enUnit of state.enUnits) {
     if (enUnit !== undefined) {
       for (const trigger of enUnit.triggers) {
-        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, context, new GlobalId(enUnit.id, "enemy"));
+        const extendedContext = {...context, triggerOwner: new GlobalId(enUnit.id, "enemy")};
+        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(enUnit.id, "enemy"));
         action = transformed;
         newActions = newActions.concat(actions);
         if (triggerLog !== undefined) {
@@ -193,6 +205,24 @@ export function applyTrigger(
       }
       return { transformed: action, actions: [] };
     }
+    case "Grow": {
+      const owner = context.triggerOwner;
+      if (owner === undefined) {
+        throw "applyTrigger: no trigger owner";
+      }
+      const multiplier = Math.round((trigger.fragments / 100) - 0.5);
+      const growAction = new AddTrigger(
+        owner,
+        focus(trigger.trigger, over(x => x.fragments, x => x * multiplier)),
+      );
+      if (action.tag === "StartTurn") {
+        return {
+          transformed: action,
+          actions: [growAction],
+        };  
+      }
+      return { transformed: action, actions: [] };
+    }
   }
 }
 
@@ -204,14 +234,15 @@ export function triggerSprite(
     case "Weak": return "tr_weak";
     case "Armor": return "tr_armor";
     case "StrongLowHP": return "tr_strong";
+    case "Grow": return "tr_strong";
   }
 }
 
 export function addFragments(
   triggers: Trigger[],
   trigger: Trigger,
-) {
-  const index = triggers.findIndex(x => x.tag === trigger.tag);
+): Trigger[] {
+  const index = triggers.findIndex(x => mergeCondition(x, trigger));
   if (index === -1) {
     return triggers.concat(trigger);
   } {
@@ -221,11 +252,21 @@ export function addFragments(
   }
 }
 
+function mergeCondition(
+  trigger1: Trigger,
+  trigger2: Trigger,
+): boolean {
+  if (trigger1.tag === "Grow" && trigger2.tag === "Grow" && trigger1.trigger.tag !== trigger2.trigger.tag) {
+    return false;
+  }
+  return trigger1.tag === trigger2.tag;
+}
+
 export function loseFragments(
   triggers: Trigger[],
   triggerTag: Trigger["tag"],
   value: number,
-) {
+): Trigger[] {
   const index = triggers.findIndex(x => x.tag === triggerTag);
   if (index === -1) {
     return triggers;

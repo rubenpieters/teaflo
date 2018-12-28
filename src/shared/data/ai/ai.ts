@@ -52,3 +52,35 @@ export const ai2: AI = [
         ],
     },
   ];
+
+
+export const ai3: AI = [
+  {
+    intent: new I.AddTriggerI(
+      I.mkSelf(),
+      new I.Static(
+        new T.Grow(100, new T.Strong(300)),
+      ),
+    ),
+    spriteId: "fr_unit_a1_l2_01_ab1",
+    outs: [
+        {
+          aiOut: new O.ToX(1),
+          condition: (state: GameState) => true,
+        },
+      ],
+  },
+  {
+    intent: new I.DamageI(
+      I.mkHighestThreat(),
+      new I.Static(5),
+    ),
+    spriteId: "fr_unit_a1_l1_01_ab1",
+    outs: [
+        {
+          aiOut: new O.ToSelf(),
+          condition: (state: GameState) => true,
+        },
+      ],
+  },
+];

@@ -2,7 +2,7 @@ import { focus, over, set } from "src/shared/iassign-util";
 import { Tree, extendTree, Location, cutTree, emptyTree } from "../tree";
 import { Ability } from "./ability";
 import { GameState, filteredEn } from "./state";
-import { applyAction, Action } from "./action";
+import { applyAction, Action, StartTurn } from "./action";
 import { nextAI } from "./ai";
 import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction, Intent, Context } from "./intent";
@@ -107,13 +107,24 @@ function runPhases(
   solData: SolutionData,
 ) {
   let log: Log = emptyLog();
+
+  // Start Turn Phase
+  const startTurnResult = applyActionsToSolution([new StartTurn], { }, state, []);
+  state = startTurnResult.state;
+  const stFilteredLog = startTurnResult.log.filter(x => x.action.tag !== "CombinedAction");
+  log = focus(log, over(x => x.st, x => x.concat(stFilteredLog)));
+
+  if (state.state === "invalid") {
+    return { state, log: log, win: false };
+  }
+
   // Action (Fr) Phase
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
   const frActionResult = applyIntentToSolution(frAbility.intent, { input: frInputs, self: solData.origin }, state);
   state = frActionResult.state;
   const filteredLog = frActionResult.log.filter(x => x.action.tag !== "CombinedAction");
-  log = focus(log, over(x => x.frLog, x => x.concat(filteredLog)));
+  log = focus(log, over(x => x.fr, x => x.concat(filteredLog)));
 
   if (state.state === "invalid") {
     return { state, log: log, win: false };
@@ -133,7 +144,7 @@ function runPhases(
         x => x,
       );
       const filteredLog = enActionResult.log.filter(x => x.action.tag !== "CombinedAction");
-      log = focus(log, over(x => x.enLog, x => x.concat(filteredLog)));
+      log = focus(log, over(x => x.en, x => x.concat(filteredLog)));
     }
   });
 

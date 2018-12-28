@@ -31,7 +31,7 @@ export const levelDataMap: { [key: string]: LevelData } = {
 export const levelEnUnitMap: { [key: string]: (string | undefined)[] } = {
   "a1_l1": ["en_unit_a1_l1_01"],
   "a1_l2": ["en_unit_a1_l2_01"],
-  "a2_l1": [undefined, "en_unit_a2_l1_01"],
+  "a2_l1": ["en_unit_a2_l1_01", "en_unit_a2_l1_01", "en_unit_a2_l1_01"],
   "a3_l1": ["en_unit_a1_l1_01", "en_unit_a1_l1_01", "en_unit_a1_l1_01"],
   "a3_l2": ["card1"],
   "a3_l3": ["card1"],

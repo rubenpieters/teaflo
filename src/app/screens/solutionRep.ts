@@ -14,23 +14,20 @@ import { mkGameState, EnStUnit, FrStUnit, filteredFr, filteredEn } from "src/sha
 import { Action, actionText } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
 import { TargetType, PositionId } from "../../shared/game/entityId";
-import { Log, LogEntry } from "../../shared/game/log";
+import { Log, LogEntry, LogKeys } from "../../shared/game/log";
 import { triggerSprite, Trigger, TriggerLog } from "../../shared/game/trigger";
 import { spriteMap } from "../../shared/data/units/spriteMap";
 
 export type IntermediateSol = {
   index: number,
-  type: "fr" | "en",
+  type: LogKeys,
 }
 
 function pickIntermediateSol(
   intermediateSol: IntermediateSol,
   log: Log,
 ): LogEntry {
-  switch (intermediateSol.type) {
-    case "fr": return log.frLog[intermediateSol.index];
-    case "en": return log.enLog[intermediateSol.index];
-  }
+  return log[intermediateSol.type][intermediateSol.index];
 }
 
 export function drawSolutionRep(

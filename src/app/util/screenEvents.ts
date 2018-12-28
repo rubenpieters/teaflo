@@ -17,6 +17,7 @@ import { drawSolutionInfo, drawCardInfo } from "../screens/solutionInfo";
 import { TargetType } from "../../shared/game/entityId";
 import { drawHoverCardFriendly, clearHoverCard } from "../screens/hoverCard";
 import { Omit } from "src/shared/type-util";
+import { LogKeys } from "src/shared/game/log";
 
 /**
  * Changes the currently active act.
@@ -114,7 +115,7 @@ export class AdvanceClickState {
 export class ShowIntermediateSol {
   constructor(
     public readonly index: number,
-    public readonly type: "fr" | "en",
+    public readonly type: LogKeys,
     public readonly tag: "ShowIntermediateSol" = "ShowIntermediateSol",
   ) {}
 }

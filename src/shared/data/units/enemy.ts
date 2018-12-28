@@ -26,7 +26,7 @@ export const en_unit_a2_l1_01: EnUnit = {
   maxHp: 45,
   charges: 5,
   maxCharges: 5,
-  ai: AI.ai1,
+  ai: AI.ai3,
   currentAI: 0,
   triggers: [],
 }
