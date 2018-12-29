@@ -48,7 +48,7 @@ export function createButtonInPool<A extends {}>(
   let btnSprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
   btnSprite.data = {
     ...<any>a,
-    ...{ selecting: false, popupF },
+    ...{ selectingStatus: "none", popupF },
     // only copy init property from old data
     ...{ init: btnSprite.data.init },
   }
@@ -82,17 +82,14 @@ export function createButtonInPool<A extends {}>(
   return result;
 }
 
-type ButtonValues = {
+export type ButtonValues = {
   init: boolean,
-  selecting: boolean,
+  selectingStatus: "left" | "right" | "none",
   popup?: Phaser.Sprite,
   popupF?: () => Phaser.Sprite,
 };
 
-export type Button = GSprite<{
-  init: boolean,
-  selecting: boolean,
-}>;
+export type Button = GSprite<ButtonValues>;
 
 function initialize(
   game: Game,
@@ -107,14 +104,19 @@ function initialize(
 
     btnSprite.inputEnabled = true;
     btnSprite.events.onInputDown.add(() => {
-      btnSprite.data.selecting = true;
+      btnSprite.data.selectingStatus = game.input.activePointer.rightButton.isDown ? "right" : "left";
       onInputDown();
     });
     btnSprite.events.onInputUp.add(() => {
       if (
         inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
       ) {
-        onInputUp();
+        if (btnSprite.data.selectingStatus === "right") {
+          console.log("RIGHT");
+        } else if (btnSprite.data.selectingStatus === "left") {
+          onInputUp();
+        }
+        btnSprite.data.selectingStatus = "none";
       }
     });
     btnSprite.events.onInputOver.add(() => {
@@ -137,8 +139,8 @@ export function addText<A>(
   btnString: string,
   txtColor: string,
   fontSize: number,
-): GSprite<A & { btnText: Phaser.Text}> {
-  const btnSpriteWTxt = (<GSprite<A & { btnText?: Phaser.Text}>>btnSprite);
+): GSprite<A & { btnText: Phaser.Text }> {
+  const btnSpriteWTxt = (<GSprite<A & { btnText?: Phaser.Text }>>btnSprite);
   const btnText = game.add.text(
     0, 0, btnString, {
       fill: txtColor,

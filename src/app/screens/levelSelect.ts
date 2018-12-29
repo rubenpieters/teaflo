@@ -6,7 +6,7 @@ import { levelAvailable } from "../savefile/rep";
 import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
 import { GSprite } from "src/shared/phaser-util";
-import { createButtonInPool, addText } from "../util/btn";
+import { createButtonInPool, addText, ButtonValues } from "../util/btn";
 import { SpritePool } from "../util/pool";
 
 export type LevelSelectData = {
@@ -53,9 +53,7 @@ export function drawLevelSelect(
   }
 }
 
-type LevelSelectButton = GSprite<{
-  init: boolean,
-  selecting: boolean,
+type LevelSelectButton = GSprite<ButtonValues & {
   levelId: string,
   btnText: Phaser.Text,
 }>;
@@ -112,7 +110,7 @@ export function createLevelSelectButton(
       if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
         // noop
       } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
-        if (btn.data.selecting) {
+        if (btn.data.selectingStatus !== "none") {
           btn.frame = DOWN;
         } else {
           btn.frame = OVER;

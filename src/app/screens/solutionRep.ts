@@ -12,7 +12,7 @@ import { Location, Tree } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
 import { mkGameState, EnStUnit, FrStUnit, filteredFr, filteredEn, GameState } from "src/shared/game/state";
 import { Action, actionText } from "../../shared/game/action";
-import { createButtonInPool, addText } from "../util/btn";
+import { createButtonInPool, addText, ButtonValues } from "../util/btn";
 import { TargetType, PositionId, toPositionId } from "../../shared/game/entityId";
 import { Log, LogEntry, LogKeys } from "../../shared/game/log";
 import { triggerSprite, Trigger, TriggerLog } from "../../shared/game/trigger";
@@ -336,9 +336,7 @@ function drawAction(
   }
 }
 
-type UnitSprite = GSprite<{
-  init: boolean,
-  selecting: boolean,
+type UnitSprite = GSprite<ButtonValues & {
   id: number,
   type: TargetType,
 }>;
@@ -401,9 +399,7 @@ export function createUnitResource(
   return unit;
 }
 
-type TriggerSprite = GSprite<{
-  init: boolean,
-  selecting: boolean,
+type TriggerSprite = GSprite<ButtonValues & {
   trigger: Trigger,
 }>;
 

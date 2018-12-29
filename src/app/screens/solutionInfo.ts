@@ -11,7 +11,7 @@ import { Location, Tree, drawPositions } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
 import { mkGameState, GameState, FrStUnit, EnStUnit } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
-import { createButtonInPool, addText } from "../util/btn";
+import { createButtonInPool, addText, ButtonValues } from "../util/btn";
 import { TargetType, GlobalId } from "../../shared/game/entityId";
 import { OVER, NEUTRAL } from "../util/button";
 import { Unit } from "../../shared/game/unit";
@@ -259,9 +259,7 @@ export function drawCardInfo(
   }
 }
 
-type AbilitySprite = GSprite<{
-  selecting: boolean,
-  init: boolean,
+type AbilitySprite = GSprite<ButtonValues & {
   ability: Ability,
   id: number,
   type: TargetType,
@@ -326,9 +324,7 @@ export function createUnitAbility(
   return sprite;
 }
 
-type EnIntentSprite = GSprite<{
-  selecting: boolean,
-  init: boolean,
+type EnIntentSprite = GSprite<ButtonValues & {
   intent: Intent,
   id: number,
   type: TargetType,
@@ -381,9 +377,7 @@ export function createEnIntent(
   return sprite;
 }
 
-type EnOutSprite = GSprite<{
-  selecting: boolean,
-  init: boolean,
+type EnOutSprite = GSprite<ButtonValues & {
   route: AIRoute,
   id: number,
   type: TargetType,
@@ -491,9 +485,7 @@ function mkTree(
   gameRefs.gameScreenData.solTreePool = sprites;
 }
 
-type ActionLogButton = GSprite<{
-  init: boolean,
-  selecting: boolean,
+type ActionLogButton = GSprite<ButtonValues & {
   action: Action,
   index: number,
   type: LogKeys,

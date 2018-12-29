@@ -6,7 +6,7 @@ import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
 import { actNumberMap } from "../gameData";
 import { GSprite } from "src/shared/phaser-util";
-import { createButtonInPool, Button, addText } from "../util/btn";
+import { createButtonInPool, Button, addText, ButtonValues } from "../util/btn";
 import { SpritePool } from "../util/pool";
 
 export type ActSelectData = {
@@ -39,9 +39,7 @@ export function drawActSelect(
   }
 }
 
-type ActSelectButton = GSprite<{
-  init: boolean,
-  selecting: boolean,
+type ActSelectButton = GSprite<ButtonValues & {
   actNumber: number,
   btnText: Phaser.Text,
 }>;
@@ -98,7 +96,7 @@ export function createActSelectButton(
       if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
         // noop
       } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
-        if (btn.data.selecting) {
+        if (btn.data.selectingStatus !== "none") {
           btn.frame = DOWN;
         } else {
           btn.frame = OVER;
