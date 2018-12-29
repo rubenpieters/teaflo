@@ -10,10 +10,10 @@ import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
 import { Location, Tree } from "src/shared/tree";
 import { Game, Button } from "phaser-ce";
-import { mkGameState, EnStUnit, FrStUnit, filteredFr, filteredEn } from "src/shared/game/state";
+import { mkGameState, EnStUnit, FrStUnit, filteredFr, filteredEn, GameState } from "src/shared/game/state";
 import { Action, actionText } from "../../shared/game/action";
 import { createButtonInPool, addText } from "../util/btn";
-import { TargetType, PositionId } from "../../shared/game/entityId";
+import { TargetType, PositionId, toPositionId } from "../../shared/game/entityId";
 import { Log, LogEntry, LogKeys } from "../../shared/game/log";
 import { triggerSprite, Trigger, TriggerLog } from "../../shared/game/trigger";
 import { spriteMap } from "../../shared/data/units/spriteMap";
@@ -185,7 +185,7 @@ export function drawSolutionRep(
 
   // draw intermediate action if defined
   if (intermediateAction !== undefined) {
-    drawAction(game, gameRefs, intermediateAction);
+    drawAction(game, gameRefs, solState, intermediateAction);
   }
 
   // draw intermediate transforms if defined and not empty
@@ -212,6 +212,7 @@ export function drawSolutionRep(
 function drawAction(
   game: Game,
   gameRefs: GameRefs,
+  state: GameState,
   action: Action,
 ) {
   switch (action.tag) {
@@ -220,8 +221,9 @@ function drawAction(
     }
     case "Damage": {
       const offset = action.target.type === "friendly" ? 0 : 1250;
+      const posId = toPositionId(state, action.target);
       const lblPos = createPosition(
-        "left", offset + 1050 + 200 * action.target.id, 150,
+        "left", offset + 1050 + 200 * posId.id, 150,
         "top", 750, 70,
       );
       const lbl = game.add.text(
@@ -238,8 +240,9 @@ function drawAction(
     }
     case "Heal": {
       const offset = action.target.type === "friendly" ? 0 : 1250;
+      const posId = toPositionId(state, action.target);
       const lblPos = createPosition(
-        "left", offset + 1050 + 200 * action.target.id, 150,
+        "left", offset + 1050 + 200 * posId.id, 150,
         "top", 750, 70,
       );
       const lbl = game.add.text(
@@ -256,8 +259,9 @@ function drawAction(
     }
     case "UseCharge": {
       const offset = action.target.type === "friendly" ? 0 : 1250;
+      const posId = toPositionId(state, action.target);
       const lblPos = createPosition(
-        "left", offset + 1050 + 200 * action.target.id, 150,
+        "left", offset + 1050 + 200 * posId.id, 150,
         "top", 750, 70,
       );
       const lbl = game.add.text(
@@ -274,8 +278,9 @@ function drawAction(
     }
     case "AddThreat": {
       const offset = action.toFriendly.type === "friendly" ? 0 : 1250;
+      const posId = toPositionId(state, action.toFriendly);
       const lblPos = createPosition(
-        "left", offset + 1050 + 200 * action.toFriendly.id, 150,
+        "left", offset + 1050 + 200 * posId.id, 150,
         "top", 750, 70,
       );
       const lbl = game.add.text(
@@ -292,8 +297,9 @@ function drawAction(
     }
     case "AddTrigger": {
       const offset = action.target.type === "friendly" ? 0 : 1250;
+      const posId = toPositionId(state, action.target);
       const lblPos = createPosition(
-        "left", offset + 1050 + 200 * action.target.id, 150,
+        "left", offset + 1050 + 200 * posId.id, 150,
         "top", 750, 70,
       );
       const lbl = game.add.text(
@@ -310,8 +316,9 @@ function drawAction(
     }
     case "LoseFragments": {
       const offset = action.target.type === "friendly" ? 0 : 1250;
+      const posId = toPositionId(state, action.target);
       const lblPos = createPosition(
-        "left", offset + 1050 + 200 * action.target.id, 150,
+        "left", offset + 1050 + 200 * posId.id, 150,
         "top", 750, 70,
       );
       const lbl = game.add.text(
