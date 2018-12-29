@@ -212,10 +212,11 @@ export function drawCardInfo(
   
       if (type === "friendly") {
         const frUnit = <FrStUnit>(<any>unit);
+        // draw abilities
         frUnit.abilities.forEach((ability, abilityIndex) => {
           const ablPos = createPosition(
             "left", 2080, config.abilityIconWidth,
-            "bot", 400, config.abilityIconHeight - 170 * (abilityIndex),
+            "bot", 400 - 170 * abilityIndex, config.abilityIconHeight,
           );
           const abilityIcon = createUnitAbility(
             game, gameRefs, ablPos, ability.spriteId, ability, id, type);
