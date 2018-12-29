@@ -84,51 +84,49 @@ export function createLevelSelectButton(
     pos,
     { levelId },
     key,
-    frame,
-    // onInputDown
-    () => {
-      if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
-        // noop
-      } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
-        btn.frame = DOWN;
-      } else {
-        // noop
-      }
-    },
-    // onInputUp
-    () => {
-      if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
-        // noop
-      } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
-        applyScreenEvent(new SE.ChangeLevel(btn.data.levelId, false), game, gameRefs);
-      } else {
-        // noop
-      }
-    },
-    // onInputOver
-    () => {
-      if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
-        // noop
-      } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
-        if (btn.data.selectingStatus !== "none") {
+    {
+      onDown: () => {
+        if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
+          // noop
+        } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
           btn.frame = DOWN;
         } else {
-          btn.frame = OVER;
+          // noop
         }
-      } else {
-        // noop
-      }
+      },
+      clickLeft: () => {
+        if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
+          // noop
+        } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
+          applyScreenEvent(new SE.ChangeLevel(btn.data.levelId, false), game, gameRefs);
+        } else {
+          // noop
+        }
+      },
+      hoverOver: () => {
+        if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
+          // noop
+        } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
+          if (btn.data.selectingStatus !== "none") {
+            btn.frame = DOWN;
+          } else {
+            btn.frame = OVER;
+          }
+        } else {
+          // noop
+        }
+      },
+      hoverOut: () => {
+        if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
+          // noop
+        } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
+          btn.frame = NEUTRAL;
+        } else {
+          // noop
+        }
+      },
     },
-    // onInputOut
-    () => {
-      if (gameRefs.saveFile.activeLevel === btn.data.levelId) {
-        // noop
-      } else if (levelAvailable(gameRefs.saveFile, btn.data.levelId)) {
-        btn.frame = NEUTRAL;
-      } else {
-        // noop
-      }
-    },
+    frame,
   );
 
   const btnString = levelId;

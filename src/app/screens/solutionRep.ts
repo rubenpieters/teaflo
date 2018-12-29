@@ -355,27 +355,21 @@ export function createUnit(
     pos,
     { id, type },
     spriteMap[key],
-    undefined,
-    // onInputDown
-    () => {
-      //
-    },
-    // onInputUp
-    () => {
-      if (gameRefs.gameScreenData.clickState !== undefined) {
-        applyScreenEvent(new SE.AdvanceClickState(new PositionId(unit.data.id, unit.data.type)), game, gameRefs);
-      } else {
-        applyScreenEvent(new SE.LockCardInfo(unit.data.id, unit.data.type), game, gameRefs);
-      }
-    },
-    // onInputOver
-    () => {
-      applyScreenEvent(new SE.ShowCardInfo(unit.data.id, unit.data.type), game, gameRefs);
-    },
-    // onInputOut
-    () => {
-      applyScreenEvent(new SE.ClearCardInfo(), game, gameRefs);
-    },
+    {
+      clickLeft: () => {
+        if (gameRefs.gameScreenData.clickState !== undefined) {
+          applyScreenEvent(new SE.AdvanceClickState(new PositionId(unit.data.id, unit.data.type)), game, gameRefs);
+        } else {
+          applyScreenEvent(new SE.LockCardInfo(unit.data.id, unit.data.type), game, gameRefs);
+        }
+      },
+      hoverOver: () => {
+        applyScreenEvent(new SE.ShowCardInfo(unit.data.id, unit.data.type), game, gameRefs);
+      },
+      hoverOut: () => {
+        applyScreenEvent(new SE.ClearCardInfo(), game, gameRefs);
+      },
+    }
   );
 
   return unit;
@@ -415,32 +409,17 @@ export function createUnitTrigger(
     pos,
     { trigger },
     triggerSprite(trigger),
-    undefined,
-    // onInputDown
-    () => {
-      //
-    },
-    // onInputUp
-    () => {
-      //
-    },
-    // onInputOver
-    () => {
-      //
-    },
-    // onInputOut
-    () => {
-      //
-    },
-    (self: TriggerSprite) => {
-      const hoverPos = relativeTo(pos,
-        "right", 50,
-        1000, 100,
-      );
-      const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-      addText(game, sprite, hoverPos, `${self.data.trigger.tag} ${self.data.trigger.fragments}`, "#FF0000", 50);
-      return sprite;
-    },
+    {
+      popupSprite: (self: TriggerSprite) => {
+        const hoverPos = relativeTo(pos,
+          "right", 50,
+          1000, 100,
+        );
+        const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+        addText(game, sprite, hoverPos, `${self.data.trigger.tag} ${self.data.trigger.fragments}`, "#FF0000", 50);
+        return sprite;
+      },
+    }
   );
 
   return sprite;

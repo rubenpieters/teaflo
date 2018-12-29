@@ -32,23 +32,28 @@ function wrapPopupOut(
   }
 }
 
+type ButtonCallbacks<A> = {
+  onDown?: () => void,
+  clickLeft?: () => void,
+  clickRight?: () => void,
+  hoverOut?: () => void,
+  hoverOver?: () => void,
+  popupSprite?: (self: GSprite<ButtonValues & A>) => Phaser.Sprite,
+};
+
 export function createButtonInPool<A extends {}>(
   game: Game,
   pool: SpritePool<Button>,
   pos: Position,
   a: A,
   key: string,
+  callbacks: ButtonCallbacks<A>,
   frame?: number,
-  onInputDown?: () => void,
-  onInputUp?: () => void,
-  onInputOver?: () => void,
-  onInputOut?: () => void,
-  popupF?: (self: GSprite<ButtonValues & A>) => Phaser.Sprite,
 ): GSprite<ButtonValues & A> {
   let btnSprite = pool.getFirstExists(false, true, pos.xMin, pos.yMin, key, frame);
   btnSprite.data = {
     ...<any>a,
-    ...{ selectingStatus: "none", popupF },
+    ...{ selectingStatus: "none", popupSprite: callbacks.popupSprite },
     // only copy init property from old data
     ...{ init: btnSprite.data.init },
   }
@@ -59,10 +64,20 @@ export function createButtonInPool<A extends {}>(
 
   // initialize if not initialized yet
   btnSprite = initialize(game, btnSprite, pos,
-    onInputDown === undefined ? () => { return; } : onInputDown,
-    onInputUp === undefined ? () => { return; } : onInputUp,
-    wrapPopupOver(onInputOver, btnSprite),
-    wrapPopupOut(onInputOut, btnSprite),
+    callbacks.onDown === undefined ? () => { return; } : callbacks.onDown,
+    () => {
+      if (btnSprite.data.selectingStatus === "right") {
+        if (callbacks.clickRight !== undefined) {
+          callbacks.clickRight();
+        }
+      } else if (btnSprite.data.selectingStatus === "left") {
+        if (callbacks.clickLeft !== undefined) {
+          callbacks.clickLeft();
+        }
+      }
+    },
+    wrapPopupOver(callbacks.hoverOver, btnSprite),
+    wrapPopupOut(callbacks.hoverOut, btnSprite),
   );
   
   const result = (<GSprite<ButtonValues & A>>btnSprite);
@@ -86,7 +101,7 @@ export type ButtonValues = {
   init: boolean,
   selectingStatus: "left" | "right" | "none",
   popup?: Phaser.Sprite,
-  popupF?: () => Phaser.Sprite,
+  popupSprite?: () => Phaser.Sprite,
 };
 
 export type Button = GSprite<ButtonValues>;
@@ -111,11 +126,7 @@ function initialize(
       if (
         inPosition(pos, game.input.activePointer.x, game.input.activePointer.y)
       ) {
-        if (btnSprite.data.selectingStatus === "right") {
-          console.log("RIGHT");
-        } else if (btnSprite.data.selectingStatus === "left") {
-          onInputUp();
-        }
+        onInputUp();
         btnSprite.data.selectingStatus = "none";
       }
     });

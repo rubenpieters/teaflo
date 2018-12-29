@@ -70,51 +70,49 @@ export function createActSelectButton(
     pos,
     { actNumber },
     key,
-    frame,
-    // onInputDown
-    () => {
-      if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
-        // noop
-      } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
-        btn.frame = DOWN;
-      } else {
-        // noop
-      }
-    },
-    // onInputUp
-    () => {
-      if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
-        // noop
-      } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
-        applyScreenEvent(new SE.ChangeAct(btn.data.actNumber), game, gameRefs)
-      } else {
-        // noop
-      }
-    },
-    // onInputOver
-    () => {
-      if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
-        // noop
-      } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
-        if (btn.data.selectingStatus !== "none") {
+    {
+      onDown: () => {
+        if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
+          // noop
+        } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
           btn.frame = DOWN;
         } else {
-          btn.frame = OVER;
+          // noop
         }
-      } else {
-        // noop
-      }
+      },
+      clickLeft: () => {
+        if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
+          // noop
+        } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
+          applyScreenEvent(new SE.ChangeAct(btn.data.actNumber), game, gameRefs)
+        } else {
+          // noop
+        }
+      },
+      hoverOver: () => {
+        if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
+          // noop
+        } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
+          if (btn.data.selectingStatus !== "none") {
+            btn.frame = DOWN;
+          } else {
+            btn.frame = OVER;
+          }
+        } else {
+          // noop
+        }
+      },
+      hoverOut: () => {
+        if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
+          // noop
+        } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
+          btn.frame = NEUTRAL;
+        } else {
+          // noop
+        }
+      },
     },
-    // onInputOut
-    () => {
-      if (gameRefs.saveFile.activeAct === btn.data.actNumber) {
-        // noop
-      } else if (actAvailable(gameRefs.saveFile, btn.data.actNumber)) {
-        btn.frame = NEUTRAL;
-      } else {
-        // noop
-      }
-    },
+    frame,
   );
 
   const btnString = actNumberMap[actNumber];

@@ -280,44 +280,32 @@ export function createUnitAbility(
     pos,
     { ability, id, type },
     key,
-    undefined,
-    // onInputDown
-    () => {
-      //
-    },
-    // onInputUp
-    () => {
-      if (sprite.data.ability.inputs.length === 0) {
-        applyScreenEvent(new SE.ExtendLevelSolution({
-          ability: sprite.data.ability,
-          origin: new GlobalId(sprite.data.id, sprite.data.type),
-          inputs: [],
-        }), game, gameRefs);
-      } else {
-        applyScreenEvent(new SE.SetClickState({
-          ability: sprite.data.ability,
-          currentInputs: [],
-          origin: new GlobalId(sprite.data.id, sprite.data.type),
-        }), game, gameRefs);
-      }
-    },
-    // onInputOver
-    () => {
-      //
-    },
-    // onInputOut
-    () => {
-      //
-    },
-    // popupF
-    (self: AbilitySprite) => {
-      const hoverPos = relativeTo(pos,
-        "right", 50,
-        1000, 100,
-      );
-      const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-      addText(game, sprite, hoverPos, `${abilityText(self.data.ability)}`, "#FF0000", 50);
-      return sprite;
+    {
+      clickLeft: () => {
+        if (sprite.data.ability.inputs.length === 0) {
+          applyScreenEvent(new SE.ExtendLevelSolution({
+            ability: sprite.data.ability,
+            origin: new GlobalId(sprite.data.id, sprite.data.type),
+            inputs: [],
+          }), game, gameRefs);
+        } else {
+          applyScreenEvent(new SE.SetClickState({
+            ability: sprite.data.ability,
+            currentInputs: [],
+            origin: new GlobalId(sprite.data.id, sprite.data.type),
+          }), game, gameRefs);
+        }
+      },
+      popupSprite: 
+      (self: AbilitySprite) => {
+        const hoverPos = relativeTo(pos,
+          "right", 50,
+          1000, 100,
+        );
+        const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+        addText(game, sprite, hoverPos, `${abilityText(self.data.ability)}`, "#FF0000", 50);
+        return sprite;
+      },
     },
   );
 
@@ -345,32 +333,16 @@ export function createEnIntent(
     pos,
     { intent, id, type },
     key,
-    undefined,
-    // onInputDown
-    () => {
-      //
-    },
-    // onInputUp
-    () => {
-      //
-    },
-    // onInputOver
-    () => {
-      //
-    },
-    // onInputOut
-    () => {
-      //
-    },
-    // popupF
-    (self: EnIntentSprite) => {
-      const hoverPos = relativeTo(pos,
-        "right", 50,
-        1000, 100,
-      );
-      const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-      addText(game, sprite, hoverPos, `${intentText(self.data.intent)}`, "#FF0000", 50);
-      return sprite;
+    {
+      popupSprite: (self: EnIntentSprite) => {
+        const hoverPos = relativeTo(pos,
+          "right", 50,
+          1000, 100,
+        );
+        const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+        addText(game, sprite, hoverPos, `${intentText(self.data.intent)}`, "#FF0000", 50);
+        return sprite;
+      },
     },
   );
 
@@ -397,32 +369,16 @@ export function createEnOut(
     pos,
     { route, id, type },
     "route",
-    undefined,
-    // onInputDown
-    () => {
-      //
-    },
-    // onInputUp
-    () => {
-      //
-    },
-    // onInputOver
-    () => {
-      //
-    },
-    // onInputOut
-    () => {
-      //
-    },
-    // popupF
-    (self: EnOutSprite) => {
-      const hoverPos = relativeTo(pos,
-        "right", 50,
-        1000, 100,
-      );
-      const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-      addText(game, sprite, hoverPos, `${routeText(self.data.route)}`, "#FF0000", 50);
-      return sprite;
+    {
+      popupSprite: (self: EnOutSprite) => {
+        const hoverPos = relativeTo(pos,
+          "right", 50,
+          1000, 100,
+        );
+        const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
+        addText(game, sprite, hoverPos, `${routeText(self.data.route)}`, "#FF0000", 50);
+        return sprite;
+      },
     },
   );
 
@@ -510,25 +466,17 @@ export function createActionLogButton(
     pos,
     { action, index, type },
     key,
+    {
+      hoverOver: () => {
+        btn.frame = OVER;
+        applyScreenEvent(new SE.ShowIntermediateSol(btn.data.index, btn.data.type), game, gameRefs);
+      },
+      hoverOut: () => {
+        btn.frame = NEUTRAL;
+        applyScreenEvent(new SE.ClearIntermediateSol(), game, gameRefs);
+      },
+    },
     frame,
-    // onInputDown
-    () => {
-      //
-    },
-    // onInputUp
-    () => {
-      //
-    },
-    // onInputOver
-    () => {
-      btn.frame = OVER;
-      applyScreenEvent(new SE.ShowIntermediateSol(btn.data.index, btn.data.type), game, gameRefs);
-    },
-    // onInputOut
-    () => {
-      btn.frame = NEUTRAL;
-      applyScreenEvent(new SE.ClearIntermediateSol(), game, gameRefs);
-    },
   );
 
   const btnString = action.tag;
