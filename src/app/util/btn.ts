@@ -39,6 +39,9 @@ type ButtonCallbacks<A> = {
   hoverOut?: () => void,
   hoverOver?: () => void,
   popupSprite?: (self: GSprite<ButtonValues & A>) => Phaser.Sprite,
+  dragStart?: () => void,
+  dragStop?: () => void,
+  dragUpdate?: () => void,
 };
 
 export function createButtonInPool<A extends {}>(
@@ -57,44 +60,49 @@ export function createButtonInPool<A extends {}>(
     // only copy init property from old data
     ...{ init: btnSprite.data.init },
   }
+  // give new type to btnSprite, since its data field has changed
+  let newBtnSprite = <GSprite<ButtonValues & A>>btnSprite;
 
   // clear old onKilled/onDestroy events
-  btnSprite.events.onKilled.removeAll();
-  btnSprite.events.onDestroy.removeAll();
+  newBtnSprite.events.onKilled.removeAll();
+  newBtnSprite.events.onDestroy.removeAll();
 
   // initialize if not initialized yet
-  btnSprite = initialize(game, btnSprite, pos,
+  newBtnSprite = initialize(game, newBtnSprite, pos,
     callbacks.onDown === undefined ? () => { return; } : callbacks.onDown,
     () => {
-      if (btnSprite.data.selectingStatus === "right") {
+      if (newBtnSprite.data.selectingStatus === "right") {
         if (callbacks.clickRight !== undefined) {
           callbacks.clickRight();
         }
-      } else if (btnSprite.data.selectingStatus === "left") {
+      } else if (newBtnSprite.data.selectingStatus === "left") {
         if (callbacks.clickLeft !== undefined) {
           callbacks.clickLeft();
         }
       }
     },
-    wrapPopupOver(callbacks.hoverOver, btnSprite),
-    wrapPopupOut(callbacks.hoverOut, btnSprite),
+    wrapPopupOver(callbacks.hoverOver, newBtnSprite),
+    wrapPopupOut(callbacks.hoverOut, newBtnSprite),
+    callbacks.dragStart,
+    callbacks.dragStop,
+    callbacks.dragUpdate,
   );
   
-  const result = (<GSprite<ButtonValues & A>>btnSprite);
-  result.events.onKilled.add(() => {
-    if (result.data.popup !== undefined) {
-      result.data.popup.destroy();
-      result.data.popup = undefined;
+  // remove popup sprite when self is destroyed/killed
+  newBtnSprite.events.onKilled.add(() => {
+    if (newBtnSprite.data.popup !== undefined) {
+      newBtnSprite.data.popup.destroy();
+      newBtnSprite.data.popup = undefined;
     }
   });
-  result.events.onDestroy.add(() => {
-    if (result.data.popup !== undefined) {
-      result.data.popup.destroy();
-      result.data.popup = undefined;
+  newBtnSprite.events.onDestroy.add(() => {
+    if (newBtnSprite.data.popup !== undefined) {
+      newBtnSprite.data.popup.destroy();
+      newBtnSprite.data.popup = undefined;
     }
   });
 
-  return result;
+  return newBtnSprite;
 }
 
 export type ButtonValues = {
@@ -106,15 +114,18 @@ export type ButtonValues = {
 
 export type Button = GSprite<ButtonValues>;
 
-function initialize(
+function initialize<A extends {}>(
   game: Game,
-  btnSprite: Button,
+  btnSprite: GSprite<ButtonValues & A>,
   pos: Position,
   onInputDown: () => void,
   onInputUp: () => void,
   onInputOver: () => void,
   onInputOut: () => void,
-): Button {
+  onDragStart?: () => void,
+  onDragStop?: () => void,
+  onDragUpdate?: () => void,
+): GSprite<ButtonValues & A> {
   if (btnSprite.data.init === undefined || btnSprite.data.init === false) {
 
     btnSprite.inputEnabled = true;
@@ -130,12 +141,21 @@ function initialize(
         btnSprite.data.selectingStatus = "none";
       }
     });
-    btnSprite.events.onInputOver.add(() => {
-      onInputOver();
-    });
-    btnSprite.events.onInputOut.add(() => {
-      onInputOut();
-    });
+    btnSprite.events.onInputOver.add(onInputOver);
+    btnSprite.events.onInputOut.add(onInputOut);
+
+    if (onDragStart !== undefined || onDragStop !== undefined || onDragUpdate !== undefined) {
+      btnSprite.input.enableDrag(false, true);
+      if (onDragStart !== undefined) {
+        btnSprite.events.onDragStart.add(onDragStart);
+      }
+      if (onDragStop !== undefined) {
+        btnSprite.events.onDragStop.add(onDragStop);
+      }
+      if (onDragUpdate !== undefined) {
+        btnSprite.events.onDragUpdate.add(onDragUpdate);
+      }
+    }
 
     btnSprite.data.init = true;
   }

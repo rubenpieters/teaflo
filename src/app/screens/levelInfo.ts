@@ -9,6 +9,7 @@ import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
 import { TargetType } from "../../shared/game/entityId";
 import { spriteMap } from "../../shared/data/units/spriteMap";
+import { createButtonInPool, ButtonValues } from "../util/btn";
 
 export function drawLevelInfo(
   game: Phaser.Game,
@@ -74,12 +75,8 @@ export function drawLevelInfo(
     const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
     const cardId = gameRefs.saveFile.levelSolutions[levelId][solId].cardIds[i];
     if (cardId !== undefined) {
-      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, cardPos, cardId, cardId, "friendly");
+      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, cardPos, cardId, cardId, cardSlot, "friendly", levelId, solId);
       cardSlot.data.card = card;
-      card.data.resetSlot = cardSlot;
-      card.data.levelId = levelId;
-      card.data.cardId = cardId;
-      card.data.solId = solId;
       // remove this card once from the supply pool
       const index = supplyPool.indexOf(cardId);
       if (index !== -1) {
@@ -104,12 +101,8 @@ export function drawLevelInfo(
     const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
     const cardId = supplyPool[i];
     if (cardId !== undefined) {
-      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, cardPos, cardId, cardId, "friendly");
+      const card = createPoolLevelSelectCard(game, gameRefs, gameRefs.levelSelectData.cardPool, gameRefs.levelSelectData.cardSlotPool, cardPos, cardId, cardId, cardSlot, "friendly", levelId, solId);
       cardSlot.data.card = card;
-      card.data.resetSlot = cardSlot;
-      card.data.levelId = levelId;
-      card.data.cardId = cardId;
-      card.data.solId = solId;
     }
     cardSlot.data.type = "supply";
     cardSlot.data.index = i;
@@ -117,15 +110,11 @@ export function drawLevelInfo(
   //levelSelect.slots = slots;
 }
 
-type LevelSelectCard = GSprite<{
-  init: boolean,
-  selecting: boolean,
+type LevelSelectCard = GSprite<ButtonValues & {
   cardId: string,
   type: TargetType,
   levelId: string,
   solId: number,
-  onDownCb: (() => void),
-  btnText: Phaser.Text,
   hoverSlot: Phaser.Sprite | undefined,
   resetSlot: Phaser.Sprite,
 }>;
@@ -138,98 +127,88 @@ function createPoolLevelSelectCard(
   pos: Position,
   key: string,
   cardId: string,
+  resetSlot: Phaser.Sprite,
   type: TargetType,
+  levelId: string,
+  solId: number,
 ): LevelSelectCard {
-  const card: LevelSelectCard = pool.getFirstExists(false, true, pos.xMin, pos.yMin, spriteMap[key]);
-
-  card.data.cardId = cardId;
-  card.data.type = type;
-
-  if (card.data.init === undefined || card.data.init === false) {
-    card.inputEnabled = true;
-    card.input.enableDrag(false, true);
-
-    card.events.onInputOver.add(() => {
-      const x = card.x + config.levelSelectCardWidth + 10;
-      const y = card.y;
-      applyScreenEvent(new SE.ShowHoverCard(card.data.type, card.data.cardId, x, y), game, gameRefs);
-    });
-    card.events.onInputOut.add(() => {
-      applyScreenEvent(new SE.ClearHoverCard(), game, gameRefs);
-    });
-    
-    card.events.onDragStart.add(() => {
-      applyScreenEvent(new SE.ClearHoverCard(), game, gameRefs);
-    });
-    card.events.onDragUpdate.add(() => {
-      const cardBounds = card.getBounds();
-      let overlap = false;
-      slotPool.forEachAlive((slot: Phaser.Sprite) => {
-        const slotBounds = slot.getBounds();
-        if (! overlap && intersects(cardBounds, slotBounds)) {
-          slot.frame = 1;
-          card.data.hoverSlot = slot;
-          overlap = true;
+  const card = createButtonInPool(
+    game,
+    pool,
+    pos,
+    { cardId, type, hoverSlot: <Phaser.Sprite | undefined>undefined, resetSlot, levelId, solId },
+    key,
+    {
+      hoverOver: () => {
+        const x = card.x + config.levelSelectCardWidth + 10;
+        const y = card.y;
+        applyScreenEvent(new SE.ShowHoverCard(card.data.type, card.data.cardId, x, y), game, gameRefs);
+      },
+      hoverOut: () => {
+        applyScreenEvent(new SE.ClearHoverCard(), game, gameRefs);
+      },
+      dragStart: () => {
+        applyScreenEvent(new SE.ClearHoverCard(), game, gameRefs);
+      },
+      dragUpdate: () => {
+        console.log("UPDATE");
+        const cardBounds = card.getBounds();
+        let overlap = false;
+        slotPool.forEachAlive((slot: Phaser.Sprite) => {
+          const slotBounds = slot.getBounds();
+          if (! overlap && intersects(cardBounds, slotBounds)) {
+            slot.frame = 1;
+            card.data.hoverSlot = slot;
+            overlap = true;
+          } else {
+            slot.frame = 0;
+          }
+        });
+        if (! overlap) {
+          card.data.hoverSlot = undefined;
+        }
+      },
+      dragStop: () => {
+        if (card.data.hoverSlot === undefined) {
+          card.data.resetSlot.data.card = card;
+          moveToSlot(card, card.data.resetSlot);
         } else {
+          moveToSlot(card, card.data.hoverSlot);
+          let from = { pos: card.data.resetSlot.data.index, type: card.data.resetSlot.data.type };
+          let to = { pos: card.data.hoverSlot.data.index, type: card.data.hoverSlot.data.type };
+          applyScreenEvent(
+            new SE.DeployCard(card.data.cardId, card.data.solId, from, to),
+            game, gameRefs
+          );
+          if (card.data.hoverSlot.data.card === undefined) {
+            // the hover slot does not contain a card
+            // just place it there
+            card.data.hoverSlot.data.card = card;
+            // reset the card info of its reset slot
+            card.data.resetSlot.data.card = undefined;
+            // its reset slot is now the hover slot
+            card.data.resetSlot = card.data.hoverSlot;
+          } else {
+            // the hover slot does contain a card
+            // alias
+            const replacedCard = card.data.hoverSlot.data.card;
+            // swap it with the currently dropped card
+            // - first replaced card to drop slot
+            card.data.resetSlot.data.card = replacedCard;
+            replacedCard.data.resetSlot = card.data.resetSlot;
+            // - then this card to hover slot
+            card.data.hoverSlot.data.card = card;
+            card.data.resetSlot = card.data.hoverSlot;
+            // move replaced card
+            moveToSlot(replacedCard, replacedCard.data.resetSlot);
+          }
+        }
+        slotPool.forEachAlive((slot: Phaser.Sprite) => {
           slot.frame = 0;
-        }
-      });
-      if (! overlap) {
-        card.data.hoverSlot = undefined;
-      }
-    });
-    card.events.onDragStop.add(() => {
-      if (card.data.hoverSlot === undefined) {
-        card.data.resetSlot.data.card = card;
-        moveToSlot(card, card.data.resetSlot);
-      } else {
-        moveToSlot(card, card.data.hoverSlot);
-        let from = { pos: card.data.resetSlot.data.index, type: card.data.resetSlot.data.type };
-        let to = { pos: card.data.hoverSlot.data.index, type: card.data.hoverSlot.data.type };
-        applyScreenEvent(
-          new SE.DeployCard(card.data.cardId, card.data.solId, from, to),
-          game, gameRefs
-        );
-        if (card.data.hoverSlot.data.card === undefined) {
-          // the hover slot does not contain a card
-          // just place it there
-          card.data.hoverSlot.data.card = card;
-          // reset the card info of its reset slot
-          card.data.resetSlot.data.card = undefined;
-          // its reset slot is now the hover slot
-          card.data.resetSlot = card.data.hoverSlot;
-        } else {
-          // the hover slot does contain a card
-          // alias
-          const replacedCard = card.data.hoverSlot.data.card;
-          // swap it with the currently dropped card
-          // - first replaced card to drop slot
-          card.data.resetSlot.data.card = replacedCard;
-          replacedCard.data.resetSlot = card.data.resetSlot;
-          // - then this card to hover slot
-          card.data.hoverSlot.data.card = card;
-          card.data.resetSlot = card.data.hoverSlot;
-          // move replaced card
-          moveToSlot(replacedCard, replacedCard.data.resetSlot);
-        }
-      }
-      slotPool.forEachAlive((slot: Phaser.Sprite) => {
-        slot.frame = 0;
-      });
-    });
-
-    card.data.init = true;
-  }
-  
-  card.events.onKilled.removeAll();
-  card.events.onKilled.add(() => {
-    card.data.hoverSlot = undefined;
-  });
-  card.events.onDestroy.removeAll();
-  card.events.onDestroy.add(() => {
-    card.data.hoverSlot = undefined;
-  });
-
+        });
+      },
+    },
+  );
   return card;
 }
 
