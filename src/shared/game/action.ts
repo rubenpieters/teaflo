@@ -58,6 +58,7 @@ export class LoseFragments {
     public readonly target: UnitId,
     public readonly value: number,
     public readonly triggerTag: Trigger["tag"],
+    public readonly triggerType: Trigger["type"],
     public readonly tag: "LoseFragments" = "LoseFragments",
   ) {}
 }
@@ -173,7 +174,7 @@ export function applyAction(
       return {
         state: overUnit(action.target,
           state,
-          x => focus(x, over(x => x.triggers, x => addFragments(x, action.trigger))),
+          x => focus(x, over(x => x.triggers[action.trigger.type], x => addFragments(x, action.trigger))),
           x => x,
         ),
         actions: [],
@@ -183,7 +184,7 @@ export function applyAction(
       return {
         state: overUnit(action.target,
           state,
-          x => focus(x, over(x => x.triggers, x => loseFragments(x, action.triggerTag, action.value))),
+          x => focus(x, over(x => x.triggers[action.triggerType], x => loseFragments(x, action.triggerTag, action.value))),
           x => x,
         ),
         actions: [],
@@ -234,10 +235,10 @@ export function applyAction(
         );
 
         const newUnit1Armor = unit2.hp > unit1.maxHp ?
-          new AddTrigger(action.target1, new Armor((unit2.hp - unit1.maxHp) * 100)) : undefined;
+          new AddTrigger(action.target1, new Armor((unit2.hp - unit1.maxHp) * 100, "other")) : undefined;
         const newUnit2Armor = unit1.hp > unit2.maxHp ?
-          new AddTrigger(action.target2, new Armor((unit1.hp - unit2.maxHp) * 100)) : undefined;
-        
+          new AddTrigger(action.target2, new Armor((unit1.hp - unit2.maxHp) * 100, "other")) : undefined;
+
         return {
           state,
           actions: <Action[]>([newUnit1Armor, newUnit2Armor].filter(x => x !== undefined)),

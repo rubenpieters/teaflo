@@ -1,5 +1,6 @@
 import { EnUnit } from "src/shared/game/unit";
 import * as AI from "../ai/ai";
+import * as T from "../../game/trigger";
 
 export const en_unit_a1_l1_01: EnUnit = {
   hp: 10,
@@ -8,7 +9,7 @@ export const en_unit_a1_l1_01: EnUnit = {
   maxCharges: 5,
   ai: AI.ai1,
   currentAI: 0,
-  triggers: [],
+  triggers: T.emptyTriggers(),
 }
 
 export const en_unit_a1_l2_01: EnUnit = {
@@ -18,7 +19,7 @@ export const en_unit_a1_l2_01: EnUnit = {
   maxCharges: 5,
   ai: AI.ai2,
   currentAI: 0,
-  triggers: [],
+  triggers: T.emptyTriggers(),
 }
 
 export const en_unit_a2_l1_01: EnUnit = {
@@ -28,7 +29,7 @@ export const en_unit_a2_l1_01: EnUnit = {
   maxCharges: 5,
   ai: AI.ai3,
   currentAI: 0,
-  triggers: [],
+  triggers: T.emptyTriggers(),
 }
 
 export const enUnitMap: {

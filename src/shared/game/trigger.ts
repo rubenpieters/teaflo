@@ -5,9 +5,23 @@ import { UnitId, eqUnitId, GlobalId, getUnit } from "./entityId";
 import { GameState } from "./state";
 import { Omit } from "../type-util";
 
+export type HasTriggers = {
+  triggers: {
+    [K in Trigger["type"]]: Trigger[]
+  }
+};
+
+export function emptyTriggers() {
+  return {
+    self: [],
+    other: [],
+  }
+}
+
 export class Weak {
   constructor(
     public readonly fragments: number,
+    public readonly type: "self",
     public readonly tag: "Weak" = "Weak",
   ) {}
 }
@@ -15,6 +29,7 @@ export class Weak {
 export class Strong {
   constructor(
     public readonly fragments: number,
+    public readonly type: "self",
     public readonly tag: "Strong" = "Strong",
   ) {}
 }
@@ -22,6 +37,7 @@ export class Strong {
 export class Armor {
   constructor(
     public readonly fragments: number,
+    public readonly type: "other",
     public readonly tag: "Armor" = "Armor",
   ) {}
 }
@@ -29,6 +45,7 @@ export class Armor {
 export class StrongLowHP {
   constructor(
     public readonly fragments: number,
+    public readonly type: "self",
     public readonly tag: "StrongLowHP" = "StrongLowHP",
   ) {}
 }
@@ -37,6 +54,7 @@ export class Grow {
   constructor(
     public readonly fragments: number,
     public readonly trigger: Trigger,
+    public readonly type: "self",
     public readonly tag: "Grow" = "Grow",
   ) {}
 }
@@ -66,9 +84,10 @@ export function applyTriggers(
 } {
   let newActions: Action[] = [];
   let transforms: TriggerLog[] = [];
+  // Self Triggers
   for (const frUnit of state.frUnits) {
     if (frUnit !== undefined) {
-      for (const trigger of frUnit.triggers) {
+      for (const trigger of frUnit.triggers.self) {
         const extendedContext = {...context, triggerOwner: new GlobalId(frUnit.id, "friendly")};
         const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(frUnit.id, "friendly"));
         action = transformed;
@@ -82,7 +101,36 @@ export function applyTriggers(
 
   for (const enUnit of state.enUnits) {
     if (enUnit !== undefined) {
-      for (const trigger of enUnit.triggers) {
+      for (const trigger of enUnit.triggers.self) {
+        const extendedContext = {...context, triggerOwner: new GlobalId(enUnit.id, "enemy")};
+        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(enUnit.id, "enemy"));
+        action = transformed;
+        newActions = newActions.concat(actions);
+        if (triggerLog !== undefined) {
+          transforms = transforms.concat(triggerLog);
+        }
+      }
+    }
+  }
+
+  // Other Triggers
+  for (const frUnit of state.frUnits) {
+    if (frUnit !== undefined) {
+      for (const trigger of frUnit.triggers.other) {
+        const extendedContext = {...context, triggerOwner: new GlobalId(frUnit.id, "friendly")};
+        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(frUnit.id, "friendly"));
+        action = transformed;
+        newActions = newActions.concat(actions);
+        if (triggerLog !== undefined) {
+          transforms = transforms.concat(triggerLog);
+        }
+      }
+    }
+  }
+
+  for (const enUnit of state.enUnits) {
+    if (enUnit !== undefined) {
+      for (const trigger of enUnit.triggers.other) {
         const extendedContext = {...context, triggerOwner: new GlobalId(enUnit.id, "enemy")};
         const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(enUnit.id, "enemy"));
         action = transformed;
@@ -168,6 +216,7 @@ export function applyTrigger(
               action.target,
               (action.value - newValue) * 100,
               "Armor",
+              "other",
             ),
           ],
           triggerLog: {

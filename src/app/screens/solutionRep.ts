@@ -106,10 +106,19 @@ export function drawSolutionRep(
       createUnitResource(game, gameRefs, unitChPos, "ch");
 
       // Triggers
-      unit.triggers.forEach((trigger, triggerIndex) => {
+      // self
+      unit.triggers.self.forEach((trigger, triggerIndex) => {
         const trPos = createPosition(
           "left", 1050 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
           "top", 1150, config.triggerHeight,
+        );
+        createUnitTrigger(game, gameRefs, trPos, trigger);
+      });
+      // other
+      unit.triggers.other.forEach((trigger, triggerIndex) => {
+        const trPos = createPosition(
+          "left", 1050 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
+          "top", 1250, config.triggerHeight,
         );
         createUnitTrigger(game, gameRefs, trPos, trigger);
       });
@@ -118,7 +127,7 @@ export function drawSolutionRep(
       let i = 0;
       for (const enId of enIds) {
         const unitThPos = relativeTo(unitPos,
-          "below", 350 + 100 * i,
+          "below", 450 + 100 * i,
           config.unitHpBarWidth, config.unitHpBarHeight,
         );
         unitThPos.xMax = unitThPos.xMin + (unitThPos.xMax - unitThPos.xMin) * (unit.threatMap[enId] / maxThreat);
@@ -155,10 +164,19 @@ export function drawSolutionRep(
       createUnitResource(game, gameRefs, unitChPos, "ch");
 
       // Triggers
-      unit.triggers.forEach((trigger, triggerIndex) => {
+      // self
+      unit.triggers.self.forEach((trigger, triggerIndex) => {
         const trPos = createPosition(
           "left", 2300 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
           "top", 1150, config.triggerHeight,
+        );
+        createUnitTrigger(game, gameRefs, trPos, trigger);
+      });
+      // other
+      unit.triggers.other.forEach((trigger, triggerIndex) => {
+        const trPos = createPosition(
+          "left", 2300 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
+          "top", 1250, config.triggerHeight,
         );
         createUnitTrigger(game, gameRefs, trPos, trigger);
       });
