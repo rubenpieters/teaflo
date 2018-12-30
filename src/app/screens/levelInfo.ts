@@ -149,17 +149,6 @@ function createPoolLevelSelectCard(
           );
         }
       },
-      hoverOver: () => {
-        // const x = card.x + config.levelSelectCardWidth + 10;
-        // const y = card.y;
-        // applyScreenEvent(new SE.ShowHoverCard(card.data.type, card.data.cardId, x, y), game, gameRefs);
-      },
-      hoverOut: () => {
-        // applyScreenEvent(new SE.ClearHoverCard(), game, gameRefs);
-      },
-      dragStart: () => {
-        // applyScreenEvent(new SE.ClearHoverCard(), game, gameRefs);
-      },
       dragUpdate: () => {
         const cardBounds = card.getBounds();
         let overlap = false;

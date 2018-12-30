@@ -8,8 +8,8 @@ function wrapPopupOver(
   self: Phaser.Sprite,
 ) {
   return function() {
-    if (self.data.popupF !== undefined) {
-      self.data.popup = self.data.popupF(self);
+    if (self.data.popupSprite !== undefined) {
+      self.data.popup = self.data.popupSprite(self);
     }
     if (f !== undefined) {
       f();

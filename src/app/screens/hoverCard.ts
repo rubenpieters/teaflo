@@ -1,8 +1,7 @@
 import { GameRefs } from "../states/game";
-import { TargetType } from "../../shared/game/entityId";
 import { config } from "../config";
-import { frUnitMap } from "../../shared/data/units/friendly";
 import { FrUnit } from "../../shared/game/unit";
+import { frUnitMap } from "../../shared/data/units/friendly";
 import { abilityText } from "../../shared/game/ability";
 
 export type HoverScreenData = {
@@ -24,14 +23,16 @@ export function drawHoverCardFriendly(
   x: number,
   y: number,
 ): Phaser.Sprite {
-  const unit: FrUnit = frUnitMap[id];
+  console.log("TEST");
+  //const unit: FrUnit = frUnitMap[id];
 
   //const hoverCard: Phaser.Sprite = gameRefs.hoverScreenData.hoverViewPool.getFirstExists(false, true, x, y, "bg_hover");
   const hoverCard = game.add.sprite(x, y, "bg_hover");
 
   const texts: Phaser.Text[] = [];
 
-  const hpString = `${frUnitMap[id].hp} HP`;
+  //const hpString = `${frUnitMap[id].hp} HP`;
+  const hpString = `X HP`;
   const hpText = game.add.text(
     x, y, hpString, {
       fill: "#FF0000",
@@ -43,7 +44,8 @@ export function drawHoverCardFriendly(
   hpText.setTextBounds(0, 0, config.hoverCardWidth, 100);
   texts.push(hpText);
 
-  const chString = `${frUnitMap[id].charges} CH`;
+  //const chString = `${frUnitMap[id].charges} CH`;
+  const chString = `X CH`;
   const chText = game.add.text(
     x, y + 100, chString, {
       fill: "#FF0000",
@@ -55,7 +57,7 @@ export function drawHoverCardFriendly(
   chText.setTextBounds(0, 0, config.hoverCardWidth, 100);
   texts.push(chText);
 
-  unit.abilities.forEach((ability, abilityIndex) => {
+  /*unit.abilities.forEach((ability, abilityIndex) => {
     const hoverAbility: Phaser.Sprite = gameRefs.hoverScreenData.hoverAbilityPool.getFirstExists(false, true, x + 25, y + 25 + 200 * (abilityIndex + 1), ability.spriteId);
 
     const abString = abilityText(ability);
@@ -69,10 +71,15 @@ export function drawHoverCardFriendly(
     );
     abText.setTextBounds(0, 0, config.hoverCardWidth - 200, 100);
     texts.push(abText);
-  });
+  });*/
 
   //hoverCard.events.onKilled.removeAll();
   hoverCard.events.onKilled.add(() => {
+    clearHoverCard(gameRefs);
+    texts.forEach(x => x.destroy());
+  });
+  //hoverCard.events.onDestroy.removeAll();
+  hoverCard.events.onDestroy.add(() => {
     clearHoverCard(gameRefs);
     texts.forEach(x => x.destroy());
   });

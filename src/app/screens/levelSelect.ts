@@ -47,6 +47,9 @@ export function drawLevelSelect(
       const introAnim = game.add.tween(button);
       introAnim.frameBased = true;
       introAnim.to({ x: pos.xMin }, 26 - (4 * i), Phaser.Easing.Linear.None, true, 50);
+      introAnim.onComplete.add(() => {
+        game.tweens.remove(introAnim);
+      });
     }
 
     i += 1;

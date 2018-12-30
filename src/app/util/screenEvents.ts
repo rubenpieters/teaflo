@@ -15,7 +15,6 @@ import { Location, cutTree } from "src/shared/tree";
 import { ClickState } from "./clickState";
 import { drawSolutionInfo, drawCardInfo } from "../screens/solutionInfo";
 import { TargetType } from "../../shared/game/entityId";
-import { drawHoverCardFriendly, clearHoverCard } from "../screens/hoverCard";
 import { Omit } from "src/shared/type-util";
 import { LogKeys } from "src/shared/game/log";
 
@@ -190,8 +189,6 @@ type ScreenEvent
   | AdvanceClickState
   | ShowIntermediateSol
   | ClearIntermediateSol
-  | ShowHoverCard
-  | ClearHoverCard
   | ShowCardInfo
   | ClearCardInfo
   | LockCardInfo
@@ -362,23 +359,6 @@ export function applyScreenEvent(
       } else {
         drawCardInfo(game, gameRefs, gameRefs.gameScreenData.state);
       }
-      return;
-    }
-    case "ShowHoverCard": {
-      switch (screenEvent.type) {
-        case "friendly": {
-          drawHoverCardFriendly(game, gameRefs, screenEvent.id, screenEvent.x, screenEvent.y);
-          return;
-        }
-        case "enemy": {
-          // drawHoverCard(game, gameRefs, screenEvent.id, screenEvent.x, screenEvent.y);
-          return;
-        }
-      }
-      return;
-    }
-    case "ClearHoverCard": {
-      clearHoverCard(gameRefs);
       return;
     }
     case "ShowCardInfo": {
