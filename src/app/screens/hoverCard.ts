@@ -23,10 +23,11 @@ export function drawHoverCardFriendly(
   id: string,
   x: number,
   y: number,
-) {
+): Phaser.Sprite {
   const unit: FrUnit = frUnitMap[id];
 
-  const hoverCard: Phaser.Sprite = gameRefs.hoverScreenData.hoverViewPool.getFirstExists(false, true, x, y, "bg_hover");
+  //const hoverCard: Phaser.Sprite = gameRefs.hoverScreenData.hoverViewPool.getFirstExists(false, true, x, y, "bg_hover");
+  const hoverCard = game.add.sprite(x, y, "bg_hover");
 
   const texts: Phaser.Text[] = [];
 
@@ -70,8 +71,11 @@ export function drawHoverCardFriendly(
     texts.push(abText);
   });
 
-  hoverCard.events.onKilled.removeAll();
+  //hoverCard.events.onKilled.removeAll();
   hoverCard.events.onKilled.add(() => {
+    clearHoverCard(gameRefs);
     texts.forEach(x => x.destroy());
   });
+
+  return hoverCard
 }

@@ -11,6 +11,7 @@ import { TargetType } from "../../shared/game/entityId";
 import { spriteMap } from "../../shared/data/units/spriteMap";
 import { createButtonInPool, ButtonValues } from "../util/btn";
 import { activeSolInfo } from "../savefile/rep";
+import { drawHoverCardFriendly } from "./hoverCard";
 
 export function drawLevelInfo(
   game: Phaser.Game,
@@ -193,6 +194,12 @@ function createPoolLevelSelectCard(
           );
         }
       },
+      popupSprite: (self: LevelSelectCard) => {
+        return drawHoverCardFriendly(game, gameRefs, self.data.cardId,
+          self.x + config.levelSelectCardWidth + 10,
+          self.y,
+        );
+      }
     },
   );
   return card;

@@ -154,7 +154,7 @@ export function changeSolId(
 
 export function activeSolInfo(
   saveFile: SaveFileV1,
-) {
+): SolInfo {
   return saveFile.levelSolutions[activeLevel(saveFile)][activeSolId(saveFile)];
 }
 
