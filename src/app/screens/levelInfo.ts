@@ -10,6 +10,7 @@ import * as SE from "../util/screenEvents";
 import { TargetType } from "../../shared/game/entityId";
 import { spriteMap } from "../../shared/data/units/spriteMap";
 import { createButtonInPool, ButtonValues } from "../util/btn";
+import { activeSolInfo } from "../savefile/rep";
 
 export function drawLevelInfo(
   game: Phaser.Game,
@@ -134,29 +135,18 @@ function createPoolLevelSelectCard(
     pool,
     pos,
     { cardId, hoverSlot: <Phaser.Sprite | undefined>undefined, resetSlot, levelId, solId },
-    key,
+    spriteMap[key],
     {
       clickRight: () => {
-        console.log("RIGHT");
-        /*slotPool.forEachAlive((slot: Phaser.Sprite) => {
-          console.log(`T: ${slot.data.type}`);
-          console.log(`C: ${slot.data.card !== undefined ? slot.data.card.data.cardId : slot.data.card}`);
-          if (slot.data.type === "deploy" && slot.data.card === undefined) {
-            console.log("MOVE");
-            // first uninhabited slot: move to it
-            moveToSlot(card, slot);
-            let from = { pos: card.data.resetSlot.data.index, type: card.data.resetSlot.data.type };
-            let to = { pos: slot.data.index, type: slot.data.type };
-            applyScreenEvent(
-              new SE.DeployCard(card.data.cardId, card.data.solId, from, to),
-              game, gameRefs
-            );
-            slot.data.card = card;
-            card.data.resetSlot.data.card = undefined;
-            card.data.resetSlot = slot;
-            return;
-          }
-        });*/
+        const firstEmptyDeploy = activeSolInfo(gameRefs.saveFile).deploy.findIndex(x => x === undefined);
+        if (firstEmptyDeploy !== -1) {
+          const from = { pos: card.data.resetSlot.data.index, type: card.data.resetSlot.data.type };
+          const to = { pos: firstEmptyDeploy, type: <"deploy">"deploy" };
+          applyScreenEvent(
+            new SE.DeployCard(from, to),
+            game, gameRefs
+          );
+        }
       },
       hoverOver: () => {
         // const x = card.x + config.levelSelectCardWidth + 10;

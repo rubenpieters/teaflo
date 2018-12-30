@@ -1,7 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { Tree, extendTree, Location, cutTree, emptyTree } from "../tree";
 import { Ability } from "./ability";
-import { GameState, filteredEn } from "./state";
+import { GameState, filteredEn, filteredFr } from "./state";
 import { applyAction, Action, StartTurn } from "./action";
 import { nextAI } from "./ai";
 import { Log, emptyLog, LogEntry } from "./log";

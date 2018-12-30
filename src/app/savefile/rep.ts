@@ -193,9 +193,6 @@ export function swapSpots(
   levelId: string = activeLevel(saveFile),
   solId: number = activeSolId(saveFile),
 ) {
-  console.log(`${JSON.stringify(saveFile)}`);
-  console.log(`${JSON.stringify(from)}`);
-  console.log(`${JSON.stringify(to)}`);
   const originalInToPos: string | undefined = saveFile.levelSolutions[levelId][solId][to.type][to.pos];
   const originalInFromPos: string | undefined = saveFile.levelSolutions[levelId][solId][from.type][from.pos];
   return focus(saveFile,
