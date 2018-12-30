@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { SaveFileV1, changeAct, changeLevel, changeScreen, initializeLevel, addSolution, addAndActivateSolution, activeLevel, activeSolId, changeSolId, swapDeployed, toDeploy, toSupply, activeAct, activeSolInfo, changeSolInfo, changeLoc } from "../savefile/rep";
+import { SaveFileV1, changeAct, changeLevel, changeScreen, initializeLevel, addSolution, addAndActivateSolution, activeLevel, activeSolId, changeSolId, activeAct, activeSolInfo, changeSolInfo, changeLoc, swapSpots } from "../savefile/rep";
 import { GameRefs, setSelectScreenVisible, setGameScreenVisible, newSolution } from "../states/game";
 import { drawActSelect } from "../screens/actSelect";
 import { drawLevelSelect } from "../screens/levelSelect";
@@ -61,10 +61,14 @@ export class ChangeActiveSolution {
   ) {}
 }
 
+export class ResetCard {
+  constructor(
+    public readonly tag: "ResetCard" = "ResetCard",
+  ) {}
+}
+
 export class DeployCard {
   constructor(
-    public readonly cardId: string,
-    public readonly solId: number,
     public readonly from: { pos: number, type: "supply" | "deploy" },
     public readonly to: { pos: number, type: "supply" | "deploy" },
     public readonly tag: "DeployCard" = "DeployCard",
@@ -176,6 +180,7 @@ type ScreenEvent
   | StartLevel
   | AddSolution
   | ChangeActiveSolution
+  | ResetCard
   | DeployCard
   | GoToMenu
   | ExtendLevelSolution
@@ -243,21 +248,14 @@ export function applyScreenEvent(
       drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
       return;
     }
+    case "ResetCard": {
+      drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
+      return;
+    }
     case "DeployCard": {
-      if (screenEvent.from.type === "supply" && screenEvent.to.type === "supply") {
-        // noop
-      } else if (screenEvent.from.type === "deploy" && screenEvent.to.type === "deploy") {
-        // swap
-        gameRefs.saveFile = swapDeployed(gameRefs.saveFile, screenEvent.from.pos, screenEvent.to.pos, screenEvent.cardId);
-      } else if (screenEvent.from.type === "supply" && screenEvent.to.type === "deploy") {
-        // put
-        gameRefs.saveFile = toDeploy(gameRefs.saveFile, screenEvent.to.pos, screenEvent.cardId);
-      } else if (screenEvent.from.type === "deploy" && screenEvent.to.type === "supply") {
-        // remove
-        gameRefs.saveFile = toSupply(gameRefs.saveFile, screenEvent.to.pos);
-      }
+      gameRefs.saveFile = swapSpots(gameRefs.saveFile, screenEvent.from, screenEvent.to);
 
-      // no need to redraw, this is handled by the sprites themselves
+      drawLevelInfo(game, gameRefs, activeLevel(gameRefs.saveFile), activeSolId(gameRefs.saveFile));
       return;
     }
     case "GoToMenu": {

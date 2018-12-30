@@ -7,7 +7,8 @@ type LockStatus = "locked" | "unlocked";
 
 export type SolInfo = {
   solution: Solution,
-  cardIds: (string | undefined)[],
+  supply: (string | undefined)[],
+  deploy: (string | undefined)[],
   loc: Location
 }
 
@@ -65,7 +66,7 @@ export function initializeLevel(
   // if the savefile has no solutions yet, then create one
   if (saveFile.levelSolutions[levelId] === undefined) {
     saveFile = focus(saveFile,
-      set(x => x.levelSolutions[levelId], [newSolution()]),
+      set(x => x.levelSolutions[levelId], [newSolution(levelId)]),
       // make it the active solution
       set(x => x.activeSolutions[levelId], 0),
     );
@@ -121,9 +122,9 @@ export function addSolution(
     // A solution should have been added already, but if not we can still add one
     console.log(`WARNING (addSolution): no solutions for level ${levelId}`);
     
-    return focus(saveFile, set(x => x.levelSolutions[levelId], [newSolution()]));
+    return focus(saveFile, set(x => x.levelSolutions[levelId], [newSolution(levelId)]));
   } else {
-    return focus(saveFile, over(x => x.levelSolutions[levelId], x => x.concat(newSolution())));
+    return focus(saveFile, over(x => x.levelSolutions[levelId], x => x.concat(newSolution(levelId))));
   }
 }
 
@@ -185,40 +186,20 @@ export function changeLoc(
   Deploy
 */
 
-export function toSupply(
+export function swapSpots(
   saveFile: SaveFileV1,
-  pos: number,
+  from: { pos: number, type: "supply" | "deploy" },
+  to: { pos: number, type: "supply" | "deploy" },
   levelId: string = activeLevel(saveFile),
   solId: number = activeSolId(saveFile),
 ) {
+  console.log(`${JSON.stringify(saveFile)}`);
+  console.log(`${JSON.stringify(from)}`);
+  console.log(`${JSON.stringify(to)}`);
+  const originalInToPos: string | undefined = saveFile.levelSolutions[levelId][solId][to.type][to.pos];
+  const originalInFromPos: string | undefined = saveFile.levelSolutions[levelId][solId][from.type][from.pos];
   return focus(saveFile,
-    set(x => x.levelSolutions[levelId][solId].cardIds[pos], undefined),
-  );
-}
-
-export function toDeploy(
-  saveFile: SaveFileV1,
-  pos: number,
-  cardId: string,
-  levelId: string = activeLevel(saveFile),
-  solId: number = activeSolId(saveFile),
-) {
-  return focus(saveFile,
-    set(x => x.levelSolutions[levelId][solId].cardIds[pos], cardId),
-  );
-}
-
-export function swapDeployed(
-  saveFile: SaveFileV1,
-  fromPos: number,
-  toPos: number,
-  cardId: string,
-  levelId: string = activeLevel(saveFile),
-  solId: number = activeSolId(saveFile),
-) {
-  const original: string | undefined = saveFile.levelSolutions[levelId][solId].cardIds[toPos];
-  return focus(saveFile,
-    set(x => x.levelSolutions[levelId][solId].cardIds[fromPos], original),
-    set(x => x.levelSolutions[levelId][solId].cardIds[toPos], cardId),
+    set(x => x.levelSolutions[levelId][solId][from.type][from.pos], originalInToPos),
+    set(x => x.levelSolutions[levelId][solId][to.type][to.pos], originalInFromPos),
   );
 }

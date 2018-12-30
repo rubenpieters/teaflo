@@ -8,6 +8,7 @@ import { Solution } from "src/shared/game/solution";
 import { emptyTree, Location } from "src/shared/tree";
 import { SpritePool } from "../util/pool";
 import { HoverScreenData } from "../screens/hoverCard";
+import { levelDataMap } from "../gameData";
 
 export type GameRefs = {
   actSelectData: ActSelectData,
@@ -30,7 +31,7 @@ const newSaveFile: SaveFileV1 = {
     "a1_l2": "unlocked",
   },
   levelSolutions: {
-    "a1_l1": [newSolution()],
+    "a1_l1": [newSolution("a1_l1")],
   },
   activeSolutions: {
     "a1_l1": 0,
@@ -127,9 +128,12 @@ export function setGameScreenVisible(
   gameRefs.gameScreenData.statsScreenData.arrowPool.visible = visible;
 }
 
-export function newSolution(): {
+export function newSolution(
+  levelId: string,
+): {
   solution: Solution,
-  cardIds: (string | undefined)[],
+  supply: (string | undefined)[],
+  deploy: (string | undefined)[],
   loc: Location,
 } {
   return {
@@ -137,7 +141,19 @@ export function newSolution(): {
       win: false,
       tree: emptyTree()
     },
-    cardIds: [],
+    supply: levelDataMap[levelId].cardIds.concat(),
+    deploy: fill(levelDataMap[levelId].slots, undefined),
     loc: [],
   };
+}
+
+function fill<A>(
+  i: number,
+  a: A,
+): A[] {
+  if (i === 0) {
+    return [];
+  } else {
+    return [a].concat(fill(i - 1, a));
+  }
 }

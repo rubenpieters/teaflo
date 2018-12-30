@@ -47,7 +47,7 @@ export function drawSolutionRep(
 
   // make initial state
   // TODO: move to applyScreenEvent?
-  const frUnits = gameRefs.saveFile.levelSolutions[levelId][solId].cardIds;
+  const frUnits = gameRefs.saveFile.levelSolutions[levelId][solId].deploy;
   const enUnits = levelEnUnitMap[levelId];
   const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solution, sol.loc, initState);
