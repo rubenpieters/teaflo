@@ -1,1 +1,1 @@
-web: npx ts-node -r tsconfig-paths/register src/server/main.ts
+web: npx ts-node src/server/main.ts

@@ -1,3 +1,3 @@
 # TeaFlo
 
-Collaboration Puzzle Game
+Game Prototype

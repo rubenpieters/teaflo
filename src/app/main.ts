@@ -2,12 +2,10 @@ import "p2";
 import "pixi";
 import "phaser";
 
-import Boot from "src/app/states/boot";
-import Load from "src/app/states/load";
-import Menu from "src/app/states/menu";
-import Game from "src/app/states/game";
-
-import { config } from "src/app/config";
+import { config } from "./config";
+import Boot from "./states/boot";
+import Load from "./states/load";
+import Game from "./states/game";
 
 
 class App extends Phaser.Game {
@@ -16,7 +14,6 @@ class App extends Phaser.Game {
 
     this.state.add("boot", Boot);
     this.state.add("load", Load);
-    this.state.add("menu", Menu);
     this.state.add("game", Game);
 
     this.state.start("boot");

@@ -1,8 +1,5 @@
 import express from "express";
 import path from "path";
-import uws from "uws";
-
-import { ClientMessage } from "src/shared/network/clientMessage";
 
 main();
 
@@ -16,19 +13,14 @@ function main(): void {
     parsedPort = Number(envPort);
   }
 
-  // initialize websocket server
-  console.log(`binding to port: ${parsedPort}`);
-  const websocketServer: uws.Server = mkServer(parsedPort);
-
-  // initialize db connection
-  // TODO
-
-  websocketServer.on("connection", onSocketConnection);
+  // initialize server
+  mkServer(parsedPort);
 }
 
-function mkServer(port: number): uws.Server {
+function mkServer(port: number): void {
   const distFolder: string = path.join(__dirname, "..", "..", "dist");
   const jsFolder: string = path.join(distFolder, "js");
+  const texturesFolder: string = path.join(distFolder, "textures");
   const indexFile: string = path.join(distFolder, "index.html");
 
   const app = express();
@@ -37,29 +29,7 @@ function mkServer(port: number): uws.Server {
 
   app.get("/", (_req, res) => { res.sendFile(indexFile); });
   app.use("/js", express.static(jsFolder));
+  app.use("/textures", express.static(texturesFolder));
 
   const server = app.listen(port, () => { console.log(`listening on ${port}`); });
-
-  const websocketServer: uws.Server = new uws.Server({ server: server });
-
-  return websocketServer;
-}
-
-function onSocketConnection(client: uws) {
-  console.log("Player Connect");
-  client.on("message", onClientMessage(client));
-}
-
-function onClientMessage(_client: uws) { 
-  return function(msg: string) {
-    console.log("received " + msg);
-    const clientMsg: ClientMessage = JSON.parse(msg);
-    switch (clientMsg.tag) {
-      case "GetCurrentBoard": {
-        //const board: Board = generateBoard(rngHandler(newRng(clientMsg.seed)), boardData);
-        //client.send(JSON.stringify({ tag: "CurrentBoard", board: board }));
-        return;
-      }
-    }
-  }
 }

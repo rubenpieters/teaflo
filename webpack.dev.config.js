@@ -1,10 +1,10 @@
 const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = {
   entry: path.join(__dirname, "src/app/main.ts"),
@@ -13,11 +13,7 @@ module.exports = {
     filename: "js/bundle.js"
   },
   resolve: {
-    plugins: [
-      new TsconfigPathsPlugin({
-        configFile: path.join(__dirname, "tsconfig.json"),
-      })
-    ],
+    plugins: [],
     extensions: [".ts", ".js"],
     alias: {
       pixi: path.join(__dirname, "node_modules/phaser-ce/build/custom/pixi.js"),
@@ -29,6 +25,9 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin([
       path.join(__dirname, "dist")
+    ]),
+    new CopyWebpackPlugin([
+      { from: "textures/", to: "textures/" },
     ]),
     new HtmlWebpackPlugin({
       title: "TeaFlo",
@@ -45,13 +44,6 @@ module.exports = {
   ],
   module: {
     rules: [
-      { test: /\.ts$/,
-        enforce: "pre",
-        loader: "tslint-loader",
-        options: {
-          typeCheck: true,
-        },
-      },
       { test: /assets(\/|\\)/,
         loader: "file-loader?name=assets/[hash].[ext]",
       },

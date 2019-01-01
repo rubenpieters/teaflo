@@ -1,4 +1,5 @@
-import { config } from "src/app/config";
+import { config } from "../config";
+
 
 export default class Boot extends Phaser.State {
   public init(): void {
