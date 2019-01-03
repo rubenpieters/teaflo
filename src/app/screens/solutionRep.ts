@@ -303,7 +303,7 @@ function drawAction(
         "top", 750, 70,
       );
       const lbl = game.add.text(
-        lblPos.xMin, lblPos.yMin, `+${action.trigger.fragments} ${action.trigger.tag}`, {
+        lblPos.xMin, lblPos.yMin, `+${action.trigger.hp} ${action.trigger.tag}`, {
           fill: "#333333",
           fontSize: 70,
           boundsAlignH: "center",
@@ -416,7 +416,7 @@ export function createUnitTrigger(
           1000, 100,
         );
         const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-        addText(game, sprite, hoverPos, `${self.data.trigger.tag} ${self.data.trigger.fragments}`, "#FF0000", 50);
+        addText(game, sprite, hoverPos, `${self.data.trigger.tag} ${self.data.trigger.hp}`, "#FF0000", 50);
         return sprite;
       },
     }

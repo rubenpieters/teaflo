@@ -183,12 +183,12 @@ function createPoolLevelSelectCard(
           );
         }
       },
-      popupSprite: (self: LevelSelectCard) => {
-        return drawHoverCardFriendly(game, gameRefs, self.data.cardId,
-          self.x + config.levelSelectCardWidth + 10,
-          self.y,
-        );
-      }
+      // popupSprite: (self: LevelSelectCard) => {
+      //   return drawHoverCardFriendly(game, gameRefs, self.data.cardId,
+      //     self.x + config.levelSelectCardWidth + 10,
+      //     self.y,
+      //   );
+      // },
     },
   );
   return card;

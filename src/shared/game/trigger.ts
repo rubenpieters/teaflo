@@ -20,7 +20,7 @@ export function emptyTriggers() {
 
 export class Weak {
   constructor(
-    public readonly fragments: number,
+    public readonly hp: number,
     public readonly type: "self",
     public readonly tag: "Weak" = "Weak",
   ) {}
@@ -28,7 +28,7 @@ export class Weak {
 
 export class Strong {
   constructor(
-    public readonly fragments: number,
+    public readonly hp: number,
     public readonly type: "self",
     public readonly tag: "Strong" = "Strong",
   ) {}
@@ -36,7 +36,7 @@ export class Strong {
 
 export class Armor {
   constructor(
-    public readonly fragments: number,
+    public readonly hp: number,
     public readonly type: "other",
     public readonly tag: "Armor" = "Armor",
   ) {}
@@ -44,7 +44,7 @@ export class Armor {
 
 export class StrongLowHP {
   constructor(
-    public readonly fragments: number,
+    public readonly hp: number,
     public readonly type: "self",
     public readonly tag: "StrongLowHP" = "StrongLowHP",
   ) {}
@@ -52,7 +52,7 @@ export class StrongLowHP {
 
 export class Grow {
   constructor(
-    public readonly fragments: number,
+    public readonly hp: number,
     public readonly trigger: Trigger,
     public readonly type: "self",
     public readonly tag: "Grow" = "Grow",
@@ -162,7 +162,7 @@ export function applyTrigger(
   switch (trigger.tag) {
     case "Weak": {
       if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, transformSelf)) {
-        const subtr = action.value - Math.round((trigger.fragments / 100) - 0.5);
+        const subtr = action.value - Math.round((trigger.hp / 100) - 0.5);
         const newValue = subtr > 0 ? subtr : 0;
         const transformed = new Damage(
           action.target,
@@ -183,7 +183,7 @@ export function applyTrigger(
     }
     case "Strong": {
       if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, transformSelf)) {
-        const newValue = action.value + Math.round((trigger.fragments / 100) - 0.5);
+        const newValue = action.value + Math.round((trigger.hp / 100) - 0.5);
         const transformed = new Damage(
           action.target,
           newValue,
@@ -203,7 +203,7 @@ export function applyTrigger(
     }
     case "Armor": {
       if (action.tag === "Damage" && eqUnitId(state, action.target, transformSelf)) {
-        let newValue = action.value - Math.round((trigger.fragments / 100) - 0.5);
+        let newValue = action.value - Math.round((trigger.hp / 100) - 0.5);
         newValue = newValue < 0 ? 0 : newValue;
         const transformed = new Damage(
           action.target,
@@ -232,7 +232,7 @@ export function applyTrigger(
     case "StrongLowHP": {
       const self = context.self;
       if (action.tag === "Damage" && self !== undefined && eqUnitId(state, self, transformSelf)) {
-        const multiplier = Math.round((trigger.fragments / 100) - 0.5);
+        const multiplier = Math.round((trigger.hp / 100) - 0.5);
         const selfUnit = getUnit(self, state);
         if (selfUnit !== undefined) {
           const missingHp = selfUnit.maxHp - selfUnit.hp;
@@ -259,10 +259,10 @@ export function applyTrigger(
       if (owner === undefined) {
         throw "applyTrigger: no trigger owner";
       }
-      const multiplier = Math.round((trigger.fragments / 100) - 0.5);
+      const multiplier = Math.round((trigger.hp / 100) - 0.5);
       const growAction = new AddTrigger(
         owner,
-        focus(trigger.trigger, over(x => x.fragments, x => x * multiplier)),
+        focus(trigger.trigger, over(x => x.hp, x => x * multiplier)),
       );
       if (action.tag === "StartTurn") {
         return {
@@ -296,7 +296,7 @@ export function addFragments(
     return triggers.concat(trigger);
   } {
     return focus(triggers,
-      over(x => x[index].fragments, x => x + trigger.fragments),
+      over(x => x[index].hp, x => x + trigger.hp),
     );
   }
 }
@@ -320,11 +320,11 @@ export function loseFragments(
   if (index === -1) {
     return triggers;
   } {
-    if (triggers[index].fragments <= value) {
+    if (triggers[index].hp <= value) {
       return triggers.slice(0, index).concat(triggers.slice(index + 1));
     } else {
       return focus(triggers,
-        over(x => x[index].fragments, x => x - value),
+        over(x => x[index].hp, x => x - value),
       );
     }
   }
