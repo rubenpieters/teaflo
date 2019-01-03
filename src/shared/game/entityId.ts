@@ -108,6 +108,37 @@ export function overUnit(
   }
 }
 
+export function overUnitS(
+  target: UnitId,
+  state: GameState,
+  f: (state: GameState, unit: Unit) => { state: GameState, unit: Unit },
+  onEmpty: (state: GameState) => GameState,
+): GameState {
+  const id = findIndex(state, target);
+  switch (target.type) {
+    case "friendly": {
+      if (state.frUnits[id] === undefined) {
+        return onEmpty(state);
+      } else {
+        // state.frUnits[id] is checked before
+        return focus(state,
+          over(x => x.frUnits[id], <any>f),
+        );
+      }
+    }
+    case "enemy": {
+      if (state.enUnits[id] === undefined) {
+        return onEmpty(state);
+      } else {
+        // state.enUnits[id] is checked before
+        return focus(state,
+          over(x => x.enUnits[id], <any>f),
+        );
+      }
+    }
+  }
+}
+
 // TODO: only accept EntityId<"friendly">
 export function overFriendly(
   target: UnitId,
