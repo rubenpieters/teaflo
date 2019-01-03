@@ -123,7 +123,7 @@ export function applyAction(
         state,
         x => damage(x, action.value),
         x => x,
-      );
+      ); 
       const unit = getUnit(action.target, state);
       let actions: Action[] = [];
       if (unit !== undefined && unit.hp <= 0) {
@@ -174,7 +174,11 @@ export function applyAction(
       return {
         state: overUnit(action.target,
           state,
-          x => focus(x, over(x => x.triggers[action.trigger.type], x => addFragments(x, action.trigger))),
+          x => focus(x, over(x => x.triggers[action.trigger.type], x => {
+            const result = addFragments(state, x, action.trigger);
+            state = result.state;
+            return result.triggers;
+          })),
           x => x,
         ),
         actions: [],
@@ -280,7 +284,7 @@ export function actionText(
       return `ADD ${action.value} TH to ${posToString(action.toFriendly)} at ${posToString(action.atEnemy)}`
     }
     case "AddTrigger": {
-      return `+STA ${action.trigger.hp} ${action.trigger.tag} to ${posToString(action.target)}`;
+      return `+STA ${action.trigger.fragments} ${action.trigger.tag} to ${posToString(action.target)}`;
     }
     case "LoseFragments": {
       return `-STA ${action.value} ${action.triggerTag} to ${posToString(action.target)}`;

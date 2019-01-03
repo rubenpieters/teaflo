@@ -38,7 +38,7 @@ export function mkGameState(
   const frUnitsWithId: (FrStUnit | undefined)[] = frUnits.map((x, i) => {
     if (x !== undefined) {
       frLastId = i;
-      return {...frUnitMap[x], ...{ id: i, cardId: x, threatMap: {} }}
+      return {...frUnitMap[x], ...{ id: i, cardId: x, threatMap: {} }};
     } else {
       return undefined;
     }
@@ -47,7 +47,7 @@ export function mkGameState(
   const enUnitsWithId: (EnStUnit | undefined)[] = enUnits.map((x, i) => {
     if (x !== undefined) {
       enLastId = i;
-      return {...enUnitMap[x], ...{ id: i + frLastId, cardId: x }}
+      return {...enUnitMap[x], ...{ id: i + frLastId, cardId: x }};
     } else {
       return undefined;
     }

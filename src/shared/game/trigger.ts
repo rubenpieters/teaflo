@@ -4,10 +4,11 @@ import { Context } from "./intent";
 import { UnitId, eqUnitId, GlobalId, getUnit } from "./entityId";
 import { GameState } from "./state";
 import { Omit } from "../type-util";
+import { HasId } from "./hasId";
 
 export type HasTriggers = {
   triggers: {
-    [K in Trigger["type"]]: Trigger[]
+    [K in Trigger["type"]]: StTrigger[]
   }
 };
 
@@ -20,7 +21,7 @@ export function emptyTriggers() {
 
 export class Weak {
   constructor(
-    public readonly hp: number,
+    public readonly fragments: number,
     public readonly type: "self",
     public readonly tag: "Weak" = "Weak",
   ) {}
@@ -28,7 +29,7 @@ export class Weak {
 
 export class Strong {
   constructor(
-    public readonly hp: number,
+    public readonly fragments: number,
     public readonly type: "self",
     public readonly tag: "Strong" = "Strong",
   ) {}
@@ -36,7 +37,7 @@ export class Strong {
 
 export class Armor {
   constructor(
-    public readonly hp: number,
+    public readonly fragments: number,
     public readonly type: "other",
     public readonly tag: "Armor" = "Armor",
   ) {}
@@ -44,7 +45,7 @@ export class Armor {
 
 export class StrongLowHP {
   constructor(
-    public readonly hp: number,
+    public readonly fragments: number,
     public readonly type: "self",
     public readonly tag: "StrongLowHP" = "StrongLowHP",
   ) {}
@@ -52,7 +53,7 @@ export class StrongLowHP {
 
 export class Grow {
   constructor(
-    public readonly hp: number,
+    public readonly fragments: number,
     public readonly trigger: Trigger,
     public readonly type: "self",
     public readonly tag: "Grow" = "Grow",
@@ -72,6 +73,8 @@ export type TriggerLog = {
   before: Action,
   after: Action,
 };
+
+export type StTrigger = Trigger & HasId;
 
 export function applyTriggers(
   state: GameState,
@@ -162,7 +165,7 @@ export function applyTrigger(
   switch (trigger.tag) {
     case "Weak": {
       if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, transformSelf)) {
-        const subtr = action.value - Math.round((trigger.hp / 100) - 0.5);
+        const subtr = action.value - Math.round((trigger.fragments / 100) - 0.5);
         const newValue = subtr > 0 ? subtr : 0;
         const transformed = new Damage(
           action.target,
@@ -183,7 +186,7 @@ export function applyTrigger(
     }
     case "Strong": {
       if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, transformSelf)) {
-        const newValue = action.value + Math.round((trigger.hp / 100) - 0.5);
+        const newValue = action.value + Math.round((trigger.fragments / 100) - 0.5);
         const transformed = new Damage(
           action.target,
           newValue,
@@ -203,7 +206,7 @@ export function applyTrigger(
     }
     case "Armor": {
       if (action.tag === "Damage" && eqUnitId(state, action.target, transformSelf)) {
-        let newValue = action.value - Math.round((trigger.hp / 100) - 0.5);
+        let newValue = action.value - Math.round((trigger.fragments / 100) - 0.5);
         newValue = newValue < 0 ? 0 : newValue;
         const transformed = new Damage(
           action.target,
@@ -232,7 +235,7 @@ export function applyTrigger(
     case "StrongLowHP": {
       const self = context.self;
       if (action.tag === "Damage" && self !== undefined && eqUnitId(state, self, transformSelf)) {
-        const multiplier = Math.round((trigger.hp / 100) - 0.5);
+        const multiplier = Math.round((trigger.fragments / 100) - 0.5);
         const selfUnit = getUnit(self, state);
         if (selfUnit !== undefined) {
           const missingHp = selfUnit.maxHp - selfUnit.hp;
@@ -259,10 +262,10 @@ export function applyTrigger(
       if (owner === undefined) {
         throw "applyTrigger: no trigger owner";
       }
-      const multiplier = Math.round((trigger.hp / 100) - 0.5);
+      const multiplier = Math.round((trigger.fragments / 100) - 0.5);
       const growAction = new AddTrigger(
         owner,
-        focus(trigger.trigger, over(x => x.hp, x => x * multiplier)),
+        focus(trigger.trigger, over(x => x.fragments, x => x * multiplier)),
       );
       if (action.tag === "StartTurn") {
         return {
@@ -288,16 +291,28 @@ export function triggerSprite(
 }
 
 export function addFragments(
-  triggers: Trigger[],
+  state: GameState,
+  triggers: StTrigger[],
   trigger: Trigger,
-): Trigger[] {
+): {
+  state: GameState,
+  triggers: StTrigger[],
+ } {
   const index = triggers.findIndex(x => mergeCondition(x, trigger));
   if (index === -1) {
-    return triggers.concat(trigger);
+    const nextId = state.nextId;
+    const stTr: StTrigger = {...trigger, ...{ id: nextId }};
+    return {
+      state: focus(state, over(x => x.nextId, x => x + 1)),
+      triggers: triggers.concat(stTr)
+    };
   } {
-    return focus(triggers,
-      over(x => x[index].hp, x => x + trigger.hp),
-    );
+    return {
+      state,
+      triggers: focus(triggers,
+        over(x => x[index].fragments, x => x + trigger.fragments),
+      ),
+    };
   }
 }
 
@@ -311,20 +326,20 @@ function mergeCondition(
   return trigger1.tag === trigger2.tag;
 }
 
-export function loseFragments(
-  triggers: Trigger[],
+export function loseFragments<T extends Trigger>(
+  triggers: T[],
   triggerTag: Trigger["tag"],
   value: number,
-): Trigger[] {
+): T[] {
   const index = triggers.findIndex(x => x.tag === triggerTag);
   if (index === -1) {
     return triggers;
   } {
-    if (triggers[index].hp <= value) {
+    if (triggers[index].fragments <= value) {
       return triggers.slice(0, index).concat(triggers.slice(index + 1));
     } else {
       return focus(triggers,
-        over(x => x[index].hp, x => x - value),
+        over(x => x[index].fragments, x => x - value),
       );
     }
   }
