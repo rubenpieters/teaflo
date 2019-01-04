@@ -84,3 +84,22 @@ export const ai3: AI = [
       ],
   },
 ];
+
+
+export const ai4: AI = [
+  {
+    intent: new I.AddTriggerI(
+      I.mkAllAlly(),
+      new I.Static(
+        new T.Weak(300, "self"),
+      ),
+    ),
+    spriteId: "fr_unit_a1_l2_01_ab1",
+    outs: [
+        {
+          aiOut: new O.ToSelf(),
+          condition: (state: GameState) => true,
+        },
+      ],
+  },
+];

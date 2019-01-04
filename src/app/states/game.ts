@@ -29,6 +29,7 @@ const newSaveFile: SaveFileV1 = {
   levelUnlocked: {
     "a1_l1": "unlocked",
     "a1_l2": "unlocked",
+    "a1_l3": "unlocked",
   },
   levelSolutions: {
     "a1_l1": [newSolution("a1_l1")],

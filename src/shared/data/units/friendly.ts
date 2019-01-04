@@ -110,6 +110,33 @@ export const fr_unit_a1_l2_03: FrUnit = {
   vital: true,
 };
 
+export const fr_unit_a1_l3_01: FrUnit = {
+  hp: 20,
+  maxHp: 20,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(1),
+        ),
+        I.thDamage(
+          new I.FromInput(0),
+          new I.Static(5),
+        ),
+      ]),
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab1",
+    },
+  ],
+  triggers: T.emptyTriggers(),
+  vital: true,
+};
+
 export const fr_unit_a2_01: FrUnit = {
   hp: 40,
   maxHp: 40,
@@ -219,6 +246,8 @@ export const frUnitMap: {
   "fr_unit_a1_l2_01": fr_unit_a1_l2_01,
   "fr_unit_a1_l2_02": fr_unit_a1_l2_02,
   "fr_unit_a1_l2_03": fr_unit_a1_l2_03,
+  // act 1 level 3
+  "fr_unit_a1_l3_01": fr_unit_a1_l3_01,
   // act 2
   "fr_unit_a2_01": fr_unit_a2_01,
   "fr_unit_a2_02": fr_unit_a2_02,
