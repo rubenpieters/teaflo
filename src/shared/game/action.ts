@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { UnitId, overUnit, overFriendly, killUnit, getUnit, posToString } from "./entityId";
+import { UnitId, overUnit, overFriendly, killUnit, getUnit, posToString, findIndex } from "./entityId";
 import { GameState, FrStUnit } from "./state";
 import { addThreat } from "./threat";
 import { Trigger, loseFragments, addFragments, Armor } from "./trigger";
@@ -171,16 +171,34 @@ export function applyAction(
       };
     }
     case "AddTrigger": {
+      const target = action.target;
+      const id = findIndex(state, target);
+      switch (target.type) {
+        case "friendly": {
+          const unit = state.frUnits[id];
+          if (unit !== undefined) {
+            const result = addFragments(state, unit.triggers[action.trigger.type], action.trigger);
+            state = focus(result.state,
+              // state.frUnits[id] is checked before
+              set(x => x.frUnits[id]!.triggers[action.trigger.type], result.triggers),
+            );
+          }
+          break;
+        }
+        case "enemy": {
+          const unit = state.enUnits[id];
+          if (unit !== undefined) {
+            const result = addFragments(state, unit.triggers[action.trigger.type], action.trigger);
+            state = focus(result.state,
+              // state.frUnits[id] is checked before
+              set(x => x.enUnits[id]!.triggers[action.trigger.type], result.triggers),
+            );
+          }
+          break;
+        }
+      }
       return {
-        state: overUnit(action.target,
-          state,
-          x => focus(x, over(x => x.triggers[action.trigger.type], x => {
-            const result = addFragments(state, x, action.trigger);
-            state = result.state;
-            return result.triggers;
-          })),
-          x => x,
-        ),
+        state,
         actions: [],
       };
     }

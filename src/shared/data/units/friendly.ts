@@ -132,6 +132,22 @@ export const fr_unit_a1_l3_01: FrUnit = {
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
     },
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(1),
+        ),
+        new I.AddTriggerI(
+          new I.FromInput(0),
+          new I.Static(new T.Weak(100, "self")),
+        ),
+      ]),
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab1",
+    },
   ],
   triggers: T.emptyTriggers(),
   vital: true,

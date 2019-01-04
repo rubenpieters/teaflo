@@ -15,7 +15,7 @@ import { Action, actionText } from "../../shared/game/action";
 import { createButtonInPool, addText, ButtonValues } from "../util/btn";
 import { TargetType, PositionId, toPositionId } from "../../shared/game/entityId";
 import { Log, LogEntry, LogKeys } from "../../shared/game/log";
-import { triggerSprite, Trigger, TriggerLog } from "../../shared/game/trigger";
+import { triggerSprite, Trigger, TriggerLog, StTrigger } from "../../shared/game/trigger";
 import { spriteMap } from "../../shared/data/units/spriteMap";
 
 export type IntermediateSol = {
@@ -394,14 +394,14 @@ export function createUnitResource(
 }
 
 type TriggerSprite = GSprite<ButtonValues & {
-  trigger: Trigger,
+  trigger: StTrigger,
 }>;
 
 export function createUnitTrigger(
   game: Phaser.Game,
   gameRefs: GameRefs,
   pos: Position,
-  trigger: Trigger,
+  trigger: StTrigger,
 ): TriggerSprite {
   const sprite: TriggerSprite = createButtonInPool(
     game,
@@ -410,13 +410,19 @@ export function createUnitTrigger(
     { trigger },
     triggerSprite(trigger),
     {
+      clickLeft: () => {
+        if (gameRefs.gameScreenData.clickState !== undefined) {
+          console.log(`TRIGGER ID: ${sprite.data.trigger.id}`);
+          //applyScreenEvent(new SE.AdvanceClickState(new PositionId(sprite.data.trigger.id, unit.data.type)), game, gameRefs);
+        }
+      },
       popupSprite: (self: TriggerSprite) => {
         const hoverPos = relativeTo(pos,
           "right", 50,
           1000, 100,
         );
         const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-        addText(game, sprite, hoverPos, `${self.data.trigger.tag} ${self.data.trigger.fragments}`, "#FF0000", 50);
+        addText(game, sprite, hoverPos, `${self.data.trigger.id}: ${self.data.trigger.tag} ${self.data.trigger.fragments}`, "#FF0000", 50);
         return sprite;
       },
     }
