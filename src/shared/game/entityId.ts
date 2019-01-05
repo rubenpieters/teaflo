@@ -3,9 +3,14 @@ import { GameState, units, FrStUnit, EnStUnit } from "./state";
 import { HasId } from "./hasId";
 import { Unit } from "./unit";
 
-export type TargetType
+export type UnitType
   = "friendly"
   | "enemy"
+  ;
+
+export type TargetType
+  = UnitType
+  | "status"
   ;
 
 export class GlobalId<A extends TargetType>{
@@ -16,7 +21,7 @@ export class GlobalId<A extends TargetType>{
   ) {}
 }
 
-export class PositionId<A extends TargetType>{
+export class PositionId<A extends UnitType>{
   constructor(
     public readonly id: number,
     public readonly type: A,
@@ -24,24 +29,26 @@ export class PositionId<A extends TargetType>{
   ) {}
 }
 
-export function isGlobalId<A extends TargetType>(
+export function isGlobalId<A extends UnitType>(
   a: any
 ): a is GlobalId<A> {
   return a.tag === "GlobalId";
 }
 
-export function isPositionId<A extends TargetType>(
+export function isPositionId<A extends UnitType>(
   a: any
 ): a is PositionId<A> {
   return a.tag === "PositionId";
 }
 
-export type EntityId<A extends TargetType>
+export type EntityId<A extends UnitType>
   = GlobalId<A>
   | PositionId<A>
   ;
 
 export type UnitId = EntityId<"friendly" | "enemy">;
+
+export type TargetId = UnitId | GlobalId<"status">;
 
 export function killUnit(
   target: UnitId,
@@ -181,7 +188,7 @@ export function overEnemy(
   }
 }
 
-export function toPositionId<A extends TargetType>(
+export function toPositionId<A extends UnitType>(
   state: GameState,
   id: EntityId<A>,
 ) {
@@ -193,7 +200,7 @@ export function toPositionId<A extends TargetType>(
   }
 }
 
-export function toGlobalId<A extends TargetType>(
+export function toGlobalId<A extends UnitType>(
   state: GameState,
   id: EntityId<A>,
 ) {
@@ -209,7 +216,7 @@ export function toGlobalId<A extends TargetType>(
   }
 }
 
-export function findIndex<A extends TargetType>(
+export function findIndex<A extends UnitType>(
   state: GameState,
   id: EntityId<A>,
 ): number {
@@ -225,7 +232,7 @@ export function findIndex<A extends TargetType>(
   throw `findIndex: unknown type ${id.type}`;
 }
 
-function findI<E extends HasId, A extends TargetType>(
+function findI<E extends HasId, A extends UnitType>(
   coll: (E | undefined)[],
   id: EntityId<A>,
 ): number {
@@ -243,19 +250,30 @@ function findI<E extends HasId, A extends TargetType>(
   }
 }
 
-export function eqUnitId<A extends TargetType>(
+export function eqUnitId(
   state: GameState,
-  id1: EntityId<A>,
-  id2: EntityId<A>,
+  id1: TargetId,
+  id2: TargetId,
 ): boolean {
-  if (id1.tag === "PositionId" && id2.tag === "PositionId") {
-    return id1.type === id2.type && id1.id === id2.id;
-  } else if (id1.tag === "GlobalId" && id2.tag === "GlobalId") {
-    return id1.type === id2.type && id1.id === id2.id;
+  if (id1.type === "status") {
+    if (id2.tag === "PositionId") {
+      return false;
+    } else {
+      return id2.type === id1.type;
+    }
+  } else if (id2.type === "status") {
+    // id1 is not a status target, but id2 is: always false
+    return false;
   } else {
-    const positionId1 = toPositionId(state, id1);
-    const positionId2 = toPositionId(state, id2);
-    return eqUnitId(state, positionId1, positionId2);
+    if (id1.tag === "PositionId" && id2.tag === "PositionId") {
+      return id1.type === id2.type && id1.id === id2.id;
+    } else if (id1.tag === "GlobalId" && id2.tag === "GlobalId") {
+      return id1.type === id2.type && id1.id === id2.id;
+    } else {
+      const positionId1 = toPositionId(state, id1);
+      const positionId2 = toPositionId(state, id2);
+      return eqUnitId(state, positionId1, positionId2);
+    }
   }
 }
 
@@ -265,12 +283,13 @@ function targetTypeToString<A extends TargetType>(
   switch (type) {
     case "enemy": return "EN";
     case "friendly": return "FR";
+    case "status": return "ST";
   }
   throw "targetTypeToString: impossible";
 }
 
-export function posToString<A extends TargetType>(
-  id: EntityId<A>,
+export function posToString(
+  id: TargetId,
 ) {
   switch (id.tag) {
     case "GlobalId": return `GID ${id.id} ${targetTypeToString(id.type)}`;

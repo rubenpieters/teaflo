@@ -13,9 +13,9 @@ import { Game, Button } from "phaser-ce";
 import { mkGameState, EnStUnit, FrStUnit, filteredFr, filteredEn, GameState } from "src/shared/game/state";
 import { Action, actionText } from "../../shared/game/action";
 import { createButtonInPool, addText, ButtonValues } from "../util/btn";
-import { TargetType, PositionId, toPositionId } from "../../shared/game/entityId";
+import { UnitType, PositionId, toPositionId, TargetId } from "../../shared/game/entityId";
 import { Log, LogEntry, LogKeys } from "../../shared/game/log";
-import { triggerSprite, Trigger, TriggerLog, StTrigger } from "../../shared/game/trigger";
+import { triggerSprite, Trigger, TriggerLog, StTrigger, triggerOrder } from "../../shared/game/trigger";
 import { spriteMap } from "../../shared/data/units/spriteMap";
 
 export type IntermediateSol = {
@@ -105,29 +105,11 @@ export function drawSolutionRep(
       unitChPos.xMax = unitChPos.xMin + (unitChPos.xMax - unitChPos.xMin) * (unit.charges / unit.maxCharges);
       createUnitResource(game, gameRefs, unitChPos, "ch");
 
-      // Triggers
-      // self
-      unit.triggers.self.forEach((trigger, triggerIndex) => {
-        const trPos = createPosition(
-          "left", 1050 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
-          "top", 1150, config.triggerHeight,
-        );
-        createUnitTrigger(game, gameRefs, trPos, trigger);
-      });
-      // other
-      unit.triggers.other.forEach((trigger, triggerIndex) => {
-        const trPos = createPosition(
-          "left", 1050 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
-          "top", 1250, config.triggerHeight,
-        );
-        createUnitTrigger(game, gameRefs, trPos, trigger);
-      });
-
       // TH
       let i = 0;
       for (const enId of enIds) {
         const unitThPos = relativeTo(unitPos,
-          "below", 450 + 100 * i,
+          "below", 250 + 100 * i,
           config.unitHpBarWidth, config.unitHpBarHeight,
         );
         unitThPos.xMax = unitThPos.xMin + (unitThPos.xMax - unitThPos.xMin) * (unit.threatMap[enId] / maxThreat);
@@ -162,25 +144,18 @@ export function drawSolutionRep(
       );
       unitChPos.xMax = unitChPos.xMin + (unitChPos.xMax - unitChPos.xMin) * (unit.charges / unit.maxCharges);
       createUnitResource(game, gameRefs, unitChPos, "ch");
-
-      // Triggers
-      // self
-      unit.triggers.self.forEach((trigger, triggerIndex) => {
-        const trPos = createPosition(
-          "left", 2300 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
-          "top", 1150, config.triggerHeight,
-        );
-        createUnitTrigger(game, gameRefs, trPos, trigger);
-      });
-      // other
-      unit.triggers.other.forEach((trigger, triggerIndex) => {
-        const trPos = createPosition(
-          "left", 2300 + 200 * unitIndex + 50 * triggerIndex, config.triggerWidth,
-          "top", 1250, config.triggerHeight,
-        );
-        createUnitTrigger(game, gameRefs, trPos, trigger);
-      });
     }
+
+    // draw triggers
+    triggerOrder.forEach((group, groupIndex) => {
+      solState.triggers[group].forEach((trigger, triggerIndex) => {
+        const trPos = createPosition(
+          "left", 1050 + 50 * triggerIndex, config.triggerWidth,
+          "top", 1250 + 100 * groupIndex, config.triggerHeight,
+        );
+        createUnitTrigger(game, gameRefs, trPos, trigger);
+      })
+    });
   });
 
   // draw intermediate action if defined
@@ -220,12 +195,7 @@ function drawAction(
       return;
     }
     case "Damage": {
-      const offset = action.target.type === "friendly" ? 0 : 1250;
-      const posId = toPositionId(state, action.target);
-      const lblPos = createPosition(
-        "left", offset + 1050 + 200 * posId.id, 150,
-        "top", 750, 70,
-      );
+      const lblPos = targetIdToLocation(state, action.target);
       const lbl = game.add.text(
         lblPos.xMin, lblPos.yMin, `-${action.value} HP`, {
           fill: "#FF0000",
@@ -239,12 +209,7 @@ function drawAction(
       return;
     }
     case "Heal": {
-      const offset = action.target.type === "friendly" ? 0 : 1250;
-      const posId = toPositionId(state, action.target);
-      const lblPos = createPosition(
-        "left", offset + 1050 + 200 * posId.id, 150,
-        "top", 750, 70,
-      );
+      const lblPos = targetIdToLocation(state, action.target);
       const lbl = game.add.text(
         lblPos.xMin, lblPos.yMin, `+${action.value} HP`, {
           fill: "#00FF00",
@@ -258,12 +223,7 @@ function drawAction(
       return;
     }
     case "UseCharge": {
-      const offset = action.target.type === "friendly" ? 0 : 1250;
-      const posId = toPositionId(state, action.target);
-      const lblPos = createPosition(
-        "left", offset + 1050 + 200 * posId.id, 150,
-        "top", 750, 70,
-      );
+      const lblPos = targetIdToLocation(state, action.target);
       const lbl = game.add.text(
         lblPos.xMin, lblPos.yMin, `-${action.value} CH`, {
           fill: "#00AAAA",
@@ -277,12 +237,7 @@ function drawAction(
       return;
     }
     case "AddThreat": {
-      const offset = action.toFriendly.type === "friendly" ? 0 : 1250;
-      const posId = toPositionId(state, action.toFriendly);
-      const lblPos = createPosition(
-        "left", offset + 1050 + 200 * posId.id, 150,
-        "top", 750, 70,
-      );
+      const lblPos = targetIdToLocation(state, action.toFriendly);
       const lbl = game.add.text(
         lblPos.xMin, lblPos.yMin, `+${action.value} TH`, {
           fill: "#000000",
@@ -296,12 +251,7 @@ function drawAction(
       return;
     }
     case "AddTrigger": {
-      const offset = action.target.type === "friendly" ? 0 : 1250;
-      const posId = toPositionId(state, action.target);
-      const lblPos = createPosition(
-        "left", offset + 1050 + 200 * posId.id, 150,
-        "top", 750, 70,
-      );
+      const lblPos = targetIdToLocation(state, action.target);
       const lbl = game.add.text(
         lblPos.xMin, lblPos.yMin, `+${action.trigger.fragments} ${action.trigger.tag}`, {
           fill: "#333333",
@@ -314,31 +264,44 @@ function drawAction(
       gameRefs.gameScreenData.intermediateActionTexts.push(lbl);
       return;
     }
-    case "LoseFragments": {
-      const offset = action.target.type === "friendly" ? 0 : 1250;
-      const posId = toPositionId(state, action.target);
+  }
+}
+
+function targetIdToLocation(
+  state: GameState,
+  targetId: TargetId,
+): Position {
+  switch (targetId.type) {
+    case "enemy": {
+      const posId = toPositionId(state, targetId);
       const lblPos = createPosition(
-        "left", offset + 1050 + 200 * posId.id, 150,
+        "left", 1250 + 1050 + 200 * posId.id, 150,
         "top", 750, 70,
       );
-      const lbl = game.add.text(
-        lblPos.xMin, lblPos.yMin, `-${action.value} ${action.triggerTag}`, {
-          fill: "#AA3333",
-          fontSize: 70,
-          boundsAlignH: "center",
-          boundsAlignV: "middle",
-        }
+      return lblPos
+    }
+    case "friendly": {
+      const posId = toPositionId(state, targetId);
+      const lblPos = createPosition(
+        "left", 1050 + 200 * posId.id, 150,
+        "top", 750, 70,
       );
-      lbl.setTextBounds(0, 0, lblPos.xMax - lblPos.xMin, lblPos.yMax - lblPos.yMin);
-      gameRefs.gameScreenData.intermediateActionTexts.push(lbl);
-      return;
+      return lblPos
+    }
+    case "status": {
+      // TODO: find exact position of trigger
+      const lblPos = createPosition(
+        "left", 200, 150,
+        "top", 750, 70,
+      );
+      return lblPos
     }
   }
 }
 
 type UnitSprite = GSprite<ButtonValues & {
   id: number,
-  type: TargetType,
+  type: UnitType,
 }>;
 
 export function createUnit(
@@ -347,7 +310,7 @@ export function createUnit(
   pos: Position,
   key: string,
   id: number,
-  type: TargetType,
+  type: UnitType,
 ): UnitSprite {
   const unit: UnitSprite = createButtonInPool(
     game,
@@ -422,7 +385,7 @@ export function createUnitTrigger(
           1000, 100,
         );
         const sprite = game.add.sprite(hoverPos.xMin, hoverPos.yMin, "bg_hover_2");
-        addText(game, sprite, hoverPos, `${self.data.trigger.id}: ${self.data.trigger.tag} ${self.data.trigger.fragments}`, "#FF0000", 50);
+        addText(game, sprite, hoverPos, `(${self.data.trigger.owner.id}) ${self.data.trigger.id}: ${self.data.trigger.tag} ${self.data.trigger.fragments}`, "#FF0000", 50);
         return sprite;
       },
     }

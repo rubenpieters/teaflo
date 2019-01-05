@@ -27,7 +27,7 @@ export const ai2: AI = [
       intent: new I.AddTriggerI(
         I.mkAllAlly(),
         new I.Static(
-          new T.Weak(100, "self"),
+          new T.Weak(100),
         ),
       ),
       spriteId: "fr_unit_a1_l2_01_ab1",
@@ -59,7 +59,7 @@ export const ai3: AI = [
     intent: new I.AddTriggerI(
       I.mkSelf(),
       new I.Static(
-        new T.Grow(100, new T.Strong(300, "self"), "self"),
+        new T.Grow(100, new T.Strong(300)),
       ),
     ),
     spriteId: "fr_unit_a1_l2_01_ab1",
@@ -91,7 +91,7 @@ export const ai4: AI = [
     intent: new I.AddTriggerI(
       I.mkAllAlly(),
       new I.Static(
-        new T.Weak(300, "self"),
+        new T.Weak(300),
       ),
     ),
     spriteId: "fr_unit_a1_l2_01_ab1",

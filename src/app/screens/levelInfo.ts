@@ -7,7 +7,7 @@ import { createPoolCardSlot } from "../util/poolCardSlot";
 import { intersects, GSprite } from "../../shared/phaser-util";
 import { applyScreenEvent } from "../util/screenEvents";
 import * as SE from "../util/screenEvents";
-import { TargetType } from "../../shared/game/entityId";
+import { UnitType } from "../../shared/game/entityId";
 import { spriteMap } from "../../shared/data/units/spriteMap";
 import { createButtonInPool, ButtonValues } from "../util/btn";
 import { activeSolInfo } from "../savefile/rep";

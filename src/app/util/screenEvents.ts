@@ -14,7 +14,7 @@ import { Ability } from "src/shared/game/ability";
 import { Location, cutTree } from "src/shared/tree";
 import { ClickState } from "./clickState";
 import { drawSolutionInfo, drawCardInfo } from "../screens/solutionInfo";
-import { TargetType } from "../../shared/game/entityId";
+import { UnitType } from "../../shared/game/entityId";
 import { Omit } from "src/shared/type-util";
 import { LogKeys } from "src/shared/game/log";
 
@@ -131,7 +131,7 @@ export class ClearIntermediateSol {
 
 export class ShowHoverCard {
   constructor(
-    public readonly type: TargetType,
+    public readonly type: UnitType,
     public readonly id: string,
     public readonly x: number,
     public readonly y: number,
@@ -148,7 +148,7 @@ export class ClearHoverCard {
 export class ShowCardInfo {
   constructor(
     public readonly id: number,
-    public readonly type: TargetType,
+    public readonly type: UnitType,
     public readonly tag: "ShowCardInfo" = "ShowCardInfo",
   ) {}
 }
@@ -162,7 +162,7 @@ export class ClearCardInfo {
 export class LockCardInfo {
   constructor(
     public readonly id: number,
-    public readonly type: TargetType,
+    public readonly type: UnitType,
     public readonly tag: "LockCardInfo" = "LockCardInfo",
   ) {}
 }

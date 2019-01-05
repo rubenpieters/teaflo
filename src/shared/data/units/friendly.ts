@@ -26,7 +26,6 @@ export const fr_unit_a1_l1_01: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab1",
     },
   ],
-  triggers: T.emptyTriggers(),
   vital: true,
 };
 
@@ -53,7 +52,6 @@ export const fr_unit_a1_l2_01: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab1",
     },
   ],
-  triggers: T.emptyTriggers(),
   vital: true,
 };
 
@@ -79,7 +77,6 @@ export const fr_unit_a1_l2_02: FrUnit = {
       spriteId: "fr_unit_a1_l2_01_ab1",
     },
   ],
-  triggers: T.emptyTriggers(),
   vital: true,
 };
 
@@ -97,7 +94,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(new T.Armor(1000, "other")),
+          new I.Static(new T.Armor(1000)),
         ),
       ]),
       inputs: [
@@ -106,7 +103,6 @@ export const fr_unit_a1_l2_03: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab2",
     },
   ],
-  triggers: T.emptyTriggers(),
   vital: true,
 };
 
@@ -140,7 +136,7 @@ export const fr_unit_a1_l3_01: FrUnit = {
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(new T.Weak(100, "self")),
+          new I.Static(new T.Weak(100)),
         ),
       ]),
       inputs: [
@@ -149,7 +145,6 @@ export const fr_unit_a1_l3_01: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab1",
     },
   ],
-  triggers: T.emptyTriggers(),
   vital: true,
 };
 
@@ -185,7 +180,6 @@ export const fr_unit_a2_01: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab1",
     },
   ],
-  triggers: T.emptyTriggers(),
   vital: true,
 };
 
@@ -203,7 +197,7 @@ export const fr_unit_a2_02: FrUnit = {
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(new T.Strong(500, "self")),
+          new I.Static(new T.Strong(500)),
         ),
       ]),
       inputs: [
@@ -219,7 +213,7 @@ export const fr_unit_a2_02: FrUnit = {
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(new T.Strong(500, "self")),
+          new I.Static(new T.Strong(500)),
         ),
       ]),
       inputs: [
@@ -228,7 +222,6 @@ export const fr_unit_a2_02: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab2",
     },
   ],
-  triggers: T.emptyTriggers(),
   vital: true,
 };
 
@@ -249,7 +242,6 @@ export const unit1: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab1",
     },
   ],
-  triggers: T.emptyTriggers(),
   vital: true,
 }
 

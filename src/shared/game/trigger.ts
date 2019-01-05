@@ -1,16 +1,23 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Action, Damage, LoseFragments, AddTrigger } from "./action";
+import { Action, Damage, AddTrigger } from "./action";
 import { Context } from "./intent";
-import { UnitId, eqUnitId, GlobalId, getUnit } from "./entityId";
+import { UnitId, eqUnitId, GlobalId, getUnit, UnitType } from "./entityId";
 import { GameState } from "./state";
 import { Omit } from "../type-util";
 import { HasId } from "./hasId";
 
 export type HasTriggers = {
   triggers: {
-    [K in Trigger["type"]]: StTrigger[]
+    [K in TriggerGroup]: StTrigger[]
   }
 };
+
+export type TriggerGroup
+  = "weak"
+  | "strong"
+  | "armor"
+  | "other"
+  ;
 
 export function emptyTriggers() {
   return {
@@ -22,7 +29,6 @@ export function emptyTriggers() {
 export class Weak {
   constructor(
     public readonly fragments: number,
-    public readonly type: "self",
     public readonly tag: "Weak" = "Weak",
   ) {}
 }
@@ -30,7 +36,6 @@ export class Weak {
 export class Strong {
   constructor(
     public readonly fragments: number,
-    public readonly type: "self",
     public readonly tag: "Strong" = "Strong",
   ) {}
 }
@@ -38,7 +43,6 @@ export class Strong {
 export class Armor {
   constructor(
     public readonly fragments: number,
-    public readonly type: "other",
     public readonly tag: "Armor" = "Armor",
   ) {}
 }
@@ -46,7 +50,6 @@ export class Armor {
 export class StrongLowHP {
   constructor(
     public readonly fragments: number,
-    public readonly type: "self",
     public readonly tag: "StrongLowHP" = "StrongLowHP",
   ) {}
 }
@@ -55,7 +58,6 @@ export class Grow {
   constructor(
     public readonly fragments: number,
     public readonly trigger: Trigger,
-    public readonly type: "self",
     public readonly tag: "Grow" = "Grow",
   ) {}
 }
@@ -68,13 +70,34 @@ export type Trigger
   | Grow
   ;
 
+export function tagToGroup(
+  tag: Trigger["tag"],
+): TriggerGroup {
+  switch (tag) {
+    case "Armor": return "armor";
+    case "Grow": return "other";
+    case "Strong": return "strong";
+    case "StrongLowHP": return "strong";
+    case "Weak": return "weak";
+  }
+}
+
+export const triggerOrder: TriggerGroup[] = [
+  "strong",
+  "weak",
+  "armor",
+  "other",
+];
+
 export type TriggerLog = {
   tag: Trigger["tag"],
   before: Action,
   after: Action,
 };
 
-export type StTrigger = Trigger & HasId;
+export type StTrigger = Trigger & HasId & HasOwner;
+
+export type HasOwner = { owner: GlobalId<UnitType> };
 
 export function applyTriggers(
   state: GameState,
@@ -87,60 +110,14 @@ export function applyTriggers(
 } {
   let newActions: Action[] = [];
   let transforms: TriggerLog[] = [];
-  // Self Triggers
-  for (const frUnit of state.frUnits) {
-    if (frUnit !== undefined) {
-      for (const trigger of frUnit.triggers.self) {
-        const extendedContext = {...context, triggerOwner: new GlobalId(frUnit.id, "friendly")};
-        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(frUnit.id, "friendly"));
-        action = transformed;
-        newActions = newActions.concat(actions);
-        if (triggerLog !== undefined) {
-          transforms = transforms.concat(triggerLog);
-        }
-      }
-    }
-  }
-
-  for (const enUnit of state.enUnits) {
-    if (enUnit !== undefined) {
-      for (const trigger of enUnit.triggers.self) {
-        const extendedContext = {...context, triggerOwner: new GlobalId(enUnit.id, "enemy")};
-        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(enUnit.id, "enemy"));
-        action = transformed;
-        newActions = newActions.concat(actions);
-        if (triggerLog !== undefined) {
-          transforms = transforms.concat(triggerLog);
-        }
-      }
-    }
-  }
-
-  // Other Triggers
-  for (const frUnit of state.frUnits) {
-    if (frUnit !== undefined) {
-      for (const trigger of frUnit.triggers.other) {
-        const extendedContext = {...context, triggerOwner: new GlobalId(frUnit.id, "friendly")};
-        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(frUnit.id, "friendly"));
-        action = transformed;
-        newActions = newActions.concat(actions);
-        if (triggerLog !== undefined) {
-          transforms = transforms.concat(triggerLog);
-        }
-      }
-    }
-  }
-
-  for (const enUnit of state.enUnits) {
-    if (enUnit !== undefined) {
-      for (const trigger of enUnit.triggers.other) {
-        const extendedContext = {...context, triggerOwner: new GlobalId(enUnit.id, "enemy")};
-        const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, new GlobalId(enUnit.id, "enemy"));
-        action = transformed;
-        newActions = newActions.concat(actions);
-        if (triggerLog !== undefined) {
-          transforms = transforms.concat(triggerLog);
-        }
+  for (const group of triggerOrder) {
+    for (const trigger of state.triggers[group]) {
+      const extendedContext = {...context, triggerOwner: trigger.owner };
+      const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, trigger.owner);
+      action = transformed;
+      newActions = newActions.concat(actions);
+      if (triggerLog !== undefined) {
+        transforms = transforms.concat(triggerLog);
       }
     }
   }
@@ -153,7 +130,7 @@ export function applyTriggers(
 
 export function applyTrigger(
   state: GameState,
-  trigger: Trigger,
+  trigger: StTrigger,
   action: Action,
   context: Context,
   transformSelf: UnitId,
@@ -215,11 +192,9 @@ export function applyTrigger(
         return {
           transformed,
           actions: [
-            new LoseFragments(
-              action.target,
-              (action.value - newValue) * 100,
-              "Armor",
-              "other",
+            new Damage(
+              new GlobalId(trigger.id, "status"),
+              action.value - newValue,
             ),
           ],
           triggerLog: {
@@ -292,46 +267,43 @@ export function triggerSprite(
 
 export function addFragments(
   state: GameState,
-  triggers: StTrigger[],
-  trigger: Trigger,
-): {
-  state: GameState,
-  triggers: StTrigger[],
- } {
-  const index = triggers.findIndex(x => mergeCondition(x, trigger));
+  trigger: Trigger & HasOwner,
+): GameState {
+  const group = tagToGroup(trigger.tag);
+  const index = state.triggers[group].findIndex(x => mergeCondition(x, trigger));
   if (index === -1) {
     const nextId = state.nextId;
     const stTr: StTrigger = {...trigger, ...{ id: nextId }};
-    return {
-      state: focus(state, over(x => x.nextId, x => x + 1)),
-      triggers: triggers.concat(stTr)
-    };
+    return focus(state,
+      over(x => x.nextId, x => x + 1),
+      over(x => x.triggers[group], x => x.concat(stTr)),
+    );
   } {
-    return {
-      state,
-      triggers: focus(triggers,
-        over(x => x[index].fragments, x => x + trigger.fragments),
-      ),
-    };
+    return focus(state,
+      over(x => x.triggers[group][index].fragments, x => x + trigger.fragments),
+    );
   }
 }
 
 function mergeCondition(
-  trigger1: Trigger,
-  trigger2: Trigger,
+  trigger1: Trigger & HasOwner,
+  trigger2: Trigger & HasOwner,
 ): boolean {
   if (trigger1.tag === "Grow" && trigger2.tag === "Grow" && trigger1.trigger.tag !== trigger2.trigger.tag) {
     return false;
   }
-  return trigger1.tag === trigger2.tag;
+  return trigger1.tag === trigger2.tag &&
+    trigger1.owner.id === trigger2.owner.id &&
+    trigger1.owner.type === trigger2.owner.type
+    ;
 }
 
-export function loseFragments<T extends Trigger>(
-  triggers: T[],
-  triggerTag: Trigger["tag"],
+export function loseFragments(
+  triggers: StTrigger[],
+  statusId: GlobalId<"status">,
   value: number,
-): T[] {
-  const index = triggers.findIndex(x => x.tag === triggerTag);
+): StTrigger[] {
+  const index = triggers.findIndex(x => x.id === statusId.id);
   if (index === -1) {
     return triggers;
   } {

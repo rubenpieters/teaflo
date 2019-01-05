@@ -6,7 +6,8 @@ import { HasAI } from "./ai";
 import { frUnitMap } from "../data/units/friendly";
 import { enUnitMap } from "../data/units/enemy";
 import { HasThreatMap } from "./threat";
-import { TargetType } from "./entityId";
+import { UnitType, GlobalId } from "./entityId";
+import { StTrigger, Trigger, TriggerGroup, triggerOrder } from "./trigger";
 
 export type FrStUnit = FrUnit & HasId & { cardId: string } & HasThreatMap;
 export type EnStUnit = EnUnit & HasId & { cardId: string } & HasAI
@@ -16,6 +17,9 @@ export type GameState = {
   enUnits: (EnStUnit | undefined)[],
   nextId: number,
   state: "invalid" | "win" | "default",
+  triggers: {
+    [K in TriggerGroup]: StTrigger[]
+  }
 }
 
 export function filteredEn(
@@ -57,6 +61,12 @@ export function mkGameState(
     enUnits: enUnitsWithId,
     nextId: enLastId + 1,
     state: "default",
+    triggers: {
+      "armor": [],
+      "strong": [],
+      "weak": [],
+      "other": [],
+    }
   }
 }
 
@@ -65,7 +75,7 @@ type UnitsResult = {
   "enemy": (EnStUnit | undefined)[],
 }
 
-export function units<A extends TargetType>(
+export function units<A extends UnitType>(
   state: GameState,
   type: A
 ): UnitsResult[A] {
@@ -78,4 +88,23 @@ export function units<A extends TargetType>(
     }
   }
   throw "impossible";
+}
+
+export function findStatus(
+  state: GameState,
+  statusId: GlobalId<"status">,
+): {
+  group: TriggerGroup,
+  index: number,
+} {
+  for (const group of triggerOrder) {
+    const index = state.triggers[group].findIndex(x => x.id === statusId.id);
+    if (index !== -1) {
+      return {
+        group,
+        index,
+      };
+    }
+  }
+  throw `findStatus: id ${statusId.id} not found`;
 }

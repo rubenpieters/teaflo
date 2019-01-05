@@ -1,4 +1,4 @@
-import { UnitId, isGlobalId, isPositionId, TargetType, GlobalId, PositionId } from "./entityId";
+import { UnitId, isGlobalId, isPositionId, UnitType, GlobalId, PositionId } from "./entityId";
 import { GameState, filteredEn, filteredFr, FrStUnit } from "./state";
 import { Action } from "./action";
 import * as A from "./action";
@@ -360,9 +360,9 @@ export function intentVarText<A>(
   switch (intentVar.tag) {
     case "Static": {
       const a = intentVar.a;
-      if (isGlobalId<TargetType>(a)) {
+      if (isGlobalId<UnitType>(a)) {
         return `<GID ${abbreviateTargetType(a.type)} ${a.id}>`;
-      } else if (isPositionId<TargetType>(a)) {
+      } else if (isPositionId<UnitType>(a)) {
         return `<POS ${abbreviateTargetType(a.type)} ${a.id}>`;
       }
       return JSON.stringify(intentVar.a);
@@ -389,7 +389,7 @@ export function intentVarText<A>(
 }
 
 function abbreviateTargetType(
-  type: TargetType,
+  type: UnitType,
 ) {
   switch (type) {
     case "enemy": return "EN";

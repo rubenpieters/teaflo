@@ -12,7 +12,7 @@ import { Game, Button } from "phaser-ce";
 import { mkGameState, GameState, FrStUnit, EnStUnit } from "src/shared/game/state";
 import { Action } from "../../shared/game/action";
 import { createButtonInPool, addText, ButtonValues } from "../util/btn";
-import { TargetType, GlobalId } from "../../shared/game/entityId";
+import { UnitType, GlobalId } from "../../shared/game/entityId";
 import { OVER, NEUTRAL } from "../util/button";
 import { Unit } from "../../shared/game/unit";
 import { SpritePool } from "../util/pool";
@@ -20,6 +20,7 @@ import { SolInfo } from "../savefile/rep";
 import { Intent } from "src/shared/game/intent";
 import { AIRoute, routeText } from "src/shared/game/ai";
 import { LogKeys } from "src/shared/game/log";
+import { HasId } from "src/shared/game/hasId";
 
 export type StatsScreenData = {
   spriteGroup: Phaser.Group,
@@ -154,7 +155,7 @@ export function drawCardInfo(
   if (info !== undefined) {
     const type = info.type;
     const id = info.id;
-    let arr: (Unit | undefined)[];
+    let arr: (Unit & HasId | undefined)[];
     if (type === "friendly") {
       arr = state.frUnits;
     } else {
@@ -180,9 +181,24 @@ export function drawCardInfo(
       }
   
       // draw stats text
-      const hpPos = createPosition(
+      const idPos = createPosition(
         "left", 1000, 720,
         "bot", 440, 100,
+      );
+      const idLbl = game.add.text(
+        idPos.xMin, idPos.yMin, `ID: ${unit.id}`, {
+          fill: "#000000",
+          fontSize: 70,
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+        }
+      );
+      idLbl.setTextBounds(0, 0, idPos.xMax - idPos.xMin, idPos.yMax - idPos.yMin);
+      gameRefs.gameScreenData.statsScreenData.texts.push(idLbl);
+
+      const hpPos = createPosition(
+        "left", 1000, 720,
+        "bot", 340, 100,
       );
       const hpLbl = game.add.text(
         hpPos.xMin, hpPos.yMin, `${unit.hp}/${unit.maxHp} HP`, {
@@ -197,7 +213,7 @@ export function drawCardInfo(
     
       const chPos = createPosition(
         "left", 1000, 720,
-        "bot", 340, 100,
+        "bot", 240, 100,
       );
       const chLbl = game.add.text(
         chPos.xMin, chPos.yMin, `${unit.charges}/${unit.maxCharges} CH`, {
@@ -262,7 +278,7 @@ export function drawCardInfo(
 type AbilitySprite = GSprite<ButtonValues & {
   ability: Ability,
   id: number,
-  type: TargetType,
+  type: UnitType,
 }>;
 
 export function createUnitAbility(
@@ -272,7 +288,7 @@ export function createUnitAbility(
   key: string,
   ability: Ability,
   id: number,
-  type: TargetType,
+  type: UnitType,
 ): AbilitySprite {
   const sprite: AbilitySprite = createButtonInPool(
     game,
@@ -315,7 +331,7 @@ export function createUnitAbility(
 type EnIntentSprite = GSprite<ButtonValues & {
   intent: Intent,
   id: number,
-  type: TargetType,
+  type: UnitType,
 }>;
 
 export function createEnIntent(
@@ -325,7 +341,7 @@ export function createEnIntent(
   key: string,
   intent: Intent,
   id: number,
-  type: TargetType,
+  type: UnitType,
 ): EnIntentSprite {
   const sprite: EnIntentSprite = createButtonInPool(
     game,
@@ -352,7 +368,7 @@ export function createEnIntent(
 type EnOutSprite = GSprite<ButtonValues & {
   route: AIRoute,
   id: number,
-  type: TargetType,
+  type: UnitType,
 }>;
 
 export function createEnOut(
@@ -361,7 +377,7 @@ export function createEnOut(
   pos: Position,
   route: AIRoute,
   id: number,
-  type: TargetType,
+  type: UnitType,
 ): EnOutSprite {
   const sprite: EnOutSprite = createButtonInPool(
     game,

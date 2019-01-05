@@ -1,13 +1,14 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { UnitId, overUnit, overFriendly, killUnit, getUnit, posToString, findIndex } from "./entityId";
-import { GameState, FrStUnit } from "./state";
+import { UnitId, overUnit, overFriendly, killUnit, getUnit, posToString, findIndex, TargetId, toGlobalId, UnitType, GlobalId } from "./entityId";
+import { GameState, FrStUnit, findStatus } from "./state";
 import { addThreat } from "./threat";
-import { Trigger, loseFragments, addFragments, Armor } from "./trigger";
+import { Trigger, loseFragments, addFragments, Armor, StTrigger, HasOwner } from "./trigger";
 import { damage, heal, useCharge } from "./unit";
+import { HasId } from "./hasId";
 
 export class Damage {
   constructor(
-    public readonly target: UnitId,
+    public readonly target: TargetId,
     public readonly value: number,
     public readonly tag: "Damage" = "Damage",
   ) {}
@@ -53,16 +54,6 @@ export class AddTrigger {
   ) {}
 }
 
-export class LoseFragments {
-  constructor(
-    public readonly target: UnitId,
-    public readonly value: number,
-    public readonly triggerTag: Trigger["tag"],
-    public readonly triggerType: Trigger["type"],
-    public readonly tag: "LoseFragments" = "LoseFragments",
-  ) {}
-}
-
 export class Death {
   constructor(
     public readonly target: UnitId,
@@ -97,7 +88,6 @@ export type Action
   | CombinedAction
   | AddThreat
   | AddTrigger
-  | LoseFragments
   | Death
   | Invalid
   | SwapHPWithExcess
@@ -119,15 +109,32 @@ export function applyAction(
   }
   switch (action.tag) {
     case "Damage": {
-      state = overUnit(action.target,
-        state,
-        x => damage(x, action.value),
-        x => x,
-      ); 
-      const unit = getUnit(action.target, state);
+      const target = action.target;
       let actions: Action[] = [];
-      if (unit !== undefined && unit.hp <= 0) {
-        actions = [new Death(action.target)];
+      if (target.type === "status") {
+        const statusIndex = findStatus(state, target);
+        const value = 100 * action.value;
+        state = focus(state,
+          over(x => x.triggers[statusIndex.group], x => {
+            if (x[statusIndex.index].fragments <= value) {
+              return x.slice(0, statusIndex.index).concat(x.slice(statusIndex.index + 1));
+            } else {
+              return focus(x,
+                over(x => x[statusIndex.index].fragments, x => x - value),
+              );
+            }
+          }),
+        );
+      } else {
+        state = overUnit(target,
+          state,
+          x => damage(x, action.value),
+          x => x,
+        ); 
+        const unit = getUnit(target, state);
+        if (unit !== undefined && unit.hp <= 0) {
+          actions = [new Death(target)];
+        }
       }
       return {
         state,
@@ -171,49 +178,17 @@ export function applyAction(
       };
     }
     case "AddTrigger": {
-      const target = action.target;
-      const id = findIndex(state, target);
-      switch (target.type) {
-        case "friendly": {
-          const unit = state.frUnits[id];
-          if (unit !== undefined) {
-            const result = addFragments(state, unit.triggers[action.trigger.type], action.trigger);
-            state = focus(result.state,
-              // state.frUnits[id] is checked before
-              set(x => x.frUnits[id]!.triggers[action.trigger.type], result.triggers),
-            );
-          }
-          break;
-        }
-        case "enemy": {
-          const unit = state.enUnits[id];
-          if (unit !== undefined) {
-            const result = addFragments(state, unit.triggers[action.trigger.type], action.trigger);
-            state = focus(result.state,
-              // state.frUnits[id] is checked before
-              set(x => x.enUnits[id]!.triggers[action.trigger.type], result.triggers),
-            );
-          }
-          break;
-        }
-      }
+      const globalId = toGlobalId(state, action.target);
+      const stTrigger: Trigger & HasOwner = {...action.trigger, ...{ owner: globalId } };
+      state = addFragments(state, stTrigger);
       return {
         state,
         actions: [],
       };
     }
-    case "LoseFragments": {
-      return {
-        state: overUnit(action.target,
-          state,
-          x => focus(x, over(x => x.triggers[action.triggerType], x => loseFragments(x, action.triggerTag, action.value))),
-          x => x,
-        ),
-        actions: [],
-      };
-    }
     case "Death": {
-      const unit = getUnit(action.target, state);
+      const target: UnitId = action.target;
+      const unit = getUnit(target, state);
       if (unit !== undefined && action.target.type === "friendly" && (<FrStUnit>unit).vital === true) {
         return {
           state: killUnit(action.target, state),
@@ -257,9 +232,9 @@ export function applyAction(
         );
 
         const newUnit1Armor = unit2.hp > unit1.maxHp ?
-          new AddTrigger(action.target1, new Armor((unit2.hp - unit1.maxHp) * 100, "other")) : undefined;
+          new AddTrigger(action.target1, new Armor((unit2.hp - unit1.maxHp) * 100)) : undefined;
         const newUnit2Armor = unit1.hp > unit2.maxHp ?
-          new AddTrigger(action.target2, new Armor((unit1.hp - unit2.maxHp) * 100, "other")) : undefined;
+          new AddTrigger(action.target2, new Armor((unit1.hp - unit2.maxHp) * 100)) : undefined;
 
         return {
           state,
@@ -303,9 +278,6 @@ export function actionText(
     }
     case "AddTrigger": {
       return `+STA ${action.trigger.fragments} ${action.trigger.tag} to ${posToString(action.target)}`;
-    }
-    case "LoseFragments": {
-      return `-STA ${action.value} ${action.triggerTag} to ${posToString(action.target)}`;
     }
     case "Death": {
       return `DEATH ${posToString(action.target)}`;

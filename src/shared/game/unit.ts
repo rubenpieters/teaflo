@@ -9,7 +9,7 @@ export type Unit = {
   maxHp: number,
   charges: number,
   maxCharges: number,
-} & HasTriggers;
+};
 
 export type FrUnit = Unit & HasAbilities & { vital: boolean };
 export type EnUnit = Unit & HasAI;
