@@ -1,8 +1,8 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { Action, Damage, AddTrigger } from "./action";
+import { Action, Damage, AddTrigger, CombinedAction } from "./action";
 import { Context } from "./intent";
 import { UnitId, eqUnitId, GlobalId, getUnit, UnitType } from "./entityId";
-import { GameState } from "./state";
+import { GameState, filteredEn } from "./state";
 import { Omit } from "../type-util";
 import { HasId } from "./hasId";
 
@@ -71,6 +71,7 @@ export class AllyWeakSelfArmor {
 
 export class Explode {
   constructor(
+    public readonly value: number,
     public readonly fragments: number,
     public readonly tag: "Explode" = "Explode",
   ) {}
@@ -289,7 +290,15 @@ export function applyTrigger(
       return { transformed: action, actions: [] };
     }
     case "Explode": {
-      // TODO
+      if (
+        action.tag === "Death" &&
+        action.target.type === "status" &&
+        action.target.id === trigger.id
+      ) {
+        const actions = filteredEn(state).map(x => new Damage(new GlobalId(x.id, "enemy"), trigger.value));
+        const damageAction = new CombinedAction(actions);
+        return { transformed: action, actions: [damageAction] };
+      }
       return { transformed: action, actions: [] };
     }
   }

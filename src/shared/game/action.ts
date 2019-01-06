@@ -16,7 +16,7 @@ export class Damage {
 
 export class Heal {
   constructor(
-    public readonly target: UnitId,
+    public readonly target: TargetId,
     public readonly value: number,
     public readonly tag: "Heal" = "Heal",
   ) {}
@@ -142,12 +142,26 @@ export function applyAction(
       };
     }
     case "Heal": {
-      return {
-        state: overUnit(action.target,
+      const target = action.target;
+      if (target.type === "status") {
+        const statusIndex = findStatus(state, target);
+        const value = 100 * action.value;
+        state = focus(state,
+          over(x => x.triggers[statusIndex.group], x => {
+            return focus(x,
+              over(x => x[statusIndex.index].fragments, x => x + value),
+            );
+          }),
+        );
+      } else {
+        state = overUnit(target,
           state,
           x => heal(x, action.value),
           x => x,
-        ),
+        );
+      }
+      return {
+        state,
         actions: [],
       };
     }
