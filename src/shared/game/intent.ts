@@ -157,7 +157,6 @@ export function thDamage(
 export type Context = {
   input?: any[],
   self?: UnitId,
-  triggerOwner?: UnitId,
 }
 
 export function intentToAction(

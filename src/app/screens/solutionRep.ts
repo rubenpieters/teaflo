@@ -13,7 +13,7 @@ import { Game, Button } from "phaser-ce";
 import { mkGameState, EnStUnit, FrStUnit, filteredFr, filteredEn, GameState } from "src/shared/game/state";
 import { Action, actionText } from "../../shared/game/action";
 import { createButtonInPool, addText, ButtonValues } from "../util/btn";
-import { UnitType, PositionId, toPositionId, TargetId } from "../../shared/game/entityId";
+import { UnitType, PositionId, toPositionId, TargetId, GlobalId } from "../../shared/game/entityId";
 import { Log, LogEntry, LogKeys } from "../../shared/game/log";
 import { triggerSprite, Trigger, TriggerLog, StTrigger, triggerOrder } from "../../shared/game/trigger";
 import { spriteMap } from "../../shared/data/units/spriteMap";
@@ -375,8 +375,7 @@ export function createUnitTrigger(
     {
       clickLeft: () => {
         if (gameRefs.gameScreenData.clickState !== undefined) {
-          console.log(`TRIGGER ID: ${sprite.data.trigger.id}`);
-          //applyScreenEvent(new SE.AdvanceClickState(new PositionId(sprite.data.trigger.id, unit.data.type)), game, gameRefs);
+          applyScreenEvent(new SE.AdvanceClickState(new GlobalId(sprite.data.trigger.id, "status")), game, gameRefs);
         }
       },
       popupSprite: (self: TriggerSprite) => {

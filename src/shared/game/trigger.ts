@@ -62,12 +62,20 @@ export class Grow {
   ) {}
 }
 
+export class AllyWeakSelfArmor {
+  constructor(
+    public readonly fragments: number,
+    public readonly tag: "AllyWeakSelfArmor" = "AllyWeakSelfArmor",
+  ) {}
+}
+
 export type Trigger
   = Weak
   | Strong
   | Armor
   | StrongLowHP
   | Grow
+  | AllyWeakSelfArmor
   ;
 
 export function tagToGroup(
@@ -79,6 +87,7 @@ export function tagToGroup(
     case "Strong": return "strong";
     case "StrongLowHP": return "strong";
     case "Weak": return "weak";
+    case "AllyWeakSelfArmor": return "other";
   }
 }
 
@@ -112,8 +121,7 @@ export function applyTriggers(
   let transforms: TriggerLog[] = [];
   for (const group of triggerOrder) {
     for (const trigger of state.triggers[group]) {
-      const extendedContext = {...context, triggerOwner: trigger.owner };
-      const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, extendedContext, trigger.owner);
+      const { actions, transformed, triggerLog } = applyTrigger(state, trigger, action, context);
       action = transformed;
       newActions = newActions.concat(actions);
       if (triggerLog !== undefined) {
@@ -128,12 +136,17 @@ export function applyTriggers(
   };
 }
 
+/*
+terminology:
+SELF - the unit which started the action
+TRIGGER OWNER - the unit to which the trigger belongs
+ACTION TARGET - the unit on which the action is targeted
+*/
 export function applyTrigger(
   state: GameState,
   trigger: StTrigger,
   action: Action,
   context: Context,
-  transformSelf: UnitId,
 ): {
   actions: Action[],
   transformed: Action,
@@ -141,7 +154,7 @@ export function applyTrigger(
 } {
   switch (trigger.tag) {
     case "Weak": {
-      if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, transformSelf)) {
+      if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, trigger.owner)) {
         const subtr = action.value - Math.round((trigger.fragments / 100) - 0.5);
         const newValue = subtr > 0 ? subtr : 0;
         const transformed = new Damage(
@@ -162,7 +175,7 @@ export function applyTrigger(
       }
     }
     case "Strong": {
-      if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, transformSelf)) {
+      if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, trigger.owner)) {
         const newValue = action.value + Math.round((trigger.fragments / 100) - 0.5);
         const transformed = new Damage(
           action.target,
@@ -182,7 +195,7 @@ export function applyTrigger(
       }
     }
     case "Armor": {
-      if (action.tag === "Damage" && eqUnitId(state, action.target, transformSelf)) {
+      if (action.tag === "Damage" && eqUnitId(state, action.target, trigger.owner)) {
         let newValue = action.value - Math.round((trigger.fragments / 100) - 0.5);
         newValue = newValue < 0 ? 0 : newValue;
         const transformed = new Damage(
@@ -209,7 +222,7 @@ export function applyTrigger(
     }
     case "StrongLowHP": {
       const self = context.self;
-      if (action.tag === "Damage" && self !== undefined && eqUnitId(state, self, transformSelf)) {
+      if (action.tag === "Damage" && self !== undefined && eqUnitId(state, self, trigger.owner)) {
         const multiplier = Math.round((trigger.fragments / 100) - 0.5);
         const selfUnit = getUnit(self, state);
         if (selfUnit !== undefined) {
@@ -233,19 +246,35 @@ export function applyTrigger(
       return { transformed: action, actions: [] };
     }
     case "Grow": {
-      const owner = context.triggerOwner;
-      if (owner === undefined) {
-        throw "applyTrigger: no trigger owner";
-      }
       const multiplier = Math.round((trigger.fragments / 100) - 0.5);
       const growAction = new AddTrigger(
-        owner,
+        trigger.owner,
         focus(trigger.trigger, over(x => x.fragments, x => x * multiplier)),
       );
       if (action.tag === "StartTurn") {
         return {
           transformed: action,
           actions: [growAction],
+        };  
+      }
+      return { transformed: action, actions: [] };
+    }
+    case "AllyWeakSelfArmor": {
+      const self = context.self;
+      if (
+        action.tag === "AddTrigger" &&
+        tagToGroup(action.trigger.tag) === "weak" &&
+        action.target.type === "friendly" &&
+        self !== undefined &&
+        ! eqUnitId(state, action.target, trigger.owner)
+      ) {
+        const armorAction = new AddTrigger(
+          trigger.owner,
+          new Armor(trigger.fragments),
+        );
+        return {
+          transformed: action,
+          actions: [armorAction],
         };  
       }
       return { transformed: action, actions: [] };
@@ -262,6 +291,7 @@ export function triggerSprite(
     case "Armor": return "tr_armor";
     case "StrongLowHP": return "tr_strong";
     case "Grow": return "tr_strong";
+    case "AllyWeakSelfArmor": return "tr_strong";
   }
 }
 
