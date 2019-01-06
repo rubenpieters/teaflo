@@ -1,6 +1,6 @@
 import { FrUnit } from "src/shared/game/unit";
 import * as I from "../../game/intent";
-import { TargetInput } from "../../game/ability";
+import { TargetInput, StatusInput } from "../../game/ability";
 import * as T from "../../game/trigger";
 
 export const fr_unit_a1_l1_01: FrUnit = {
@@ -263,6 +263,57 @@ export const fr_unit_a2_03: FrUnit = {
   vital: true,
 };
 
+export const fr_unit_a2_04: FrUnit = {
+  hp: 40,
+  maxHp: 40,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(1),
+        ),
+        new I.DamageI(
+          new I.FromInput(0),
+          new I.Static(2),
+        ),
+        I.thDamage(
+          new I.FromInput(1),
+          new I.Static(15),
+        ),
+      ]),
+      inputs: [
+        new StatusInput(),
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab2",
+    },
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(1),
+        ),
+        new I.AddTriggerI(
+          I.mkSelf(),
+          new I.Static(new T.Weak(300)),
+        ),
+        new I.AddTriggerI(
+          new I.FromInput(0),
+          new I.Static(new T.Strong(300)),
+        ),
+      ]),
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab2",
+    },
+  ],
+  vital: true,
+};
+
 export const unit1: FrUnit = {
   hp: 100,
   maxHp: 100,
@@ -298,6 +349,7 @@ export const frUnitMap: {
   "fr_unit_a2_01": fr_unit_a2_01,
   "fr_unit_a2_02": fr_unit_a2_02,
   "fr_unit_a2_03": fr_unit_a2_03,
+  "fr_unit_a2_04": fr_unit_a2_04,
   "card1": unit1,
   "card2": unit1,
   "card3": unit1,

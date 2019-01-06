@@ -23,9 +23,23 @@ export class TargetInput {
   ) {}
 }
 
+export class UnitInput {
+  constructor(
+    public readonly tag: "UnitInput" = "UnitInput",
+  ) {}
+}
+
+export class StatusInput {
+  constructor(
+    public readonly tag: "StatusInput" = "StatusInput",
+  ) {}
+}
+
 export type UserInput
   = NumberInput
   | TargetInput
+  | UnitInput
+  | StatusInput
   ;
 
 export function abilityText(

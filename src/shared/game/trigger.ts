@@ -69,6 +69,13 @@ export class AllyWeakSelfArmor {
   ) {}
 }
 
+export class Explode {
+  constructor(
+    public readonly fragments: number,
+    public readonly tag: "Explode" = "Explode",
+  ) {}
+}
+
 export type Trigger
   = Weak
   | Strong
@@ -76,6 +83,7 @@ export type Trigger
   | StrongLowHP
   | Grow
   | AllyWeakSelfArmor
+  | Explode
   ;
 
 export function tagToGroup(
@@ -88,6 +96,7 @@ export function tagToGroup(
     case "StrongLowHP": return "strong";
     case "Weak": return "weak";
     case "AllyWeakSelfArmor": return "other";
+    case "Explode": return "other";
   }
 }
 
@@ -279,6 +288,10 @@ export function applyTrigger(
       }
       return { transformed: action, actions: [] };
     }
+    case "Explode": {
+      // TODO
+      return { transformed: action, actions: [] };
+    }
   }
 }
 
@@ -292,6 +305,7 @@ export function triggerSprite(
     case "StrongLowHP": return "tr_strong";
     case "Grow": return "tr_strong";
     case "AllyWeakSelfArmor": return "tr_strong";
+    case "Explode": return "tr_strong";
   }
 }
 

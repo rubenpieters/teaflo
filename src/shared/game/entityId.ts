@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { GameState, units, FrStUnit, EnStUnit } from "./state";
+import { GameState, units, FrStUnit, EnStUnit, findStatus } from "./state";
 import { HasId } from "./hasId";
 import { Unit } from "./unit";
 
@@ -82,6 +82,25 @@ export function getUnit(
       return state.enUnits[id];
     }
   }
+}
+
+export function killStatus(
+  target: GlobalId<"status">,
+  state: GameState,
+): GameState {
+  const statusIndex = findStatus(state, target);
+  return focus(state,
+    over(x => x.triggers[statusIndex.group], x =>
+      x.slice(0, statusIndex.index).concat(x.slice(statusIndex.index + 1))
+  ));
+}
+
+export function getStatus(
+  target: GlobalId<"status">,
+  state: GameState,
+) {
+  const statusIndex = findStatus(state, target);
+  return state.triggers[statusIndex.group][statusIndex.index];
 }
 
 export function overUnit(

@@ -1,5 +1,5 @@
 import { focus, over, set } from "src/shared/iassign-util";
-import { UnitId, overUnit, overFriendly, killUnit, getUnit, posToString, findIndex, TargetId, toGlobalId, UnitType, GlobalId } from "./entityId";
+import { UnitId, overUnit, overFriendly, killUnit, getUnit, posToString, findIndex, TargetId, toGlobalId, UnitType, GlobalId, getStatus, killStatus } from "./entityId";
 import { GameState, FrStUnit, findStatus } from "./state";
 import { addThreat } from "./threat";
 import { Trigger, loseFragments, addFragments, Armor, StTrigger, HasOwner } from "./trigger";
@@ -56,7 +56,7 @@ export class AddTrigger {
 
 export class Death {
   constructor(
-    public readonly target: UnitId,
+    public readonly target: TargetId,
     public readonly tag: "Death" = "Death",
   ) {}
 }
@@ -116,15 +116,15 @@ export function applyAction(
         const value = 100 * action.value;
         state = focus(state,
           over(x => x.triggers[statusIndex.group], x => {
-            if (x[statusIndex.index].fragments <= value) {
-              return x.slice(0, statusIndex.index).concat(x.slice(statusIndex.index + 1));
-            } else {
-              return focus(x,
-                over(x => x[statusIndex.index].fragments, x => x - value),
-              );
-            }
+            return focus(x,
+              over(x => x[statusIndex.index].fragments, x => x - value),
+            );
           }),
         );
+        const status = getStatus(target, state);
+        if (status.fragments <= 0) {
+          actions = [new Death(target)];
+        }
       } else {
         state = overUnit(target,
           state,
@@ -187,17 +187,24 @@ export function applyAction(
       };
     }
     case "Death": {
-      const target: UnitId = action.target;
-      const unit = getUnit(target, state);
-      if (unit !== undefined && action.target.type === "friendly" && (<FrStUnit>unit).vital === true) {
+      const target: TargetId = action.target;
+      if (target.type === "status") {
         return {
-          state: killUnit(action.target, state),
-          actions: [new Invalid],
+          state: killStatus(target, state),
+          actions: [],
         }
       } else {
-        return {
-          state: killUnit(action.target, state),
-          actions: [],
+        const unit = getUnit(target, state);
+        if (unit !== undefined && target.type === "friendly" && (<FrStUnit>unit).vital === true) {
+          return {
+            state: killUnit(target, state),
+            actions: [new Invalid],
+          }
+        } else {
+          return {
+            state: killUnit(target, state),
+            actions: [],
+          }
         }
       }
     }
