@@ -87,15 +87,17 @@ export function drawLevelInfo(
   // supply slots
   const supplySize = levelDataMap[levelId].cardIds.length;
   for (let i = 0; i < supplySize; i++) {
+    const row = Math.floor(i / 4);
+    const col = i % 4;
     const cardSlotPos = absoluteIn(
       leftBgSpritePos, config.levelBgWidth, config.levelBgHeight,
-      17 + 20 * i, config.levelSelectCardWidth,
-      17, config.levelSelectCardHeight,
+      17 + 20 * col, config.levelSelectCardWidth,
+      17 + 20 * row, config.levelSelectCardHeight,
     );
     const cardPos = absoluteIn(
       leftBgSpritePos, config.levelBgWidth, config.levelBgHeight,
-      15 + 20 * i, config.levelSelectCardWidth,
-      15, config.levelSelectCardHeight,
+      15 + 20 * col, config.levelSelectCardWidth,
+      15 + 20 * row, config.levelSelectCardHeight,
     );
     const cardSlot = createPoolCardSlot(gameRefs.levelSelectData.cardSlotPool, cardSlotPos);
     const cardId = gameRefs.saveFile.levelSolutions[levelId][solId].supply[i];
