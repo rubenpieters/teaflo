@@ -1,5 +1,6 @@
 import { Pool, newButton } from "../phaser/pool";
 import { config } from "../config";
+import { createTween } from "../phaser/animation";
 
 export default class Game extends Phaser.State {
   public init(): void {
@@ -20,13 +21,9 @@ export default class Game extends Phaser.State {
           }
         },
         introAnim: (self) => {
-          const introAnim = this.add.tween(self);
-          introAnim.frameBased = true;
-          introAnim.from({ y: config.gameHeight + 400 }, 50, Phaser.Easing.Linear.None, false, 100 * self.data);
-          introAnim.onComplete.add(() => {
-            this.tweens.remove(introAnim);
-          });
-          return introAnim;
+          return createTween(this.game, self,
+            tween => tween.from({ y: config.gameHeight + 400 }, 50, Phaser.Easing.Linear.None, false, 100 * self.data)
+          );
         }
       }
     );
