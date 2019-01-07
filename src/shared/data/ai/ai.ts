@@ -3,7 +3,7 @@ import { AI} from "../../game/ai";
 import * as O  from "../../game/ai";
 import { GameState } from "../../game/state";
 import * as I from "../../game/intent";
-import { PositionId } from "../../game/entityId";
+import { PositionId, UnitId, getUnit } from "../../game/entityId";
 import * as T from "../../game/trigger";
 
 export const ai1: AI = [
@@ -59,13 +59,23 @@ export const ai3: AI = [
     intent: new I.AddTriggerI(
       I.mkSelf(),
       new I.Static(
-        new T.Grow(100, new T.Strong(300)),
+        new T.Grow(100, new T.Strong(100)),
       ),
     ),
     spriteId: "fr_unit_a1_l2_01_ab1",
     outs: [
         {
           aiOut: new O.ToX(1),
+          condition: (state: GameState, selfId: UnitId) => {
+            const selfUnit = getUnit(selfId, state);
+            if (selfUnit !== undefined) {
+              return selfUnit.hp < selfUnit.maxHp;
+            }
+            throw "Should not happen";
+          },
+        },
+        {
+          aiOut: new O.ToSelf,
           condition: (state: GameState) => true,
         },
       ],

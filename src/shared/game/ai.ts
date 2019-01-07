@@ -1,6 +1,7 @@
 import { focus, over, set } from "src/shared/iassign-util";
 import { GameState } from "./state";
 import { Intent } from "./intent";
+import { GlobalId, UnitId } from "./entityId";
 
 export type HasAI = {
   ai: AI,
@@ -47,15 +48,16 @@ type AIOut
   | ToSelf
   ;
 
-type Condition = (state: GameState) => boolean;
+type Condition = (state: GameState, self: UnitId) => boolean;
 
 function nextOut(
   state: GameState,
   outs: Outs,
+  self: UnitId,
 ): AIOut {
   const next: AIOut | undefined = outs.reduce((prev, { aiOut, condition }) => {
     if (prev === undefined) {
-      if (condition(state)) {
+      if (condition(state, self)) {
         return aiOut;
       } else {
         return prev;
@@ -73,9 +75,10 @@ function nextOut(
 
 export function nextAI<E extends HasAI>(
   state: GameState,
-  e: E
+  e: E,
+  self: UnitId,
 ): E {
-  const newOut = nextOut(state, e.ai[e.currentAI].outs);
+  const newOut = nextOut(state, e.ai[e.currentAI].outs, self);
   switch (newOut.tag) {
     case "ToSelf": return e;
     case "ToX": return focus(e, set(x => x.currentAI, newOut.x));

@@ -140,7 +140,7 @@ function runPhases(
       state = enActionResult.state;
       // forward enUnit AI
       state = overEnemy(enUnitSelf, state,
-        x => nextAI(state, x),
+        x => nextAI(state, x, enUnitSelf),
         x => x,
       );
       const filteredLog = enActionResult.log.filter(x => x.action.tag !== "CombinedAction");
