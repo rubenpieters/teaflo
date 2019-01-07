@@ -3,11 +3,13 @@ import { DataSprite } from "./datasprite";
 // FrameType:
 // custom type to characterize different frames
 // for example: union of string for different button states
-export type PoolInfo<FrameType> = {
+export type PoolInfo<Data, FrameType> = {
   // sprites in this pool share this spritesheet
   spritesheet: string,
   // conversion of custom frame type to actual frame index
-  toFrame: (frameType: FrameType) => number
+  toFrame: (frameType: FrameType) => number,
+  // intro animation, represented as a Phaser Tween
+  introAnim: (sprite: DataSprite<Data>) => Phaser.Tween,
 }
 
 export type SpriteCallbacks = {
@@ -18,11 +20,11 @@ export type SpriteCallbacks = {
 }
 
 export class Pool<Data, FrameType> extends Phaser.Group {
-  poolInfo: PoolInfo<FrameType>
+  poolInfo: PoolInfo<Data, FrameType>
 
   constructor(
     game: Phaser.Game,
-    poolInfo: PoolInfo<FrameType>,
+    poolInfo: PoolInfo<Data, FrameType>,
     parent?: PIXI.DisplayObjectContainer,
     name?: string,
     addToStage?: boolean,
@@ -102,6 +104,14 @@ export class Pool<Data, FrameType> extends Phaser.Group {
     frameType: FrameType,
   ) {
     sprite.frame = this.poolInfo.toFrame(frameType);
+  }
+
+  // play the intro animation of all existing sprites in this pool
+  playIntroAnimations() {
+    this.forEachExists((sprite: DataSprite<Data>) => {
+      const tween = this.poolInfo.introAnim(sprite);
+      tween.start();
+    });
   }
 }
 
