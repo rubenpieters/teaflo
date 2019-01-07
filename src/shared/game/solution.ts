@@ -21,6 +21,11 @@ export type Solution = {
   tree: Tree<SolutionData>,
 }
 
+export const emptySolution: Solution = {
+  win: false,
+  tree: emptyTree(),
+};
+
 export function extendSolution(
   solData: SolutionData,
   solution: Solution,
