@@ -1,5 +1,5 @@
 import { Pool, newButton } from "../phaser/pool";
-import { config } from "../config";
+import { settings } from "../data/settings";
 import { createTween } from "../phaser/animation";
 
 export default class Game extends Phaser.State {
@@ -22,14 +22,14 @@ export default class Game extends Phaser.State {
         },
         introAnim: (self) => {
           return createTween(this.game, self,
-            tween => tween.from({ y: config.gameHeight + 400 }, 50, Phaser.Easing.Linear.None, false, 100 * self.data)
+            tween => tween.from({ y: settings.gameHeight + 400 }, 50, Phaser.Easing.Linear.None, false, 100 * self.data)
           );
         }
       }
     );
-    newButton(pool, 100, config.gameHeight - 100, "neutral", 0, {});
-    newButton(pool, 600, config.gameHeight - 100, "neutral", 1, {});
-    newButton(pool, 1100, config.gameHeight - 100, "neutral", 2, {});
+    newButton(pool, 100, settings.gameHeight - 100, "neutral", 0, {});
+    newButton(pool, 600, settings.gameHeight - 100, "neutral", 1, {});
+    newButton(pool, 1100, settings.gameHeight - 100, "neutral", 2, {});
     pool.playIntroAnimations();
   }
 }

@@ -37,7 +37,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
 
   // create a new sprite in this pool
   // uses getFirstExists to reuse killed sprites
-  newSprite(
+  public newSprite(
     x: number,
     y: number,
     frameType: FrameType,
@@ -99,7 +99,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   }
 
   // NOTE: only give a sprite belonging to this pool as parameter
-  setFrame(
+  public setFrame(
     sprite: DataSprite<Data>,
     frameType: FrameType,
   ) {
@@ -107,7 +107,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   }
 
   // play the intro animation of all existing sprites in this pool
-  playIntroAnimations() {
+  public playIntroAnimations() {
     this.forEachExists((sprite: DataSprite<Data>) => {
       const tween = this.poolInfo.introAnim(sprite);
       tween.start();

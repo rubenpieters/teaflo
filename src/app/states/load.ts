@@ -1,4 +1,4 @@
-import { config } from "../config";
+import { settings } from "../data/settings";
 
 let loadingText: Phaser.Text;
 let ready: boolean = false;
@@ -6,8 +6,8 @@ let ready: boolean = false;
 export default class Load extends Phaser.State {
   public init(): void {
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    this.scale.maxWidth = config.gameWidth;
-    this.scale.maxHeight = config.gameHeight;
+    this.scale.maxWidth = settings.gameWidth;
+    this.scale.maxHeight = settings.gameHeight;
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
 
@@ -22,9 +22,9 @@ export default class Load extends Phaser.State {
 
     loadingText.setTextBounds(
       0,
-      config.gameHeight / 3,
-      config.gameWidth,
-      config.gameHeight
+      settings.gameHeight / 3,
+      settings.gameWidth,
+      settings.gameHeight
     );
   }
 
