@@ -1,7 +1,7 @@
 import expect from "expect";
-import { extendTree, emptyTree, cutTree, getLocation } from "src/shared/tree";
+import { extendTree, emptyTree, cutTree, getLocation } from "../../src/shared/tree";
 
-function basicTest() {
+export function basicTest() {
   let x = emptyTree();
   
   let t = extendTree((x, y) => x == y, x, [], 1);
@@ -20,4 +20,4 @@ function basicTest() {
   expect(() => getLocation(x, [0, 0])).toThrow();
 }
 
-basicTest();
+// basicTest();
