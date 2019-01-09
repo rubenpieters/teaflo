@@ -1,4 +1,5 @@
 import { DataSprite } from "./datasprite";
+import { createTween } from "./animation";
 
 // FrameType:
 // custom type to characterize different frames
@@ -9,14 +10,16 @@ export type PoolInfo<Data, FrameType> = {
   // conversion of custom frame type to actual frame index
   toFrame: (frameType: FrameType) => number,
   // intro animation, represented as a Phaser Tween
-  introAnim: (sprite: DataSprite<Data>) => Phaser.Tween,
+  introAnim: (sprite: DataSprite<Data>, tween: Phaser.Tween) => Phaser.Tween,
+  // custom callbacks for sprites in this pool
+  callbacks: SpriteCallbacks<Data>,
 }
 
-export type SpriteCallbacks = {
-  onDown?: () => void,
-  click?: () => void,
-  hoverOut?: () => void,
-  hoverOver?: () => void,
+export type SpriteCallbacks<Data> = {
+  onDown?: (self: DataSprite<Data>) => void,
+  click?: (self: DataSprite<Data>) => void,
+  hoverOut?: (self: DataSprite<Data>) => void,
+  hoverOver?: (self: DataSprite<Data>) => void,
 }
 
 export class Pool<Data, FrameType> extends Phaser.Group {
@@ -42,12 +45,6 @@ export class Pool<Data, FrameType> extends Phaser.Group {
     y: number,
     frameType: FrameType,
     data: Data,
-    callbacks: {
-      onDown: () => void,
-      click: () => void,
-      hoverOut?: () => void,
-      hoverOver?: () => void,
-    },
   ): DataSprite<Data> {
     const sprite: DataSprite<Data> = this.getFirstExists(false, true, x, y);
     // replace data variable
@@ -67,7 +64,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
       sprite.events.onInputDown.add(() => {
         if (sprite.props !== undefined) {
           sprite.props.selecting = true;
-          callbacks.onDown();
+          invokeIfDefined(this.poolInfo.callbacks.onDown, sprite);
         }
       });
       sprite.events.onInputUp.removeAll();
@@ -76,19 +73,15 @@ export class Pool<Data, FrameType> extends Phaser.Group {
           const pX = this.game.input.activePointer.x;
           const pY = this.game.input.activePointer.y;
           if (pX >= x && pX <= x + sprite.width && pY >= y && pY <= y + sprite.height) {
-            callbacks.click();
+            invokeIfDefined(this.poolInfo.callbacks.click, sprite);
           }
           sprite.props.selecting = false;
         }
       });
       sprite.events.onInputOver.removeAll();
-      if (callbacks.hoverOver !== undefined) {
-        sprite.events.onInputOver.add(callbacks.hoverOver);
-      }
+      sprite.events.onInputOver.add(() => invokeIfDefined(this.poolInfo.callbacks.hoverOver, sprite));
       sprite.events.onInputOut.removeAll();
-      if (callbacks.hoverOut !== undefined) {
-        sprite.events.onInputOut.add(callbacks.hoverOut);
-      }
+      sprite.events.onInputOut.add(() => invokeIfDefined(this.poolInfo.callbacks.hoverOut, sprite));
 
       sprite.props = {
         init: true,
@@ -109,44 +102,60 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   // play the intro animation of all existing sprites in this pool
   public playIntroAnimations() {
     this.forEachExists((sprite: DataSprite<Data>) => {
-      const tween = this.poolInfo.introAnim(sprite);
+      const tween = createTween(this.game, sprite, x => this.poolInfo.introAnim(sprite, x));
       tween.start();
     });
   }
 }
 
-export function newButton<Data>(
-  pool: Pool<Data, "neutral" | "hover" | "down">,
-  x: number,
-  y: number,
-  buttonStatus: "neutral" | "hover" | "down",
-  data: Data,
-  callbacks: SpriteCallbacks,
-): DataSprite<Data> {
-  const sprite = pool.newSprite(
-    x, y, buttonStatus, data,
-    {
-      onDown: () => {
-        pool.setFrame(sprite, "down");
-        if (callbacks.onDown !== undefined) callbacks.onDown();
-      },
-      click: () => {
-        pool.setFrame(sprite, "neutral");
-        if (callbacks.click !== undefined) callbacks.click();
-      },
-      hoverOver: () => {
-        if (sprite.props !== undefined && sprite.props.selecting) {
-          pool.setFrame(sprite, "down");
-        } else {
-          pool.setFrame(sprite, "hover");
-        }
-        if (callbacks.hoverOver !== undefined) callbacks.hoverOver();
-      },
-      hoverOut: () => {
-        pool.setFrame(sprite, "neutral");
-        if (callbacks.hoverOut !== undefined) callbacks.hoverOut();
+function invokeIfDefined<A>(
+  f: ((a: A) => void) | undefined,
+  a: A,
+): void {
+  if (f !== undefined) {
+    f(a);
+  }
+}
+
+export function mkButtonPool<Data>(
+  game: Phaser.Game,
+  poolInfo: PoolInfo<Data, "neutral" | "hover" | "down">,
+  mLockCondition?: (self: DataSprite<Data>) => boolean,
+): Pool<Data, "neutral" | "hover" | "down"> {
+  const callbacks = poolInfo.callbacks;
+  const lockCondition = mLockCondition === undefined ? () => false : mLockCondition;
+  const newCallbacks: SpriteCallbacks<Data> = {
+    onDown: (self: DataSprite<Data>) => {
+      if (! lockCondition(self)) {
+        pool.setFrame(self, "down");
+        if (callbacks.onDown !== undefined) callbacks.onDown(self);
       }
     },
-  )
-  return sprite;
+    click: (self: DataSprite<Data>) => {
+      if (! lockCondition(self)) {
+        pool.setFrame(self, "hover");
+        if (callbacks.click !== undefined) callbacks.click(self);
+      }
+    },
+    hoverOver: (self: DataSprite<Data>) => {
+      if (! lockCondition(self)) {
+        if (self.props !== undefined && self.props.selecting) {
+          pool.setFrame(self, "down");
+        } else {
+          pool.setFrame(self, "hover");
+        }
+        if (callbacks.hoverOver !== undefined) callbacks.hoverOver(self);
+      }
+    },
+    hoverOut: (self: DataSprite<Data>) => {
+      if (! lockCondition(self)) {
+        pool.setFrame(self, "neutral");
+        if (callbacks.hoverOut !== undefined) callbacks.hoverOut(self);
+      }
+    }
+  };
+  const pool: Pool<Data, "neutral" | "hover" | "down"> = new Pool(
+    game, { ...poolInfo, ...{ callbacks: newCallbacks } },
+  );
+  return pool;
 }
