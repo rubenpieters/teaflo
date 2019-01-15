@@ -41,6 +41,10 @@ export default class Load extends Phaser.State {
     this.game.load.image("card1", "textures/card1.png");
     this.game.load.image("card2", "textures/card2.png");
     this.game.load.image("card3", "textures/card3.png");
+    this.game.load.image("card4", "textures/card4.png");
+    this.game.load.image("card5", "textures/card5.png");
+    this.game.load.image("card6", "textures/card6.png");
+    this.game.load.image("card7", "textures/card7.png");
     this.game.load.image("fr_unit_a1_l1_01", "textures/fr_unit_a1_l1_01.png");
     this.game.load.image("fr_unit_a1_l2_01", "textures/fr_unit_a1_l2_01.png");
     this.game.load.image("fr_unit_a1_l2_02", "textures/fr_unit_a1_l2_02.png");

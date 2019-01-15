@@ -68,6 +68,16 @@ export function mkAllExceptSelf(): IntentVar<UnitId> {
   return new AllExceptSelf;
 }
 
+export class AllyExceptSelf {
+  constructor(
+    public readonly tag: "AllyExceptSelf" = "AllyExceptSelf",
+  ) {}
+}
+
+export function mkAllyExceptSelf(): IntentVar<UnitId> {
+  return new AllyExceptSelf;
+}
+
 export type IntentVar<A>
   = Static<A>
   | FromInput
@@ -76,6 +86,7 @@ export type IntentVar<A>
   | AllAlly
   | HighestThreat
   | AllExceptSelf
+  | AllyExceptSelf
   ;
 
 export class DamageI {
@@ -256,7 +267,7 @@ function evaluateTargets(
   context: Context,
   target: IntentVar<UnitId>,
   create: (target: IntentVar<UnitId>) => Action,
-) {
+): Action {
   if (target.tag === "AllEnemy") {
     const actions = filteredEn(state)
       .map(x => create(new Static(new GlobalId(x.id, "enemy"))));
@@ -278,6 +289,16 @@ function evaluateTargets(
       .filter(x => x.id !== self.id)
       .map(x => create(new Static(new GlobalId(x.id, "enemy"))));
     return new A.CombinedAction(actionsFr.concat(actionsEn));
+  } else if (target.tag === "AllyExceptSelf") {
+    const self = context.self;
+    if (self === undefined) {
+      console.log("evaluateTargets: no self given");
+      throw "evaluateTargets: no self given";
+    }
+    const actionsFr = filteredFr(state)
+      .filter(x => x.id !== self.id)
+      .map(x => create(new Static(new GlobalId(x.id, "friendly"))));
+    return new A.CombinedAction(actionsFr);
   } else {
     return create(target);
   }
@@ -350,6 +371,10 @@ function evaluateIntentVar<A>(
       console.log("AllExceptSelf: Internal Intent Var");
       throw "AllExceptSelf: Internal Intent Var";
     }
+    case "AllyExceptSelf": {
+      console.log("AllyExceptSelf: Internal Intent Var");
+      throw "AllyExceptSelf: Internal Intent Var";
+    }
   }
 }
 
@@ -383,6 +408,9 @@ export function intentVarText<A>(
     }
     case "AllExceptSelf": {
       return `<All Except Self>`;
+    }
+    case "AllyExceptSelf": {
+      return `<Allies Except Self>`;
     }
   }
 }

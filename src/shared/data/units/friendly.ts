@@ -94,7 +94,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(new T.Armor(1000)),
+          new I.Static(T.full(new T.Armor(1))),
         ),
       ]),
       inputs: [
@@ -136,7 +136,7 @@ export const fr_unit_a1_l3_01: FrUnit = {
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(new T.Weak(100)),
+          new I.Static(T.full(new T.Weak(1))),
         ),
       ]),
       inputs: [
@@ -149,16 +149,16 @@ export const fr_unit_a1_l3_01: FrUnit = {
 };
 
 export const fr_unit_a2_01: FrUnit = {
-  hp: 40,
-  maxHp: 40,
-  charges: 5,
-  maxCharges: 5,
+  hp: 70,
+  maxHp: 70,
+  charges: 30,
+  maxCharges: 30,
   abilities: [
     {
       intent: new I.CombinedIntent([
         new I.UseChargeI(
           I.mkSelf(),
-          new I.Static(1),
+          new I.Static(5),
         ),
         I.thDamage(
           I.mkAllExceptSelf(),
@@ -169,10 +169,16 @@ export const fr_unit_a2_01: FrUnit = {
       spriteId: "fr_unit_a1_l1_01_ab1",
     },
     {
-      intent: new I.SwapHPWithExcessI(
-        new I.FromInput(0),
-        new I.FromInput(1),
-      ),
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(2),
+        ),
+        new I.SwapHPWithExcessI(
+          new I.FromInput(0),
+          new I.FromInput(1),
+        ),
+      ]),
       inputs: [
         new TargetInput(),
         new TargetInput(),
@@ -184,41 +190,37 @@ export const fr_unit_a2_01: FrUnit = {
 };
 
 export const fr_unit_a2_02: FrUnit = {
-  hp: 25,
-  maxHp: 25,
-  charges: 5,
-  maxCharges: 5,
+  hp: 70,
+  maxHp: 70,
+  charges: 30,
+  maxCharges: 30,
   abilities: [
     {
       intent: new I.CombinedIntent([
         new I.UseChargeI(
           I.mkSelf(),
-          new I.Static(2),
+          new I.Static(4),
         ),
         new I.AddTriggerI(
-          new I.FromInput(0),
-          new I.Static(new T.Strong(500)),
+          I.mkSelf(),
+          new I.Static(T.full(new T.AllyWeakSelfArmor(3))),
         ),
       ]),
-      inputs: [
-        new TargetInput(),
-      ],
+      inputs: [],
       spriteId: "fr_unit_a1_l1_01_ab2",
     },
     {
       intent: new I.CombinedIntent([
         new I.UseChargeI(
           I.mkSelf(),
-          new I.Static(2),
+          new I.Static(7),
         ),
         new I.AddTriggerI(
-          new I.FromInput(0),
-          new I.Static(new T.Strong(500)),
+          new I.AllExceptSelf(),
+          new I.Static(T.full(new T.Weak(2))),
         ),
       ]),
-      inputs: [
-        new TargetInput(),
-      ],
+      inputs: [],
       spriteId: "fr_unit_a1_l1_01_ab2",
     },
   ],
@@ -226,62 +228,24 @@ export const fr_unit_a2_02: FrUnit = {
 };
 
 export const fr_unit_a2_03: FrUnit = {
-  hp: 40,
-  maxHp: 40,
-  charges: 5,
-  maxCharges: 5,
+  hp: 70,
+  maxHp: 70,
+  charges: 30,
+  maxCharges: 30,
   abilities: [
     {
       intent: new I.CombinedIntent([
         new I.UseChargeI(
           I.mkSelf(),
-          new I.Static(1),
-        ),
-        new I.AddTriggerI(
-          I.mkSelf(),
-          new I.Static(new T.AllyWeakSelfArmor(300)),
-        ),
-      ]),
-      inputs: [],
-      spriteId: "fr_unit_a1_l1_01_ab2",
-    },
-    {
-      intent: new I.CombinedIntent([
-        new I.UseChargeI(
-          I.mkSelf(),
-          new I.Static(1),
-        ),
-        new I.AddTriggerI(
-          new I.AllExceptSelf(),
-          new I.Static(new T.Weak(200)),
-        ),
-      ]),
-      inputs: [],
-      spriteId: "fr_unit_a1_l1_01_ab2",
-    },
-  ],
-  vital: true,
-};
-
-export const fr_unit_a2_04: FrUnit = {
-  hp: 40,
-  maxHp: 40,
-  charges: 5,
-  maxCharges: 5,
-  abilities: [
-    {
-      intent: new I.CombinedIntent([
-        new I.UseChargeI(
-          I.mkSelf(),
-          new I.Static(1),
+          new I.Static(8),
         ),
         new I.DamageI(
           new I.FromInput(0),
-          new I.Static(2),
+          new I.Static(7),
         ),
         I.thDamage(
           new I.FromInput(1),
-          new I.Static(15),
+          new I.Static(10),
         ),
       ]),
       inputs: [
@@ -294,18 +258,63 @@ export const fr_unit_a2_04: FrUnit = {
       intent: new I.CombinedIntent([
         new I.UseChargeI(
           I.mkSelf(),
-          new I.Static(1),
+          new I.Static(3),
         ),
         new I.AddTriggerI(
           I.mkSelf(),
-          new I.Static(new T.Weak(300)),
+          new I.Static(T.full(new T.Weak(1))),
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(new T.Strong(300)),
+          new I.Static(T.full(new T.Strong(2))),
         ),
       ]),
       inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab2",
+    },
+  ],
+  vital: true,
+};
+
+export const fr_unit_a2_04: FrUnit = {
+  hp: 70,
+  maxHp: 70,
+  charges: 30,
+  maxCharges: 30,
+  abilities: [
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(5),
+        ),
+        new I.AddTriggerI(
+          I.mkSelf(),
+          new I.Static(T.full(new T.Explode(10, 10))),
+        ),
+      ]),
+      inputs: [],
+      spriteId: "fr_unit_a1_l1_01_ab2",
+    },
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(3),
+        ),
+        new I.DamageI(
+          new I.FromInput(0),
+          new I.Static(10),
+        ),
+        new I.AddTriggerI(
+          new I.FromInput(1),
+          new I.Static(T.full(new T.Armor(5))),
+        ),
+      ]),
+      inputs: [
+        new StatusInput(),
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
@@ -315,38 +324,54 @@ export const fr_unit_a2_04: FrUnit = {
 };
 
 export const fr_unit_a2_05: FrUnit = {
-  hp: 40,
-  maxHp: 40,
-  charges: 5,
-  maxCharges: 5,
+  hp: 70,
+  maxHp: 70,
+  charges: 30,
+  maxCharges: 30,
   abilities: [
     {
       intent: new I.CombinedIntent([
         new I.UseChargeI(
           I.mkSelf(),
-          new I.Static(1),
+          new I.Static(9),
         ),
-        new I.AddTriggerI(
-          I.mkSelf(),
-          new I.Static(new T.Explode(20, 200)),
+        new I.DamageI(
+          new I.FromInput(0),
+          new I.Static(5),
+        ),
+        new I.DamageI(
+          new I.FromInput(1),
+          new I.Static(5),
+        ),
+        new I.HealI(
+          new I.FromInput(2),
+          new I.Static(10),
         ),
       ]),
-      inputs: [],
+      inputs: [
+        new StatusInput(),
+        new StatusInput(),
+        new StatusInput(),
+      ],
       spriteId: "fr_unit_a1_l1_01_ab2",
     },
     {
       intent: new I.CombinedIntent([
         new I.UseChargeI(
           I.mkSelf(),
-          new I.Static(1),
+          new I.Static(5),
         ),
         new I.DamageI(
           new I.FromInput(0),
-          new I.Static(200),
+          new I.Static(16),
+        ),
+        new I.AddTriggerI(
+          I.mkSelf(),
+          new I.Static(T.full(new T.Weak(1))),
         ),
       ]),
       inputs: [
-        new StatusInput(),
+        new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
     },
@@ -355,34 +380,42 @@ export const fr_unit_a2_05: FrUnit = {
 };
 
 export const fr_unit_a2_06: FrUnit = {
-  hp: 40,
-  maxHp: 40,
-  charges: 5,
-  maxCharges: 5,
+  hp: 70,
+  maxHp: 70,
+  charges: 30,
+  maxCharges: 30,
   abilities: [
     {
       intent: new I.CombinedIntent([
         new I.UseChargeI(
           I.mkSelf(),
-          new I.Static(1),
-        ),
-        new I.DamageI(
-          new I.FromInput(0),
-          new I.Static(100),
-        ),
-        new I.DamageI(
-          new I.FromInput(1),
-          new I.Static(100),
-        ),
-        new I.HealI(
-          new I.FromInput(2),
           new I.Static(2),
+        ),
+        new I.AddTriggerI(
+          I.mkSelf(),
+          new I.Static(T.full(new T.ThreatOnAllyDamage(2))),
         ),
       ]),
       inputs: [
-        new StatusInput(),
-        new StatusInput(),
-        new StatusInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab2",
+    },
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(5),
+        ),
+        new I.AddTriggerI(
+          I.mkSelf(),
+          new I.Static(T.full(new T.Armor(14))),
+        ),
+        new I.DamageI(
+          I.mkAllyExceptSelf(),
+          new I.Static(3),
+        ),
+      ]),
+      inputs: [
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
     },

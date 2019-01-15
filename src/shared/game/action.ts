@@ -113,7 +113,7 @@ export function applyAction(
       let actions: Action[] = [];
       if (target.type === "status") {
         const statusIndex = findStatus(state, target);
-        const value = 100 * action.value;
+        const value = action.value;
         state = focus(state,
           over(x => x.triggers[statusIndex.group], x => {
             return focus(x,
@@ -145,7 +145,7 @@ export function applyAction(
       const target = action.target;
       if (target.type === "status") {
         const statusIndex = findStatus(state, target);
-        const value = 100 * action.value;
+        const value = action.value;
         state = focus(state,
           over(x => x.triggers[statusIndex.group], x => {
             return focus(x,
