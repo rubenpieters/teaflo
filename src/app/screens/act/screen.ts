@@ -2,6 +2,7 @@ import { actData } from "../../screens/act/data";
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
 import { createPosition } from "../../util/position";
+import { createTween } from "../../phaser/animation";
 
 export class ActScreen {
   actBtnPool: Pool<ActBtnData, "neutral" | "hover" | "down">
@@ -27,8 +28,8 @@ export class ActScreen {
       const actId = Number(actKey);
 
       const pos = createPosition(
-        "left", 100 + 500 * i, 400,
-        "bot", -100, 200,
+        "left", 100 + 210 * i, 400,
+        "top", -200, 200,
       );
       
       this.actBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { actId, actIndex: i });
@@ -57,15 +58,24 @@ function mkActBtnPool(
       spritesheet: "btn",
       toFrame: frameType => {
         switch (frameType) {
-          case "down": return 0;
+          case "down": return 1;
           case "hover": return 2;
-          case "neutral": return 1;
+          case "neutral": return 0;
         }
       },
       introAnim: (self, tween) => {
-        return tween.from({ y: settings.gameHeight + 400 }, 250, Phaser.Easing.Linear.None, false, 50 * self.data.actIndex);
+        return tween.from({ y: -400 }, 150, Phaser.Easing.Linear.None, false, 30 * self.data.actIndex);
       },
-      callbacks: {},
+      callbacks: {
+        hoverOver: (self) => {
+          const tween = createTween(game, self, x => x.to({ y: -100 }, 75, Phaser.Easing.Linear.None, false, 0));
+          tween.start();
+        },
+        hoverOut: (self) => {
+          const tween = createTween(game, self, x => x.to({ y: -200 }, 75, Phaser.Easing.Linear.None, false, 0));
+          tween.start();
+        },
+      },
     },
     self => { return false; }
   );
