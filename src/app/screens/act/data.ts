@@ -1,3 +1,5 @@
+import { GameRefs } from "src/app/states/game";
+
 export type ActData = {
   shortName: string,
   longName: string,
@@ -18,4 +20,18 @@ export const actData: {
     shortName: "3",
     longName: "Act 3",
   },
+}
+
+export type ActSaveData = {
+  selectedActId: number | undefined,
+}
+
+export const actSaveData: ActSaveData = {
+  selectedActId: undefined,
+}
+
+export function selectedActId(
+  gameRefs: GameRefs
+): number | undefined {
+  return gameRefs.saveData.act.selectedActId;
 }
