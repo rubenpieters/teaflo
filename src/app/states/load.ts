@@ -34,6 +34,11 @@ export default class Load extends Phaser.State {
   public preload(): void {
     // load sprites
     this.game.load.spritesheet("btn", "textures/bmark.png", 200, 400);
+    this.game.load.image("bg0", "textures/bg0.png");
+    this.game.load.image("bg1", "textures/bg1.png");
+    this.game.load.image("bg2", "textures/bg2.png");
+    this.game.load.image("bg3", "textures/bg3.png");
+    this.game.load.image("bg4", "textures/bg4.png");
 
     // indicate loading is done
     loadingText.setText("Click anywhere to continue...");

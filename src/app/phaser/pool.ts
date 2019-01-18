@@ -1,5 +1,5 @@
 import { DataSprite } from "./datasprite";
-import { createTween } from "./animation";
+import { createTween, createChainedTween } from "./animation";
 
 // FrameType:
 // custom type to characterize different frames
@@ -10,7 +10,7 @@ export type PoolInfo<Data, FrameType> = {
   // conversion of custom frame type to actual frame index
   toFrame: (frameType: FrameType) => number,
   // intro animation, represented as a Phaser Tween
-  introAnim: (sprite: DataSprite<Data>, tween: Phaser.Tween) => Phaser.Tween,
+  introAnim: ((sprite: DataSprite<Data>, tween: Phaser.Tween) => void)[],
   // custom callbacks for sprites in this pool
   callbacks: SpriteCallbacks<Data>,
 }
@@ -102,8 +102,11 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   // play the intro animation of all existing sprites in this pool
   public playIntroAnimations() {
     this.forEachExists((sprite: DataSprite<Data>) => {
-      const tween = createTween(this.game, sprite, x => this.poolInfo.introAnim(sprite, x));
-      tween.start();
+      const fs = this.poolInfo.introAnim.map(f => (x: Phaser.Tween) => f(sprite, x));
+      const tween = createChainedTween(this.game, sprite, ...fs);
+      if (tween !== undefined) {
+        tween.start();
+      }
     });
   }
 }

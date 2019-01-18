@@ -3,7 +3,7 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
 import { createPosition } from "../../util/position";
 import { createTween } from "../../phaser/animation";
-import { GameRefs } from "src/app/states/game";
+import { GameRefs } from "../../states/game";
 import { changeAct } from "./events";
 
 export class ActScreen {
@@ -78,9 +78,11 @@ function mkActBtnPool(
           case "neutral": return 0;
         }
       },
-      introAnim: (self, tween) => {
-        return tween.from({ y: -400 }, 150, Phaser.Easing.Linear.None, false, 30 * self.data.actIndex);
-      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: -400 }, 150, Phaser.Easing.Linear.None, false, 30 * self.data.actIndex);
+        }
+      ],
       callbacks: {
         click: (self) => {
           changeAct(gameRefs, self.data.actId);

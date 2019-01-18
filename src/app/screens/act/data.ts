@@ -26,8 +26,10 @@ export type ActSaveData = {
   selectedActId: number | undefined,
 }
 
-export const actSaveData: ActSaveData = {
-  selectedActId: undefined,
+export function mkActSaveData(): ActSaveData {
+  return {
+    selectedActId: undefined,
+  };
 }
 
 export function selectedActId(
