@@ -32,20 +32,20 @@ export class ActScreen {
       const actId = Number(actKey);
       
       const selActId = selectedActId(this.gameRefs);
-      if (selActId !== undefined && selActId == actId) {
+      if (selActId !== undefined && selActId === actId) {
         // this is the currently selected act
         const pos = createPosition(
           "left", 100 + 210 * i, 400,
           "top", -100, 200,
         );
-        this.actBtnPool.newSprite(pos.xMin, pos.yMin, "down", { actId, actIndex: i, selected: true, });
+        this.actBtnPool.newSprite(pos.xMin, pos.yMin, "down", { actId, actIndex: i, });
       } else {
         const pos = createPosition(
           "left", 100 + 210 * i, 400,
           "top", -200, 200,
         );
         // this is not the currently selected act
-        this.actBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { actId, actIndex: i, selected: false, });
+        this.actBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { actId, actIndex: i, });
       }
       i += 1;
     }
@@ -61,7 +61,6 @@ export class ActScreen {
 type ActBtnData = {
   actId: number,
   actIndex: number,
-  selected: boolean,
 }
 
 function mkActBtnPool(
@@ -97,6 +96,6 @@ function mkActBtnPool(
         },
       },
     },
-    self => { return self.data.selected; }
+    self => { return self.data.actId === selectedActId(gameRefs); }
   );
 }
