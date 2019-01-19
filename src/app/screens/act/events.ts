@@ -11,5 +11,5 @@ export function changeAct(
   if (levelId === undefined) {
     gameRefs.saveData.levelSelect.selectedLevelId[actId] = levelMap[actId][0].id;
   }
-  gameRefs.screens.levelSelectScreen.draw();
+  gameRefs.screens.levelSelectScreen.draw(actId);
 }

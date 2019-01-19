@@ -42,6 +42,6 @@ export default class Game extends Phaser.State {
     gameRefs.screens.actScreen = actScreen;
 
     actScreen.draw();
-    levelSelectScreen.draw();
+    //levelSelectScreen.draw(0);
   }
 }
