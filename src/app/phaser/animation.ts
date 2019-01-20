@@ -18,6 +18,7 @@ export function createChainedTween(
   ...fs: ((tween: Phaser.Tween) => void)[]
 ): Phaser.Tween | undefined {
   let tween: Phaser.Tween | undefined = undefined;
+  let result: Phaser.Tween | undefined = undefined;
   fs.forEach(f => {
     let t = game.add.tween(obj);
     t.frameBased = true;
@@ -26,10 +27,12 @@ export function createChainedTween(
       game.tweens.remove(t);
     });
     if (tween !== undefined) {
-      tween = tween.chain(t);
+      tween.chain(t);
+      tween = t;
     } else {
       tween = t;
+      result = tween;
     }
   });
-  return tween;
+  return result;
 }

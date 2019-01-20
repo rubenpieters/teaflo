@@ -109,6 +109,14 @@ export class Pool<Data, FrameType> extends Phaser.Group {
       }
     });
   }
+
+  public introTween(
+    sprite: DataSprite<Data>,
+  ): Phaser.Tween | undefined {
+    const fs = this.poolInfo.introAnim.map(f => (x: Phaser.Tween) => f(sprite, x));
+    const tween = createChainedTween(this.game, sprite, ...fs);
+    return tween;
+  }
 }
 
 function invokeIfDefined<A>(

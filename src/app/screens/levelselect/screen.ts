@@ -39,26 +39,32 @@ export class LevelSelectScreen {
   drawMenu(
     actId: number,
   ) {
-    this.redrawMenu(actId);
-    this.levelBtnPool.playIntroAnimations();
-  }
-
-  redrawMenu(
-    actId: number,
-  ) {
     this.levelBtnPool.killAll();
 
-    let levelIndex = 0;
-    for (const levelData of levelMap[actId]) {
-      const levelId = levelData.id;
-      const pos = createPosition(
-        "left", 250, 400,
-        "top", 300 + (250 * levelIndex), 200,
-      );
-      const sprite = this.levelBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { levelId, levelIndex });
-      addText(this.gameRefs, sprite, pos, levelData.name, "#000000", 40);
+    this.createLevelBtn(actId, 0);
+  }
 
-      levelIndex += 1;
+
+  createLevelBtn(
+    actId: number,
+    levelIndex: number,
+  ) {
+    const levelData = levelMap[actId][levelIndex];
+    const levelId = levelData.id;
+    const pos = createPosition(
+      "left", 250, 400,
+      "top", 300 + (250 * levelIndex), 200,
+    );
+    const sprite = this.levelBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { levelId, levelIndex });
+    addText(this.gameRefs, sprite, pos, levelData.name, "#000000", 40);
+    const tween = this.levelBtnPool.introTween(sprite);
+    if (tween !== undefined) {
+      if (levelIndex + 1 < levelMap[actId].length) {
+        tween.onComplete.add(() => {
+          this.createLevelBtn(actId, levelIndex + 1);
+        });
+      }
+      tween.start();
     }
   }
 
@@ -96,8 +102,10 @@ function mkBgPool(
         },
         (self, tween) => {
           tween.from({}, 30);
-          tween.onComplete.add(() => self.loadTexture("bg4"));
-          gameRefs.screens.levelSelectScreen.drawMenu(self.data.actId);
+          tween.onComplete.add(() => {
+            self.loadTexture("bg4");
+            gameRefs.screens.levelSelectScreen.drawMenu(self.data.actId);
+        });
         },
       ],
       callbacks: {},
@@ -126,7 +134,7 @@ function mkLevelBtnPool(
       },
       introAnim: [
         (self, tween) => {
-          tween.from({ y: self.y - 100 }, 100, Phaser.Easing.Linear.None, false, 30 * self.data.levelIndex);
+          tween.from({ y: self.y - 100 }, 50, Phaser.Easing.Linear.None, false, 0);
         }
       ],
       callbacks: {
