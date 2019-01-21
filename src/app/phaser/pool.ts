@@ -103,16 +103,16 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   public playIntroAnimations() {
     this.forEachExists((sprite: DataSprite<Data>) => {
       const fs = this.poolInfo.introAnim.map(f => (x: Phaser.Tween) => f(sprite, x));
-      const tween = createChainedTween(this.game, sprite, ...fs);
-      if (tween !== undefined) {
-        tween.start();
+      const intro = createChainedTween(this.game, sprite, ...fs);
+      if (intro !== undefined) {
+        intro.first.start();
       }
     });
   }
 
   public introTween(
     sprite: DataSprite<Data>,
-  ): Phaser.Tween | undefined {
+  ): { first: Phaser.Tween, last: Phaser.Tween } | undefined {
     const fs = this.poolInfo.introAnim.map(f => (x: Phaser.Tween) => f(sprite, x));
     const tween = createChainedTween(this.game, sprite, ...fs);
     return tween;
