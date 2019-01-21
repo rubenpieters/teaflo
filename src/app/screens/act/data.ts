@@ -65,3 +65,33 @@ export function selectedActId(
 ): number | undefined {
   return gameRefs.saveData.act.selectedActId;
 }
+
+export type LevelSaveData = {
+  selectedLevelId: string | undefined,
+  levels: { [key in string]: SolutionData[]
+  },
+}
+
+export function mkLevelSaveData(): LevelSaveData {
+  return {
+    selectedLevelId: undefined,
+    levels: {},
+  };
+}
+
+export function selectedLevelId(
+  gameRefs: GameRefs
+): string | undefined {
+  return gameRefs.saveData.level.selectedLevelId;
+}
+
+export type SolutionData = {
+  name: string,
+}
+
+export function mkSolutionData(
+): SolutionData {
+  return {
+    name: "New_Sol",
+  };
+}
