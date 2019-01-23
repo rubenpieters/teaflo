@@ -37,8 +37,8 @@ export class ActScreen {
       if (selActId !== undefined && selActId === actId) {
         // this is the currently selected act
         const pos = createPosition(
-          "left", 100 + 210 * i, 400,
-          "top", -100, 200,
+          "left", 100 + 210 * i, 200,
+          "top", -100, 400,
         );
         this.actBtnPool.newSprite(pos.xMin, pos.yMin, "down", { actId, actIndex: i, });
       } else {

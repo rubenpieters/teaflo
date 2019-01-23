@@ -2,6 +2,7 @@ import { ActScreen } from "../screens/act/screen";
 import { ActSaveData, mkActSaveData, LevelSaveData, mkLevelSaveData } from "../screens/act/data";
 import { BgScreen } from "../screens/bg/screen";
 import { LevelScreen } from "../screens/level/screen";
+import { MenuScreen } from "../screens/menu/screen";
 
 export type GameRefs = {
   game: Phaser.Game,
@@ -9,6 +10,7 @@ export type GameRefs = {
     bgScreen: BgScreen,
     actScreen: ActScreen,
     levelScreen: LevelScreen,
+    menuScreen: MenuScreen,
   },
   saveData: {
     act: ActSaveData,
@@ -31,6 +33,7 @@ export default class Game extends Phaser.State {
         bgScreen: <any>undefined,
         actScreen: <any>undefined,
         levelScreen: <any>undefined,
+        menuScreen: <any>undefined,
       },
       saveData: {
         act: mkActSaveData(),
@@ -44,7 +47,10 @@ export default class Game extends Phaser.State {
     gameRefs.screens.actScreen = actScreen;
     const levelScreen = new LevelScreen(gameRefs);
     gameRefs.screens.levelScreen = levelScreen;
+    const menuScreen = new MenuScreen(gameRefs);
+    gameRefs.screens.menuScreen = menuScreen;
 
     actScreen.drawActBtn();
+    menuScreen.drawMenuBtn();
   }
 }
