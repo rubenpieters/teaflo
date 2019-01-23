@@ -9,6 +9,7 @@ export type ActData = {
 export type LevelData = {
   name: string,
   id: string,
+  cardIds: string[],
 }
 
 export const actData: {
@@ -21,10 +22,12 @@ export const actData: {
       {
         name: "A1 level1",
         id: "a1l1",
+        cardIds: [],
       },
       {
         name: "A1 level2",
         id: "a1l2",
+        cardIds: ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
       },
     ],
   },
@@ -35,6 +38,7 @@ export const actData: {
       {
         name: "A2 level1",
         id: "a2l1",
+        cardIds: [],
       },
     ],
   },
@@ -45,6 +49,7 @@ export const actData: {
       {
         name: "A3 level1",
         id: "a3l1",
+        cardIds: [],
       },
     ],
   },
