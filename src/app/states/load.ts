@@ -40,6 +40,7 @@ export default class Load extends Phaser.State {
     this.game.load.image("bg2", "textures/bg2.png");
     this.game.load.image("bg3", "textures/bg3.png");
     this.game.load.image("bg4", "textures/bg4.png");
+    this.game.load.image("box", "textures/box.png");
     this.game.load.spritesheet("btn_level", "textures/btn_level.png", 400, 200);
 
     // indicate loading is done

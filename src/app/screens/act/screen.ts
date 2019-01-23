@@ -6,6 +6,7 @@ import { createTween } from "../../phaser/animation";
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
 import { addText } from "../../phaser/datasprite";
+import { loadLevel } from "../level/events";
 
 export class ActScreen {
   actBtnPool: Pool<ActBtnData, "neutral" | "hover" | "down">
@@ -320,7 +321,7 @@ function mkSolBtnPool(
               break;
             }
             case "SolBtnDataSelect": {
-              console.log(`SELECT: ${data.solIndex}`);
+              loadLevel(gameRefs, data.levelId, data.solIndex);
               break;
             }
           }
