@@ -17,7 +17,6 @@ export class MenuScreen {
   drawMenuBtn() {
     this.redrawMenuBtn();
     this.menuBtnPool.playIntroAnimations();
-    console.log("TEST");
   }
 
   redrawMenuBtn() {

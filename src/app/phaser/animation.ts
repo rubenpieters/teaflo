@@ -1,3 +1,5 @@
+import { DataSprite } from "./datasprite";
+
 export function createTween(
   game: Phaser.Game,
   obj: any,
@@ -38,4 +40,29 @@ export function createChainedTween(
     return { first, last };
   }
   return undefined;
+}
+
+export function chainSpriteCreation(
+  spriteFs: {
+    create: () => DataSprite<any>,
+    introTween: (sprite: DataSprite<any>) => { first: Phaser.Tween, last: Phaser.Tween } | undefined,
+  }[],
+  animation: boolean,
+) {
+  if (spriteFs.length === 0) {
+    return;
+  } else {
+    const fs = spriteFs[0];
+    const sprite = fs.create();
+    if (animation) {
+      const intro = fs.introTween(sprite);
+      if (intro !== undefined) {
+        intro.last.onComplete.add(() => {
+          chainSpriteCreation(spriteFs.splice(1), animation);
+        });
+      }
+    } else {
+      chainSpriteCreation(spriteFs.splice(1), animation);
+    }
+  }
 }

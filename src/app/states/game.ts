@@ -3,6 +3,8 @@ import { ActSaveData, mkActSaveData, LevelSaveData, mkLevelSaveData } from "../s
 import { BgScreen } from "../screens/bg/screen";
 import { LevelScreen } from "../screens/level/screen";
 import { MenuScreen } from "../screens/menu/screen";
+import { settings } from "../data/settings";
+import { createPosition } from "../util/position";
 
 export type GameRefs = {
   game: Phaser.Game,
@@ -19,6 +21,10 @@ export type GameRefs = {
 }
 
 export default class Game extends Phaser.State {
+  public preload(): void {
+    this.game.time.advancedTiming = true;
+  }
+
   public init(): void {
 
   }
@@ -52,5 +58,13 @@ export default class Game extends Phaser.State {
 
     actScreen.drawActBtn();
     menuScreen.drawMenuBtn();
+  }
+
+  public render(): void {
+    const pos = createPosition(
+      "right", 70, settings.gameWidth,
+      "top", 20, settings.gameHeight,
+    );
+    this.game.debug.text(`${this.game.time.fps} FPS` || '--', pos.xMax, pos.yMin, "#00ff00");   
   }
 }

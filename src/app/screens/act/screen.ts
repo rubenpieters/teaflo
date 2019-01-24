@@ -2,10 +2,10 @@ import { actData, selectedActId, selectedLevelId } from "../../screens/act/data"
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
 import { createPosition } from "../../util/position";
-import { createTween } from "../../phaser/animation";
+import { createTween, chainSpriteCreation } from "../../phaser/animation";
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
-import { addText } from "../../phaser/datasprite";
+import { addText, DataSprite } from "../../phaser/datasprite";
 import { loadLevel } from "../level/events";
 
 export class ActScreen {
@@ -119,7 +119,49 @@ export class ActScreen {
     levelId: string,
     animation: boolean,
   ) {
-    this.createSolBtn(levelId, 0, animation);
+    //this.createSolBtn(levelId, 0, animation);
+    const levels = this.gameRefs.saveData.level.levels[levelId];
+    let solBtns: {
+      create: () => DataSprite<SolBtnData>,
+      introTween: (sprite: DataSprite<SolBtnData>) => { first: Phaser.Tween, last: Phaser.Tween } | undefined,
+    }[];
+    let solAddI = 0;
+    if (levels === undefined) {
+      solBtns = [];
+    } else {
+      solBtns = levels.map((levelData, solIndex) => {
+        return {
+          create: () => {
+            const pos = createPosition(
+              "left", 250, 400,
+              "top", 300 + (250 * solIndex), 200,
+            );
+            const sprite = this.solBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { tag: "SolBtnDataSelect", levelId, solIndex });
+            addText(this.gameRefs, sprite, pos, levelData.name, "#000000", 40);
+            return sprite;
+          },
+          introTween: (sprite: DataSprite<SolBtnData>) => {
+            return this.solBtnPool.introTween(sprite);
+          },
+        }
+      });
+      solAddI = levels.length;
+    }
+    const solAddBtn = {
+      create: () => {
+        const pos = createPosition(
+          "left", 250, 400,
+          "top", 300 + (250 * solAddI), 200,
+        );
+        const sprite = this.solBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { tag: "SolBtnDataAdd", levelId });
+        addText(this.gameRefs, sprite, pos, "+", "#000000", 40);
+        return sprite;
+      },
+      introTween: (sprite: DataSprite<SolBtnData>) => {
+        return this.solBtnPool.introTween(sprite);
+      },
+    };
+    chainSpriteCreation(solBtns.concat(solAddBtn), animation);
   }
 
   private createSolBtn(

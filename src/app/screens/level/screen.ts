@@ -66,3 +66,21 @@ function mkBoxPool(
     },
   )
 }
+
+function mkCard(
+  gameRefs: GameRefs,
+): Pool<{}, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      spritesheet: "fr_unit_a1_l2_01",
+      toFrame: frameType => { return <any>undefined },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ x: self.x - 50 }, 75, Phaser.Easing.Linear.None, false, 50);
+        },
+      ],
+      callbacks: {},
+    },
+  )
+}
