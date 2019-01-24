@@ -14,10 +14,8 @@ export class LevelScreen {
 
   drawBox(
   ) {
+    this.boxPool.killAll();
     this.gameRefs.screens.bgScreen.bgOnIntroComplete(
-      () => {
-        this.boxPool.killAll();
-      },
       () => {
         this.createBox(true);
       },

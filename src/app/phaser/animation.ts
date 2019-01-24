@@ -60,6 +60,7 @@ export function chainSpriteCreation(
         intro.last.onComplete.add(() => {
           chainSpriteCreation(spriteFs.splice(1), animation);
         });
+        intro.first.start();
       }
     } else {
       chainSpriteCreation(spriteFs.splice(1), animation);

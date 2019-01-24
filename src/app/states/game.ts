@@ -1,5 +1,5 @@
 import { ActScreen } from "../screens/act/screen";
-import { ActSaveData, mkActSaveData, LevelSaveData, mkLevelSaveData } from "../screens/act/data";
+import { ActSaveData, mkActSaveData } from "../screens/act/data";
 import { BgScreen } from "../screens/bg/screen";
 import { LevelScreen } from "../screens/level/screen";
 import { MenuScreen } from "../screens/menu/screen";
@@ -16,7 +16,6 @@ export type GameRefs = {
   },
   saveData: {
     act: ActSaveData,
-    level: LevelSaveData,
   }
 }
 
@@ -43,7 +42,6 @@ export default class Game extends Phaser.State {
       },
       saveData: {
         act: mkActSaveData(),
-        level: mkLevelSaveData(),
       }
     }
 

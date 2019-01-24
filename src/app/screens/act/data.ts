@@ -55,39 +55,30 @@ export const actData: {
   },
 }
 
+export class SelectedAct {
+  constructor (
+    public readonly actId: number,
+    public readonly tag: "SelectedAct" = "SelectedAct",
+  ) {}
+}
+
+export class SelectedLevel {
+  constructor (
+    public readonly levelId: string,
+    public readonly tag: "SelectedLevel" = "SelectedLevel",
+  ) {}
+}
+
 export type ActSaveData = {
-  selectedActId: number | undefined,
+  currentMenu: SelectedAct | SelectedLevel | undefined,
+  levels: { [key in string]: SolutionData[] }
 }
 
 export function mkActSaveData(): ActSaveData {
   return {
-    selectedActId: undefined,
-  };
-}
-
-export function selectedActId(
-  gameRefs: GameRefs
-): number | undefined {
-  return gameRefs.saveData.act.selectedActId;
-}
-
-export type LevelSaveData = {
-  selectedLevelId: string | undefined,
-  levels: { [key in string]: SolutionData[]
-  },
-}
-
-export function mkLevelSaveData(): LevelSaveData {
-  return {
-    selectedLevelId: undefined,
+    currentMenu: undefined,
     levels: {},
   };
-}
-
-export function selectedLevelId(
-  gameRefs: GameRefs
-): string | undefined {
-  return gameRefs.saveData.level.selectedLevelId;
 }
 
 export type SolutionData = {
@@ -99,4 +90,32 @@ export function mkSolutionData(
   return {
     name: "New_Sol",
   };
+}
+
+export function selectedMenu(
+  gameRefs: GameRefs
+): SelectedAct | SelectedLevel | undefined {
+  return gameRefs.saveData.act.currentMenu;
+}
+
+export function selectedActId(
+  gameRefs: GameRefs
+): number | undefined {
+  const menu = selectedMenu(gameRefs);
+  if (menu === undefined) return undefined;
+  switch (menu.tag) {
+    case "SelectedAct": return menu.actId;
+    case "SelectedLevel": return undefined;
+  } 
+}
+
+export function selectedLevelId(
+  gameRefs: GameRefs
+): string | undefined {
+  const menu = selectedMenu(gameRefs);
+  if (menu === undefined) return undefined;
+  switch (menu.tag) {
+    case "SelectedAct": return undefined;
+    case "SelectedLevel": return menu.levelId;
+  } 
 }

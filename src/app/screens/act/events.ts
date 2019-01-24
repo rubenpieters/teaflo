@@ -1,12 +1,11 @@
 import { GameRefs } from "../../states/game";
-import { mkSolutionData } from "./data";
+import { mkSolutionData, SelectedAct, SelectedLevel } from "./data";
 
 export function changeAct(
   gameRefs: GameRefs,
   actId: number,
 ) {
-  gameRefs.saveData.act.selectedActId = actId;
-  gameRefs.saveData.level.selectedLevelId = undefined;
+  gameRefs.saveData.act.currentMenu = new SelectedAct(actId);
 
   gameRefs.screens.actScreen.actSelectMode();
   gameRefs.screens.actScreen.redrawActBtn();
@@ -17,8 +16,7 @@ export function changeLevel(
   gameRefs: GameRefs,
   levelId: string,
 ) {
-  gameRefs.saveData.act.selectedActId = undefined;
-  gameRefs.saveData.level.selectedLevelId = levelId;
+  gameRefs.saveData.act.currentMenu = new SelectedLevel(levelId);
   
   gameRefs.screens.actScreen.levelSelectMode();
   gameRefs.screens.actScreen.redrawActBtn();
@@ -29,11 +27,11 @@ export function addNewSolution(
   gameRefs: GameRefs,
   levelId: string,
 ) {
-  const solutions = gameRefs.saveData.level.levels[levelId];
+  const solutions = gameRefs.saveData.act.levels[levelId];
   if (solutions === undefined) {
-    gameRefs.saveData.level.levels[levelId] = [mkSolutionData()];
+    gameRefs.saveData.act.levels[levelId] = [mkSolutionData()];
   } else {
-    gameRefs.saveData.level.levels[levelId].push(mkSolutionData());
+    gameRefs.saveData.act.levels[levelId].push(mkSolutionData());
   }
 
   gameRefs.screens.actScreen.redrawSolBtn(levelId);

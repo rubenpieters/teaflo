@@ -12,15 +12,12 @@ export class BgScreen {
 
   drawBg(
   ) {
-    this.bgOnIntroComplete(() => { return; }, () => { return; });
+    this.bgOnIntroComplete(() => { return; });
   }
 
   bgOnIntroComplete(
-    before: () => void,
     after: () => void,
   ) {
-    before();
-
     this.bgPool.killAll();
 
     const sprite = this.bgPool.newSprite(0, 0, {}, {});

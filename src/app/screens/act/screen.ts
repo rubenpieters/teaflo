@@ -1,4 +1,4 @@
-import { actData, selectedActId, selectedLevelId } from "../../screens/act/data";
+import { actData, selectedActId, selectedMenu } from "../../screens/act/data";
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
 import { createPosition } from "../../util/position";
@@ -21,6 +21,24 @@ export class ActScreen {
     this.solBtnPool = mkSolBtnPool(gameRefs);
   }
 
+  draw() {
+    const menu = selectedMenu(this.gameRefs);
+    if (menu === undefined) {
+      this.drawActBtn();
+      return;
+    }
+    switch (menu.tag) {
+      case "SelectedAct": {
+        changeAct(this.gameRefs, menu.actId);
+        break;
+      }
+      case "SelectedLevel": {
+        changeLevel(this.gameRefs, menu.levelId);
+        break;
+      }
+    }
+  }
+
   drawActBtn() {
     this.redrawActBtn();
     this.actBtnPool.playIntroAnimations();
@@ -29,11 +47,11 @@ export class ActScreen {
   redrawActBtn() {
     this.actBtnPool.killAll();
 
+    const selActId = selectedActId(this.gameRefs);
     let i = 0;
     for (const actKey in actData) {
       const actId = Number(actKey);
       
-      const selActId = selectedActId(this.gameRefs);
       if (selActId !== undefined && selActId === actId) {
         // this is the currently selected act
         const pos = createPosition(
@@ -56,10 +74,8 @@ export class ActScreen {
   drawLevelBtn(
     actId: number,
   ) {
+    this.levelBtnPool.killAll();
     this.gameRefs.screens.bgScreen.bgOnIntroComplete(
-      () => {
-        this.levelBtnPool.killAll();
-      },
       () => {
         this._drawLevelBtn(actId);
       },
@@ -105,10 +121,8 @@ export class ActScreen {
   drawSolBtn(
     levelId: string,
   ) {
+    this.solBtnPool.killAll();
     this.gameRefs.screens.bgScreen.bgOnIntroComplete(
-      () => {
-        this.solBtnPool.killAll();
-      },
       () => {
         this._drawSolBtn(levelId, true);
       },
@@ -119,8 +133,7 @@ export class ActScreen {
     levelId: string,
     animation: boolean,
   ) {
-    //this.createSolBtn(levelId, 0, animation);
-    const levels = this.gameRefs.saveData.level.levels[levelId];
+    const levels = this.gameRefs.saveData.act.levels[levelId];
     let solBtns: {
       create: () => DataSprite<SolBtnData>,
       introTween: (sprite: DataSprite<SolBtnData>) => { first: Phaser.Tween, last: Phaser.Tween } | undefined,
@@ -162,65 +175,6 @@ export class ActScreen {
       },
     };
     chainSpriteCreation(solBtns.concat(solAddBtn), animation);
-  }
-
-  private createSolBtn(
-    levelId: string,
-    solIndex: number,
-    animation: boolean,
-  ) {
-    const levels = this.gameRefs.saveData.level.levels[levelId];
-    if (levels === undefined) {
-      this.createSolAddBtn(levelId, solIndex, animation);
-      return;
-    }
-    const levelData = levels[solIndex];
-    const pos = createPosition(
-      "left", 250, 400,
-      "top", 300 + (250 * solIndex), 200,
-    );
-    const sprite = this.solBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { tag: "SolBtnDataSelect", levelId, solIndex });
-    addText(this.gameRefs, sprite, pos, levelData.name, "#000000", 40);
-    if (animation) {
-      const intro = this.solBtnPool.introTween(sprite);
-      if (intro !== undefined) {
-        if (solIndex + 1 < levels.length) {
-          intro.last.onComplete.add(() => {
-            this.createSolBtn(levelId, solIndex + 1, animation);
-          });
-        } else {
-          intro.last.onComplete.add(() => {
-            this.createSolAddBtn(levelId, solIndex + 1, animation);
-          });
-        }
-        intro.first.start();
-      }
-    } else {
-      if (solIndex + 1 < levels.length) {
-        this.createSolBtn(levelId, solIndex + 1, animation);
-      } else {
-        this.createSolAddBtn(levelId, solIndex + 1, animation);
-      }
-    }
-  }
-
-  createSolAddBtn(
-    levelId: string,
-    solIndex: number,
-    animation: boolean,
-  ) {
-    const pos = createPosition(
-      "left", 250, 400,
-      "top", 300 + (250 * solIndex), 200,
-    );
-    const sprite = this.solBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { tag: "SolBtnDataAdd", levelId });
-    addText(this.gameRefs, sprite, pos, "+", "#000000", 40);
-    if (animation) {
-      const intro = this.solBtnPool.introTween(sprite);
-      if (intro !== undefined) {
-        intro.first.start();
-      }
-    }
   }
 
   setVisibility(
