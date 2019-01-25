@@ -1,0 +1,164 @@
+{"frames": {
+
+"bmark_click.png":
+{
+	"frame": {"x":0,"y":600,"w":200,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":400},
+	"sourceSize": {"w":200,"h":400}
+},
+"bmark_hover.png":
+{
+	"frame": {"x":1150,"y":200,"w":200,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":400},
+	"sourceSize": {"w":200,"h":400}
+},
+"bmark_neutral.png":
+{
+	"frame": {"x":1350,"y":200,"w":200,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":400},
+	"sourceSize": {"w":200,"h":400}
+},
+"box.png":
+{
+	"frame": {"x":800,"y":600,"w":640,"h":1080},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":640,"h":1080},
+	"sourceSize": {"w":640,"h":1080}
+},
+"bt_bmark_click.png":
+{
+	"frame": {"x":600,"y":600,"w":200,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":400},
+	"sourceSize": {"w":200,"h":400}
+},
+"bt_bmark_hover.png":
+{
+	"frame": {"x":200,"y":600,"w":200,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":400},
+	"sourceSize": {"w":200,"h":400}
+},
+"bt_bmark_neutral.png":
+{
+	"frame": {"x":400,"y":600,"w":200,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":400},
+	"sourceSize": {"w":200,"h":400}
+},
+"btn_level.png":
+{
+	"frame": {"x":450,"y":0,"w":401,"h":200},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":401,"h":200},
+	"sourceSize": {"w":401,"h":200}
+},
+"btn_level_click.png":
+{
+	"frame": {"x":851,"y":0,"w":400,"h":200},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":400,"h":200},
+	"sourceSize": {"w":400,"h":200}
+},
+"btn_level_hover.png":
+{
+	"frame": {"x":1251,"y":0,"w":400,"h":200},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":400,"h":200},
+	"sourceSize": {"w":400,"h":200}
+},
+"btn_level_neutral.png":
+{
+	"frame": {"x":0,"y":200,"w":400,"h":200},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":400,"h":200},
+	"sourceSize": {"w":400,"h":200}
+},
+"en_unit_a1_l1_01.png":
+{
+	"frame": {"x":400,"y":200,"w":150,"h":300},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":300},
+	"sourceSize": {"w":150,"h":300}
+},
+"fr_unit_a1_l1_01.png":
+{
+	"frame": {"x":850,"y":200,"w":150,"h":300},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":300},
+	"sourceSize": {"w":150,"h":300}
+},
+"fr_unit_a1_l1_01_ab1.png":
+{
+	"frame": {"x":300,"y":0,"w":150,"h":150},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":150},
+	"sourceSize": {"w":150,"h":150}
+},
+"fr_unit_a1_l1_01_ab2.png":
+{
+	"frame": {"x":0,"y":0,"w":150,"h":150},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":150},
+	"sourceSize": {"w":150,"h":150}
+},
+"fr_unit_a1_l2_01.png":
+{
+	"frame": {"x":700,"y":200,"w":150,"h":300},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":300},
+	"sourceSize": {"w":150,"h":300}
+},
+"fr_unit_a1_l2_01_ab1.png":
+{
+	"frame": {"x":150,"y":0,"w":150,"h":150},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":150},
+	"sourceSize": {"w":150,"h":150}
+},
+"fr_unit_a1_l2_02.png":
+{
+	"frame": {"x":550,"y":200,"w":150,"h":300},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":300},
+	"sourceSize": {"w":150,"h":300}
+},
+"fr_unit_a1_l2_03.png":
+{
+	"frame": {"x":1000,"y":200,"w":150,"h":300},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":300},
+	"sourceSize": {"w":150,"h":300}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "atlas1.png",
+	"format": "RGBA8888",
+	"size": {"w":1651,"h":1680},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:fd7275dc5fb79cbb781917993363c2ae:e17cbb3ed865fafe4e3bcbd12853c8d5:e0a4090ab9cfa19ce78ee46e3d0364f4$"
+}
+}

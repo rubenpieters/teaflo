@@ -15,7 +15,8 @@
     "pack-dev": "npx webpack --watch --config webpack.dev.config.js",
     "pack-prod": "npx webpack --config webpack.prod.config.js",
     "heroku-prebuild": "npm run-script setup",
-    "heroku-postbuild": "npm run-script pack-prod"
+    "heroku-postbuild": "npm run-script pack-prod",
+    "install-texpack": "chmod +x scripts/install-tex-pack.sh && scripts/install-tex-pack.sh"
   },
   "dependencies": {
     "express": "^4.16.4",

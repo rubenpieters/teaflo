@@ -37,7 +37,7 @@ function mkBgPool(
   return new Pool(
     gameRefs.game,
     {
-      spritesheet: "bg0",
+      atlas: "bg0",
       toFrame: frameType => { return <any>undefined },
       introAnim: [
         (self, tween) => {

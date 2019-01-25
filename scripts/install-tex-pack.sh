@@ -1,0 +1,14 @@
+echo "-- apt"
+apt-get install libpng12-dev
+echo "-- mkdir"
+mkdir ~/tmp
+echo "-- cd"
+cd ~/tmp
+echo "-- git clone"
+git clone git@github.com:urraka/texpack.git
+echo "-- cd"
+cd ~/tmp/texpack
+echo "-- make"
+make
+echo "-- make install"
+make install

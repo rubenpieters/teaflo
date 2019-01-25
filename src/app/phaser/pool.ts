@@ -6,9 +6,9 @@ import { createTween, createChainedTween } from "./animation";
 // for example: union of string for different button states
 export type PoolInfo<Data, FrameType> = {
   // sprites in this pool share this spritesheet
-  spritesheet: string,
+  atlas: string,
   // conversion of custom frame type to actual frame index
-  toFrame: (frameType: FrameType) => number,
+  toFrame: (frameType: FrameType) => string,
   // intro animation, represented as a Phaser Tween
   introAnim: ((sprite: DataSprite<Data>, tween: Phaser.Tween) => void)[],
   // custom callbacks for sprites in this pool
@@ -51,10 +51,10 @@ export class Pool<Data, FrameType> extends Phaser.Group {
     sprite.data = data;
     // load texture if it is not loaded yet
     if (sprite.key === "" || sprite.key === null || sprite.key === undefined) {
-      sprite.loadTexture(this.poolInfo.spritesheet, this.poolInfo.toFrame(frameType));
+      sprite.loadTexture(this.poolInfo.atlas, this.poolInfo.toFrame(frameType));
     // otherwise set to correct frame
     } else {
-      sprite.frame = this.poolInfo.toFrame(frameType);
+      sprite.frameName = this.poolInfo.toFrame(frameType);
     }
     // initialize sprite if not initialized yet
     if (sprite.props === undefined || sprite.props.init === false) {
@@ -96,7 +96,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
     sprite: DataSprite<Data>,
     frameType: FrameType,
   ) {
-    sprite.frame = this.poolInfo.toFrame(frameType);
+    sprite.frameName = this.poolInfo.toFrame(frameType);
   }
 
   // play the intro animation of all existing sprites in this pool

@@ -58,12 +58,12 @@ function mkMenuBtnPool(
   return mkButtonPool(
     gameRefs.game,
     {
-      spritesheet: "bt_bmark",
+      atlas: "atlas1",
       toFrame: frameType => {
         switch (frameType) {
-          case "down": return 1;
-          case "hover": return 2;
-          case "neutral": return 0;
+          case "down": return "bt_bmark_click.png";
+          case "hover": return "bt_bmark_hover.png";
+          case "neutral": return "bt_bmark_neutral.png";
         }
       },
       introAnim: [

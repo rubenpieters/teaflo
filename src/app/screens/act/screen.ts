@@ -211,12 +211,12 @@ function mkActBtnPool(
   return mkButtonPool(
     gameRefs.game,
     {
-      spritesheet: "btn",
+      atlas: "atlas1",
       toFrame: frameType => {
         switch (frameType) {
-          case "down": return 1;
-          case "hover": return 2;
-          case "neutral": return 0;
+          case "down": return <any>"bmark_click.png";
+          case "hover": return <any>"bmark_hover.png";
+          case "neutral": return <any>"bmark_neutral.png";
         }
       },
       introAnim: [
@@ -253,12 +253,12 @@ function mkLevelBtnPool(
   return mkButtonPool(
     gameRefs.game,
     {
-      spritesheet: "btn_level",
+      atlas: "atlas1",
       toFrame: frameType => {
         switch (frameType) {
-          case "down": return 1;
-          case "hover": return 2;
-          case "neutral": return 0;
+          case "down": return "btn_level_click.png";
+          case "hover": return "btn_level_hover.png";
+          case "neutral": return "btn_level_neutral.png";
         }
       },
       introAnim: [
@@ -295,12 +295,12 @@ function mkSolBtnPool(
   return mkButtonPool(
     gameRefs.game,
     {
-      spritesheet: "btn_level",
+      atlas: "atlas1",
       toFrame: frameType => {
         switch (frameType) {
-          case "down": return 1;
-          case "hover": return 2;
-          case "neutral": return 0;
+          case "down": return "btn_level_click.png";
+          case "hover": return "btn_level_hover.png";
+          case "neutral": return "btn_level_neutral.png";
         }
       },
       introAnim: [

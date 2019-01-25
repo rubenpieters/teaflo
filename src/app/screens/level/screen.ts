@@ -53,7 +53,7 @@ function mkBoxPool(
   return new Pool(
     gameRefs.game,
     {
-      spritesheet: "box",
+      atlas: "box",
       toFrame: frameType => { return <any>undefined },
       introAnim: [
         (self, tween) => {
@@ -71,8 +71,8 @@ function mkCard(
   return new Pool(
     gameRefs.game,
     {
-      spritesheet: "fr_unit_a1_l2_01",
-      toFrame: frameType => { return <any>undefined },
+      atlas: "atlas1",
+      toFrame: frameType => { return "fr_unit_a1_l2_01.jpg" },
       introAnim: [
         (self, tween) => {
           tween.from({ x: self.x - 50 }, 75, Phaser.Easing.Linear.None, false, 50);
