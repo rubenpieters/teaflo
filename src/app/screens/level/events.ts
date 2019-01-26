@@ -1,5 +1,7 @@
 import { GameRefs } from "../../states/game";
-import { SelectedBuildSchem, currentSchemSol } from "../act/data";
+import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt } from "../act/data";
+import { emptyTree, Location } from "../../../shared/tree";
+import { Solution } from "src/shared/game/solution";
 
 
 export function loadLevel(
@@ -7,12 +9,42 @@ export function loadLevel(
   levelId: string,
   solId: number,
 ) {
-  gameRefs.saveData.act.currentSchem = new SelectedBuildSchem(levelId, solId);
+  const sol = schemScholAt(gameRefs, levelId, solId);
+  if (sol === undefined || sol.solInfo === undefined) {
+    gameRefs.saveData.act.currentSchem = new SelectedBuildSchem(levelId, solId);
+  
+    gameRefs.screens.actScreen.setVisibility(false);
+    gameRefs.screens.execScreen.setVisibility(false);
+    gameRefs.screens.levelScreen.setVisibility(true);
+  
+    gameRefs.screens.levelScreen.drawBox();
+  } else {
+    gameRefs.saveData.act.currentSchem = new SelectedExecSchem(levelId, solId);
 
-  gameRefs.screens.actScreen.setVisibility(false);
-  gameRefs.screens.levelScreen.setVisibility(true);
+    gameRefs.screens.actScreen.setVisibility(false);
+    gameRefs.screens.levelScreen.setVisibility(false);
+    gameRefs.screens.execScreen.setVisibility(true);
 
-  gameRefs.screens.levelScreen.drawBox();
+    gameRefs.screens.execScreen.drawClearBtn();
+  }
+}
+
+export function newExecLevel(
+  gameRefs: GameRefs,
+  levelId: string,
+  solId: number,
+) {
+  const sol = currentSchemSol(gameRefs);
+  if (sol !== undefined) {
+    sol.solInfo = {
+      solution: {
+        win: false,
+        tree: emptyTree(),
+      },
+      loc: [],
+    };
+    loadLevel(gameRefs, levelId, solId);
+  }
 }
 
 export function moveCardToFirstFree(

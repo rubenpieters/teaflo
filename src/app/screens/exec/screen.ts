@@ -1,9 +1,9 @@
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
-import { createPosition } from "src/app/util/position";
-import { addText } from "src/app/phaser/datasprite";
+import { createPosition } from "../../util/position";
+import { addText } from "../../phaser/datasprite";
 
-export class LevelScreen {
+export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
 
   constructor(
@@ -30,6 +30,11 @@ export class LevelScreen {
     addText(this.gameRefs, sprite, pos, "Clear Solution", "#000000", 40);
   }
 
+  setVisibility(
+    visibility: boolean,
+  ) {
+    this.clearBtnPool.visible = visibility;
+  }
 }
 
 function mkClearBtnPool(

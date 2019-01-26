@@ -5,6 +5,7 @@ import { LevelScreen } from "../screens/level/screen";
 import { MenuScreen } from "../screens/menu/screen";
 import { settings } from "../data/settings";
 import { createPosition } from "../util/position";
+import { ExecScreen } from "../screens/exec/screen";
 
 export type GameRefs = {
   game: Phaser.Game,
@@ -12,12 +13,15 @@ export type GameRefs = {
     bgScreen: BgScreen,
     actScreen: ActScreen,
     levelScreen: LevelScreen,
+    execScreen: ExecScreen,
     menuScreen: MenuScreen,
   },
   saveData: {
     act: ActSaveData,
   }
 }
+
+let gameRefs: GameRefs;
 
 export default class Game extends Phaser.State {
   public preload(): void {
@@ -32,13 +36,14 @@ export default class Game extends Phaser.State {
     this.stage.backgroundColor = 0xDCDCDC;
 
     // TODO: should screens be part of gameRefs?
-    let gameRefs: GameRefs = {
+    gameRefs = {
       game: this.game,
       screens: {
         bgScreen: <any>undefined,
         actScreen: <any>undefined,
         levelScreen: <any>undefined,
         menuScreen: <any>undefined,
+        execScreen: <any>undefined,
       },
       saveData: {
         act: mkActSaveData(),
@@ -51,6 +56,8 @@ export default class Game extends Phaser.State {
     gameRefs.screens.actScreen = actScreen;
     const levelScreen = new LevelScreen(gameRefs);
     gameRefs.screens.levelScreen = levelScreen;
+    const execScreen = new ExecScreen(gameRefs);
+    gameRefs.screens.execScreen = execScreen;
     const menuScreen = new MenuScreen(gameRefs);
     gameRefs.screens.menuScreen = menuScreen;
 
@@ -63,6 +70,11 @@ export default class Game extends Phaser.State {
       "right", 70, settings.gameWidth,
       "top", 20, settings.gameHeight,
     );
-    this.game.debug.text(`${this.game.time.fps} FPS` || '--', pos.xMax, pos.yMin, "#00ff00");   
+    this.game.debug.text(`${this.game.time.fps} FPS` || '--', pos.xMax, pos.yMin, "#00ff00");
+    const pos2 = createPosition(
+      "right", 70, settings.gameWidth,
+      "top", 40, settings.gameHeight,
+    );
+    this.game.debug.text(`${gameRefs.screens.levelScreen.buildCardPool.countLiving()}` || '--', pos2.xMax, pos2.yMin, "#00ff00");
   }
 }

@@ -6,5 +6,6 @@ export function loadActScreen(
 ) {
   gameRefs.screens.actScreen.setVisibility(true);
   gameRefs.screens.levelScreen.setVisibility(false);
+  gameRefs.screens.execScreen.setVisibility(false);
   gameRefs.screens.actScreen.draw();
 }

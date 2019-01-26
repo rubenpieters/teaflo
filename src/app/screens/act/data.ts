@@ -1,4 +1,6 @@
 import { GameRefs } from "../../states/game";
+import { Solution } from "src/shared/game/solution";
+import { Location } from "src/shared/tree";
 
 export type ActData = {
   shortName: string,
@@ -102,6 +104,10 @@ export type SolutionData = {
   name: string,
   supply: (string | undefined )[],
   deploy: (string | undefined )[],
+  solInfo: {
+    solution: Solution,
+    loc: Location
+  } | undefined,
 }
 
 export function mkSolutionData(
@@ -111,6 +117,7 @@ export function mkSolutionData(
     name: "New_Sol",
     supply: levelData[levelId].cardIds.concat(),
     deploy: repeat(levelData[levelId].slots, undefined),
+    solInfo: undefined,
   };
 }
 
@@ -180,4 +187,13 @@ export function currentSchemSol(
 ): SolutionData | undefined {
   const schem = selectedSchem(gameRefs);
   return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId][schem.solId];
+}
+
+export function schemScholAt(
+  gameRefs: GameRefs,
+  levelId: string,
+  solId: number,
+): SolutionData | undefined {
+  const schem = selectedSchem(gameRefs);
+  return schem === undefined ? undefined : gameRefs.saveData.act.levels[levelId][solId];
 }

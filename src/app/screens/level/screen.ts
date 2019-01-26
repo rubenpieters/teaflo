@@ -2,14 +2,15 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
-import { chainSpriteCreation } from "../../phaser/animation";
-import { currentSchemSol } from "../act/data";
+import { chainSpriteCreation, createTween } from "../../phaser/animation";
+import { currentSchemSol, selectedSchem } from "../act/data";
 import { cardMap } from "../../data/cardMap";
-import { moveCard, moveCardToFirstFree } from "../level/events";
+import { moveCard, moveCardToFirstFree, loadLevel, newExecLevel } from "../level/events";
 import { filterUndefined } from "../../util/util";
 
 export class LevelScreen {
   boxPool: Pool<{}, {}>
+  box: Phaser.Sprite | undefined
   buildCardPool: Pool<BuildCardData | BuildSlotData, {}>
   execStartBtnPool: Pool<{}, "neutral" | "hover" | "down">
 
@@ -55,6 +56,7 @@ export class LevelScreen {
           "top", 0, 1080,
         );
         const sprite = this.boxPool.newSprite(pos.xMin, pos.yMin, {}, {});
+        this.box = sprite;
         return sprite;
       },
       introTween: (sprite: DataSprite<{}>) => {
@@ -222,7 +224,22 @@ function mkExecStartBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          console.log("GO!");
+          const schem = selectedSchem(gameRefs);
+          if (schem !== undefined) {
+            const box = gameRefs.screens.levelScreen.box;
+            if (box !== undefined) {
+              const boxToLeftTween = createTween(gameRefs.game, box,
+                (tween) => {
+                  tween.to({ x: - 640 }, 50, Phaser.Easing.Linear.None);
+                },
+              );
+
+              boxToLeftTween.onComplete.add(() => {
+                newExecLevel(gameRefs, schem.levelId, schem.solId);
+              });
+              boxToLeftTween.start();
+            }
+          }
         },
       },
     },
