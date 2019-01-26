@@ -1,4 +1,5 @@
 import { GameRefs } from "../../states/game";
+import { SelectedBuildSchem } from "../act/data";
 
 
 export function loadLevel(
@@ -6,6 +7,7 @@ export function loadLevel(
   levelId: string,
   solId: number,
 ) {
+  gameRefs.saveData.act.currentSchem = new SelectedBuildSchem(levelId, solId);
 
   gameRefs.screens.actScreen.setVisibility(false);
   gameRefs.screens.levelScreen.setVisibility(true);

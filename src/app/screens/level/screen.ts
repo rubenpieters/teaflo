@@ -1,15 +1,20 @@
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition } from "../../util/position";
-import { addText } from "../../phaser/datasprite";
+import { addText, DataSprite } from "../../phaser/datasprite";
+import { chainSpriteCreation } from "../../phaser/animation";
+import { levelAvailableCards } from "../act/data";
+import { cardMap } from "../../data/cardMap";
 
 export class LevelScreen {
   boxPool: Pool<{}, {}>
+  buildCardPool: Pool<BuildCardData, {}>
 
   constructor(
     public readonly gameRefs: GameRefs
   ) {
     this.boxPool = mkBoxPool(gameRefs);
+    this.buildCardPool = mkBuildCardPool(gameRefs);
   }
 
   drawBox(
@@ -25,19 +30,45 @@ export class LevelScreen {
   createBox(
     animation: boolean,
   ) {
-    const pos = createPosition(
-      "left", 0, 640,
-      "top", 0, 1080,
-    );
-    const sprite = this.boxPool.newSprite(pos.xMin, pos.yMin, {}, {});
-    if (animation) {
-      const intro = this.boxPool.introTween(sprite);
-      if (intro !== undefined) {
-        intro.first.start();
-      }
-    } else {
+    let spriteFs: {
+      create: () => DataSprite<any>,
+      introTween: (sprite: DataSprite<any>) => { first: Phaser.Tween, last: Phaser.Tween } | undefined,
+    }[];
+    const boxF = {
+      create: () => {
+        const pos = createPosition(
+          "left", 0, 640,
+          "top", 0, 1080,
+        );
+        const sprite = this.boxPool.newSprite(pos.xMin, pos.yMin, {}, {});
+        return sprite;
+      },
+      introTween: (sprite: DataSprite<{}>) => {
+        return this.boxPool.introTween(sprite);
+      },
+    };
 
-    }
+    const cards = levelAvailableCards(this.gameRefs);
+    console.log(`CARDS: ${cards}`);
+    const cardF = cards === undefined ? [] : cards.map((cardId, cardIndex) => {
+      return {
+        create: () => {
+          const pos = createPosition(
+            "left", 40 + cardIndex * 200, 150,
+            "top", 40, 300,
+          );
+          const sprite = this.buildCardPool.newSprite(pos.xMin, pos.yMin, {}, { cardId });
+          return sprite;
+        },
+        introTween: (sprite: DataSprite<BuildCardData>) => {
+          return this.buildCardPool.introTween(sprite);
+        },
+      };
+    });
+
+    spriteFs = [boxF];
+    spriteFs = spriteFs.concat(cardF);  
+    chainSpriteCreation(spriteFs, animation);
   }
 
   setVisibility(
@@ -54,7 +85,7 @@ function mkBoxPool(
     gameRefs.game,
     {
       atlas: "box",
-      toFrame: frameType => { return <any>undefined },
+      toFrame: (self, frameType) => { return <any>undefined },
       introAnim: [
         (self, tween) => {
           tween.from({ x: self.x - 640 }, 75, Phaser.Easing.Linear.None, false, 50);
@@ -65,17 +96,21 @@ function mkBoxPool(
   )
 }
 
-function mkCard(
+type BuildCardData = {
+  cardId: string,
+}
+
+function mkBuildCardPool(
   gameRefs: GameRefs,
-): Pool<{}, {}> {
+): Pool<BuildCardData, {}> {
   return new Pool(
     gameRefs.game,
     {
       atlas: "atlas1",
-      toFrame: frameType => { return "fr_unit_a1_l2_01.jpg" },
+      toFrame: (self, frameType) => { return cardMap[self.data.cardId] },
       introAnim: [
         (self, tween) => {
-          tween.from({ x: self.x - 50 }, 75, Phaser.Easing.Linear.None, false, 50);
+          tween.from({ y: self.y - 50 }, 60, Phaser.Easing.Linear.None, false, 30);
         },
       ],
       callbacks: {},

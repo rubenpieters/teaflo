@@ -28,11 +28,11 @@ export class ActScreen {
       return;
     }
     switch (menu.tag) {
-      case "SelectedAct": {
+      case "SelectedActMenu": {
         changeAct(this.gameRefs, menu.actId);
         break;
       }
-      case "SelectedLevel": {
+      case "SelectedLevelMenu": {
         changeLevel(this.gameRefs, menu.levelId);
         break;
       }
@@ -212,7 +212,7 @@ function mkActBtnPool(
     gameRefs.game,
     {
       atlas: "atlas1",
-      toFrame: frameType => {
+      toFrame: (self, frameType) => {
         switch (frameType) {
           case "down": return <any>"bmark_click.png";
           case "hover": return <any>"bmark_hover.png";
@@ -254,7 +254,7 @@ function mkLevelBtnPool(
     gameRefs.game,
     {
       atlas: "atlas1",
-      toFrame: frameType => {
+      toFrame: (self, frameType) => {
         switch (frameType) {
           case "down": return "btn_level_click.png";
           case "hover": return "btn_level_hover.png";
@@ -296,7 +296,7 @@ function mkSolBtnPool(
     gameRefs.game,
     {
       atlas: "atlas1",
-      toFrame: frameType => {
+      toFrame: (self, frameType) => {
         switch (frameType) {
           case "down": return "btn_level_click.png";
           case "hover": return "btn_level_hover.png";

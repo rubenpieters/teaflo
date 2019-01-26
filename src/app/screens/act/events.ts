@@ -1,11 +1,11 @@
 import { GameRefs } from "../../states/game";
-import { mkSolutionData, SelectedAct, SelectedLevel } from "./data";
+import { mkSolutionData, SelectedActMenu, SelectedLevelMenu } from "./data";
 
 export function changeAct(
   gameRefs: GameRefs,
   actId: number,
 ) {
-  gameRefs.saveData.act.currentMenu = new SelectedAct(actId);
+  gameRefs.saveData.act.currentMenu = new SelectedActMenu(actId);
 
   gameRefs.screens.actScreen.actSelectMode();
   gameRefs.screens.actScreen.redrawActBtn();
@@ -16,7 +16,7 @@ export function changeLevel(
   gameRefs: GameRefs,
   levelId: string,
 ) {
-  gameRefs.saveData.act.currentMenu = new SelectedLevel(levelId);
+  gameRefs.saveData.act.currentMenu = new SelectedLevelMenu(levelId);
   
   gameRefs.screens.actScreen.levelSelectMode();
   gameRefs.screens.actScreen.redrawActBtn();

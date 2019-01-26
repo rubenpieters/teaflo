@@ -8,7 +8,7 @@ export type PoolInfo<Data, FrameType> = {
   // sprites in this pool share this spritesheet
   atlas: string,
   // conversion of custom frame type to actual frame index
-  toFrame: (frameType: FrameType) => string,
+  toFrame: (sprite: DataSprite<Data>, frameType: FrameType) => string,
   // intro animation, represented as a Phaser Tween
   introAnim: ((sprite: DataSprite<Data>, tween: Phaser.Tween) => void)[],
   // custom callbacks for sprites in this pool
@@ -51,10 +51,10 @@ export class Pool<Data, FrameType> extends Phaser.Group {
     sprite.data = data;
     // load texture if it is not loaded yet
     if (sprite.key === "" || sprite.key === null || sprite.key === undefined) {
-      sprite.loadTexture(this.poolInfo.atlas, this.poolInfo.toFrame(frameType));
+      sprite.loadTexture(this.poolInfo.atlas, this.poolInfo.toFrame(sprite, frameType));
     // otherwise set to correct frame
     } else {
-      sprite.frameName = this.poolInfo.toFrame(frameType);
+      sprite.frameName = this.poolInfo.toFrame(sprite, frameType);
     }
     // initialize sprite if not initialized yet
     if (sprite.props === undefined || sprite.props.init === false) {
@@ -96,7 +96,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
     sprite: DataSprite<Data>,
     frameType: FrameType,
   ) {
-    sprite.frameName = this.poolInfo.toFrame(frameType);
+    sprite.frameName = this.poolInfo.toFrame(sprite, frameType);
   }
 
   // play the intro animation of all existing sprites in this pool

@@ -59,7 +59,7 @@ function mkMenuBtnPool(
     gameRefs.game,
     {
       atlas: "atlas1",
-      toFrame: frameType => {
+      toFrame: (self, frameType) => {
         switch (frameType) {
           case "down": return "bt_bmark_click.png";
           case "hover": return "bt_bmark_hover.png";
