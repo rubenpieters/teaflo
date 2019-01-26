@@ -1,4 +1,4 @@
-import { GameRefs } from "src/app/states/game";
+import { GameRefs } from "../../states/game";
 
 export type ActData = {
   shortName: string,
@@ -10,30 +10,35 @@ export type LevelData = {
   name: string,
   id: string,
   cardIds: string[],
+  slots: number,
 }
 
 const a1l1: LevelData = {
   name: "A1 level1",
   id: "a1l1",
   cardIds: [],
+  slots: 1,
 };
 
 const a1l2: LevelData = {
   name: "A1 level2",
   id: "a1l2",
   cardIds: ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
+  slots: 3,
 };
 
 const a2l1: LevelData = {
   name: "A2 level1",
   id: "a2l1",
   cardIds: [],
+  slots: 1,
 };
 
 const a3l1: LevelData = {
   name: "A3 level1",
   id: "a3l1",
   cardIds: [],
+  slots: 1,
 };
 
 export const actData: {
@@ -95,13 +100,29 @@ export function mkActSaveData(): ActSaveData {
 
 export type SolutionData = {
   name: string,
+  supply: (string | undefined )[],
+  deploy: (string | undefined )[],
 }
 
 export function mkSolutionData(
+  levelId: string,
 ): SolutionData {
   return {
     name: "New_Sol",
+    supply: levelData[levelId].cardIds,
+    deploy: repeat(levelData[levelId].slots, undefined),
   };
+}
+
+function repeat<A>(
+  x: number,
+  a: A,
+): A[] {
+  const l: A[] = [];
+  for (let i = 0; i < x; i++) {
+    l.push(a);
+  }
+  return l;
 }
 
 export function selectedMenu(
@@ -149,19 +170,14 @@ export class SelectedExecSchem {
 }
 
 export function selectedSchem(
-  gameRefs: GameRefs
+  gameRefs: GameRefs,
 ): SelectedBuildSchem | SelectedExecSchem | undefined {
   return gameRefs.saveData.act.currentSchem;
 }
 
-export function levelAvailableCards(
-  gameRefs: GameRefs
-): string[] | undefined {
+export function currentSchemSol(
+  gameRefs: GameRefs,
+): SolutionData | undefined {
   const schem = selectedSchem(gameRefs);
-  if (schem === undefined) return undefined;
-  console.log(`LEVELID: ${schem.levelId}`);
-  switch (schem.tag) {
-    case "SelectedBuildSchem": return levelData[schem.levelId].cardIds;
-    case "SelectedExecSchem": return undefined;
-  } 
+  return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId][schem.solId];
 }

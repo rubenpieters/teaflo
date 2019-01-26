@@ -1,4 +1,5 @@
 import { GameRefs } from "../../states/game";
+import { selectedSchem, currentSchemSol } from "../act/data";
 
 export function loadActScreen(
   gameRefs: GameRefs,
