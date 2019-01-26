@@ -152,7 +152,7 @@ function mkBuildCardPool(
       },
       introAnim: [
         (self, tween) => {
-          tween.from({ y: self.y - 50 }, 60, Phaser.Easing.Linear.None, false, 30);
+          tween.from({ y: self.y - 50 }, 60, Phaser.Easing.Linear.None, false, 20);
         },
       ],
       callbacks: {

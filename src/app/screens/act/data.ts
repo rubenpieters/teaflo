@@ -109,7 +109,7 @@ export function mkSolutionData(
 ): SolutionData {
   return {
     name: "New_Sol",
-    supply: levelData[levelId].cardIds,
+    supply: levelData[levelId].cardIds.concat(),
     deploy: repeat(levelData[levelId].slots, undefined),
   };
 }
