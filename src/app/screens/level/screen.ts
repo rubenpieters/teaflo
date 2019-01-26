@@ -11,21 +11,25 @@ import { filterUndefined } from "../../util/util";
 export class LevelScreen {
   boxPool: Pool<{}, {}>
   buildCardPool: Pool<BuildCardData | BuildSlotData, {}>
+  execStartBtnPool: Pool<{}, "neutral" | "hover" | "down">
 
   constructor(
     public readonly gameRefs: GameRefs
   ) {
     this.boxPool = mkBoxPool(gameRefs);
     this.buildCardPool = mkBuildCardPool(gameRefs);
+    this.execStartBtnPool = mkExecStartBtnPool(gameRefs);
   }
 
   drawBox(
   ) {
     this.boxPool.killAll();
     this.buildCardPool.killAll();
+    this.execStartBtnPool.killAll();
     this.gameRefs.screens.bgScreen.bgOnIntroComplete(
       () => {
         this.createBox(true);
+        this.drawExecStartBtn();
       },
     );
   }
@@ -97,6 +101,25 @@ export class LevelScreen {
     spriteFs = [boxF];
     spriteFs = spriteFs.concat(supplyF).concat(deployF);
     chainSpriteCreation(spriteFs, animation);
+    //chainSpriteCreation(deployF, animation);
+  }
+
+  drawExecStartBtn(
+  ) {
+    this.redrawExecStartBtn();
+    this.execStartBtnPool.playIntroAnimations();
+  }
+
+  redrawExecStartBtn(
+  ) {
+    this.execStartBtnPool.killAll();
+
+    const pos = createPosition(
+      "right", 400, 400,
+      "bot", 300, 200,
+    );
+    const sprite = this.execStartBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", {});
+    addText(this.gameRefs, sprite, pos, "Start", "#000000", 40);
   }
 
   setVisibility(
@@ -104,6 +127,7 @@ export class LevelScreen {
   ) {
     this.boxPool.visible = visibility;
     this.buildCardPool.visible = visibility;
+    this.execStartBtnPool.visible = visibility;
   }
 }
 
@@ -113,8 +137,8 @@ function mkBoxPool(
   return new Pool(
     gameRefs.game,
     {
-      atlas: "box",
-      toFrame: (self, frameType) => { return <any>undefined },
+      atlas: "atlas1",
+      toFrame: (self, frameType) => { return "box.png" },
       introAnim: [
         (self, tween) => {
           tween.from({ x: self.x - 640 }, 75, Phaser.Easing.Linear.None, false, 50);
@@ -152,7 +176,7 @@ function mkBuildCardPool(
       },
       introAnim: [
         (self, tween) => {
-          tween.from({ y: self.y - 50 }, 60, Phaser.Easing.Linear.None, false, 20);
+          tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
         },
       ],
       callbacks: {
@@ -174,5 +198,34 @@ function mkBuildCardPool(
         },
       },
     },
+  );
+}
+
+function mkExecStartBtnPool(
+  gameRefs: GameRefs,
+): Pool<{}, "neutral" | "hover" | "down"> {
+  return mkButtonPool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        switch (frameType) {
+          case "down": return "btn_level_click.png";
+          case "hover": return "btn_level_hover.png";
+          case "neutral": return "btn_level_neutral.png";
+        }
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 50, Phaser.Easing.Linear.None, false, 0);
+        }
+      ],
+      callbacks: {
+        click: (self) => {
+          console.log("GO!");
+        },
+      },
+    },
+    self => { return false; }
   );
 }

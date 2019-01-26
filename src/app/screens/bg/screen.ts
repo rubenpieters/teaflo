@@ -41,19 +41,19 @@ function mkBgPool(
       toFrame: frameType => { return <any>undefined },
       introAnim: [
         (self, tween) => {
-          tween.from({}, 30);
+          tween.from({}, 15);
           tween.onComplete.add(() => self.loadTexture("bg1"));
         },
         (self, tween) => {
-          tween.from({}, 30);
+          tween.from({}, 15);
           tween.onComplete.add(() => self.loadTexture("bg2"));
         },
         (self, tween) => {
-          tween.from({}, 30);
+          tween.from({}, 15);
           tween.onComplete.add(() => self.loadTexture("bg3"));
         },
         (self, tween) => {
-          tween.from({}, 30);
+          tween.from({}, 15);
           tween.onComplete.add(() => {
             self.loadTexture("bg4");
         });
