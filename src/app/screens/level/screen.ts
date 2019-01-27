@@ -131,6 +131,12 @@ export class LevelScreen {
     this.buildCardPool.visible = visibility;
     this.execStartBtnPool.visible = visibility;
   }
+
+  clearAnimations() {
+    this.gameRefs.game.tweens.removeFrom(this.boxPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.buildCardPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.execStartBtnPool, true);
+  }
 }
 
 function mkBoxPool(

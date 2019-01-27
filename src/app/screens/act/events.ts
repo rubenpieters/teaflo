@@ -7,6 +7,8 @@ export function changeAct(
 ) {
   gameRefs.saveData.act.currentMenu = new SelectedActMenu(actId);
 
+  gameRefs.screens.actScreen.clearAnimations();
+  gameRefs.screens.bgScreen.clearAnimations();
   gameRefs.screens.actScreen.actSelectMode();
   gameRefs.screens.actScreen.redrawActBtn();
   gameRefs.screens.actScreen.drawLevelBtn(actId);

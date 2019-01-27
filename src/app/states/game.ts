@@ -18,7 +18,7 @@ export type GameRefs = {
   },
   saveData: {
     act: ActSaveData,
-  }
+  },
 }
 
 let gameRefs: GameRefs;

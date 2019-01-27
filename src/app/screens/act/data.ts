@@ -12,6 +12,7 @@ export type LevelData = {
   name: string,
   id: string,
   cardIds: string[],
+  enemyIds: string[],
   slots: number,
 }
 
@@ -19,6 +20,7 @@ const a1l1: LevelData = {
   name: "A1 level1",
   id: "a1l1",
   cardIds: [],
+  enemyIds: ["en_unit_a1_l2_01"],
   slots: 1,
 };
 
@@ -26,6 +28,7 @@ const a1l2: LevelData = {
   name: "A1 level2",
   id: "a1l2",
   cardIds: ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
+  enemyIds: ["en_unit_a1_l2_01"],
   slots: 3,
 };
 
@@ -33,6 +36,7 @@ const a2l1: LevelData = {
   name: "A2 level1",
   id: "a2l1",
   cardIds: [],
+  enemyIds: ["en_unit_a1_l2_01"],
   slots: 1,
 };
 
@@ -40,6 +44,7 @@ const a3l1: LevelData = {
   name: "A3 level1",
   id: "a3l1",
   cardIds: [],
+  enemyIds: ["en_unit_a1_l2_01"],
   slots: 1,
 };
 
@@ -196,4 +201,11 @@ export function schemScholAt(
 ): SolutionData | undefined {
   const schem = selectedSchem(gameRefs);
   return schem === undefined ? undefined : gameRefs.saveData.act.levels[levelId][solId];
+}
+
+export function currentSolution(
+  gameRefs: GameRefs,
+) {
+  const schem = selectedSchem(gameRefs);
+  return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo;
 }

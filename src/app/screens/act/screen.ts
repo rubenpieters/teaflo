@@ -185,18 +185,23 @@ export class ActScreen {
     this.solBtnPool.visible = visibility;
   }
 
-  actSelectMode(
-  ) {
+  actSelectMode() {
     this.actBtnPool.visible = true;
     this.levelBtnPool.visible = true;
     this.solBtnPool.visible = false;
   }
 
-  levelSelectMode(
-  ) {
+  levelSelectMode() {
     this.actBtnPool.visible = true;
     this.levelBtnPool.visible = false;
     this.solBtnPool.visible = true;
+  }
+
+  clearAnimations() {
+    console.log("clear");
+    this.gameRefs.game.tweens.removeFrom(this.actBtnPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.levelBtnPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.solBtnPool, true);
   }
 }
 

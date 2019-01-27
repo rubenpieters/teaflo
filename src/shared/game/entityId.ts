@@ -1,4 +1,4 @@
-import { focus, over, set } from "src/shared/iassign-util";
+import { focus, over, set } from "../../shared/iassign-util";
 import { GameState, units, FrStUnit, EnStUnit, findStatus } from "./state";
 import { HasId } from "./hasId";
 import { Unit } from "./unit";

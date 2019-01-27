@@ -29,6 +29,10 @@ export class BgScreen {
       intro.first.start();
     }
   }
+
+  clearAnimations() {
+    this.gameRefs.game.tweens.removeFrom(this.bgPool, true);
+  }
 }
 
 function mkBgPool(
@@ -53,7 +57,7 @@ function mkBgPool(
           tween.onComplete.add(() => self.loadTexture("bg3"));
         },
         (self, tween) => {
-          tween.from({}, 15);
+          tween.from({}, 500);
           tween.onComplete.add(() => {
             self.loadTexture("bg4");
         });
