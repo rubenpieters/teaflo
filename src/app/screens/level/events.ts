@@ -1,7 +1,7 @@
 import { GameRefs } from "../../states/game";
 import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt } from "../act/data";
 import { emptyTree, Location } from "../../../shared/tree";
-import { Solution } from "src/shared/game/solution";
+import { updateSolutionRep } from "../exec/events";
 
 
 export function loadLevel(
@@ -26,6 +26,7 @@ export function loadLevel(
     gameRefs.screens.execScreen.setVisibility(true);
 
     gameRefs.screens.execScreen.drawClearBtn();
+    updateSolutionRep(gameRefs);
   }
 }
 

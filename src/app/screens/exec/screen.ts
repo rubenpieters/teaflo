@@ -49,10 +49,10 @@ export class ExecScreen {
 
     state.frUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
-
+        console.log(`drawing: ${unit.cardId}`);
         const unitPos = createPosition(
-          "left", 1050 + 200 * unitIndex, 150,
-          "top", 600, 300,
+          "left", 500 + 200 * unitIndex, 150,
+          "top", 300, 300,
         );
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {}, { cardId: unit.cardId });
         //mkUnitPool(game, gameRefs, unitPos, unit.cardId, unitIndex, "friendly");
