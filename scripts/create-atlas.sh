@@ -1,1 +1,0 @@
-texpack --output ../assets/test --POT test.txt
