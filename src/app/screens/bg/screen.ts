@@ -57,7 +57,7 @@ function mkBgPool(
           tween.onComplete.add(() => self.loadTexture("bg3"));
         },
         (self, tween) => {
-          tween.from({}, 500);
+          tween.from({}, 15);
           tween.onComplete.add(() => {
             self.loadTexture("bg4");
         });
