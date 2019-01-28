@@ -22,7 +22,7 @@ def gen_ts(atlas):
 
   s = json.loads(s)
   type_name = atlas.capitalize()
-  content = json.dumps(s["sprites"])
+  content = json.dumps(s["sprites"], indent=4)
   type_decl = f"export type {type_name} = {content}"
   const_decl = f"export const {atlas}: {type_name} = {content}"
   
