@@ -5,16 +5,19 @@ import { addText } from "../../phaser/datasprite";
 import { GameState, filteredEn, filteredFr } from "../../../shared/game/state";
 import { Log } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
+import { TextPool } from "../../phaser/textpool";
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
   unitPool: Pool<UnitData, {}>
+  textPool: TextPool
 
   constructor(
     public readonly gameRefs: GameRefs
   ) {
     this.clearBtnPool = mkClearBtnPool(gameRefs);
     this.unitPool = mkUnitPool(gameRefs);
+    this.textPool = new TextPool(gameRefs.game);
   }
 
   drawClearBtn(
@@ -25,7 +28,7 @@ export class ExecScreen {
 
   redrawExecStartBtn(
   ) {
-    this.clearBtnPool.killAll();
+    this.clearBtnPool.clear();
 
     const pos = createPosition(
       "right", 400, 400,
@@ -49,7 +52,6 @@ export class ExecScreen {
 
     state.frUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
-        console.log(`drawing: ${unit.cardId}`);
         const unitPos = createPosition(
           "left", 500 + 200 * unitIndex, 150,
           "top", 300, 300,
@@ -88,11 +90,23 @@ export class ExecScreen {
     });
   }
 
+  drawStats(
+  ) {
+    this.clearBtnPool.clear();
+
+    const textPos = createPosition(
+      "left", 600, 150,
+      "bot", 200, 300,
+    );
+    this.textPool.newText(textPos, "Skills");
+  }
+
   setVisibility(
     visibility: boolean,
   ) {
     this.clearBtnPool.visible = visibility;
     this.unitPool.visible = visibility;
+    this.textPool.setVisiblity(visibility);
   }
 }
 

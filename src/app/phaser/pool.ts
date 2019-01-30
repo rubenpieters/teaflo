@@ -117,6 +117,10 @@ export class Pool<Data, FrameType> extends Phaser.Group {
     const tween = createChainedTween(this.game, sprite, ...fs);
     return tween;
   }
+
+  public clear() {
+    this.killAll();
+  }
 }
 
 function invokeIfDefined<A>(

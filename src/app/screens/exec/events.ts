@@ -18,4 +18,5 @@ export function updateSolutionRep(
   const solResult = runSolution(sol.solInfo.solution, sol.solInfo.loc, initState);
 
   gameRefs.screens.execScreen.drawFriendlyUnits(solResult.state);
+  gameRefs.screens.execScreen.drawStats();
 }
