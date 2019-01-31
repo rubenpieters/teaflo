@@ -2,15 +2,26 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo } from "../../util/position";
 import { addText } from "../../phaser/datasprite";
-import { GameState, filteredEn, filteredFr } from "../../../shared/game/state";
+import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit } from "../../../shared/game/state";
 import { Log } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
+import { getUnit, GlobalId } from "../../../shared/game/entityId";
+import { hoverUnit, clearHover, clickUnit } from "./events";
+import { Ability } from "src/shared/game/ability";
+
+type UnitSelection = GlobalId<"friendly" | "enemy">;
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
   unitPool: Pool<UnitData, {}>
+  abilityPool: Pool<AbilityData, {}>
   textPool: TextPool
+
+  state: GameState | undefined
+  hoveredUnit: UnitSelection | undefined
+  selectedUnit: UnitSelection | undefined
+  clickstate: undefined
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -18,6 +29,13 @@ export class ExecScreen {
     this.clearBtnPool = mkClearBtnPool(gameRefs);
     this.unitPool = mkUnitPool(gameRefs);
     this.textPool = new TextPool(gameRefs.game);
+    this.abilityPool = mkAbilityPool(gameRefs);
+  }
+
+  reset() {
+    this.state = undefined;
+    this.hoveredUnit = undefined;
+    this.selectedUnit = undefined;
   }
 
   drawClearBtn(
@@ -39,8 +57,8 @@ export class ExecScreen {
   }
 
   drawFriendlyUnits(
-    state: GameState,
   ) {
+    const state = this.state!;
     // calculate max threat value
     const enIds = filteredEn(state)
       .map(x => x.id)
@@ -56,7 +74,10 @@ export class ExecScreen {
           "left", 500 + 200 * unitIndex, 150,
           "top", 300, 300,
         );
-        const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {}, { cardId: unit.cardId });
+        const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
+          { cardId: unit.cardId,
+            globalId: new GlobalId(unit.id, "friendly"),
+          });
         //mkUnitPool(game, gameRefs, unitPos, unit.cardId, unitIndex, "friendly");
 
         // HP
@@ -88,17 +109,56 @@ export class ExecScreen {
         }*/
       }
     });
+    state.enUnits.forEach((unit, unitIndex) => {
+      if (unit !== undefined) {
+        const unitPos = createPosition(
+          "left", 1400 + 200 * unitIndex, 150,
+          "top", 300, 300,
+        );
+        const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
+          { cardId: unit.cardId,
+            globalId: new GlobalId(unit.id, "enemy"),
+          });
+      }
+    });
   }
 
   drawStats(
   ) {
     this.clearBtnPool.clear();
+    this.abilityPool.clear();
+    this.textPool.clear();
 
     const textPos = createPosition(
       "left", 600, 150,
       "bot", 200, 300,
     );
     this.textPool.newText(textPos, "Skills");
+
+    const showUnit = this.hoveredUnit !== undefined ? this.hoveredUnit : this.selectedUnit;
+    if (showUnit !== undefined) {
+      const unit = getUnit(showUnit, this.state!);
+      if (unit !== undefined) {
+        const pos1 = createPosition(
+          "left", 600, 150,
+          "bot", 100, 300,
+        );
+        this.textPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
+
+        if (showUnit.type === "friendly") {
+          const frUnit = <FrStUnit>unit;
+          frUnit.abilities.forEach((ability, abilityIndex) => {
+            const abPos = createPosition(
+              "left", 600 + 200 * abilityIndex, 150,
+              "bot", 50, 150,
+            );
+            this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex });
+          });
+        } else if (showUnit.type === "enemy") {
+          const enUnit = <EnStUnit>unit;
+        }
+      }
+    }
   }
 
   setVisibility(
@@ -141,6 +201,7 @@ function mkClearBtnPool(
 
 type UnitData = {
   cardId: string,
+  globalId: GlobalId<"friendly" | "enemy">,
 };
 
 function mkUnitPool(
@@ -158,7 +219,17 @@ function mkUnitPool(
           tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
         },
       ],
-      callbacks: {},
+      callbacks: {
+        click: (self) => {
+          clickUnit(gameRefs, self.data.globalId);
+        },
+        hoverOver: (self) => {
+          hoverUnit(gameRefs, self.data.globalId);
+        },
+        hoverOut: (self) => {
+          clearHover(gameRefs);
+        },
+      },
     },
   );
 }
@@ -179,6 +250,35 @@ function mkResPool(
         },
       ],
       callbacks: {},
+    },
+  );
+}
+
+type AbilityData = {
+  ability: Ability,
+  index: number,
+};
+
+function mkAbilityPool(
+  gameRefs: GameRefs,
+): Pool<AbilityData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return `${self.data.ability.spriteId}.png`;
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+          
+        },
+      },
     },
   );
 }

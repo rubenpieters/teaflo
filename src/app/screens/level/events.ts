@@ -24,6 +24,7 @@ export function loadLevel(
     gameRefs.screens.actScreen.setVisibility(false);
     gameRefs.screens.levelScreen.setVisibility(false);
     gameRefs.screens.execScreen.setVisibility(true);
+    gameRefs.screens.execScreen.reset();
 
     gameRefs.screens.execScreen.drawClearBtn();
     updateSolutionRep(gameRefs);
