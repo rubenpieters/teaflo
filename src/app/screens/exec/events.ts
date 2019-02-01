@@ -1,7 +1,7 @@
 import { GameRefs } from "../../../app/states/game";
-import { currentSolution, currentSchemSol, selectedSchem, levelData } from "../act/data";
+import { currentSolution, currentSchemSol, selectedSchem, levelData, setSolution } from "../act/data";
 import { mkGameState } from "../../../shared/game/state";
-import { runSolution } from "../../../shared/game/solution";
+import { runSolution, extendSolution, SolutionData } from "../../../shared/game/solution";
 import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
 
 export function updateSolutionRep(
@@ -17,6 +17,7 @@ export function updateSolutionRep(
   const enUnits = levelData[schem.levelId].enemyIds;
   const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solInfo.solution, sol.solInfo.loc, initState);
+  console.log(solResult.state);
 
   gameRefs.screens.execScreen.state = solResult.state;
   gameRefs.screens.execScreen.drawFriendlyUnits();
@@ -27,6 +28,7 @@ export function hoverUnit(
   gameRefs: GameRefs,
   globalId: GlobalId<"friendly" | "enemy">,
 ) {
+  // TODO: only redraw if necessary?
   gameRefs.screens.execScreen.hoveredUnit = globalId;
   gameRefs.screens.execScreen.drawStats();
 }
@@ -49,4 +51,18 @@ export function clickUnit(
     gameRefs.screens.execScreen.selectedUnit = globalId;
   }
   gameRefs.screens.execScreen.drawStats();
+}
+
+export function extendLevelSolution(
+  gameRefs: GameRefs,
+  solData: SolutionData,
+) {
+  const solInfo = currentSolution(gameRefs);
+  if (solInfo !== undefined) {
+    const newSol = extendSolution(solData, solInfo.solution, solInfo.loc);
+    setSolution(gameRefs, newSol);
+
+    updateSolutionRep(gameRefs);
+    gameRefs.screens.execScreen.clickState = undefined;
+  }
 }

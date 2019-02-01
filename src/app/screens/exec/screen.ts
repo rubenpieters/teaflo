@@ -6,8 +6,8 @@ import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit } from "../../../
 import { Log } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
-import { getUnit, GlobalId } from "../../../shared/game/entityId";
-import { hoverUnit, clearHover, clickUnit } from "./events";
+import { getUnit, GlobalId, UnitId } from "../../../shared/game/entityId";
+import { hoverUnit, clearHover, clickUnit, extendLevelSolution } from "./events";
 import { Ability } from "src/shared/game/ability";
 
 type UnitSelection = GlobalId<"friendly" | "enemy">;
@@ -21,7 +21,7 @@ export class ExecScreen {
   state: GameState | undefined
   hoveredUnit: UnitSelection | undefined
   selectedUnit: UnitSelection | undefined
-  clickstate: undefined
+  clickState: { ability: Ability, inputs: any[], origin: UnitId } | undefined
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -58,6 +58,8 @@ export class ExecScreen {
 
   drawFriendlyUnits(
   ) {
+    this.unitPool.clear();
+    
     const state = this.state!;
     // calculate max threat value
     const enIds = filteredEn(state)
@@ -152,7 +154,7 @@ export class ExecScreen {
               "left", 600 + 200 * abilityIndex, 150,
               "bot", 50, 150,
             );
-            this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex });
+            this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
           });
         } else if (showUnit.type === "enemy") {
           const enUnit = <EnStUnit>unit;
@@ -166,6 +168,7 @@ export class ExecScreen {
   ) {
     this.clearBtnPool.visible = visibility;
     this.unitPool.visible = visibility;
+    this.abilityPool.visible = visibility;
     this.textPool.setVisiblity(visibility);
   }
 }
@@ -221,7 +224,15 @@ function mkUnitPool(
       ],
       callbacks: {
         click: (self) => {
-          clickUnit(gameRefs, self.data.globalId);
+          const clickState = gameRefs.screens.execScreen.clickState;
+          if (clickState === undefined) {
+            clickUnit(gameRefs, self.data.globalId);
+          } else {
+            clickState.inputs.push(self.data.globalId);
+            if (clickState.inputs.length === clickState.ability.inputs.length) {
+              extendLevelSolution(gameRefs, clickState!);
+            }
+          }
         },
         hoverOver: (self) => {
           hoverUnit(gameRefs, self.data.globalId);
@@ -257,6 +268,7 @@ function mkResPool(
 type AbilityData = {
   ability: Ability,
   index: number,
+  globalId: GlobalId<"friendly" | "enemy">,
 };
 
 function mkAbilityPool(
@@ -276,7 +288,16 @@ function mkAbilityPool(
       ],
       callbacks: {
         click: (self) => {
-          
+          if (gameRefs.screens.execScreen.clickState === undefined) {
+            gameRefs.screens.execScreen.clickState = {
+              ability: self.data.ability,
+              inputs: [],
+              origin: self.data.globalId,
+            }
+            if (self.data.ability.inputs.length === 0) {
+              extendLevelSolution(gameRefs, gameRefs.screens.execScreen.clickState!);
+            }
+          }
         },
       },
     },

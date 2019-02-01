@@ -200,7 +200,7 @@ export function applyTrigger(
     case "Weak": {
       if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, trigger.owner)) {
         const subtr = action.value - triggerValue;
-        const newValue = triggerValue > 0 ? triggerValue : 0;
+        const newValue = subtr > 0 ? triggerValue : 0;
         const transformed = new Damage(
           action.target,
           newValue,

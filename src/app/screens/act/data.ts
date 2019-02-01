@@ -209,3 +209,12 @@ export function currentSolution(
   const schem = selectedSchem(gameRefs);
   return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo;
 }
+export function setSolution(
+  gameRefs: GameRefs,
+  solInfo: { solution: Solution, loc: Location },
+) {
+  const schem = selectedSchem(gameRefs);
+  if (schem !== undefined) {
+    gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo = solInfo;
+  }
+}
