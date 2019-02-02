@@ -1,15 +1,17 @@
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo } from "../../util/position";
-import { addText } from "../../phaser/datasprite";
+import { addText, DataSprite } from "../../phaser/datasprite";
 import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit } from "../../../shared/game/state";
 import { Log } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution } from "./events";
-import { Ability } from "src/shared/game/ability";
+import { Ability } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger } from "../../../shared/game/trigger";
+import { Action } from "../../../shared/game/action";
+import { chainSpriteCreation } from "../../../app/phaser/animation";
 
 type UnitSelection = GlobalId<"friendly" | "enemy">;
 
@@ -20,8 +22,11 @@ export class ExecScreen {
   unitTextPool: TextPool
   statsTextPool: TextPool
   triggerPool: Pool<TriggerData, {}>
+  logTextPool: TextPool
+  logActionPool: Pool<LogActionData, {}>
 
   state: GameState | undefined
+  log: Log | undefined
   hoveredUnit: UnitSelection | undefined
   selectedUnit: UnitSelection | undefined
   clickState: { ability: Ability, inputs: any[], origin: UnitId } | undefined
@@ -35,6 +40,8 @@ export class ExecScreen {
     this.statsTextPool = new TextPool(gameRefs.game);
     this.abilityPool = mkAbilityPool(gameRefs);
     this.triggerPool = mkTriggerPool(gameRefs);
+    this.logTextPool = new TextPool(gameRefs.game);
+    this.logActionPool = mkLogActionPool(gameRefs);
   }
 
   reset() {
@@ -184,6 +191,68 @@ export class ExecScreen {
         }
       }
     }
+  }
+
+  drawLogAnimation(
+    prevState: GameState,
+  ) {
+    // on every log action:
+    //   intro animation for log action icon
+    //   do animation on state
+    //   draw new state after that action
+    this.logActionPool.clear();
+    this.logTextPool.clear();
+    let spriteFs: {
+      create: () => DataSprite<any>,
+      introTween: (sprite: DataSprite<any>) => { first: Phaser.Tween, last: Phaser.Tween } | undefined,
+    }[];
+    const stF = this.log!.st.map((entry, entryIndex) => {
+      return {
+        create: () => {
+          const pos = createPosition(
+            "left", 40 + entryIndex * 70, 150,
+            "top", 40, 300,
+          );
+          const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, entry);
+          return sprite;
+        },
+        introTween: (sprite: DataSprite<LogActionData>) => {
+          return this.logActionPool.introTween(sprite);
+        },
+      };
+    });
+    const frF = this.log!.fr.map((entry, entryIndex) => {
+      return {
+        create: () => {
+          const pos = createPosition(
+            "left", 40 + entryIndex * 70, 150,
+            "top", 150, 300,
+          );
+          const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, entry);
+          return sprite;
+        },
+        introTween: (sprite: DataSprite<LogActionData>) => {
+          return this.logActionPool.introTween(sprite);
+        },
+      };
+    });
+    const enF = this.log!.en.map((entry, entryIndex) => {
+      return {
+        create: () => {
+          const pos = createPosition(
+            "left", 40 + entryIndex * 70, 150,
+            "top", 240, 300,
+          );
+          const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, entry);
+          return sprite;
+        },
+        introTween: (sprite: DataSprite<LogActionData>) => {
+          return this.logActionPool.introTween(sprite);
+        },
+      };
+    });
+    spriteFs = stF.concat(frF).concat(enF);
+    chainSpriteCreation(spriteFs, true);
   }
 
   setVisibility(
@@ -342,6 +411,34 @@ function mkTriggerPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         return `icon_a.png`;
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+        },
+      },
+    },
+  );
+}
+
+type LogActionData = {
+  action: Action,
+  state: GameState,
+};
+
+function mkLogActionPool(
+  gameRefs: GameRefs,
+): Pool<LogActionData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return `icon_b.png`;
       },
       introAnim: [
         (self, tween) => {

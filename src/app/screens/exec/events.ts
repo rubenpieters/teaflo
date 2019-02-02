@@ -18,9 +18,17 @@ export function updateSolutionRep(
   const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solInfo.solution, sol.solInfo.loc, initState);
 
+  const prevState = gameRefs.screens.execScreen.state;
   gameRefs.screens.execScreen.state = solResult.state;
-  gameRefs.screens.execScreen.drawFriendlyUnits();
-  gameRefs.screens.execScreen.drawStats();
+  gameRefs.screens.execScreen.log = solResult.log;
+  if (prevState === undefined) {
+    // there was no previous state, just draw
+    gameRefs.screens.execScreen.drawFriendlyUnits();
+    gameRefs.screens.execScreen.drawStats(); 
+  } else {
+    // draw log animations
+    gameRefs.screens.execScreen.drawLogAnimation(prevState);
+  }
 }
 
 export function hoverUnit(
