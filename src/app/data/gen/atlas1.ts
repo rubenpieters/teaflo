@@ -103,45 +103,57 @@ export type Atlas1 = {
         "width": 150,
         "height": 300
     },
-    "bmark_neutral.png": {
+    "hp.png": {
         "x": 750,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
+    "ch.png": {
+        "x": 825,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
+    "bmark_neutral.png": {
+        "x": 900,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
-        "x": 950,
+        "x": 1100,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_hover.png": {
-        "x": 1150,
+        "x": 1300,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_neutral.png": {
-        "x": 1350,
+        "x": 1500,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_click.png": {
-        "x": 1550,
+        "x": 1700,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_hover.png": {
-        "x": 1750,
-        "y": 200,
+        "x": 0,
+        "y": 360,
         "width": 200,
         "height": 400
     },
     "box.png": {
-        "x": 0,
-        "y": 450,
+        "x": 200,
+        "y": 500,
         "width": 640,
         "height": 1080
     }
@@ -250,45 +262,57 @@ export const atlas1: Atlas1 = {
         "width": 150,
         "height": 300
     },
-    "bmark_neutral.png": {
+    "hp.png": {
         "x": 750,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
+    "ch.png": {
+        "x": 825,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
+    "bmark_neutral.png": {
+        "x": 900,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
-        "x": 950,
+        "x": 1100,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_hover.png": {
-        "x": 1150,
+        "x": 1300,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_neutral.png": {
-        "x": 1350,
+        "x": 1500,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_click.png": {
-        "x": 1550,
+        "x": 1700,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_hover.png": {
-        "x": 1750,
-        "y": 200,
+        "x": 0,
+        "y": 360,
         "width": 200,
         "height": 400
     },
     "box.png": {
-        "x": 0,
-        "y": 450,
+        "x": 200,
+        "y": 500,
         "width": 640,
         "height": 1080
     }

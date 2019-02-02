@@ -18,6 +18,7 @@ type UnitSelection = GlobalId<"friendly" | "enemy">;
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
   unitPool: Pool<UnitData, {}>
+  unitResPool: Pool<UnitResData, {}>
   abilityPool: Pool<AbilityData, {}>
   unitTextPool: TextPool
   statsTextPool: TextPool
@@ -36,6 +37,7 @@ export class ExecScreen {
   ) {
     this.clearBtnPool = mkClearBtnPool(gameRefs);
     this.unitPool = mkUnitPool(gameRefs);
+    this.unitResPool = mkUnitResPool(gameRefs);
     this.unitTextPool = new TextPool(gameRefs.game);
     this.statsTextPool = new TextPool(gameRefs.game);
     this.abilityPool = mkAbilityPool(gameRefs);
@@ -72,6 +74,7 @@ export class ExecScreen {
   drawFriendlyUnits(
   ) {
     this.unitPool.clear();
+    this.unitResPool.clear();
     this.triggerPool.clear();
     this.unitTextPool.clear();
 
@@ -94,27 +97,41 @@ export class ExecScreen {
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: new GlobalId(unit.id, "friendly"),
-          });
-        //mkUnitPool(game, gameRefs, unitPos, unit.cardId, unitIndex, "friendly");
+          }
+        );
 
         // HP
-        /*const unitHpPos = relativeTo(unitPos,
-          "below", 50,
-          150, 50,
+        const unitHpPos = createPosition(
+          "left", 650 + 160 * unitIndex, 75,
+          "top", 50, 300,
         );
-        unitHpPos.xMax = unitHpPos.xMin + (unitHpPos.xMax - unitHpPos.xMin) * (unit.hp / unit.maxHp);
-        createUnitResource(game, gameRefs, unitHpPos, "hp");
+        const hpHeight = unitHpPos.yMax - unitHpPos.yMin;
+        unitHpPos.yMin = unitHpPos.yMin + hpHeight * ((unit.maxHp - unit.hp) / unit.maxHp);
+        const unitHpSprite = this.unitResPool.newSprite(unitHpPos.xMin, unitHpPos.yMin, {},
+          { cardId: unit.cardId,
+            globalId: new GlobalId(unit.id, "friendly"),
+            type: "hp",
+          }
+        );
+        unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
 
         // CH
-        const unitChPos = relativeTo(unitPos,
-          "below", 150,
-          150, 50,
+        const unitChPos = createPosition(
+          "left", 725 + 160 * unitIndex, 75,
+          "top", 50, 300,
         );
-        unitChPos.xMax = unitChPos.xMin + (unitChPos.xMax - unitChPos.xMin) * (unit.charges / unit.maxCharges);
-        createUnitResource(game, gameRefs, unitChPos, "ch");
+        const chHeight = unitChPos.yMax - unitChPos.yMin;
+        unitChPos.yMin = unitChPos.yMin + chHeight * ((unit.maxCharges - unit.charges) / unit.maxCharges);
+        const unitChSprite = this.unitResPool.newSprite(unitChPos.xMin, unitChPos.yMin, {},
+          { cardId: unit.cardId,
+            globalId: new GlobalId(unit.id, "friendly"),
+            type: "ch",
+          }
+        );
+        unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
 
         // TH
-        let i = 0;
+        /*let i = 0;
         for (const enId of enIds) {
           const unitThPos = relativeTo(unitPos,
             "below", 250 + 100 * i,
@@ -135,7 +152,38 @@ export class ExecScreen {
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: new GlobalId(unit.id, "enemy"),
-          });
+          }
+        );
+
+        // HP
+        const unitHpPos = createPosition(
+          "left", 1300 + 160 * unitIndex, 75,
+          "top", 50, 300,
+        );
+        const hpHeight = unitHpPos.yMax - unitHpPos.yMin;
+        unitHpPos.yMin = unitHpPos.yMin + hpHeight * ((unit.maxHp - unit.hp) / unit.maxHp);
+        const unitHpSprite = this.unitResPool.newSprite(unitHpPos.xMin, unitHpPos.yMin, {},
+          { cardId: unit.cardId,
+            globalId: new GlobalId(unit.id, "enemy"),
+            type: "hp",
+          }
+        );
+        unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
+
+        // CH
+        const unitChPos = createPosition(
+          "left", 1375 + 160 * unitIndex, 75,
+          "top", 50, 300,
+        );
+        const chHeight = unitChPos.yMax - unitChPos.yMin;
+        unitChPos.yMin = unitChPos.yMin + chHeight * ((unit.maxCharges - unit.charges) / unit.maxCharges);
+        const unitChSprite = this.unitResPool.newSprite(unitChPos.xMin, unitChPos.yMin, {},
+          { cardId: unit.cardId,
+            globalId: new GlobalId(unit.id, "enemy"),
+            type: "ch",
+          }
+        );
+        unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
       }
     });
 
@@ -217,7 +265,16 @@ export class ExecScreen {
           return sprite;
         },
         introTween: (sprite: DataSprite<LogActionData>) => {
-          return this.logActionPool.introTween(sprite);
+          const tween = this.logActionPool.introTween(sprite);
+          if (tween !== undefined) {
+            tween.last.onComplete.add(() => {
+              // TODO: add parameter to the draw functions instead of setting the screen state
+              this.gameRefs.screens.execScreen.state = entry.state;
+              this.gameRefs.screens.execScreen.drawFriendlyUnits();
+              this.gameRefs.screens.execScreen.drawStats(); 
+            });
+          }
+          return tween;
         },
       };
     });
@@ -232,7 +289,16 @@ export class ExecScreen {
           return sprite;
         },
         introTween: (sprite: DataSprite<LogActionData>) => {
-          return this.logActionPool.introTween(sprite);
+          const tween = this.logActionPool.introTween(sprite);
+          if (tween !== undefined) {
+            tween.last.onComplete.add(() => {
+              // TODO: add parameter to the draw functions instead of setting the screen state
+              this.gameRefs.screens.execScreen.state = entry.state;
+              this.gameRefs.screens.execScreen.drawFriendlyUnits();
+              this.gameRefs.screens.execScreen.drawStats(); 
+            });
+          }
+          return tween;
         },
       };
     });
@@ -247,7 +313,16 @@ export class ExecScreen {
           return sprite;
         },
         introTween: (sprite: DataSprite<LogActionData>) => {
-          return this.logActionPool.introTween(sprite);
+          const tween = this.logActionPool.introTween(sprite);
+          if (tween !== undefined) {
+            tween.last.onComplete.add(() => {
+              // TODO: add parameter to the draw functions instead of setting the screen state
+              this.gameRefs.screens.execScreen.state = entry.state;
+              this.gameRefs.screens.execScreen.drawFriendlyUnits();
+              this.gameRefs.screens.execScreen.drawStats(); 
+            });
+          }
+          return tween;
         },
       };
     });
@@ -260,8 +335,10 @@ export class ExecScreen {
   ) {
     this.clearBtnPool.visible = visibility;
     this.unitPool.visible = visibility;
+    this.unitResPool.visible = visibility;
     this.abilityPool.visible = visibility;
     this.triggerPool.visible = visibility;
+    this.logActionPool.visible = visibility;
     this.statsTextPool.setVisiblity(visibility);
     this.unitTextPool.setVisiblity(visibility);
   }
@@ -310,6 +387,50 @@ function mkUnitPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         return cardMap[self.data.cardId];
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+          const clickState = gameRefs.screens.execScreen.clickState;
+          if (clickState === undefined) {
+            clickUnit(gameRefs, self.data.globalId);
+          } else {
+            clickState.inputs.push(self.data.globalId);
+            if (clickState.inputs.length === clickState.ability.inputs.length) {
+              extendLevelSolution(gameRefs, clickState!);
+            }
+          }
+        },
+        hoverOver: (self) => {
+          hoverUnit(gameRefs, self.data.globalId);
+        },
+        hoverOut: (self) => {
+          clearHover(gameRefs);
+        },
+      },
+    },
+  );
+}
+
+type UnitResData = {
+  cardId: string,
+  globalId: GlobalId<"friendly" | "enemy">,
+  type: "hp" | "ch",
+};
+
+function mkUnitResPool(
+  gameRefs: GameRefs,
+): Pool<UnitResData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return `${self.data.type}.png`;
       },
       introAnim: [
         (self, tween) => {

@@ -22,3 +22,5 @@ textures/icon_c.png
 textures/icon_d.png
 textures/icon_e.png
 textures/icon_f.png
+textures/hp.png
+textures/ch.png
