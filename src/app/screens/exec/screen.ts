@@ -81,7 +81,7 @@ export class ExecScreen {
     state.frUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
         const unitPos = createPosition(
-          "left", 500 + 200 * unitIndex, 150,
+          "left", 650 + 160 * unitIndex, 150,
           "top", 50, 300,
         );
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
@@ -122,8 +122,8 @@ export class ExecScreen {
     state.enUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
         const unitPos = createPosition(
-          "left", 1400 + 200 * unitIndex, 150,
-          "top", 300, 300,
+          "left", 1300 + 160 * unitIndex, 150,
+          "top", 50, 300,
         );
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
@@ -133,15 +133,15 @@ export class ExecScreen {
     });
 
     const textPos = createPosition(
-      "left", 600, 150,
-      "top", 200, 300,
+      "left", 650, 150,
+      "top", 300, 300,
     );
-    this.statsTextPool.newText(textPos, "Aether");
+    this.unitTextPool.newText(textPos, "Aether");
     triggerOrder.forEach((tag, tagIndex) => {
       state.triggers[tag].forEach((trigger, triggerIndex) => {
         const triggerPos = createPosition(
-          "left", 600 + 200 * triggerIndex, 150,
-          "top", 200 + 200 * tagIndex, 300,
+          "left", 650 + 80 * triggerIndex, 150,
+          "top", 400 + 80 * tagIndex, 300,
         );
         this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { trigger });
       });
@@ -155,7 +155,7 @@ export class ExecScreen {
     this.statsTextPool.clear();
 
     const textPos = createPosition(
-      "left", 600, 150,
+      "left", 650, 150,
       "bot", 200, 300,
     );
     this.statsTextPool.newText(textPos, "Skills");
@@ -165,7 +165,7 @@ export class ExecScreen {
       const unit = getUnit(showUnit, this.state!);
       if (unit !== undefined) {
         const pos1 = createPosition(
-          "left", 600, 150,
+          "left", 650, 150,
           "bot", 100, 300,
         );
         this.statsTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
@@ -174,7 +174,7 @@ export class ExecScreen {
           const frUnit = <FrStUnit>unit;
           frUnit.abilities.forEach((ability, abilityIndex) => {
             const abPos = createPosition(
-              "left", 600 + 200 * abilityIndex, 150,
+              "left", 650 + 200 * abilityIndex, 150,
               "bot", 50, 150,
             );
             this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
@@ -341,7 +341,7 @@ function mkTriggerPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return `fr_unit_a1_l1_01_ab1.png`;
+        return `icon_a.png`;
       },
       introAnim: [
         (self, tween) => {
