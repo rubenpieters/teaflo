@@ -94,7 +94,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
         ),
         new I.AddTriggerI(
           new I.FromInput(0),
-          new I.Static(T.full(new T.Armor(1))),
+          new I.Static(T.full(new T.Armor(10))),
         ),
       ]),
       inputs: [

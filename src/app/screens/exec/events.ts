@@ -17,7 +17,6 @@ export function updateSolutionRep(
   const enUnits = levelData[schem.levelId].enemyIds;
   const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solInfo.solution, sol.solInfo.loc, initState);
-  console.log(solResult.state);
 
   gameRefs.screens.execScreen.state = solResult.state;
   gameRefs.screens.execScreen.drawFriendlyUnits();

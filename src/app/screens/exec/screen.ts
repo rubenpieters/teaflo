@@ -9,6 +9,7 @@ import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution } from "./events";
 import { Ability } from "src/shared/game/ability";
+import { triggerOrder, StTrigger } from "../../../shared/game/trigger";
 
 type UnitSelection = GlobalId<"friendly" | "enemy">;
 
@@ -16,7 +17,9 @@ export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
   unitPool: Pool<UnitData, {}>
   abilityPool: Pool<AbilityData, {}>
-  textPool: TextPool
+  unitTextPool: TextPool
+  statsTextPool: TextPool
+  triggerPool: Pool<TriggerData, {}>
 
   state: GameState | undefined
   hoveredUnit: UnitSelection | undefined
@@ -28,14 +31,17 @@ export class ExecScreen {
   ) {
     this.clearBtnPool = mkClearBtnPool(gameRefs);
     this.unitPool = mkUnitPool(gameRefs);
-    this.textPool = new TextPool(gameRefs.game);
+    this.unitTextPool = new TextPool(gameRefs.game);
+    this.statsTextPool = new TextPool(gameRefs.game);
     this.abilityPool = mkAbilityPool(gameRefs);
+    this.triggerPool = mkTriggerPool(gameRefs);
   }
 
   reset() {
     this.state = undefined;
     this.hoveredUnit = undefined;
     this.selectedUnit = undefined;
+    this.clickState = undefined;
   }
 
   drawClearBtn(
@@ -59,7 +65,9 @@ export class ExecScreen {
   drawFriendlyUnits(
   ) {
     this.unitPool.clear();
-    
+    this.triggerPool.clear();
+    this.unitTextPool.clear();
+
     const state = this.state!;
     // calculate max threat value
     const enIds = filteredEn(state)
@@ -74,7 +82,7 @@ export class ExecScreen {
       if (unit !== undefined) {
         const unitPos = createPosition(
           "left", 500 + 200 * unitIndex, 150,
-          "top", 300, 300,
+          "top", 50, 300,
         );
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
@@ -123,19 +131,34 @@ export class ExecScreen {
           });
       }
     });
+
+    const textPos = createPosition(
+      "left", 600, 150,
+      "top", 200, 300,
+    );
+    this.statsTextPool.newText(textPos, "Aether");
+    triggerOrder.forEach((tag, tagIndex) => {
+      state.triggers[tag].forEach((trigger, triggerIndex) => {
+        const triggerPos = createPosition(
+          "left", 600 + 200 * triggerIndex, 150,
+          "top", 200 + 200 * tagIndex, 300,
+        );
+        this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { trigger });
+      });
+    });
   }
 
   drawStats(
   ) {
     this.clearBtnPool.clear();
     this.abilityPool.clear();
-    this.textPool.clear();
+    this.statsTextPool.clear();
 
     const textPos = createPosition(
       "left", 600, 150,
       "bot", 200, 300,
     );
-    this.textPool.newText(textPos, "Skills");
+    this.statsTextPool.newText(textPos, "Skills");
 
     const showUnit = this.hoveredUnit !== undefined ? this.hoveredUnit : this.selectedUnit;
     if (showUnit !== undefined) {
@@ -145,7 +168,7 @@ export class ExecScreen {
           "left", 600, 150,
           "bot", 100, 300,
         );
-        this.textPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
+        this.statsTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
 
         if (showUnit.type === "friendly") {
           const frUnit = <FrStUnit>unit;
@@ -169,7 +192,9 @@ export class ExecScreen {
     this.clearBtnPool.visible = visibility;
     this.unitPool.visible = visibility;
     this.abilityPool.visible = visibility;
-    this.textPool.setVisiblity(visibility);
+    this.triggerPool.visible = visibility;
+    this.statsTextPool.setVisiblity(visibility);
+    this.unitTextPool.setVisiblity(visibility);
   }
 }
 
@@ -298,6 +323,33 @@ function mkAbilityPool(
               extendLevelSolution(gameRefs, gameRefs.screens.execScreen.clickState!);
             }
           }
+        },
+      },
+    },
+  );
+}
+
+type TriggerData = {
+  trigger: StTrigger,
+};
+
+function mkTriggerPool(
+  gameRefs: GameRefs,
+): Pool<TriggerData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return `fr_unit_a1_l1_01_ab1.png`;
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
         },
       },
     },
