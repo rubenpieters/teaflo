@@ -13,7 +13,7 @@ export class TextPool {
   public newText(
     pos: Position,
     textContent: string,
-  ) {
+  ): Phaser.Text {
     const text = this.game.add.text(
       pos.xMin, pos.yMin, textContent, {
         fill: "#000000",
@@ -24,6 +24,7 @@ export class TextPool {
     );
     text.setTextBounds(0, 0, pos.xMax - pos.xMin, pos.yMax - pos.yMin);
     this.texts.push(text);
+    return text;
   }
 
   public clear() {

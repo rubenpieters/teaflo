@@ -11,7 +11,7 @@ import { hoverUnit, clearHover, clickUnit, extendLevelSolution } from "./events"
 import { Ability } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
-import { chainSpriteCreation } from "../../../app/phaser/animation";
+import { chainSpriteCreation, createTween, addTextPopup } from "../../../app/phaser/animation";
 
 type UnitSelection = GlobalId<"friendly" | "enemy">;
 
@@ -72,13 +72,15 @@ export class ExecScreen {
   }
 
   drawFriendlyUnits(
+    state: GameState,
+    prevState?: GameState,
   ) {
+    // when drawing elements: if difference with previous state, play animation
     this.unitPool.clear();
     this.unitResPool.clear();
     this.triggerPool.clear();
     this.unitTextPool.clear();
 
-    const state = this.state!;
     // calculate max threat value
     const enIds = filteredEn(state)
       .map(x => x.id)
@@ -204,6 +206,7 @@ export class ExecScreen {
   }
 
   drawStats(
+    state: GameState,
   ) {
     this.clearBtnPool.clear();
     this.abilityPool.clear();
@@ -217,7 +220,7 @@ export class ExecScreen {
 
     const showUnit = this.hoveredUnit !== undefined ? this.hoveredUnit : this.selectedUnit;
     if (showUnit !== undefined) {
-      const unit = getUnit(showUnit, this.state!);
+      const unit = getUnit(showUnit, state);
       if (unit !== undefined) {
         const pos1 = createPosition(
           "left", 650, 150,
@@ -244,6 +247,7 @@ export class ExecScreen {
   drawLogAnimation(
     prevState: GameState,
   ) {
+    this.logActionPool.clear(); 
     // on every log action:
     //   intro animation for log action icon
     //   do animation on state
@@ -267,11 +271,23 @@ export class ExecScreen {
         introTween: (sprite: DataSprite<LogActionData>) => {
           const tween = this.logActionPool.introTween(sprite);
           if (tween !== undefined) {
-            tween.last.onComplete.add(() => {
-              // TODO: add parameter to the draw functions instead of setting the screen state
-              this.gameRefs.screens.execScreen.state = entry.state;
-              this.gameRefs.screens.execScreen.drawFriendlyUnits();
-              this.gameRefs.screens.execScreen.drawStats(); 
+            const textPos = createPosition(
+              "left", 680, 100,
+              "top", 200, 100,
+            );
+            addTextPopup(
+              this.gameRefs,
+              tween.first,
+              () => {
+                return this.logTextPool.newText(textPos, JSON.stringify(entry.action));
+              },
+              tween => {
+                tween.to({ y: textPos.yMin - 100 }, 1000);
+              },
+            );
+            tween.first.onStart.add(() => {
+              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state);
+              this.gameRefs.screens.execScreen.drawStats(entry.state); 
             });
           }
           return tween;
@@ -291,11 +307,23 @@ export class ExecScreen {
         introTween: (sprite: DataSprite<LogActionData>) => {
           const tween = this.logActionPool.introTween(sprite);
           if (tween !== undefined) {
-            tween.last.onComplete.add(() => {
-              // TODO: add parameter to the draw functions instead of setting the screen state
-              this.gameRefs.screens.execScreen.state = entry.state;
-              this.gameRefs.screens.execScreen.drawFriendlyUnits();
-              this.gameRefs.screens.execScreen.drawStats(); 
+            const textPos = createPosition(
+              "left", 680, 100,
+              "top", 200, 100,
+            );
+            addTextPopup(
+              this.gameRefs,
+              tween.first,
+              () => {
+                return this.logTextPool.newText(textPos, JSON.stringify(entry.action));
+              },
+              tween => {
+                tween.to({ y: textPos.yMin - 100 }, 1000);
+              },
+            );
+            tween.first.onStart.add(() => {
+              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state);
+              this.gameRefs.screens.execScreen.drawStats(entry.state); 
             });
           }
           return tween;
@@ -315,11 +343,23 @@ export class ExecScreen {
         introTween: (sprite: DataSprite<LogActionData>) => {
           const tween = this.logActionPool.introTween(sprite);
           if (tween !== undefined) {
-            tween.last.onComplete.add(() => {
-              // TODO: add parameter to the draw functions instead of setting the screen state
-              this.gameRefs.screens.execScreen.state = entry.state;
-              this.gameRefs.screens.execScreen.drawFriendlyUnits();
-              this.gameRefs.screens.execScreen.drawStats(); 
+            const textPos = createPosition(
+              "left", 680, 100,
+              "top", 200, 100,
+            );
+            addTextPopup(
+              this.gameRefs,
+              tween.first,
+              () => {
+                return this.logTextPool.newText(textPos, JSON.stringify(entry.action));
+              },
+              tween => {
+                tween.to({ y: textPos.yMin - 100 }, 1000);
+              },
+            );
+            tween.first.onStart.add(() => {
+              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state);
+              this.gameRefs.screens.execScreen.drawStats(entry.state); 
             });
           }
           return tween;
@@ -563,7 +603,7 @@ function mkLogActionPool(
       },
       introAnim: [
         (self, tween) => {
-          tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
+          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
         },
       ],
       callbacks: {

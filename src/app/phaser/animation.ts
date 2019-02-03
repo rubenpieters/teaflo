@@ -1,4 +1,5 @@
 import { DataSprite } from "./datasprite";
+import { GameRefs } from "../states/game";
 
 export function createTween(
   game: Phaser.Game,
@@ -66,4 +67,20 @@ export function chainSpriteCreation(
       chainSpriteCreation(spriteFs.splice(1), animation);
     }
   }
+}
+
+export function addTextPopup(
+  gameRefs: GameRefs,
+  tween: Phaser.Tween,
+  createText: () => Phaser.Text,
+  textAnimation: (tween: Phaser.Tween) => void,
+) {
+  tween.onStart.add(() => {
+    const text = createText();
+    const textTween = createTween(gameRefs.game, text, textAnimation);
+    textTween.onComplete.add(() => {
+      text.destroy()
+    });
+    textTween.start();
+  });
 }

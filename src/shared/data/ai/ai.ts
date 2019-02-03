@@ -27,7 +27,7 @@ export const ai2: AI = [
       intent: new I.AddTriggerI(
         I.mkAllAlly(),
         new I.Static(
-          new T.Weak(7),
+          T.full(new T.Weak(1)),
         ),
       ),
       spriteId: "fr_unit_a1_l2_01_ab1",

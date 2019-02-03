@@ -23,8 +23,8 @@ export function updateSolutionRep(
   gameRefs.screens.execScreen.log = solResult.log;
   if (prevState === undefined) {
     // there was no previous state, just draw
-    gameRefs.screens.execScreen.drawFriendlyUnits();
-    gameRefs.screens.execScreen.drawStats(); 
+    gameRefs.screens.execScreen.drawFriendlyUnits(solResult.state);
+    gameRefs.screens.execScreen.drawStats(solResult.state); 
   } else {
     // draw log animations
     gameRefs.screens.execScreen.drawLogAnimation(prevState);
@@ -37,14 +37,14 @@ export function hoverUnit(
 ) {
   // TODO: only redraw if necessary?
   gameRefs.screens.execScreen.hoveredUnit = globalId;
-  gameRefs.screens.execScreen.drawStats();
+  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
 }
 
 export function clearHover(
   gameRefs: GameRefs,
 ) {
   gameRefs.screens.execScreen.hoveredUnit = undefined;
-  gameRefs.screens.execScreen.drawStats();
+  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
 }
 
 export function clickUnit(
@@ -57,7 +57,7 @@ export function clickUnit(
   } else {
     gameRefs.screens.execScreen.selectedUnit = globalId;
   }
-  gameRefs.screens.execScreen.drawStats();
+  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
 }
 
 export function extendLevelSolution(
