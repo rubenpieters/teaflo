@@ -6,14 +6,14 @@ import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit } from "../../../
 import { Log, LogEntry } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
-import { getUnit, GlobalId, UnitId } from "../../../shared/game/entityId";
+import { getUnit, GlobalId, UnitId, getStatus } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution } from "./events";
 import { Ability } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
 import { chainSpriteCreation, createTween, addTextPopup } from "../../../app/phaser/animation";
 
-type UnitSelection = GlobalId<"friendly" | "enemy">;
+export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
@@ -270,29 +270,41 @@ export class ExecScreen {
       "left", 650, 150,
       "bot", 200, 300,
     );
-    this.statsTextPool.newText(textPos, "Skills");
+    this.statsTextPool.newText(textPos, "Detail");
 
     const showUnit = this.hoveredUnit !== undefined ? this.hoveredUnit : this.selectedUnit;
     if (showUnit !== undefined) {
-      const unit = getUnit(showUnit, state);
-      if (unit !== undefined) {
-        const pos1 = createPosition(
-          "left", 650, 150,
-          "bot", 100, 300,
-        );
-        this.statsTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
-
-        if (showUnit.type === "friendly") {
-          const frUnit = <FrStUnit>unit;
-          frUnit.abilities.forEach((ability, abilityIndex) => {
-            const abPos = createPosition(
-              "left", 650 + 200 * abilityIndex, 150,
-              "bot", 50, 150,
-            );
-            this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
-          });
-        } else if (showUnit.type === "enemy") {
-          const enUnit = <EnStUnit>unit;
+      if (showUnit.type === "friendly" || showUnit.type === "enemy") {
+        const unit = getUnit(showUnit, state);
+        if (unit !== undefined) {
+          const pos1 = createPosition(
+            "left", 650, 150,
+            "bot", 100, 300,
+          );
+          this.statsTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
+  
+          if (showUnit.type === "friendly") {
+            const frUnit = <FrStUnit>unit;
+            frUnit.abilities.forEach((ability, abilityIndex) => {
+              const abPos = createPosition(
+                "left", 650 + 200 * abilityIndex, 150,
+                "bot", 50, 150,
+              );
+              this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
+            });
+          } else if (showUnit.type === "enemy") {
+            const enUnit = <EnStUnit>unit;
+          }
+        }
+      } else {
+        // TODO: breaks if it cannot find status
+        const unit = getStatus(<GlobalId<"status">>showUnit, state);
+        if (unit !== undefined) {
+          const pos1 = createPosition(
+            "left", 650, 150,
+            "bot", 100, 300,
+          );
+          this.statsTextPool.newText(pos1, `${unit.tag}: ${unit.fragments}`);
         }
       }
     }
@@ -580,26 +592,6 @@ function mkUnitResPool(
   );
 }
 
-function mkResPool(
-  gameRefs: GameRefs,
-): Pool<{}, {}> {
-  return new Pool(
-    gameRefs.game,
-    {
-      atlas: "atlas1",
-      toFrame: (self, frameType) => {
-        return "";
-      },
-      introAnim: [
-        (self, tween) => {
-          tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
-        },
-      ],
-      callbacks: {},
-    },
-  );
-}
-
 type AbilityData = {
   ability: Ability,
   index: number,
@@ -660,6 +652,12 @@ function mkTriggerPool(
       ],
       callbacks: {
         click: (self) => {
+        },
+        hoverOver: (self) => {
+          hoverUnit(gameRefs, new GlobalId(self.data.trigger.id, "status"));
+        },
+        hoverOut: (self) => {
+          clearHover(gameRefs);
         },
       },
     },

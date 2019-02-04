@@ -3,6 +3,7 @@ import { currentSolution, currentSchemSol, selectedSchem, levelData, setSolution
 import { mkGameState } from "../../../shared/game/state";
 import { runSolution, extendSolution, SolutionData } from "../../../shared/game/solution";
 import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
+import { UnitSelection } from "./screen";
 
 export function updateSolutionRep(
   gameRefs: GameRefs,
@@ -33,7 +34,7 @@ export function updateSolutionRep(
 
 export function hoverUnit(
   gameRefs: GameRefs,
-  globalId: GlobalId<"friendly" | "enemy">,
+  globalId: UnitSelection,
 ) {
   // TODO: only redraw if necessary?
   gameRefs.screens.execScreen.hoveredUnit = globalId;
@@ -49,7 +50,7 @@ export function clearHover(
 
 export function clickUnit(
   gameRefs: GameRefs,
-  globalId: GlobalId<"friendly" | "enemy">,
+  globalId: UnitSelection,
 ) {
   const selected = gameRefs.screens.execScreen.selectedUnit;
   if (selected !== undefined && eqUnitId(gameRefs.screens.execScreen.state!, globalId, selected)) {
