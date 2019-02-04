@@ -121,7 +121,7 @@ export class ExecScreen {
           const prevUnit = getUnit(new GlobalId(unit.id, "friendly"), prevState);
           if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
             const prevUnitHpPos = createPosition(
-              "left", 1300 + 160 * unitIndex, 75,
+              "left", 650 + 160 * unitIndex, 75,
               "top", 50, 300,
             );
             const prevDiff = hpHeight * ((prevUnit.maxHp - prevUnit.hp) / prevUnit.maxHp);
@@ -136,7 +136,7 @@ export class ExecScreen {
             prevUnitHpSprite.height = prevUnitHpPos.yMax - prevUnitHpPos.yMin;
             const tween = createTween(this.gameRefs.game, prevUnitHpSprite,
               tween => {
-                tween.to({ y: prevUnitHpPos.yMin, height: 0 }, 200, undefined, false, 100);
+                tween.to({ y: prevUnitHpPos.yMax, height: 0 }, 200, undefined, false, 100);
               }
             );
             tween.onComplete.add(() => prevUnitHpSprite.kill());
@@ -202,7 +202,6 @@ export class ExecScreen {
         if (prevState !== undefined) {
           const prevUnit = getUnit(new GlobalId(unit.id, "enemy"), prevState);
           if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
-            console.log(`PREV HP: ${prevUnit.hp} -- HP: ${unit.hp} -- ID: ${unit.id}`);
             const prevUnitHpPos = createPosition(
               "left", 1300 + 160 * unitIndex, 75,
               "top", 50, 300,
