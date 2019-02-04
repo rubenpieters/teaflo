@@ -24,3 +24,4 @@ textures/icon_e.png
 textures/icon_f.png
 textures/hp.png
 textures/ch.png
+textures/res_anim.png

@@ -115,32 +115,38 @@ export type Atlas1 = {
         "width": 75,
         "height": 300
     },
-    "bmark_neutral.png": {
+    "res_anim.png": {
         "x": 900,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
+    "bmark_neutral.png": {
+        "x": 975,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
-        "x": 1100,
+        "x": 1175,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_hover.png": {
-        "x": 1300,
+        "x": 1375,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_neutral.png": {
-        "x": 1500,
+        "x": 1575,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_click.png": {
-        "x": 1700,
+        "x": 1775,
         "y": 200,
         "width": 200,
         "height": 400
@@ -274,32 +280,38 @@ export const atlas1: Atlas1 = {
         "width": 75,
         "height": 300
     },
-    "bmark_neutral.png": {
+    "res_anim.png": {
         "x": 900,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
+    "bmark_neutral.png": {
+        "x": 975,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
-        "x": 1100,
+        "x": 1175,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_hover.png": {
-        "x": 1300,
+        "x": 1375,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_neutral.png": {
-        "x": 1500,
+        "x": 1575,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bt_bmark_click.png": {
-        "x": 1700,
+        "x": 1775,
         "y": 200,
         "width": 200,
         "height": 400

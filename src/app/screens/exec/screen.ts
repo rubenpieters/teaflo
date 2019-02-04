@@ -3,7 +3,7 @@ import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
 import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit } from "../../../shared/game/state";
-import { Log } from "../../../shared/game/log";
+import { Log, LogEntry } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId } from "../../../shared/game/entityId";
@@ -116,6 +116,33 @@ export class ExecScreen {
           }
         );
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
+        // draw hp changing animation
+        if (prevState !== undefined) {
+          const prevUnit = getUnit(new GlobalId(unit.id, "friendly"), prevState);
+          if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
+            const prevUnitHpPos = createPosition(
+              "left", 1300 + 160 * unitIndex, 75,
+              "top", 50, 300,
+            );
+            const prevDiff = hpHeight * ((prevUnit.maxHp - prevUnit.hp) / prevUnit.maxHp);
+            prevUnitHpPos.yMax = unitHpPos.yMin;
+            prevUnitHpPos.yMin = prevUnitHpPos.yMin + prevDiff;
+            const prevUnitHpSprite = this.unitResPool.newSprite(prevUnitHpPos.xMin, prevUnitHpPos.yMin, {},
+              { cardId: unit.cardId,
+                globalId: new GlobalId(unit.id, "friendly"),
+                type: "res_anim",
+              }
+            );
+            prevUnitHpSprite.height = prevUnitHpPos.yMax - prevUnitHpPos.yMin;
+            const tween = createTween(this.gameRefs.game, prevUnitHpSprite,
+              tween => {
+                tween.to({ y: prevUnitHpPos.yMin, height: 0 }, 200, undefined, false, 100);
+              }
+            );
+            tween.onComplete.add(() => prevUnitHpSprite.kill());
+            tween.start();
+          }
+        }
 
         // CH
         const unitChPos = createPosition(
@@ -171,6 +198,34 @@ export class ExecScreen {
           }
         );
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
+        // draw hp changing animation
+        if (prevState !== undefined) {
+          const prevUnit = getUnit(new GlobalId(unit.id, "enemy"), prevState);
+          if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
+            console.log(`PREV HP: ${prevUnit.hp} -- HP: ${unit.hp} -- ID: ${unit.id}`);
+            const prevUnitHpPos = createPosition(
+              "left", 1300 + 160 * unitIndex, 75,
+              "top", 50, 300,
+            );
+            const prevDiff = hpHeight * ((prevUnit.maxHp - prevUnit.hp) / prevUnit.maxHp);
+            prevUnitHpPos.yMax = unitHpPos.yMin;
+            prevUnitHpPos.yMin = prevUnitHpPos.yMin + prevDiff;
+            const prevUnitHpSprite = this.unitResPool.newSprite(prevUnitHpPos.xMin, prevUnitHpPos.yMin, {},
+              { cardId: unit.cardId,
+                globalId: new GlobalId(unit.id, "enemy"),
+                type: "res_anim",
+              }
+            );
+            prevUnitHpSprite.height = prevUnitHpPos.yMax - prevUnitHpPos.yMin;
+            const tween = createTween(this.gameRefs.game, prevUnitHpSprite,
+              tween => {
+                tween.to({ y: prevUnitHpPos.yMax, height: 0 }, 200, undefined, false, 100);
+              }
+            );
+            tween.onComplete.add(() => prevUnitHpSprite.kill());
+            tween.start();
+          }
+        }
 
         // CH
         const unitChPos = createPosition(
@@ -245,7 +300,7 @@ export class ExecScreen {
   }
 
   drawLogAnimation(
-    prevState: GameState,
+    prevState?: GameState | undefined
   ) {
     this.logActionPool.clear(); 
     // on every log action:
@@ -286,8 +341,11 @@ export class ExecScreen {
               },
             );
             tween.first.onStart.add(() => {
-              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state);
-              this.gameRefs.screens.execScreen.drawStats(entry.state); 
+              const prev = fetchPrevEntry(this.log!, entryIndex, "st");
+              const prevS = prev === undefined ? prevState : prev.state;
+              //console.log(`${JSON.stringify(prevState!.enUnits)}`);
+              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state, prevS);
+              this.gameRefs.screens.execScreen.drawStats(entry.state);
             });
           }
           return tween;
@@ -322,8 +380,11 @@ export class ExecScreen {
               },
             );
             tween.first.onStart.add(() => {
-              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state);
-              this.gameRefs.screens.execScreen.drawStats(entry.state); 
+              const prev = fetchPrevEntry(this.log!, entryIndex, "fr");
+              const prevS = prev === undefined ? undefined : prev.state;
+              //console.log(`${JSON.stringify(prevState!.enUnits)}`);
+              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state, prevS);
+              this.gameRefs.screens.execScreen.drawStats(entry.state);
             });
           }
           return tween;
@@ -358,8 +419,11 @@ export class ExecScreen {
               },
             );
             tween.first.onStart.add(() => {
-              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state);
-              this.gameRefs.screens.execScreen.drawStats(entry.state); 
+              const prev = fetchPrevEntry(this.log!, entryIndex, "en");
+              const prevS = prev === undefined ? undefined : prev.state;
+              //console.log(`${JSON.stringify(prevState!.enUnits)}`);
+              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state, prevS);
+              this.gameRefs.screens.execScreen.drawStats(entry.state);
             });
           }
           return tween;
@@ -382,6 +446,23 @@ export class ExecScreen {
     this.statsTextPool.setVisiblity(visibility);
     this.unitTextPool.setVisiblity(visibility);
   }
+}
+
+function fetchPrevEntry(
+  log: Log,
+  index: number,
+  type: "st" | "fr" | "en",
+): LogEntry | undefined {
+  if (index === 0) {
+    switch (type) {
+      case "st": return undefined;
+      case "fr": return log.st[log.st.length - 1];
+      case "en": return log.fr[log.fr.length - 1];
+    }
+  } else {
+    return log[type][index - 1];
+  }
+  throw `should not happen -- ${index} ${type}`;
 }
 
 function mkClearBtnPool(
@@ -459,7 +540,7 @@ function mkUnitPool(
 type UnitResData = {
   cardId: string,
   globalId: GlobalId<"friendly" | "enemy">,
-  type: "hp" | "ch",
+  type: "hp" | "ch" | "res_anim",
 };
 
 function mkUnitResPool(
