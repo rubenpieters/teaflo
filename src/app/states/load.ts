@@ -33,11 +33,11 @@ export default class Load extends Phaser.State {
 
   public preload(): void {
     // load sprites
-    this.game.load.image("bg0", "textures/bg0.png");
-    this.game.load.image("bg1", "textures/bg1.png");
-    this.game.load.image("bg2", "textures/bg2.png");
-    this.game.load.image("bg3", "textures/bg3.png");
-    this.game.load.image("bg4", "textures/bg4.png");
+    this.game.load.image("bg0", "textures/paper_bg2.jpg");
+    this.game.load.image("bg1", "textures/paper_bg3.jpg");
+    this.game.load.image("bg2", "textures/paper_bg4.jpg");
+    this.game.load.image("bg3", "textures/paper_bg5.jpg");
+    this.game.load.image("bg4", "textures/paper_bg1.jpg");
     this.game.load.atlasJSONHash('atlas1', 'assets/atlas1.png', 'assets/atlas1.json');
 
     // indicate loading is done
