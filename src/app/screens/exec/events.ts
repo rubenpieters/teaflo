@@ -4,6 +4,16 @@ import { mkGameState } from "../../../shared/game/state";
 import { runSolution, extendSolution, SolutionData } from "../../../shared/game/solution";
 import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
 import { UnitSelection } from "./screen";
+import { loadLevel } from "../level/events";
+
+export function drawCurrentLevel(
+  gameRefs: GameRefs,
+) {
+  const schem = selectedSchem(gameRefs);
+  if (schem !== undefined) {
+    loadLevel(gameRefs, schem.levelId, schem.solId);
+  }
+}
 
 export function updateSolutionRep(
   gameRefs: GameRefs,

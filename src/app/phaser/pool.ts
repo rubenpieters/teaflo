@@ -54,7 +54,10 @@ export class Pool<Data, FrameType> extends Phaser.Group {
       sprite.loadTexture(this.poolInfo.atlas, this.poolInfo.toFrame(sprite, frameType));
     // otherwise set to correct frame
     } else {
-      sprite.frameName = this.poolInfo.toFrame(sprite, frameType);
+      const frameName = this.poolInfo.toFrame(sprite, frameType);
+      if (frameName !== undefined) {
+        sprite.frameName = frameName;
+      }
     }
     // initialize sprite if not initialized yet
     if (sprite.props === undefined || sprite.props.init === false) {

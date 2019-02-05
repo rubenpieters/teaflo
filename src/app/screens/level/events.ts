@@ -3,7 +3,6 @@ import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt } 
 import { emptyTree, Location } from "../../../shared/tree";
 import { updateSolutionRep } from "../exec/events";
 
-
 export function loadLevel(
   gameRefs: GameRefs,
   levelId: string,

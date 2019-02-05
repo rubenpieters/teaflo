@@ -2,8 +2,9 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createTween } from "../../phaser/animation";
 import { settings } from "../../data/settings";
-import { loadActScreen } from "./events";
+import { loadActScreen, loadExecScreen } from "./events";
 import { createPosition } from "../../util/position";
+import { drawCurrentLevel } from "../exec/events";
 
 export class MenuScreen {
   menuBtnPool: Pool<MenuBtnData, "neutral" | "hover" | "down">
@@ -76,10 +77,11 @@ function mkMenuBtnPool(
           switch (self.data.type) {
             case "act": {
               loadActScreen(gameRefs);
-              break;
+              return;
             }
             case "level": {
-              throw "TODO";
+              drawCurrentLevel(gameRefs);
+              return;
             }
           }
         },

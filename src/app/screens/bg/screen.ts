@@ -10,6 +10,13 @@ export class BgScreen {
     this.bgPool = mkBgPool(gameRefs);
   }
 
+  initialize() {
+    this.bgPool.killAll();
+
+    const sprite = this.bgPool.newSprite(0, 0, {}, {});
+    sprite.loadTexture("bg4");
+  }
+
   drawBg(
   ) {
     this.bgOnIntroComplete(() => { return; });

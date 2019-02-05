@@ -198,7 +198,6 @@ export class ActScreen {
   }
 
   clearAnimations() {
-    console.log("clear");
     this.gameRefs.game.tweens.removeFrom(this.actBtnPool, true);
     this.gameRefs.game.tweens.removeFrom(this.levelBtnPool, true);
     this.gameRefs.game.tweens.removeFrom(this.solBtnPool, true);

@@ -61,6 +61,7 @@ export default class Game extends Phaser.State {
     const menuScreen = new MenuScreen(gameRefs);
     gameRefs.screens.menuScreen = menuScreen;
 
+    bgScreen.initialize();
     actScreen.drawActBtn();
     menuScreen.drawMenuBtn();
   }
