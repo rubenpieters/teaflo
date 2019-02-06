@@ -94,6 +94,10 @@ function mkMenuBtnPool(
         },
       },
     },
-    self => { return gameRefs.saveData.act.activeScreen === self.data.type; }
+    self => {
+      return gameRefs.saveData.act.activeScreen === self.data.type
+        || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined
+      ;
+    }
   );
 }
