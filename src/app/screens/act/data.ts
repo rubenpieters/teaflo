@@ -94,6 +94,7 @@ export class SelectedLevelMenu {
 export type ActSaveData = {
   currentMenu: SelectedActMenu | SelectedLevelMenu | undefined,
   currentSchem: SelectedBuildSchem | SelectedExecSchem | undefined,
+  activeScreen: "menu" | "schem",
   levels: { [key in string]: SolutionData[] }
 }
 
@@ -101,6 +102,7 @@ export function mkActSaveData(): ActSaveData {
   return {
     currentMenu: undefined,
     currentSchem: undefined,
+    activeScreen: "menu",
     levels: {},
   };
 }

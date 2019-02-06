@@ -25,31 +25,30 @@ export class MenuScreen {
 
     let i = 0;
     // buttons are placed in reverse order on the screen
-    const l: ("act" | "level")[] = ["level", "act"];
+    const l: ("menu" | "schem")[] = ["schem", "menu"];
     for (const type of l) {
-      
-      /*if (selActId !== undefined && selActId === actId) {
-        // this is the currently selected act
+      if (this.gameRefs.saveData.act.activeScreen === type) {
+        // this is the currently selected menu type
         const pos = createPosition(
-          "left", 100 + 210 * i, 400,
-          "top", -100, 200,
+          "right", 100 + 210 * i, 200,
+          "bot", - 100, 400,
         );
-        this.actBtnPool.newSprite(pos.xMin, pos.yMin, "down", { actId, actIndex: i, });
-      } else {*/
+        this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "down", { type, index: i, });
+      } else {
         const pos = createPosition(
           "right", 100 + 210 * i, 200,
           "bot", - 200, 400,
         );
         // this is not the currently selected act
         this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { type, index: i, });
-      //}
+      }
       i += 1;
     }
   }
 }
 
 type MenuBtnData = {
-  type: "act" | "level",
+  type: "menu" | "schem",
   index: number,
 }
 
@@ -75,11 +74,11 @@ function mkMenuBtnPool(
       callbacks: {
         click: (self) => {
           switch (self.data.type) {
-            case "act": {
+            case "menu": {
               loadActScreen(gameRefs);
               return;
             }
-            case "level": {
+            case "schem": {
               drawCurrentLevel(gameRefs);
               return;
             }
@@ -95,6 +94,6 @@ function mkMenuBtnPool(
         },
       },
     },
-    self => { return false; }
+    self => { return gameRefs.saveData.act.activeScreen === self.data.type; }
   );
 }

@@ -28,6 +28,8 @@ export function loadLevel(
     gameRefs.screens.execScreen.drawClearBtn();
     updateSolutionRep(gameRefs);
   }
+  gameRefs.saveData.act.activeScreen = "schem";
+  gameRefs.screens.menuScreen.redrawMenuBtn();
 }
 
 export function newExecLevel(
