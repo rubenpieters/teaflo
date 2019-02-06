@@ -75,7 +75,12 @@ export class Pool<Data, FrameType> extends Phaser.Group {
         if (sprite.props !== undefined) {
           const pX = this.game.input.activePointer.x;
           const pY = this.game.input.activePointer.y;
-          if (pX >= x && pX <= x + sprite.width && pY >= y && pY <= y + sprite.height) {
+          if (
+            pX >= sprite.x
+            && pX <= sprite.x + sprite.width
+            && pY >= sprite.y
+            && pY <= sprite.y + sprite.height
+          ) {
             invokeIfDefined(this.poolInfo.callbacks.click, sprite);
           }
           sprite.props.selecting = false;

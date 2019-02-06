@@ -55,6 +55,7 @@ export function killUnit(
   state: GameState,
 ) {
   const id = findIndex(state, target);
+  if (id === undefined) return state;
   switch (target.type) {
     case "friendly": {
       return focus(state,
@@ -74,6 +75,7 @@ export function getUnit(
   state: GameState,
 ) {
   const id = findIndex(state, target);
+  if (id === undefined) return undefined;
   switch (target.type) {
     case "friendly": {
       return state.frUnits[id];
@@ -110,37 +112,7 @@ export function overUnit(
   onEmpty: (state: GameState) => GameState,
 ): GameState {
   const id = findIndex(state, target);
-  switch (target.type) {
-    case "friendly": {
-      if (state.frUnits[id] === undefined) {
-        return onEmpty(state);
-      } else {
-        // state.frUnits[id] is checked before
-        return focus(state,
-          over(x => x.frUnits[id], <any>f),
-        );
-      }
-    }
-    case "enemy": {
-      if (state.enUnits[id] === undefined) {
-        return onEmpty(state);
-      } else {
-        // state.enUnits[id] is checked before
-        return focus(state,
-          over(x => x.enUnits[id], <any>f),
-        );
-      }
-    }
-  }
-}
-
-export function overUnitS(
-  target: UnitId,
-  state: GameState,
-  f: (state: GameState, unit: Unit) => { state: GameState, unit: Unit },
-  onEmpty: (state: GameState) => GameState,
-): GameState {
-  const id = findIndex(state, target);
+  if (id === undefined) return state;
   switch (target.type) {
     case "friendly": {
       if (state.frUnits[id] === undefined) {
@@ -171,11 +143,12 @@ export function overFriendly(
   state: GameState,
   f: (unit: FrStUnit) => FrStUnit,
   onEmpty: (state: GameState) => GameState,
-) {
+): GameState {
   if (target.type !== "friendly") {
     throw `overFriendly: wrong target type ${JSON.stringify(target)}`;
   }
   const id = findIndex(state, target);
+  if (id === undefined) return state;
   if (state.frUnits[id] === undefined) {
     return onEmpty(state);
   } else {
@@ -192,11 +165,12 @@ export function overEnemy(
   state: GameState,
   f: (unit: EnStUnit) => EnStUnit,
   onEmpty: (state: GameState) => GameState,
-) {
+): GameState {
   if (target.type !== "enemy") {
     throw `overEnemy: wrong target type ${JSON.stringify(target)}`;
   }
   const id = findIndex(state, target);
+  if (id === undefined) return state;
   if (state.enUnits[id] === undefined) {
     return onEmpty(state);
   } else {
@@ -214,7 +188,11 @@ export function toPositionId<A extends UnitType>(
   switch (id.tag) {
     case "PositionId": return id;
     case "GlobalId": {
-      return new PositionId(findIndex(state, id), id.type);
+      const index = findIndex(state, id);
+      if (index === undefined) {
+        throw `can't find id: ${JSON.stringify(id)}`;
+      }
+      return new PositionId(index, id.type);
     }
   }
 }
@@ -238,7 +216,7 @@ export function toGlobalId<A extends UnitType>(
 export function findIndex<A extends UnitType>(
   state: GameState,
   id: EntityId<A>,
-): number {
+): number | undefined {
   switch (id.type) {
     case "friendly": {
       return findI(state.frUnits, id);
@@ -254,7 +232,7 @@ export function findIndex<A extends UnitType>(
 function findI<E extends HasId, A extends UnitType>(
   coll: (E | undefined)[],
   id: EntityId<A>,
-): number {
+): number | undefined {
   switch (id.tag) {
     case "PositionId": {
       return id.id;
@@ -262,7 +240,7 @@ function findI<E extends HasId, A extends UnitType>(
     case "GlobalId": {
       const e: number = coll.findIndex(x => x !== undefined && x.id === id.id);
       if (e === -1) {
-        throw `findI: not found ${JSON.stringify(id)}`;
+        return undefined;
       }
       return e;
     }
