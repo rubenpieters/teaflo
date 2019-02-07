@@ -1,6 +1,7 @@
 import { GameRefs } from "../../states/game";
-import { Solution } from "src/shared/game/solution";
-import { Location } from "src/shared/tree";
+import { Solution } from "../../../shared/game/solution";
+import { Location } from "../../../shared/tree";
+import { SpeedType } from "../../../app/phaser/animation";
 
 export type ActData = {
   shortName: string,
@@ -97,7 +98,7 @@ export type ActSaveData = {
   activeScreen: "menu" | "schem",
   levels: { [key in string]: SolutionData[] },
   animationSpeeds: {
-    log: "pause" | "play" | "fast"
+    log: SpeedType,
   },
 }
 

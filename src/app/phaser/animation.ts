@@ -30,13 +30,16 @@ export function createTypeTween(
   return tween;
 }
 
+export type SpeedType = "pause" | "play" | "fast" | "skip";
+
 export function speedTypeToSpeed(
-  speedType: "pause" | "play" | "fast",
+  speedType: SpeedType,
 ): number {
   switch (speedType) {
     case "pause": return 0;
     case "play": return 1;
     case "fast": return 3;
+    case "skip": return 1000;
   }
 }
 

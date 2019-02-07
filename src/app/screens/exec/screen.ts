@@ -11,7 +11,7 @@ import { hoverUnit, clearHover, clickUnit, extendLevelSolution } from "./events"
 import { Ability } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
-import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed } from "../../../app/phaser/animation";
+import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType } from "../../../app/phaser/animation";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -262,7 +262,7 @@ export class ExecScreen {
   }
 
   drawAnimControlBtns() {
-    const types: ["pause", "play", "fast"] = ["pause", "play", "fast"];
+    const types: ["pause", "play", "fast", "skip"] = ["pause", "play", "fast", "skip"];
     types.map((type, typeIndex) => {
       const pos = createPosition(
         "left", 50 + 70 * typeIndex, 60,
@@ -457,12 +457,24 @@ export class ExecScreen {
         },
       };
     });
-    spriteFs = stF.concat(frF).concat(enF);
+    // show end state at the end
+    // added because otherwise the "skip" speed doesn't show the last state for some reason
+    const last = {
+      create: () => {
+        this.gameRefs.screens.execScreen.drawState(this.state!);
+        this.gameRefs.screens.execScreen.drawStats(this.state!);
+        return <any>undefined;
+      },
+      introTween: (sprite: DataSprite<LogActionData>) => {
+        return undefined;
+      },
+    };
+    spriteFs = stF.concat(frF).concat(enF).concat(last);
     chainSpriteCreation(spriteFs, true);
   }
 
   setLogAnimationSpeed(
-    speed: "pause" | "play" | "fast",
+    speed: SpeedType,
   ) {
     this.gameRefs.saveData.act.animationSpeeds.log = speed;
     const tweens = this.gameRefs.game.tweens.getAll();
@@ -487,6 +499,7 @@ export class ExecScreen {
     this.logActionPool.visible = visibility;
     this.statsTextPool.setVisiblity(visibility);
     this.unitTextPool.setVisiblity(visibility);
+    this.animControlBtnPool.visible = visibility;
   }
 }
 
@@ -734,7 +747,7 @@ function mkLogActionPool(
 }
 
 type AnimControlBtn = {
-  type: "pause" | "play" | "fast",
+  type: "pause" | "play" | "fast" | "skip",
 };
 
 function mkAnimControlBtnPool(
@@ -754,20 +767,7 @@ function mkAnimControlBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          switch (self.data.type) {
-            case "pause": {
-              gameRefs.screens.execScreen.setLogAnimationSpeed("pause");
-              return;
-            }
-            case "play": {
-              gameRefs.screens.execScreen.setLogAnimationSpeed("play");
-              return;
-            }
-            case "fast": {
-              gameRefs.screens.execScreen.setLogAnimationSpeed("fast");
-              return;
-            }
-          }
+          gameRefs.screens.execScreen.setLogAnimationSpeed(self.data.type);
         },
       },
     },
