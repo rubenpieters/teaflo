@@ -11,7 +11,7 @@ import { hoverUnit, clearHover, clickUnit, extendLevelSolution } from "./events"
 import { Ability } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
-import { chainSpriteCreation, createTween, addTextPopup } from "../../../app/phaser/animation";
+import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed } from "../../../app/phaser/animation";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -25,6 +25,7 @@ export class ExecScreen {
   triggerPool: Pool<TriggerData, {}>
   logTextPool: TextPool
   logActionPool: Pool<LogActionData, {}>
+  animControlBtnPool: Pool<AnimControlBtn, {}>
 
   state: GameState | undefined
   log: Log | undefined
@@ -44,6 +45,7 @@ export class ExecScreen {
     this.triggerPool = mkTriggerPool(gameRefs);
     this.logTextPool = new TextPool(gameRefs.game);
     this.logActionPool = mkLogActionPool(gameRefs);
+    this.animControlBtnPool = mkAnimControlBtnPool(gameRefs);
   }
 
   reset() {
@@ -71,7 +73,7 @@ export class ExecScreen {
     addText(this.gameRefs, sprite, pos, "Clear Solution", "#000000", 40);
   }
 
-  drawFriendlyUnits(
+  drawState(
     state: GameState,
     prevState?: GameState,
   ) {
@@ -259,6 +261,17 @@ export class ExecScreen {
     });
   }
 
+  drawAnimControlBtns() {
+    const types: ["pause", "play", "fast"] = ["pause", "play", "fast"];
+    types.map((type, typeIndex) => {
+      const pos = createPosition(
+        "left", 50 + 70 * typeIndex, 60,
+        "bot", 50, 60,
+      );
+      this.animControlBtnPool.newSprite(pos.xMin, pos.yMin, {}, { type });
+    });
+  }
+
   drawStats(
     state: GameState,
   ) {
@@ -350,12 +363,13 @@ export class ExecScreen {
               tween => {
                 tween.to({ y: textPos.yMin - 100 }, 1000);
               },
+              "log",
             );
             tween.first.onStart.add(() => {
               const prev = fetchPrevEntry(this.log!, entryIndex, "st");
               const prevS = prev === undefined ? prevState : prev.state;
               //console.log(`${JSON.stringify(prevState!.enUnits)}`);
-              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state, prevS);
+              this.gameRefs.screens.execScreen.drawState(entry.state, prevS);
               this.gameRefs.screens.execScreen.drawStats(entry.state);
             });
           }
@@ -389,12 +403,13 @@ export class ExecScreen {
               tween => {
                 tween.to({ y: textPos.yMin - 100 }, 1000);
               },
+              "log",
             );
             tween.first.onStart.add(() => {
               const prev = fetchPrevEntry(this.log!, entryIndex, "fr");
               const prevS = prev === undefined ? undefined : prev.state;
               //console.log(`${JSON.stringify(prevState!.enUnits)}`);
-              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state, prevS);
+              this.gameRefs.screens.execScreen.drawState(entry.state, prevS);
               this.gameRefs.screens.execScreen.drawStats(entry.state);
             });
           }
@@ -428,12 +443,13 @@ export class ExecScreen {
               tween => {
                 tween.to({ y: textPos.yMin - 100 }, 1000);
               },
+              "log",
             );
             tween.first.onStart.add(() => {
               const prev = fetchPrevEntry(this.log!, entryIndex, "en");
               const prevS = prev === undefined ? undefined : prev.state;
               //console.log(`${JSON.stringify(prevState!.enUnits)}`);
-              this.gameRefs.screens.execScreen.drawFriendlyUnits(entry.state, prevS);
+              this.gameRefs.screens.execScreen.drawState(entry.state, prevS);
               this.gameRefs.screens.execScreen.drawStats(entry.state);
             });
           }
@@ -443,6 +459,21 @@ export class ExecScreen {
     });
     spriteFs = stF.concat(frF).concat(enF);
     chainSpriteCreation(spriteFs, true);
+  }
+
+  setLogAnimationSpeed(
+    speed: "pause" | "play" | "fast",
+  ) {
+    this.gameRefs.saveData.act.animationSpeeds.log = speed;
+    const tweens = this.gameRefs.game.tweens.getAll();
+    tweens.forEach(tween => {
+      if ( (<any>tween).data !== undefined
+        && (<any>tween).data.log !== undefined
+        && (<any>tween).data.log === true
+      ) {
+        tween.timeScale = speedTypeToSpeed(speed);
+      }
+    });
   }
 
   setVisibility(
@@ -682,18 +713,61 @@ function mkLogActionPool(
       introAnim: [
         (self, tween) => {
           tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
+          (<any>tween).data = { log: true };
+          tween.timeScale = speedTypeToSpeed(gameRefs.saveData.act.animationSpeeds.log);
         },
       ],
       callbacks: {
         click: (self) => {
         },
         hoverOver: (self) => {
-          gameRefs.screens.execScreen.drawFriendlyUnits(self.data.state);
+          gameRefs.screens.execScreen.drawState(self.data.state);
           gameRefs.screens.execScreen.drawStats(self.data.state);
         },
         hoverOut: (self) => {
-          gameRefs.screens.execScreen.drawFriendlyUnits(gameRefs.screens.execScreen.state!);
+          gameRefs.screens.execScreen.drawState(gameRefs.screens.execScreen.state!);
           gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
+        },
+      },
+    },
+  );
+}
+
+type AnimControlBtn = {
+  type: "pause" | "play" | "fast",
+};
+
+function mkAnimControlBtnPool(
+  gameRefs: GameRefs,
+): Pool<AnimControlBtn, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return `icon_a.png`;
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+          switch (self.data.type) {
+            case "pause": {
+              gameRefs.screens.execScreen.setLogAnimationSpeed("pause");
+              return;
+            }
+            case "play": {
+              gameRefs.screens.execScreen.setLogAnimationSpeed("play");
+              return;
+            }
+            case "fast": {
+              gameRefs.screens.execScreen.setLogAnimationSpeed("fast");
+              return;
+            }
+          }
         },
       },
     },

@@ -34,8 +34,9 @@ export function updateSolutionRep(
   gameRefs.screens.execScreen.log = solResult.log;
   if (prevState === undefined) {
     // there was no previous state, just draw
-    gameRefs.screens.execScreen.drawFriendlyUnits(solResult.state);
-    gameRefs.screens.execScreen.drawStats(solResult.state); 
+    gameRefs.screens.execScreen.drawState(solResult.state);
+    gameRefs.screens.execScreen.drawStats(solResult.state);
+    gameRefs.screens.execScreen.drawAnimControlBtns();
   } else {
     // draw log animations
     gameRefs.screens.execScreen.drawLogAnimation(prevState);

@@ -15,6 +15,31 @@ export function createTween(
   return tween;
 }
 
+export function createTypeTween(
+  gameRefs: GameRefs,
+  obj: any,
+  f: (tween: Phaser.Tween) => void,
+  type?: "log"
+): Phaser.Tween {
+  const tween = createTween(gameRefs.game, obj, f);
+  if (type !== undefined) {
+    (<any>tween).data = { };
+    (<any>tween).data[type] = true;
+    tween.timeScale = speedTypeToSpeed(gameRefs.saveData.act.animationSpeeds[type]);
+  }
+  return tween;
+}
+
+export function speedTypeToSpeed(
+  speedType: "pause" | "play" | "fast",
+): number {
+  switch (speedType) {
+    case "pause": return 0;
+    case "play": return 1;
+    case "fast": return 3;
+  }
+}
+
 export function createChainedTween(
   game: Phaser.Game,
   obj: any,
@@ -74,10 +99,11 @@ export function addTextPopup(
   tween: Phaser.Tween,
   createText: () => Phaser.Text,
   textAnimation: (tween: Phaser.Tween) => void,
-) {
+  type?: "log",
+): void {
   tween.onStart.add(() => {
     const text = createText();
-    const textTween = createTween(gameRefs.game, text, textAnimation);
+    const textTween = createTypeTween(gameRefs, text, textAnimation, type);
     textTween.onComplete.add(() => {
       text.destroy()
     });

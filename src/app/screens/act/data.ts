@@ -95,7 +95,10 @@ export type ActSaveData = {
   currentMenu: SelectedActMenu | SelectedLevelMenu | undefined,
   currentSchem: SelectedBuildSchem | SelectedExecSchem | undefined,
   activeScreen: "menu" | "schem",
-  levels: { [key in string]: SolutionData[] }
+  levels: { [key in string]: SolutionData[] },
+  animationSpeeds: {
+    log: "pause" | "play" | "fast"
+  },
 }
 
 export function mkActSaveData(): ActSaveData {
@@ -104,6 +107,9 @@ export function mkActSaveData(): ActSaveData {
     currentSchem: undefined,
     activeScreen: "menu",
     levels: {},
+    animationSpeeds: {
+      log: "play",
+    }
   };
 }
 
