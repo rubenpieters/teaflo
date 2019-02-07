@@ -687,6 +687,14 @@ function mkLogActionPool(
       callbacks: {
         click: (self) => {
         },
+        hoverOver: (self) => {
+          gameRefs.screens.execScreen.drawFriendlyUnits(self.data.state);
+          gameRefs.screens.execScreen.drawStats(self.data.state);
+        },
+        hoverOut: (self) => {
+          gameRefs.screens.execScreen.drawFriendlyUnits(gameRefs.screens.execScreen.state!);
+          gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
+        },
       },
     },
   );
