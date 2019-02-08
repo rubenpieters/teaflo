@@ -1,6 +1,6 @@
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
-import { createPosition, relativeTo } from "../../util/position";
+import { createPosition, relativeTo, Position } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
 import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit } from "../../../shared/game/state";
 import { Log, LogEntry } from "../../../shared/game/log";
@@ -9,7 +9,7 @@ import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId, getStatus } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution } from "./events";
 import { Ability } from "../../../shared/game/ability";
-import { triggerOrder, StTrigger } from "../../../shared/game/trigger";
+import { triggerOrder, StTrigger, Trigger, TriggerLog } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType } from "../../../app/phaser/animation";
 
@@ -25,6 +25,8 @@ export class ExecScreen {
   triggerPool: Pool<TriggerData, {}>
   logTextPool: TextPool
   logActionPool: Pool<LogActionData, {}>
+  logTriggerPool: Pool<LogTriggerData, {}>
+
   animControlBtnPool: Pool<AnimControlBtn, {}>
 
   state: GameState | undefined
@@ -45,6 +47,7 @@ export class ExecScreen {
     this.triggerPool = mkTriggerPool(gameRefs);
     this.logTextPool = new TextPool(gameRefs.game);
     this.logActionPool = mkLogActionPool(gameRefs);
+    this.logTriggerPool = mkLogTriggerPool(gameRefs);
     this.animControlBtnPool = mkAnimControlBtnPool(gameRefs);
   }
 
@@ -336,126 +339,48 @@ export class ExecScreen {
     let spriteFs: {
       create: () => DataSprite<any>,
       introTween: (sprite: DataSprite<any>) => { first: Phaser.Tween, last: Phaser.Tween } | undefined,
-    }[];
-    const stF = this.log!.st.map((entry, entryIndex) => {
-      return {
-        create: () => {
-          const pos = createPosition(
-            "left", 40 + entryIndex * 70, 150,
-            "top", 40, 300,
-          );
-          const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, entry);
-          return sprite;
-        },
-        introTween: (sprite: DataSprite<LogActionData>) => {
-          const tween = this.logActionPool.introTween(sprite);
-          if (tween !== undefined) {
-            const textPos = createPosition(
-              "left", 680, 100,
-              "top", 200, 100,
-            );
-            addTextPopup(
-              this.gameRefs,
-              tween.first,
-              () => {
-                return this.logTextPool.newText(textPos, JSON.stringify(entry.action));
-              },
-              tween => {
-                tween.to({ y: textPos.yMin - 100 }, 1000);
-              },
-              "log",
-            );
-            tween.first.onStart.add(() => {
-              const prev = fetchPrevEntry(this.log!, entryIndex, "st");
-              const prevS = prev === undefined ? prevState : prev.state;
-              //console.log(`${JSON.stringify(prevState!.enUnits)}`);
-              this.gameRefs.screens.execScreen.drawState(entry.state, prevS);
-              this.gameRefs.screens.execScreen.drawStats(entry.state);
-            });
-          }
-          return tween;
-        },
-      };
+    }[] = [];
+    const stF = this.log!.st.forEach((entry: LogEntry, entryIndex) => {
+      const pos = createPosition(
+        "left", 40 + entryIndex * 70, 150,
+        "top", 40, 300,
+      );
+      spriteFs.push(this.createLogEntryAnim(entry, entryIndex, pos, prevState, "st"));
+      entry.transforms.forEach((triggerLog, triggerLogIndex) => {
+        const pos = createPosition(
+          "left", 390, 150,
+          "top", 40, 300,
+        );
+        spriteFs.push(this.createTriggerEntryAnim(triggerLog, pos));
+      });
     });
     const frF = this.log!.fr.map((entry, entryIndex) => {
-      return {
-        create: () => {
-          const pos = createPosition(
-            "left", 40 + entryIndex * 70, 150,
-            "top", 150, 300,
-          );
-          const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, entry);
-          return sprite;
-        },
-        introTween: (sprite: DataSprite<LogActionData>) => {
-          const tween = this.logActionPool.introTween(sprite);
-          if (tween !== undefined) {
-            const textPos = createPosition(
-              "left", 680, 100,
-              "top", 200, 100,
-            );
-            addTextPopup(
-              this.gameRefs,
-              tween.first,
-              () => {
-                return this.logTextPool.newText(textPos, JSON.stringify(entry.action));
-              },
-              tween => {
-                tween.to({ y: textPos.yMin - 100 }, 1000);
-              },
-              "log",
-            );
-            tween.first.onStart.add(() => {
-              const prev = fetchPrevEntry(this.log!, entryIndex, "fr");
-              const prevS = prev === undefined ? undefined : prev.state;
-              //console.log(`${JSON.stringify(prevState!.enUnits)}`);
-              this.gameRefs.screens.execScreen.drawState(entry.state, prevS);
-              this.gameRefs.screens.execScreen.drawStats(entry.state);
-            });
-          }
-          return tween;
-        },
-      };
+      const pos = createPosition(
+        "left", 40 + entryIndex * 70, 150,
+        "top", 150, 300,
+      );
+      spriteFs.push(this.createLogEntryAnim(entry, entryIndex, pos, undefined, "fr"));
+      entry.transforms.forEach((triggerLog, triggerLogIndex) => {
+        const pos = createPosition(
+          "left", 390, 150,
+          "top", 40, 300,
+        );
+        spriteFs.push(this.createTriggerEntryAnim(triggerLog, pos));
+      });
     });
     const enF = this.log!.en.map((entry, entryIndex) => {
-      return {
-        create: () => {
-          const pos = createPosition(
-            "left", 40 + entryIndex * 70, 150,
-            "top", 240, 300,
-          );
-          const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, entry);
-          return sprite;
-        },
-        introTween: (sprite: DataSprite<LogActionData>) => {
-          const tween = this.logActionPool.introTween(sprite);
-          if (tween !== undefined) {
-            const textPos = createPosition(
-              "left", 680, 100,
-              "top", 200, 100,
-            );
-            addTextPopup(
-              this.gameRefs,
-              tween.first,
-              () => {
-                return this.logTextPool.newText(textPos, JSON.stringify(entry.action));
-              },
-              tween => {
-                tween.to({ y: textPos.yMin - 100 }, 1000);
-              },
-              "log",
-            );
-            tween.first.onStart.add(() => {
-              const prev = fetchPrevEntry(this.log!, entryIndex, "en");
-              const prevS = prev === undefined ? undefined : prev.state;
-              //console.log(`${JSON.stringify(prevState!.enUnits)}`);
-              this.gameRefs.screens.execScreen.drawState(entry.state, prevS);
-              this.gameRefs.screens.execScreen.drawStats(entry.state);
-            });
-          }
-          return tween;
-        },
-      };
+      const pos = createPosition(
+        "left", 40 + entryIndex * 70, 150,
+        "top", 240, 300,
+      );
+      spriteFs.push(this.createLogEntryAnim(entry, entryIndex, pos, undefined, "en"));
+      entry.transforms.forEach((triggerLog, triggerLogIndex) => {
+        const pos = createPosition(
+          "left", 390, 150,
+          "top", 40, 300,
+        );
+        spriteFs.push(this.createTriggerEntryAnim(triggerLog, pos));
+      });
     });
     // show end state at the end
     // added because otherwise the "skip" speed doesn't show the last state for some reason
@@ -469,8 +394,86 @@ export class ExecScreen {
         return undefined;
       },
     };
-    spriteFs = stF.concat(frF).concat(enF).concat(last);
+    spriteFs.push(last);
     chainSpriteCreation(spriteFs, true);
+  }
+
+  createLogEntryAnim(
+    entry: LogEntry,
+    entryIndex: number,
+    pos: Position,
+    prevState: GameState | undefined,
+    type: "st" | "fr" | "en",
+  ) {
+    return {
+      create: () => {
+        const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, entry);
+        return sprite;
+      },
+      introTween: (sprite: DataSprite<LogActionData>) => {
+        const tween = this.logActionPool.introTween(sprite);
+        if (tween !== undefined) {
+          const textPos = createPosition(
+            "left", 680, 100,
+            "top", 200, 100,
+          );
+          addTextPopup(
+            this.gameRefs,
+            tween.first,
+            () => {
+              return this.logTextPool.newText(textPos, JSON.stringify(entry.action));
+            },
+            tween => {
+              tween.to({ y: textPos.yMin - 100 }, 1000);
+            },
+            "log",
+          );
+          tween.first.onStart.add(() => {
+            // clear trigger log entries
+            this.gameRefs.screens.execScreen.logTriggerPool.clear();
+            // update state view
+            const prev = fetchPrevEntry(this.log!, entryIndex, type);
+            const prevS = prev === undefined ? prevState : prev.state;
+            this.gameRefs.screens.execScreen.drawState(entry.state, prevS);
+            this.gameRefs.screens.execScreen.drawStats(entry.state);
+          });
+        }
+        return tween;
+      },
+    };
+  }
+
+  createTriggerEntryAnim(
+    triggerLog: TriggerLog,
+    pos: Position,
+  ) {
+    return {
+      create: () => {
+        const sprite = this.logTriggerPool.newSprite(pos.xMin, pos.yMin, {}, triggerLog);
+        return sprite;
+      },
+      introTween: (sprite: DataSprite<LogTriggerData>) => {
+        const tween = this.logTriggerPool.introTween(sprite);
+        if (tween !== undefined) {
+          const textPos = createPosition(
+            "left", 680, 100,
+            "top", 200, 100,
+          );
+          addTextPopup(
+            this.gameRefs,
+            tween.first,
+            () => {
+              return this.logTextPool.newText(textPos, `${triggerLog.tag}`);
+            },
+            tween => {
+              tween.to({ y: textPos.yMin - 100 }, 1000);
+            },
+            "log",
+          );
+        }
+        return tween;
+      },
+    };
   }
 
   setLogAnimationSpeed(
@@ -497,8 +500,10 @@ export class ExecScreen {
     this.abilityPool.visible = visibility;
     this.triggerPool.visible = visibility;
     this.logActionPool.visible = visibility;
+    this.logTriggerPool.visible = visibility;
     this.statsTextPool.setVisiblity(visibility);
     this.unitTextPool.setVisiblity(visibility);
+    this.logTextPool.setVisiblity(visibility);
     this.animControlBtnPool.visible = visibility;
   }
 }
@@ -740,6 +745,45 @@ function mkLogActionPool(
         hoverOut: (self) => {
           gameRefs.screens.execScreen.drawState(gameRefs.screens.execScreen.state!);
           gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
+        },
+      },
+    },
+  );
+}
+
+type LogTriggerData = {
+  tag: Trigger["tag"],
+  before: Action,
+  after: Action,
+};
+
+function mkLogTriggerPool(
+  gameRefs: GameRefs,
+): Pool<LogTriggerData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return `icon_c.png`;
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
+          (<any>tween).data = { log: true };
+          tween.timeScale = speedTypeToSpeed(gameRefs.saveData.act.animationSpeeds.log);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+        },
+        hoverOver: (self) => {
+          //gameRefs.screens.execScreen.drawState(self.data.state);
+          //gameRefs.screens.execScreen.drawStats(self.data.state);
+        },
+        hoverOut: (self) => {
+          //gameRefs.screens.execScreen.drawState(gameRefs.screens.execScreen.state!);
+          //gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
         },
       },
     },
