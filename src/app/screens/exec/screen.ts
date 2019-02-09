@@ -404,8 +404,8 @@ export class ExecScreen {
     // added because otherwise the "skip" speed doesn't show the last state for some reason
     const last = {
       create: () => {
-        this.gameRefs.screens.execScreen.drawState(this.state!);
-        this.gameRefs.screens.execScreen.drawStats(this.state!);
+        this.gameRefs.screens.execScreen.drawState(this.currentState()!);
+        this.gameRefs.screens.execScreen.drawStats(this.currentState()!);
         return <any>undefined;
       },
       introTween: (sprite: DataSprite<LogActionData>) => {

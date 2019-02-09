@@ -51,14 +51,14 @@ export function hoverUnit(
 ) {
   // TODO: only redraw if necessary?
   gameRefs.screens.execScreen.hoveredUnit = globalId;
-  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
+  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
 }
 
 export function clearHover(
   gameRefs: GameRefs,
 ) {
   gameRefs.screens.execScreen.hoveredUnit = undefined;
-  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
+  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
 }
 
 export function clickUnit(
@@ -66,12 +66,12 @@ export function clickUnit(
   globalId: UnitSelection,
 ) {
   const selected = gameRefs.screens.execScreen.selectedUnit;
-  if (selected !== undefined && eqUnitId(gameRefs.screens.execScreen.state!, globalId, selected)) {
+  if (selected !== undefined && eqUnitId(gameRefs.screens.execScreen.currentState(), globalId, selected)) {
     gameRefs.screens.execScreen.selectedUnit = undefined;
   } else {
     gameRefs.screens.execScreen.selectedUnit = globalId;
   }
-  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
+  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
 }
 
 export function extendLevelSolution(
