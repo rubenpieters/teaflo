@@ -3,7 +3,7 @@ import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
 import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit } from "../../../shared/game/state";
-import { Log, LogEntry } from "../../../shared/game/log";
+import { Log, LogEntry, LogKeys } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId, getStatus } from "../../../shared/game/entityId";
@@ -37,6 +37,7 @@ export class ExecScreen {
   hoveredUnit: UnitSelection | undefined
   selectedUnit: UnitSelection | undefined
   clickState: { ability: Ability, inputs: any[], origin: UnitId } | undefined
+  intermediate: { type: LogKeys, index: number } | undefined
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -57,9 +58,23 @@ export class ExecScreen {
 
   reset() {
     this.state = undefined;
+    this.log = undefined;
     this.hoveredUnit = undefined;
     this.selectedUnit = undefined;
     this.clickState = undefined;
+    this.intermediate = undefined;
+  }
+
+  currentState(): GameState {
+    if (this.intermediate === undefined) {
+      return this.state!;
+    }
+    return this.log![this.intermediate.type][this.intermediate.index].state;
+  }
+
+  drawCurrentState() {
+    this.drawState(this.currentState());
+    this.drawStats(this.currentState());
   }
 
   drawClearBtn(
@@ -374,7 +389,7 @@ export class ExecScreen {
     const enF = this.log!.en.map((entry, entryIndex) => {
       const pos = createPosition(
         "left", 40 + entryIndex * 70, 150,
-        "top", 240, 300,
+        "top", 260, 300,
       );
       spriteFs.push(this.createLogEntryAnim(entry, entryIndex, pos, undefined, "en"));
       entry.transforms.forEach((triggerLog, triggerLogIndex) => {
@@ -401,6 +416,51 @@ export class ExecScreen {
     chainSpriteCreation(spriteFs, true);
   }
 
+  drawIntermediateLog(
+    upto: {
+      type: LogKeys,
+      index: number,
+    },
+  ) {
+    this.logActionPool.clear();
+    this.logTriggerPool.clear();
+
+    this.intermediate = upto;
+
+    const logTypes: ["st", "fr", "en"] = ["st", "fr", "en"];
+    logTypes.forEach((type, typeIndex) => {
+      this.log![type].forEach((entry, entryIndex) => {
+        const pos = createPosition(
+          "left", 40 + entryIndex * 70, 150,
+          "top", 40 + 110 * typeIndex, 300,
+        );
+        if (logTypes.indexOf(type) !== -1 &&
+            (logTypes.indexOf(type) < logTypes.indexOf(upto.type) || 
+              (logTypes.indexOf(type) === logTypes.indexOf(upto.type) && entryIndex < upto.index
+            ))
+        ) {
+          const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ type, index: entryIndex }});
+          sprite.tint = 0xFFFFFF;
+        } else if (logTypes.indexOf(type) === logTypes.indexOf(upto.type) && entryIndex === upto.index) {
+          const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ type, index: entryIndex }});
+          sprite.tint = 0xFFFFFF;
+          //this.createLogEntryAnim(entry, entryIndex, pos, undefined, type).create();
+          entry.transforms.forEach((triggerLog, triggerLogIndex) => {
+            const pos = createPosition(
+              "left", 390, 150,
+              "top", 40 + triggerLogIndex * 70, 300,
+            );
+            this.logTriggerPool.newSprite(pos.xMin, pos.yMin, {}, triggerLog);
+          });
+        } else {
+          const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ type, index: entryIndex }});
+          sprite.tint = 0xAAAAAA;
+        }
+      })
+    });
+    this.drawCurrentState();
+  }
+
   createLogEntryAnim(
     entry: LogEntry,
     entryIndex: number,
@@ -410,7 +470,7 @@ export class ExecScreen {
   ) {
     return {
       create: () => {
-        const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, entry);
+        const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ type, index: entryIndex }});
         return sprite;
       },
       introTween: (sprite: DataSprite<LogActionData>) => {
@@ -741,6 +801,9 @@ function mkTriggerPool(
 type LogActionData = {
   action: Action,
   state: GameState,
+  type: LogKeys,
+  index: number,
+  transforms: TriggerLog[],
 };
 
 function mkLogActionPool(
@@ -762,14 +825,16 @@ function mkLogActionPool(
       ],
       callbacks: {
         click: (self) => {
+          gameRefs.screens.execScreen.drawIntermediateLog(
+            { type: self.data.type, index: self.data.index }
+          );
         },
         hoverOver: (self) => {
           gameRefs.screens.execScreen.drawState(self.data.state);
           gameRefs.screens.execScreen.drawStats(self.data.state);
         },
         hoverOut: (self) => {
-          gameRefs.screens.execScreen.drawState(gameRefs.screens.execScreen.state!);
-          gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.state!);
+          gameRefs.screens.execScreen.drawCurrentState();
         },
       },
     },
