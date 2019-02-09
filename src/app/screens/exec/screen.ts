@@ -12,6 +12,8 @@ import { Ability } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType } from "../../../app/phaser/animation";
+import { drawPositions, Location } from "../../../shared/tree";
+import { Solution } from "../../../shared/game/solution";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -26,6 +28,7 @@ export class ExecScreen {
   logTextPool: TextPool
   logActionPool: Pool<LogActionData, {}>
   logTriggerPool: Pool<LogTriggerData, {}>
+  solTreePool: Pool<SolTreeData, {}>
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
 
@@ -49,6 +52,7 @@ export class ExecScreen {
     this.logActionPool = mkLogActionPool(gameRefs);
     this.logTriggerPool = mkLogTriggerPool(gameRefs);
     this.animControlBtnPool = mkAnimControlBtnPool(gameRefs);
+    this.solTreePool = mkSolTreePool(gameRefs);
   }
 
   reset() {
@@ -329,7 +333,6 @@ export class ExecScreen {
   drawLogAnimation(
     prevState?: GameState | undefined
   ) {
-    this.logActionPool.clear(); 
     // on every log action:
     //   intro animation for log action icon
     //   do animation on state
@@ -476,6 +479,27 @@ export class ExecScreen {
     };
   }
 
+  drawTree(
+    solInfo: {
+      solution: Solution,
+      loc: Location,
+    }
+  ) {
+    this.solTreePool.clear();
+
+    const x = 100;
+    const y = 750;
+
+    const initialNodeType = solInfo.loc.length === 0 ? "node_full" : "node";
+    const sprite = this.solTreePool.newSprite(x - 50, y, {}, { type: initialNodeType });
+
+    const drawPosList = drawPositions(solInfo.solution.tree);
+      drawPosList.forEach((drawPos) => {
+        const type = JSON.stringify(drawPos.loc) === JSON.stringify(solInfo.loc) ? "node_full" : "node";
+        const sprite = this.solTreePool.newSprite(x + drawPos.x * 50, y + drawPos.y * 50, {}, { type });
+    });
+  }
+
   setLogAnimationSpeed(
     speed: SpeedType,
   ) {
@@ -505,6 +529,7 @@ export class ExecScreen {
     this.unitTextPool.setVisiblity(visibility);
     this.logTextPool.setVisiblity(visibility);
     this.animControlBtnPool.visible = visibility;
+    this.solTreePool.visible = visibility;
   }
 }
 
@@ -812,6 +837,38 @@ function mkAnimControlBtnPool(
       callbacks: {
         click: (self) => {
           gameRefs.screens.execScreen.setLogAnimationSpeed(self.data.type);
+        },
+      },
+    },
+  );
+}
+
+type SolTreeData = {
+  type: "node" | "branch" | "node_full",
+};
+
+function mkSolTreePool(
+  gameRefs: GameRefs,
+): Pool<SolTreeData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        switch (self.data.type) {
+          case "branch": return "tree_branch.png";
+          case "node": return "tree_node.png";
+          case "node_full": return "tree_node_full.png";
+        }
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+          
         },
       },
     },

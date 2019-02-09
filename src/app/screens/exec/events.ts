@@ -32,6 +32,8 @@ export function updateSolutionRep(
   const prevState = gameRefs.screens.execScreen.state;
   gameRefs.screens.execScreen.state = solResult.state;
   gameRefs.screens.execScreen.log = solResult.log;
+  // update tree rep
+  gameRefs.screens.execScreen.drawTree(sol.solInfo!);
   if (prevState === undefined) {
     // there was no previous state, just draw
     gameRefs.screens.execScreen.drawState(solResult.state);

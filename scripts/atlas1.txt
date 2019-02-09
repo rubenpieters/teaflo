@@ -25,3 +25,6 @@ textures/icon_f.png
 textures/hp.png
 textures/ch.png
 textures/res_anim.png
+textures/tree_node.png
+textures/tree_branch.png
+textures/tree_node_full.png
