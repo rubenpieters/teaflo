@@ -14,6 +14,7 @@ import { Action } from "../../../shared/game/action";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution } from "../../../shared/game/solution";
+import { changePage } from "../codex/events";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -29,6 +30,7 @@ export class ExecScreen {
   logActionPool: Pool<LogActionData, {}>
   logTriggerPool: Pool<LogTriggerData, {}>
   solTreePool: Pool<SolTreeData, {}>
+  detailBtnPool: Pool<DetailBtnData, {}>
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
 
@@ -54,6 +56,7 @@ export class ExecScreen {
     this.logTriggerPool = mkLogTriggerPool(gameRefs);
     this.animControlBtnPool = mkAnimControlBtnPool(gameRefs);
     this.solTreePool = mkSolTreePool(gameRefs);
+    this.detailBtnPool = mkDetailBtnPool(gameRefs);
   }
 
   reset() {
@@ -328,6 +331,7 @@ export class ExecScreen {
     this.clearBtnPool.clear();
     this.abilityPool.clear();
     this.statsTextPool.clear();
+    this.detailBtnPool.clear();
 
     const textPos = createPosition(
       "left", 650, 150,
@@ -355,6 +359,11 @@ export class ExecScreen {
               );
               this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
             });
+            const detailBtnPos = createPosition(
+              "left", 900, 150,
+              "bot", 50, 150,
+            );
+            this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "CardId", cardId: frUnit.cardId } });
           } else if (showUnit.type === "enemy") {
             const enUnit = <EnStUnit>unit;
           }
@@ -570,6 +579,7 @@ export class ExecScreen {
     this.logTextPool.setVisiblity(visibility);
     this.animControlBtnPool.visible = visibility;
     this.solTreePool.visible = visibility;
+    this.detailBtnPool.visible = visibility;
   }
 }
 
@@ -915,6 +925,34 @@ function mkSolTreePool(
       callbacks: {
         click: (self) => {
           changeLevelLoc(gameRefs, self.data.loc);
+        },
+      },
+    },
+  );
+}
+
+type DetailBtnData = {
+  type: { tag: "CardId", cardId: string }
+};
+
+function mkDetailBtnPool(
+  gameRefs: GameRefs,
+): Pool<DetailBtnData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return "icon_a.png"
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+          changePage(gameRefs, self.data.type);
         },
       },
     },

@@ -37,6 +37,7 @@ export function loadCodexScreen(
   gameRefs.screens.codexScreen.setVisibility(true);
   gameRefs.screens.settingsScreen.setVisibility(false);
   gameRefs.saveData.act.activeScreen = "codex";
+  gameRefs.screens.codexScreen.drawPage();
   gameRefs.screens.menuScreen.redrawMenuBtn();
 }
 

@@ -15,6 +15,8 @@ export function loadLevel(
     gameRefs.screens.actScreen.setVisibility(false);
     gameRefs.screens.execScreen.setVisibility(false);
     gameRefs.screens.levelScreen.setVisibility(true);
+    gameRefs.screens.codexScreen.setVisibility(false);
+    gameRefs.screens.settingsScreen.setVisibility(false);
   
     gameRefs.screens.levelScreen.drawBox();
   } else {
