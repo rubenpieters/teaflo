@@ -95,7 +95,7 @@ export class SelectedLevelMenu {
 export type ActSaveData = {
   currentMenu: SelectedActMenu | SelectedLevelMenu | undefined,
   currentSchem: SelectedBuildSchem | SelectedExecSchem | undefined,
-  activeScreen: "menu" | "schem",
+  activeScreen: "menu" | "schem" | "codex" | "settings",
   levels: { [key in string]: SolutionData[] },
   animationSpeeds: {
     log: SpeedType,

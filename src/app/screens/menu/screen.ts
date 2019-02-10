@@ -2,7 +2,7 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createTween } from "../../phaser/animation";
 import { settings } from "../../data/settings";
-import { loadActScreen, loadExecScreen } from "./events";
+import { loadActScreen, loadExecScreen, loadCodexScreen, loadSettingsScreen } from "./events";
 import { createPosition } from "../../util/position";
 import { drawCurrentLevel } from "../exec/events";
 
@@ -25,7 +25,7 @@ export class MenuScreen {
 
     let i = 0;
     // buttons are placed in reverse order on the screen
-    const l: ("menu" | "schem")[] = ["schem", "menu"];
+    const l: ["settings", "codex", "schem", "menu"] = ["settings", "codex", "schem", "menu"];
     for (const type of l) {
       if (this.gameRefs.saveData.act.activeScreen === type) {
         // this is the currently selected menu type
@@ -48,7 +48,7 @@ export class MenuScreen {
 }
 
 type MenuBtnData = {
-  type: "menu" | "schem",
+  type: "menu" | "schem" | "codex" | "settings",
   index: number,
 }
 
@@ -80,6 +80,14 @@ function mkMenuBtnPool(
             }
             case "schem": {
               drawCurrentLevel(gameRefs);
+              return;
+            }
+            case "codex": {
+              loadCodexScreen(gameRefs);
+              return;
+            }
+            case "settings": {
+              loadSettingsScreen(gameRefs);
               return;
             }
           }
