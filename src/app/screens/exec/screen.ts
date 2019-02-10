@@ -368,7 +368,6 @@ export class ExecScreen {
           }
         }
       } else {
-        // TODO: breaks if it cannot find status
         const unit = getStatus(<GlobalId<"status">>showUnit, state);
         if (unit !== undefined) {
           const pos1 = createPosition(

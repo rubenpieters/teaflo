@@ -2,6 +2,7 @@ import { focus, over, set } from "../../shared/iassign-util";
 import { GameState, units, FrStUnit, EnStUnit, findStatus } from "./state";
 import { HasId } from "./hasId";
 import { Unit } from "./unit";
+import { StTrigger } from "./trigger";
 
 export type UnitType
   = "friendly"
@@ -91,6 +92,9 @@ export function killStatus(
   state: GameState,
 ): GameState {
   const statusIndex = findStatus(state, target);
+  if (statusIndex === undefined) {
+    throw `findStatus: id ${target.id} not found`;
+  }
   return focus(state,
     over(x => x.triggers[statusIndex.group], x =>
       x.slice(0, statusIndex.index).concat(x.slice(statusIndex.index + 1))
@@ -100,8 +104,11 @@ export function killStatus(
 export function getStatus(
   target: GlobalId<"status">,
   state: GameState,
-) {
+): StTrigger | undefined {
   const statusIndex = findStatus(state, target);
+  if (statusIndex === undefined) {
+    return undefined;
+  }
   return state.triggers[statusIndex.group][statusIndex.index];
 }
 

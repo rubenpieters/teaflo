@@ -96,7 +96,7 @@ export function findStatus(
 ): {
   group: TriggerGroup,
   index: number,
-} {
+} | undefined {
   for (const group of triggerOrder) {
     const index = state.triggers[group].findIndex(x => x.id === statusId.id);
     if (index !== -1) {
@@ -106,5 +106,5 @@ export function findStatus(
       };
     }
   }
-  throw `findStatus: id ${statusId.id} not found`;
+  return undefined;
 }

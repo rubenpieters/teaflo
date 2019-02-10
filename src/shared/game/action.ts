@@ -113,6 +113,9 @@ export function applyAction(
       let actions: Action[] = [];
       if (target.type === "status") {
         const statusIndex = findStatus(state, target);
+        if (statusIndex === undefined) {
+          throw `findStatus: id ${target.id} not found`;
+        }
         const value = action.value;
         state = focus(state,
           over(x => x.triggers[statusIndex.group], x => {
@@ -122,6 +125,9 @@ export function applyAction(
           }),
         );
         const status = getStatus(target, state);
+        if (status === undefined) {
+          throw `findStatus: id ${target.id} not found`;
+        }
         if (status.fragments <= 0) {
           actions = [new Death(target)];
         }
@@ -145,6 +151,9 @@ export function applyAction(
       const target = action.target;
       if (target.type === "status") {
         const statusIndex = findStatus(state, target);
+        if (statusIndex === undefined) {
+          throw `findStatus: id ${target.id} not found`;
+        }
         const value = action.value;
         state = focus(state,
           over(x => x.triggers[statusIndex.group], x => {
