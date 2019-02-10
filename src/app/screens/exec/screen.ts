@@ -7,7 +7,7 @@ import { Log, LogEntry, LogKeys } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId, getStatus } from "../../../shared/game/entityId";
-import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc } from "./events";
+import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution } from "./events";
 import { Ability } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
@@ -110,20 +110,20 @@ export class ExecScreen {
 
   drawClearBtn(
   ) {
-    this.redrawExecStartBtn();
+    this.redrawClearBtn();
     this.clearBtnPool.playIntroAnimations();
   }
 
-  redrawExecStartBtn(
+  redrawClearBtn(
   ) {
     this.clearBtnPool.clear();
 
     const pos = createPosition(
-      "right", 400, 400,
-      "bot", 300, 200,
+      "right", 100, 400,
+      "bot", 500, 200,
     );
     const sprite = this.clearBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", {});
-    addText(this.gameRefs, sprite, pos, "Clear Solution", "#000000", 40);
+    addText(this.gameRefs, sprite, pos, "Clear", "#000000", 40);
   }
 
   drawState(
@@ -328,7 +328,6 @@ export class ExecScreen {
   drawStats(
     state: GameState,
   ) {
-    this.clearBtnPool.clear();
     this.abilityPool.clear();
     this.statsTextPool.clear();
     this.detailBtnPool.clear();
@@ -621,7 +620,7 @@ function mkClearBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          console.log("CLEAR!");
+          clearSolution(gameRefs);
         },
       },
     },

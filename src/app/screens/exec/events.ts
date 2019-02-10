@@ -37,6 +37,7 @@ export function updateSolutionRep(
   gameRefs.screens.execScreen.drawTree(sol.solInfo!);
   if (prevState === undefined) {
     gameRefs.screens.execScreen.drawAnimControlBtns();
+    gameRefs.screens.execScreen.drawClearBtn();
   }
   const firstLogKey = gameRefs.screens.execScreen.firstLogKey();
   if (firstLogKey !== undefined) {
@@ -103,4 +104,14 @@ export function changeLevelLoc(
     gameRefs.screens.execScreen.clickState = undefined;
     gameRefs.screens.execScreen.intermediate = undefined;
   }
+}
+
+export function clearSolution(
+  gameRefs: GameRefs,
+) {
+  const schem = selectedSchem(gameRefs);
+  if (schem !== undefined) {
+    gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo = undefined;
+  }
+  drawCurrentLevel(gameRefs);
 }
