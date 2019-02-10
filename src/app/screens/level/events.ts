@@ -1,7 +1,9 @@
 import { GameRefs } from "../../states/game";
-import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt } from "../act/data";
+import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt, levelData, selectedSchem } from "../act/data";
 import { emptyTree, Location } from "../../../shared/tree";
 import { updateSolutionRep } from "../exec/events";
+import { mkGameState } from "../../../shared/game/state";
+import { endStates } from "../../../shared/game/solution";
 
 export function loadLevel(
   gameRefs: GameRefs,
@@ -81,5 +83,34 @@ export function moveCard(
     sol[from.type][from.index] = oldTo;
 
     gameRefs.screens.levelScreen.redrawBox();
+  }
+}
+
+export function levelStats(
+  gameRefs: GameRefs,
+  levelId: string,
+  solIndex: number,
+): {
+  win: boolean,
+} {
+  const sol = gameRefs.saveData.act.levels[levelId][solIndex];
+  if (sol === undefined || sol.solInfo === undefined) {
+    return {
+      win: false,
+    };
+  }
+
+  const frUnits = sol.deploy;
+  const enUnits = levelData[levelId].enemyIds;
+  const initState = mkGameState(frUnits, enUnits);
+  const finalStates = endStates(sol.solInfo.solution.tree, initState);
+  const findWin = finalStates.find(x => x.state === "win");
+  if (findWin !== undefined) {
+    return {
+      win: true,
+    }
+  }
+  return {
+    win: false,
   }
 }

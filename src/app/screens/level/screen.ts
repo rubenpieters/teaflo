@@ -5,7 +5,7 @@ import { addText, DataSprite } from "../../phaser/datasprite";
 import { chainSpriteCreation, createTween } from "../../phaser/animation";
 import { currentSchemSol, selectedSchem } from "../act/data";
 import { cardMap } from "../../data/cardMap";
-import { moveCard, moveCardToFirstFree, loadLevel, newExecLevel } from "../level/events";
+import { moveCard, moveCardToFirstFree, loadLevel, newExecLevel, levelStats } from "../level/events";
 import { filterUndefined } from "../../util/util";
 
 export class LevelScreen {

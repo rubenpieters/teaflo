@@ -6,7 +6,7 @@ import { createTween, chainSpriteCreation } from "../../phaser/animation";
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
 import { addText, DataSprite } from "../../phaser/datasprite";
-import { loadLevel } from "../level/events";
+import { loadLevel, levelStats } from "../level/events";
 
 export class ActScreen {
   actBtnPool: Pool<ActBtnData, "neutral" | "hover" | "down">
@@ -150,7 +150,8 @@ export class ActScreen {
               "top", 300 + (250 * solIndex), 200,
             );
             const sprite = this.solBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { tag: "SolBtnDataSelect", levelId, solIndex });
-            addText(this.gameRefs, sprite, pos, levelData.name, "#000000", 40);
+            const lvlStats = levelStats(this.gameRefs, levelId, solIndex);
+            addText(this.gameRefs, sprite, pos, `${levelData.name}\nWin: ${lvlStats.win}`, "#000000", 40);
             return sprite;
           },
           introTween: (sprite: DataSprite<SolBtnData>) => {

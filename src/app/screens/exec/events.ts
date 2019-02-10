@@ -5,7 +5,7 @@ import { runSolution, extendSolution, SolutionData } from "../../../shared/game/
 import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
 import { UnitSelection } from "./screen";
 import { loadLevel } from "../level/events";
-import { Location } from "src/shared/tree";
+import { Location } from "../../../shared/tree";
 
 export function drawCurrentLevel(
   gameRefs: GameRefs,

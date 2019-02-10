@@ -91,20 +91,23 @@ export function _runSolution(
   return _runSolution(tree.nodes[loc[0]].tree, loc.slice(1), phasesResult.state, phasesResult.log, phasesResult.win);
 }
 
-export function findWin(
+export function endStates(
   tree: Tree<SolutionData>,
   state: GameState,
-): boolean {
-  for (const node of tree.nodes) {
-    const solData = node.v;
-
-    const phasesResult = runPhases(state, solData);
-    const rec = findWin(node.tree, phasesResult.state);
-    if (rec) {
-      return true;
+): GameState[] {
+  if (tree.nodes.length === 0) {
+    return [state];
+  } else {
+    let result: GameState[] = [];
+    for (const node of tree.nodes) {
+      const solData = node.v;
+  
+      const phasesResult = runPhases(state, solData);
+      const rec = endStates(node.tree, phasesResult.state);
+      result = result.concat(rec);
     }
+    return result;
   }
-  return false;
 }
 
 function runPhases(
@@ -163,7 +166,10 @@ function runPhases(
     ;
   
   const win = countAllBelow0 === filteredEn(state).length;
-  return { state, log: log, win: win };
+  if (win) {
+    state = focus(state, set(x => x.state, "win"));
+  }
+  return { state, log, win };
 }
 
 function applyIntentToSolution(
