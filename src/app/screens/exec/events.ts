@@ -1,10 +1,11 @@
 import { GameRefs } from "../../../app/states/game";
-import { currentSolution, currentSchemSol, selectedSchem, levelData, setSolution } from "../act/data";
+import { currentSolution, currentSchemSol, selectedSchem, levelData, setSolution, setLocation } from "../act/data";
 import { mkGameState } from "../../../shared/game/state";
 import { runSolution, extendSolution, SolutionData } from "../../../shared/game/solution";
 import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
 import { UnitSelection } from "./screen";
 import { loadLevel } from "../level/events";
+import { Location } from "src/shared/tree";
 
 export function drawCurrentLevel(
   gameRefs: GameRefs,
@@ -35,13 +36,14 @@ export function updateSolutionRep(
   // update tree rep
   gameRefs.screens.execScreen.drawTree(sol.solInfo!);
   if (prevState === undefined) {
-    // there was no previous state, just draw
+    gameRefs.screens.execScreen.drawAnimControlBtns();
+  }
+  const firstLogKey = gameRefs.screens.execScreen.firstLogKey();
+  if (firstLogKey !== undefined) {
+    gameRefs.screens.execScreen.drawIntermediateLog(firstLogKey, true);
+  } else {
     gameRefs.screens.execScreen.drawState(solResult.state);
     gameRefs.screens.execScreen.drawStats(solResult.state);
-    gameRefs.screens.execScreen.drawAnimControlBtns();
-  } else {
-    // draw log animations
-    gameRefs.screens.execScreen.drawLogAnimation(prevState);
   }
 }
 
@@ -85,5 +87,20 @@ export function extendLevelSolution(
 
     updateSolutionRep(gameRefs);
     gameRefs.screens.execScreen.clickState = undefined;
+    gameRefs.screens.execScreen.intermediate = undefined;
+  }
+}
+
+export function changeLevelLoc(
+  gameRefs: GameRefs,
+  loc: Location,
+) {
+  const solInfo = currentSolution(gameRefs);
+  if (solInfo !== undefined) {
+    setLocation(gameRefs, loc);
+
+    updateSolutionRep(gameRefs);
+    gameRefs.screens.execScreen.clickState = undefined;
+    gameRefs.screens.execScreen.intermediate = undefined;
   }
 }

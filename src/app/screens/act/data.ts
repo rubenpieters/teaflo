@@ -218,6 +218,7 @@ export function currentSolution(
   const schem = selectedSchem(gameRefs);
   return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo;
 }
+
 export function setSolution(
   gameRefs: GameRefs,
   solInfo: { solution: Solution, loc: Location },
@@ -225,5 +226,18 @@ export function setSolution(
   const schem = selectedSchem(gameRefs);
   if (schem !== undefined) {
     gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo = solInfo;
+  }
+}
+
+export function setLocation(
+  gameRefs: GameRefs,
+  loc: Location,
+) {
+  const schem = selectedSchem(gameRefs);
+  if (schem !== undefined) {
+    const solInfo = gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo;
+    if (solInfo !== undefined) {
+      solInfo.loc = loc;
+    }
   }
 }
