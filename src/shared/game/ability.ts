@@ -1,5 +1,6 @@
 import { Action } from "./action";
 import { Intent, intentVarText } from "./intent";
+import { GlobalId } from "./entityId";
 
 export type HasAbilities = {
   abilities: Ability[],
@@ -11,24 +12,28 @@ export type Ability = {
   spriteId: string,
 };
 
+// user must specify a number
 export class NumberInput {
   constructor(
     public readonly tag: "NumberInput" = "NumberInput",
   ) {}
 }
 
+// user must specify a target (a unit or a status)
 export class TargetInput {
   constructor(
     public readonly tag: "TargetInput" = "TargetInput",
   ) {}
 }
 
+// user must specify a unit (friendly or enemy)
 export class UnitInput {
   constructor(
     public readonly tag: "UnitInput" = "UnitInput",
   ) {}
 }
 
+// user must specify a status (friendly or enemy)
 export class StatusInput {
   constructor(
     public readonly tag: "StatusInput" = "StatusInput",
@@ -41,6 +46,26 @@ export type UserInput
   | UnitInput
   | StatusInput
   ;
+
+export function matchUserInput(
+  userInput: UserInput,
+  globalId: GlobalId<"friendly" | "enemy" | "status">,
+): boolean {
+  switch (userInput.tag) {
+    case "NumberInput": {
+      return false;
+    }
+    case "TargetInput": {
+      return true;
+    }
+    case "UnitInput": {
+      return globalId.type === "friendly" || globalId.type === "enemy";
+    }
+    case "StatusInput": {
+      return globalId.type === "status";
+    }
+  }
+}
 
 export function abilityText(
   ability: Ability,

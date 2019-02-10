@@ -8,7 +8,7 @@ import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId, getStatus } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution } from "./events";
-import { Ability } from "../../../shared/game/ability";
+import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType } from "../../../app/phaser/animation";
@@ -654,9 +654,12 @@ function mkUnitPool(
           if (clickState === undefined) {
             clickUnit(gameRefs, self.data.globalId);
           } else {
-            clickState.inputs.push(self.data.globalId);
-            if (clickState.inputs.length === clickState.ability.inputs.length) {
-              extendLevelSolution(gameRefs, clickState!);
+            const inputType: UserInput = clickState.ability.inputs[clickState.inputs.length];
+            if (matchUserInput(inputType, self.data.globalId)) {
+              clickState.inputs.push(self.data.globalId);
+              if (clickState.inputs.length === clickState.ability.inputs.length) {
+                extendLevelSolution(gameRefs, clickState!);
+              }
             }
           }
         },
@@ -698,9 +701,12 @@ function mkUnitResPool(
           if (clickState === undefined) {
             clickUnit(gameRefs, self.data.globalId);
           } else {
-            clickState.inputs.push(self.data.globalId);
-            if (clickState.inputs.length === clickState.ability.inputs.length) {
-              extendLevelSolution(gameRefs, clickState!);
+            const inputType: UserInput = clickState.ability.inputs[clickState.inputs.length];
+            if (matchUserInput(inputType, self.data.globalId)) {
+              clickState.inputs.push(self.data.globalId);
+              if (clickState.inputs.length === clickState.ability.inputs.length) {
+                extendLevelSolution(gameRefs, clickState!);
+              }
             }
           }
         },
@@ -775,6 +781,19 @@ function mkTriggerPool(
       ],
       callbacks: {
         click: (self) => {
+          const globalId = new GlobalId(self.data.trigger.id, "status");
+          const clickState = gameRefs.screens.execScreen.clickState;
+          if (clickState === undefined) {
+            clickUnit(gameRefs, globalId);
+          } else {
+            const inputType: UserInput = clickState.ability.inputs[clickState.inputs.length];
+            if (matchUserInput(inputType, globalId)) {
+              clickState.inputs.push(globalId);
+              if (clickState.inputs.length === clickState.ability.inputs.length) {
+                extendLevelSolution(gameRefs, clickState!);
+              }
+            }
+          }
         },
         hoverOver: (self) => {
           hoverUnit(gameRefs, new GlobalId(self.data.trigger.id, "status"));
