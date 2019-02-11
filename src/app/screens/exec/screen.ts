@@ -71,6 +71,16 @@ export class ExecScreen {
     this.logTriggerPool.clear();
   }
 
+  canExtendState(): boolean {
+    if (this.state === undefined) {
+      return false;
+    }
+    if (this.state.state === "invalid" || this.state.state === "win") {
+      return false;
+    }
+    return true;
+  }
+
   currentState(): GameState {
     if (this.intermediate === undefined) {
       return this.state!;

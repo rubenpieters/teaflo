@@ -87,13 +87,24 @@ export class Pool<Data, FrameType> extends Phaser.Group {
         }
       });
       sprite.events.onInputOver.removeAll();
-      sprite.events.onInputOver.add(() => invokeIfDefined(this.poolInfo.callbacks.hoverOver, sprite));
+      sprite.events.onInputOver.add((obj: DataSprite<Data>, pointer: Phaser.Pointer) => {
+        if (obj.props !== undefined) {
+          obj.props.hovering = true;
+        }
+        invokeIfDefined(this.poolInfo.callbacks.hoverOver, sprite);
+      });
       sprite.events.onInputOut.removeAll();
-      sprite.events.onInputOut.add(() => invokeIfDefined(this.poolInfo.callbacks.hoverOut, sprite));
+      sprite.events.onInputOut.add((obj: DataSprite<Data>, pointer: Phaser.Pointer) => {
+        if (obj.props !== undefined && obj.props.hovering) {
+          invokeIfDefined(this.poolInfo.callbacks.hoverOut, sprite);
+          obj.props.hovering = false;
+        }
+      });
 
       sprite.props = {
         init: true,
         selecting: false,
+        hovering: false,
       };
     }
     return sprite;

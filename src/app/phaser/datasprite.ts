@@ -11,6 +11,10 @@ export interface DataSprite<Data> extends Phaser.Sprite {
     // a sprite is being selected when it has received a pointer down event
     // but the pointer has not been lifted up yet
     selecting: boolean,
+    // hovering status:
+    // a sprite is being hovered when it has received a house over event
+    // but no hover out event
+    hovering: boolean,
   }
 }
 
