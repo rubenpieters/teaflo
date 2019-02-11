@@ -75,18 +75,22 @@ function mkMenuBtnPool(
         click: (self) => {
           switch (self.data.type) {
             case "menu": {
+              gameRefs.screens.execScreen.clearAnimations();
               loadActScreen(gameRefs);
               return;
             }
             case "schem": {
+              gameRefs.screens.execScreen.clearAnimations();
               drawCurrentLevel(gameRefs);
               return;
             }
             case "codex": {
+              gameRefs.screens.execScreen.clearAnimations();
               loadCodexScreen(gameRefs);
               return;
             }
             case "settings": {
+              gameRefs.screens.execScreen.clearAnimations();
               loadSettingsScreen(gameRefs);
               return;
             }

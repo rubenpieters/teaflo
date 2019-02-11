@@ -579,6 +579,21 @@ export class ExecScreen {
     this.solTreePool.visible = visibility;
     this.detailBtnPool.visible = visibility;
   }
+
+  clearAnimations() {
+    this.gameRefs.game.tweens.removeFrom(this.clearBtnPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.unitPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.unitResPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.abilityPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.triggerPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.logActionPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.logTriggerPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.solTreePool, true);
+    this.gameRefs.game.tweens.removeFrom(this.detailBtnPool, true);
+    this.gameRefs.game.tweens.removeFrom(this.statsTextPool.texts, true);
+    this.gameRefs.game.tweens.removeFrom(this.unitTextPool.texts, true);
+    this.gameRefs.game.tweens.removeFrom(this.logTextPool.texts, true);
+  }
 }
 
 function fetchPrevEntry(
