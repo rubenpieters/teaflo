@@ -768,7 +768,7 @@ function mkAbilityPool(
       ],
       callbacks: {
         click: (self) => {
-          if (gameRefs.screens.execScreen.clickState === undefined) {
+          if (gameRefs.screens.execScreen.canExtendState() && gameRefs.screens.execScreen.clickState === undefined) {
             gameRefs.screens.execScreen.clickState = {
               ability: self.data.ability,
               inputs: [],
