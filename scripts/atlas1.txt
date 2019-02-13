@@ -40,3 +40,10 @@ textures/select3.png
 textures/unit1.png
 textures/unit2.png
 textures/unit3.png
+textures/menu_btn_half1.png
+textures/menu_btn_half2.png
+textures/menu_btn_joined.png
+textures/menu_btn_joined1.png
+textures/menu_btn_joined2.png
+textures/menu_btn_joined3.png
+textures/menu_btn_joined4.png
