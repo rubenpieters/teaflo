@@ -83,7 +83,7 @@ export default class Game extends Phaser.State {
     );
     this.game.debug.text(`${this.game.time.fps} FPS` || '--', pos.xMax, pos.yMin, "#00ff00");
     const pos2 = createPosition(
-      "right", 70, settings.gameWidth,
+      "right", 140, settings.gameWidth,
       "top", 40, settings.gameHeight,
     );
     this.game.debug.text(`x: ${this.game.input.x} y: ${this.game.input.y}`, pos2.xMax, pos2.yMin);
