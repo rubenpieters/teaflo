@@ -1,49 +1,84 @@
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
-import { createTween } from "../../phaser/animation";
+import { createTween, chainSpriteCreation } from "../../phaser/animation";
 import { settings } from "../../data/settings";
 import { loadActScreen, loadExecScreen, loadCodexScreen, loadSettingsScreen } from "./events";
 import { createPosition } from "../../util/position";
 import { drawCurrentLevel } from "../exec/events";
+import { DataSprite } from "src/app/phaser/datasprite";
 
 export class MenuScreen {
+  menuBgPool: Pool<MenuBgData, {}>
   menuBtnPool: Pool<MenuBtnData, "neutral" | "hover" | "down">
 
   constructor(
     public readonly gameRefs: GameRefs
   ) {
+    this.menuBgPool = mkMenuBgPool(gameRefs);
     this.menuBtnPool = mkMenuBtnPool(gameRefs);
   }
 
   drawMenuBtn() {
-    this.redrawMenuBtn();
+    this.redrawMenuBtn(true);
     this.menuBtnPool.playIntroAnimations();
   }
 
-  redrawMenuBtn() {
-    this.menuBtnPool.killAll();
+  redrawMenuBtn(
+    animation: boolean = false,
+  ) {
+    this.menuBgPool.clear();
+    this.menuBtnPool.clear();
+
+
+    let spriteFs: {
+      create: () => DataSprite<any>,
+      introTween: (sprite: DataSprite<any>) => { first: Phaser.Tween, last: Phaser.Tween } | undefined,
+    }[];
+
+    const bgF = {
+      create: () => {
+        const pos = createPosition(
+          "right", 0, 300,
+          "top", 0, 1080,
+        );
+        const sprite = this.menuBgPool.newSprite(pos.xMin, pos.yMin, {}, {});
+        return sprite;
+      },
+      introTween: (sprite: DataSprite<MenuBgData>) => {
+        return this.menuBgPool.introTween(sprite);
+      },
+    };
+
 
     let i = 0;
     // buttons are placed in reverse order on the screen
     const l: ["settings", "codex", "schem", "menu"] = ["settings", "codex", "schem", "menu"];
-    for (const type of l) {
-      if (this.gameRefs.saveData.act.activeScreen === type) {
-        // this is the currently selected menu type
-        const pos = createPosition(
-          "right", 100 + 210 * i, 200,
-          "bot", - 100, 400,
-        );
-        this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "down", { type, index: i, });
-      } else {
-        const pos = createPosition(
-          "right", 100 + 210 * i, 200,
-          "bot", - 200, 400,
-        );
-        // this is not the currently selected act
-        this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { type, index: i, });
+    const buttonF = l.map((type, i) => {
+      return {
+        create: () => {
+          let sprite;
+          const pos = createPosition(
+            "right", 335, 70,
+            "top", 200 * i, 70,
+          );
+          if (this.gameRefs.saveData.act.activeScreen === type) {
+            // this is the currently selected menu type
+            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "down", { type, index: i, });
+          } else {
+            // this is not the currently selected act
+            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { type, index: i, });
+          }
+          return sprite;
+        },
+        introTween: (sprite: DataSprite<MenuBtnData>) => {
+          return this.menuBtnPool.introTween(sprite);
+        },
       }
-      i += 1;
-    }
+    });
+
+    spriteFs = [bgF];
+    spriteFs = spriteFs.concat(buttonF);
+    chainSpriteCreation(spriteFs, animation);
   }
 }
 
@@ -61,15 +96,15 @@ function mkMenuBtnPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         switch (frameType) {
-          case "down": return "bt_bmark_click.png";
-          case "hover": return "bt_bmark_hover.png";
-          case "neutral": return "bt_bmark_neutral.png";
+          case "down": return "menu_btn2.png";
+          case "hover": return "menu_btn3.png";
+          case "neutral": return "menu_btn1.png";
         }
       },
       introAnim: [
         (self, tween) => {
-          tween.from({ y: settings.gameHeight + 200 }, 150, Phaser.Easing.Linear.None, false, 30 * self.data.index);
-        }
+          tween.from({ alpha: 0 }, 30, Phaser.Easing.Linear.None, false, 0);
+        },
       ],
       callbacks: {
         click: (self) => {
@@ -96,14 +131,14 @@ function mkMenuBtnPool(
             }
           }
         },
-        hoverOver: (self) => {
+        /*hoverOver: (self) => {
           const tween = createTween(gameRefs.game, self, x => x.to({ y: settings.gameHeight - 300 }, 75, Phaser.Easing.Linear.None, false, 0));
           tween.start();
         },
         hoverOut: (self) => {
           const tween = createTween(gameRefs.game, self, x => x.to({ y: settings.gameHeight - 200 }, 75, Phaser.Easing.Linear.None, false, 0));
           tween.start();
-        },
+        },*/
       },
     },
     self => {
@@ -111,5 +146,25 @@ function mkMenuBtnPool(
         || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined
       ;
     }
+  );
+}
+
+type MenuBgData = {}
+
+function mkMenuBgPool(
+  gameRefs: GameRefs,
+): Pool<MenuBgData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => { return "menu_bar.png"; },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ alpha: 0 }, 125, Phaser.Easing.Linear.None, false, 0);
+        },
+      ],
+      callbacks: {},
+    },
   );
 }
