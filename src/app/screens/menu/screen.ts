@@ -49,7 +49,6 @@ export class MenuScreen {
       },
     };
 
-
     let i = 0;
     // buttons are placed in reverse order on the screen
     const l: ["settings", "codex", "schem", "menu"] = ["settings", "codex", "schem", "menu"];
