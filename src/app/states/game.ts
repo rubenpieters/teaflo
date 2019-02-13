@@ -86,6 +86,7 @@ export default class Game extends Phaser.State {
       "right", 70, settings.gameWidth,
       "top", 40, settings.gameHeight,
     );
-    this.game.debug.text(`${gameRefs.screens.levelScreen.buildCardPool.countLiving()}` || '--', pos2.xMax, pos2.yMin, "#00ff00");
+    this.game.debug.text(`x: ${this.game.input.x} y: ${this.game.input.y}`, pos2.xMax, pos2.yMin);
+    //this.game.debug.text(`${gameRefs.screens.levelScreen.buildCardPool.countLiving()}` || '--', pos2.xMax, pos2.yMin, "#00ff00");
   }
 }

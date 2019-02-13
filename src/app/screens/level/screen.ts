@@ -3,13 +3,13 @@ import { GameRefs } from "../../states/game";
 import { createPosition } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
 import { chainSpriteCreation, createTween } from "../../phaser/animation";
-import { currentSchemSol, selectedSchem } from "../act/data";
+import { currentSchemSol, selectedSchem, levelData } from "../act/data";
 import { cardMap } from "../../data/cardMap";
 import { moveCard, moveCardToFirstFree, loadLevel, newExecLevel, levelStats } from "../level/events";
 import { filterUndefined } from "../../util/util";
 
 export class LevelScreen {
-  boxPool: Pool<{}, {}>
+  boxPool: Pool<BoxData, {}>
   box: Phaser.Sprite | undefined
   buildCardPool: Pool<BuildCardData | BuildSlotData, {}>
   execStartBtnPool: Pool<{}, "neutral" | "hover" | "down">
@@ -45,6 +45,9 @@ export class LevelScreen {
   createBox(
     animation: boolean,
   ) {
+    const schem = selectedSchem(this.gameRefs);
+    const solData = currentSchemSol(this.gameRefs);
+
     let spriteFs: {
       create: () => DataSprite<any>,
       introTween: (sprite: DataSprite<any>) => { first: Phaser.Tween, last: Phaser.Tween } | undefined,
@@ -55,26 +58,25 @@ export class LevelScreen {
           "left", 0, 640,
           "top", 0, 1080,
         );
-        const sprite = this.boxPool.newSprite(pos.xMin, pos.yMin, {}, {});
+        const sprite = this.boxPool.newSprite(pos.xMin, pos.yMin, {}, { sprite: levelData[schem!.levelId].boxSprite });
         this.box = sprite;
         return sprite;
       },
-      introTween: (sprite: DataSprite<{}>) => {
+      introTween: (sprite: DataSprite<BoxData>) => {
         return this.boxPool.introTween(sprite);
       },
     };
 
-    const solData = currentSchemSol(this.gameRefs);
     const supplyF = solData === undefined ? [] : solData.supply.map((cardId, cardIndex) => {
       const data: BuildCardData | BuildSlotData = cardId === undefined ?
         { tag: "slot", index: cardIndex } : { tag: "card", cardId, type: "supply", index: cardIndex };
       return {
         create: () => {
-          const pos = createPosition(
-            "left", 40 + cardIndex * 200, 150,
-            "top", 40, 300,
-          );
-          const sprite = this.buildCardPool.newSprite(pos.xMin, pos.yMin, {}, data);
+          const loc = levelData[schem!.levelId].supplyLocations[cardIndex];
+          const sprite = this.buildCardPool.newSprite(loc.x, loc.y, {}, data);
+          if (animation) {
+            sprite.alpha = 0;
+          }
           return sprite;
         },
         introTween: (sprite: DataSprite<BuildCardData | BuildSlotData>) => {
@@ -92,6 +94,9 @@ export class LevelScreen {
             "top", 80, 300,
           );
           const sprite = this.buildCardPool.newSprite(pos.xMin, pos.yMin, {}, data);
+          if (animation) {
+            sprite.alpha = 0;
+          }
           return sprite;
         },
         introTween: (sprite: DataSprite<BuildCardData | BuildSlotData>) => {
@@ -139,17 +144,21 @@ export class LevelScreen {
   }
 }
 
+type BoxData = {
+  sprite: string,
+}
+
 function mkBoxPool(
   gameRefs: GameRefs,
-): Pool<{}, {}> {
+): Pool<BoxData, {}> {
   return new Pool(
     gameRefs.game,
     {
       atlas: "atlas1",
-      toFrame: (self, frameType) => { return "box.png" },
+      toFrame: (self, frameType) => { return self.data.sprite; },
       introAnim: [
         (self, tween) => {
-          tween.from({ x: self.x - 640 }, 75, Phaser.Easing.Linear.None, false, 50);
+          tween.from({ alpha: 0 }, 125, Phaser.Easing.Linear.None, false, 0);
         },
       ],
       callbacks: {},
@@ -184,7 +193,7 @@ function mkBuildCardPool(
       },
       introAnim: [
         (self, tween) => {
-          tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
+          tween.to({ alpha: 1 }, 20, Phaser.Easing.Linear.None, false, 5);
         },
       ],
       callbacks: {

@@ -7,6 +7,7 @@ export type ActData = {
   shortName: string,
   longName: string,
   levels: LevelData[],
+  bgSprite: string,
 }
 
 export type LevelData = {
@@ -15,6 +16,9 @@ export type LevelData = {
   cardIds: string[],
   enemyIds: string[],
   slots: number,
+  selectLocation: { x: number, y: number },
+  boxSprite: string,
+  supplyLocations: { x: number, y: number }[],
 }
 
 const a1l1: LevelData = {
@@ -23,6 +27,9 @@ const a1l1: LevelData = {
   cardIds: [],
   enemyIds: ["en_unit_a1_l2_01"],
   slots: 1,
+  selectLocation: { x: 200, y: 200 },
+  boxSprite: "select3.png",
+  supplyLocations: [{ x: 300, y: 100 }, { x: 150, y: 500 }, { x: 450, y: 500 }],
 };
 
 const a1l2: LevelData = {
@@ -31,6 +38,9 @@ const a1l2: LevelData = {
   cardIds: ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
   enemyIds: ["en_unit_a1_l2_01"],
   slots: 3,
+  selectLocation: { x: 500, y: 500 },
+  boxSprite: "select3.png",
+  supplyLocations: [{ x: 300, y: 100 }, { x: 150, y: 500 }, { x: 450, y: 500 }],
 };
 
 const a2l1: LevelData = {
@@ -39,6 +49,9 @@ const a2l1: LevelData = {
   cardIds: [],
   enemyIds: ["en_unit_a1_l2_01"],
   slots: 1,
+  selectLocation: { x: 200, y: 200 },
+  boxSprite: "select3.png",
+  supplyLocations: [{ x: 300, y: 100 }, { x: 150, y: 500 }, { x: 450, y: 500 }],
 };
 
 const a3l1: LevelData = {
@@ -47,6 +60,9 @@ const a3l1: LevelData = {
   cardIds: [],
   enemyIds: ["en_unit_a1_l2_01"],
   slots: 1,
+  selectLocation: { x: 200, y: 200 },
+  boxSprite: "select3.png",
+  supplyLocations: [{ x: 300, y: 100 }, { x: 150, y: 500 }, { x: 450, y: 500 }],
 };
 
 export const actData: {
@@ -56,16 +72,19 @@ export const actData: {
     shortName: "1",
     longName: "Act 1",
     levels: [a1l1, a1l2],
+    bgSprite: "sel_act1.png",
   },
   1: {
     shortName: "2",
     longName: "Act 2",
     levels: [a2l1],
+    bgSprite: "sel_act1.png",
   },
   2: {
     shortName: "3",
     longName: "Act 3",
     levels: [a3l1],
+    bgSprite: "sel_act1.png",
   },
 }
 

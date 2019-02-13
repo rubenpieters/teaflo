@@ -1,4 +1,4 @@
-import { actData, selectedActId, selectedMenu } from "../../screens/act/data";
+import { actData, selectedActId, selectedMenu, LevelData } from "../../screens/act/data";
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
 import { createPosition } from "../../util/position";
@@ -27,7 +27,7 @@ export class ActScreen {
       this.drawActBtn();
       return;
     }
-    switch (menu.tag) {
+    switch (menu.tag) {                                                                                             
       case "SelectedActMenu": {
         changeAct(this.gameRefs, menu.actId);
         break;
@@ -74,10 +74,16 @@ export class ActScreen {
   drawLevelBtn(
     actId: number,
   ) {
-    this.levelBtnPool.killAll();
+    this.levelBtnPool.clear();
     this.gameRefs.screens.bgScreen.bgOnIntroComplete(
       () => {
         this._drawLevelBtn(actId);
+        /*const levels = actData[actId].levels;
+        this.levelSelectionPool.newSprite(0, 0, {}, {
+          polys: levels.map(x => new Phaser.Polygon(x.spritePoints.map(({x, y}) => new Phaser.Point(x, y)))),
+          levelData: levels,
+          bgSprite: actData[actId].bgSprite,
+        });*/
       },
     );
   }

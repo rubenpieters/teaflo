@@ -28,7 +28,7 @@ export class TextPool {
   }
 
   public clear() {
-    this.texts.forEach(x => x.destroy());
+    this.texts.forEach(x => x.kill());
   }
 
   public setVisiblity(

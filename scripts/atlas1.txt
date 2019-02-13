@@ -28,3 +28,15 @@ textures/res_anim.png
 textures/tree_node.png
 textures/tree_branch.png
 textures/tree_node_full.png
+textures/menu_bar.png
+textures/menu_btn1.png
+textures/menu_btn2.png
+textures/menu_btn3.png
+textures/sel_act1.png
+textures/sel_level1.png
+textures/sel_level2.png
+textures/sel_level3.png
+textures/select3.png
+textures/unit1.png
+textures/unit2.png
+textures/unit3.png
