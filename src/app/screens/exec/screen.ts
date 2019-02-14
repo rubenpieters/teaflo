@@ -590,6 +590,10 @@ export class ExecScreen {
     this.detailBtnPool.visible = visibility;
   }
 
+  clear() {
+    
+  }
+
   clearAnimations() {
     this.gameRefs.game.tweens.removeFrom(this.clearBtnPool, true);
     this.gameRefs.game.tweens.removeFrom(this.unitPool, true);

@@ -2,6 +2,7 @@ import { GameRefs } from "../../states/game";
 import { Solution } from "../../../shared/game/solution";
 import { Location } from "../../../shared/tree";
 import { SpeedType } from "../../../app/phaser/animation";
+import { ScreenActive, ScreenAct, ScreenSchem, ScreenCodex, ScreenSettings } from "../transition";
 
 export type ActData = {
   shortName: string,
@@ -120,7 +121,6 @@ export type ActSaveData = {
     log: SpeedType,
   },
 }
-
 export function mkActSaveData(): ActSaveData {
   return {
     currentMenu: undefined,
@@ -163,6 +163,25 @@ function repeat<A>(
     l.push(a);
   }
   return l;
+}
+
+export function currentScreen(
+  gameRefs: GameRefs
+): ScreenActive {
+  switch (gameRefs.saveData.act.activeScreen) {
+    case "menu": {
+      return new ScreenAct(gameRefs.saveData.act.currentMenu);
+    }
+    case "schem": {
+      return new ScreenSchem(gameRefs.saveData.act.currentSchem);
+    }
+    case "codex": {
+      return new ScreenCodex();
+    }
+    case "settings": {
+      return new ScreenSettings();
+    }
+  }
 }
 
 export function selectedMenu(

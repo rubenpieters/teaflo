@@ -1,4 +1,4 @@
-import { actData, selectedActId, selectedMenu, LevelData } from "../../screens/act/data";
+import { actData, selectedActId, selectedMenu, SelectedActMenu, SelectedLevelMenu, LevelData } from "../../screens/act/data";
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
 import { createPosition } from "../../util/position";
@@ -7,6 +7,7 @@ import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
 import { addText, DataSprite } from "../../phaser/datasprite";
 import { loadLevel, levelStats } from "../level/events";
+import { ScreenAct, transitionScreen } from "../transition";
 
 export class ActScreen {
   actBtnPool: Pool<ActBtnData, "neutral" | "hover" | "down">
@@ -75,17 +76,18 @@ export class ActScreen {
     actId: number,
   ) {
     this.levelBtnPool.clear();
-    this.gameRefs.screens.bgScreen.bgOnIntroComplete(
+    this._drawLevelBtn(actId);
+    /*this.gameRefs.screens.bgScreen.bgOnIntroComplete(
       () => {
         this._drawLevelBtn(actId);
-        /*const levels = actData[actId].levels;
+        const levels = actData[actId].levels;
         this.levelSelectionPool.newSprite(0, 0, {}, {
           polys: levels.map(x => new Phaser.Polygon(x.spritePoints.map(({x, y}) => new Phaser.Point(x, y)))),
           levelData: levels,
           bgSprite: actData[actId].bgSprite,
-        });*/
+        });
       },
-    );
+    );*/
   }
 
   private _drawLevelBtn(
@@ -128,11 +130,7 @@ export class ActScreen {
     levelId: string,
   ) {
     this.solBtnPool.killAll();
-    this.gameRefs.screens.bgScreen.bgOnIntroComplete(
-      () => {
-        this._drawSolBtn(levelId, true);
-      },
-    );
+    this._drawSolBtn(levelId, true);
   }
 
   private _drawSolBtn(
@@ -237,7 +235,7 @@ function mkActBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          changeAct(gameRefs, self.data.actId);
+          transitionScreen(gameRefs, new ScreenAct(new SelectedActMenu(self.data.actId)))
         },
         hoverOver: (self) => {
           const tween = createTween(gameRefs.game, self, x => x.to({ y: -100 }, 75, Phaser.Easing.Linear.None, false, 0));
