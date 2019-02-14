@@ -9,7 +9,7 @@ import { DataSprite } from "src/app/phaser/datasprite";
 
 export class MenuScreen {
   menuBgPool: Pool<MenuBgData, {}>
-  menuBtnPool: Pool<MenuBtnData, "neutral" | "hover" | "down">
+  menuBtnPool: Pool<MenuBtnData, "closed" | "open">
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -56,16 +56,20 @@ export class MenuScreen {
       return {
         create: () => {
           let sprite;
-          const pos = createPosition(
-            "right", 335, 70,
-            "top", 200 * i, 70,
-          );
           if (this.gameRefs.saveData.act.activeScreen === type) {
             // this is the currently selected menu type
-            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "down", { type, index: i, });
+            const pos = createPosition(
+              "right", 250, 250,
+              "top", 270 * i, 250,
+            );
+            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "open", { type, index: i, });
           } else {
             // this is not the currently selected act
-            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { type, index: i, });
+            const pos = createPosition(
+              "right", 50, 250,
+              "top", 270 * i, 250,
+            );
+            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "closed", { type, index: i, });
           }
           return sprite;
         },
@@ -88,16 +92,15 @@ type MenuBtnData = {
 
 function mkMenuBtnPool(
   gameRefs: GameRefs,
-): Pool<MenuBtnData, "neutral" | "hover" | "down"> {
-  return mkButtonPool(
+): Pool<MenuBtnData, "closed" | "open"> {
+  return new Pool(
     gameRefs.game,
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         switch (frameType) {
-          case "down": return "menu_btn2.png";
-          case "hover": return "menu_btn3.png";
-          case "neutral": return "menu_btn1.png";
+          case "closed": return "menu_btn_joined.png";
+          case "open": return "menu_btn_joined4.png";
         }
       },
       introAnim: [
@@ -107,44 +110,72 @@ function mkMenuBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          switch (self.data.type) {
-            case "menu": {
-              gameRefs.screens.execScreen.clearAnimations();
-              loadActScreen(gameRefs);
-              return;
-            }
-            case "schem": {
-              gameRefs.screens.execScreen.clearAnimations();
-              drawCurrentLevel(gameRefs);
-              return;
-            }
-            case "codex": {
-              gameRefs.screens.execScreen.clearAnimations();
-              loadCodexScreen(gameRefs);
-              return;
-            }
-            case "settings": {
-              gameRefs.screens.execScreen.clearAnimations();
-              loadSettingsScreen(gameRefs);
-              return;
+          if (! (gameRefs.saveData.act.activeScreen === self.data.type
+            || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined)
+          ) {
+            switch (self.data.type) {
+              case "menu": {
+                gameRefs.screens.execScreen.clearAnimations();
+                loadActScreen(gameRefs);
+                return;
+              }
+              case "schem": {
+                gameRefs.screens.execScreen.clearAnimations();
+                drawCurrentLevel(gameRefs);
+                return;
+              }
+              case "codex": {
+                gameRefs.screens.execScreen.clearAnimations();
+                loadCodexScreen(gameRefs);
+                return;
+              }
+              case "settings": {
+                gameRefs.screens.execScreen.clearAnimations();
+                loadSettingsScreen(gameRefs);
+                return;
+              }
             }
           }
         },
-        /*hoverOver: (self) => {
-          const tween = createTween(gameRefs.game, self, x => x.to({ y: settings.gameHeight - 300 }, 75, Phaser.Easing.Linear.None, false, 0));
-          tween.start();
+        hoverOver: (self) => {
+          if (! (gameRefs.saveData.act.activeScreen === self.data.type
+            || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined)
+          ) {
+            const tween1 = createTween(gameRefs.game, self, x => x.to({}, 10, Phaser.Easing.Linear.None, false, 0));
+            tween1.onComplete.add(() => { self.frameName = "menu_btn_joined1.png"; self.x -= 50; });
+            const tween2 = createTween(gameRefs.game, self, x => x.to({}, 10, Phaser.Easing.Linear.None, false, 0));
+            tween2.onComplete.add(() => { self.frameName = "menu_btn_joined2.png"; self.x -= 50; });
+            const tween3 = createTween(gameRefs.game, self, x => x.to({}, 10, Phaser.Easing.Linear.None, false, 0));
+            tween3.onComplete.add(() => { self.frameName = "menu_btn_joined3.png"; self.x -= 50; });
+            const tween4 = createTween(gameRefs.game, self, x => x.to({}, 10, Phaser.Easing.Linear.None, false, 0));
+            tween4.onComplete.add(() => { self.frameName = "menu_btn_joined4.png"; self.x -= 50; });
+            tween1.chain(tween2, tween3, tween4);
+            tween1.start();
+          }
         },
         hoverOut: (self) => {
-          const tween = createTween(gameRefs.game, self, x => x.to({ y: settings.gameHeight - 200 }, 75, Phaser.Easing.Linear.None, false, 0));
-          tween.start();
-        },*/
+          if (! (gameRefs.saveData.act.activeScreen === self.data.type
+            || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined)
+          ) {
+              const tween1 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
+              tween1.onComplete.add(() => { self.frameName = "menu_btn_joined3.png"; self.x += 50; });
+              const tween2 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
+              tween2.onComplete.add(() => { self.frameName = "menu_btn_joined2.png"; self.x += 50; });
+              const tween3 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
+              tween3.onComplete.add(() => { self.frameName = "menu_btn_joined1.png"; self.x += 50; });
+              const tween4 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
+              tween4.onComplete.add(() => { self.frameName = "menu_btn_joined.png"; self.x += 50; });
+              tween1.chain(tween2, tween3, tween4);
+              tween1.start();
+          }
+        },
       },
     },
-    self => {
+    /*self => {
       return gameRefs.saveData.act.activeScreen === self.data.type
         || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined
       ;
-    }
+    }*/
   );
 }
 
