@@ -28,7 +28,7 @@ export class BgScreen {
     this.bgPool.killAll();
 
     const sprite = this.bgPool.newSprite(0, 0, {}, {});
-    sprite.loadTexture("bg0");
+    sprite.loadTexture("bg3");
 
     const intro = this.bgPool.introTween(sprite);
     if (intro !== undefined) {
@@ -48,20 +48,20 @@ function mkBgPool(
   return new Pool(
     gameRefs.game,
     {
-      atlas: "bg0",
+      atlas: "bg4",
       toFrame: frameType => { return <any>undefined },
       introAnim: [
-        (self, tween) => {
-          tween.from({}, 15);
-          tween.onComplete.add(() => self.loadTexture("bg1"));
-        },
         (self, tween) => {
           tween.from({}, 15);
           tween.onComplete.add(() => self.loadTexture("bg2"));
         },
         (self, tween) => {
           tween.from({}, 15);
-          tween.onComplete.add(() => self.loadTexture("bg3"));
+          tween.onComplete.add(() => self.loadTexture("bg1"));
+        },
+        (self, tween) => {
+          tween.from({}, 15);
+          tween.onComplete.add(() => self.loadTexture("bg0"));
         },
         (self, tween) => {
           tween.from({}, 15);

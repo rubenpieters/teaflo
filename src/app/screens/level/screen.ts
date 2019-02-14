@@ -27,12 +27,9 @@ export class LevelScreen {
     this.boxPool.killAll();
     this.buildCardPool.killAll();
     this.execStartBtnPool.killAll();
-    this.gameRefs.screens.bgScreen.bgOnIntroComplete(
-      () => {
-        this.createBox(true);
-        this.drawExecStartBtn();
-      },
-    );
+    
+    this.createBox(true);
+    this.drawExecStartBtn();
   }
 
   redrawBox(
@@ -46,6 +43,7 @@ export class LevelScreen {
     animation: boolean,
   ) {
     const schem = selectedSchem(this.gameRefs);
+    const levelId = schem!.levelId;
     const solData = currentSchemSol(this.gameRefs);
 
     let spriteFs: {
@@ -58,7 +56,7 @@ export class LevelScreen {
           "left", 0, 640,
           "top", 0, 1080,
         );
-        const sprite = this.boxPool.newSprite(pos.xMin, pos.yMin, {}, { sprite: levelData[schem!.levelId].boxSprite });
+        const sprite = this.boxPool.newSprite(pos.xMin, pos.yMin, {}, { sprite: levelData[levelId].boxSprite });
         this.box = sprite;
         return sprite;
       },

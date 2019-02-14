@@ -4,6 +4,7 @@ import { emptyTree, Location } from "../../../shared/tree";
 import { updateSolutionRep } from "../exec/events";
 import { mkGameState } from "../../../shared/game/state";
 import { endStates } from "../../../shared/game/solution";
+import { transitionScreen, ScreenSchem } from "../transition";
 
 export function loadLevel(
   gameRefs: GameRefs,
@@ -12,29 +13,10 @@ export function loadLevel(
 ) {
   const sol = schemScholAt(gameRefs, levelId, solId);
   if (sol === undefined || sol.solInfo === undefined) {
-    gameRefs.saveData.act.currentSchem = new SelectedBuildSchem(levelId, solId);
-  
-    gameRefs.screens.actScreen.setVisibility(false);
-    gameRefs.screens.execScreen.setVisibility(false);
-    gameRefs.screens.levelScreen.setVisibility(true);
-    gameRefs.screens.codexScreen.setVisibility(false);
-    gameRefs.screens.settingsScreen.setVisibility(false);
-  
-    gameRefs.screens.levelScreen.drawBox();
+    transitionScreen(gameRefs, new ScreenSchem(new SelectedBuildSchem(levelId, solId)));
   } else {
-    gameRefs.saveData.act.currentSchem = new SelectedExecSchem(levelId, solId);
-
-    gameRefs.screens.actScreen.setVisibility(false);
-    gameRefs.screens.levelScreen.setVisibility(false);
-    gameRefs.screens.execScreen.setVisibility(true);
-    gameRefs.screens.codexScreen.setVisibility(false);
-    gameRefs.screens.settingsScreen.setVisibility(false);
-    gameRefs.screens.execScreen.reset();
-
-    updateSolutionRep(gameRefs);
+    transitionScreen(gameRefs, new ScreenSchem(new SelectedExecSchem(levelId, solId)));
   }
-  gameRefs.saveData.act.activeScreen = "schem";
-  gameRefs.screens.menuScreen.redrawMenuBtn();
 }
 
 export function newExecLevel(

@@ -235,7 +235,7 @@ function mkActBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          transitionScreen(gameRefs, new ScreenAct(new SelectedActMenu(self.data.actId)))
+          transitionScreen(gameRefs, new ScreenAct(new SelectedActMenu(self.data.actId)));
         },
         hoverOver: (self) => {
           const tween = createTween(gameRefs.game, self, x => x.to({ y: -100 }, 75, Phaser.Easing.Linear.None, false, 0));
@@ -277,7 +277,7 @@ function mkLevelBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          changeLevel(gameRefs, self.data.levelId);
+          transitionScreen(gameRefs, new ScreenAct(new SelectedLevelMenu(self.data.levelId)))
         },
       },
     },

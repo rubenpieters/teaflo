@@ -1,5 +1,26 @@
 import { GameRefs } from "../../states/game";
 import { mkSolutionData, SelectedActMenu, SelectedLevelMenu } from "./data";
+import { transitionScreen, ScreenAct } from "../transition";
+
+export function loadActMenu(
+  gameRefs: GameRefs,
+) {
+  const menu = gameRefs.saveData.act.currentMenu;
+  if (menu !== undefined) {
+    switch (menu.tag) {
+      case "SelectedActMenu": {
+        transitionScreen(gameRefs, new ScreenAct(menu));
+        break;
+      }
+      case "SelectedLevelMenu": {
+        transitionScreen(gameRefs, new ScreenAct(menu));
+        break;
+      }
+    }
+  } else {
+    transitionScreen(gameRefs, new ScreenAct(undefined));
+  }
+}
 
 export function changeAct(
   gameRefs: GameRefs,

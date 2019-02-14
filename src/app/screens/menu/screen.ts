@@ -6,6 +6,8 @@ import { loadActScreen, loadExecScreen, loadCodexScreen, loadSettingsScreen } fr
 import { createPosition } from "../../util/position";
 import { drawCurrentLevel } from "../exec/events";
 import { DataSprite } from "src/app/phaser/datasprite";
+import { loadActMenu } from "../act/events";
+import { transitionScreen, ScreenCodex, ScreenSettings } from "../transition";
 
 export class MenuScreen {
   menuBgPool: Pool<MenuBgData, {}>
@@ -105,7 +107,7 @@ function mkMenuBtnPool(
       },
       introAnim: [
         (self, tween) => {
-          tween.from({ alpha: 0 }, 30, Phaser.Easing.Linear.None, false, 0);
+          tween.from({ x: self.x - 50, alpha: 0.5 }, 30, Phaser.Easing.Linear.None, false, 0);
         },
       ],
       callbacks: {
@@ -115,23 +117,19 @@ function mkMenuBtnPool(
           ) {
             switch (self.data.type) {
               case "menu": {
-                gameRefs.screens.execScreen.clearAnimations();
-                loadActScreen(gameRefs);
+                loadActMenu(gameRefs);
                 return;
               }
               case "schem": {
-                gameRefs.screens.execScreen.clearAnimations();
                 drawCurrentLevel(gameRefs);
                 return;
               }
               case "codex": {
-                gameRefs.screens.execScreen.clearAnimations();
-                loadCodexScreen(gameRefs);
+                transitionScreen(gameRefs, new ScreenCodex());
                 return;
               }
               case "settings": {
-                gameRefs.screens.execScreen.clearAnimations();
-                loadSettingsScreen(gameRefs);
+                transitionScreen(gameRefs, new ScreenSettings());
                 return;
               }
             }
