@@ -113,3 +113,34 @@ export const ai4: AI = [
       ],
   },
 ];
+
+export const ai5: AI = [
+  {
+    intent: new I.AddTriggerI(
+      I.mkHighestThreat(),
+      new I.Static(
+        T.full(new T.Fragile(4)),
+      ),
+    ),
+    spriteId: "fr_unit_a1_l2_01_ab1",
+    outs: [
+        {
+          aiOut: new O.ToX(1),
+          condition: (state: GameState) => true,
+        },
+      ],
+  },
+  {
+    intent: new I.DamageI(
+      I.mkHighestThreat(),
+      new I.Static(1),
+    ),
+    spriteId: "fr_unit_a1_l1_01_ab1",
+    outs: [
+        {
+          aiOut: new O.ToX(0),
+          condition: (state: GameState) => true,
+        },
+      ],
+  },
+];

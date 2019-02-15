@@ -47,6 +47,13 @@ export class Armor {
   ) {}
 }
 
+export class Fragile {
+  constructor(
+    public readonly fragments: number,
+    public readonly tag: "Fragile" = "Fragile",
+  ) {}
+}
+
 export class StrongLowHP {
   constructor(
     public readonly fragments: number,
@@ -93,6 +100,7 @@ export type Trigger
   | AllyWeakSelfArmor
   | Explode
   | ThreatOnAllyDamage
+  | Fragile
   ;
 
 export function tagToGroup(
@@ -107,6 +115,7 @@ export function tagToGroup(
     case "AllyWeakSelfArmor": return "other";
     case "Explode": return "other";
     case "ThreatOnAllyDamage": return "other";
+    case "Fragile": return "armor";
   }
 }
 
@@ -122,6 +131,7 @@ export function triggerToFragmentValue(
     case "AllyWeakSelfArmor": return 3;
     case "Explode": return trigger.value;
     case "ThreatOnAllyDamage": return 3;
+    case "Fragile": return 1;
   }
 }
 
@@ -349,6 +359,31 @@ export function applyTrigger(
       }
       return { transformed: action, actions: [] };
     }
+    case "Fragile": {
+      if (action.tag === "Damage" && eqUnitId(state, action.target, trigger.owner)) {
+        let newValue = action.value + triggerValue;
+        const transformed = new Damage(
+          action.target,
+          newValue,
+        );
+        return {
+          transformed,
+          actions: [
+            new Damage(
+              new GlobalId(trigger.id, "status"),
+              newValue - action.value,
+            ),
+          ],
+          triggerLog: {
+            tag: trigger.tag,
+            before: action,
+            after: transformed,
+          },
+        };
+      } else {
+        return { transformed: action, actions: [] };
+      }
+    }
   }
 }
 
@@ -364,6 +399,7 @@ export function triggerSprite(
     case "AllyWeakSelfArmor": return "tr_strong";
     case "Explode": return "tr_strong";
     case "ThreatOnAllyDamage": return "tr_strong";
+    case "Fragile": return "tr_strong";
   }
 }
 
