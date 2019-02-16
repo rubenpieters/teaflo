@@ -15,6 +15,7 @@ import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, Speed
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution } from "../../../shared/game/solution";
 import { changePage } from "../codex/events";
+import { intentDescription } from "../../util/intentDesc";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -31,6 +32,7 @@ export class ExecScreen {
   logTriggerPool: Pool<LogTriggerData, {}>
   solTreePool: Pool<SolTreeData, {}>
   detailBtnPool: Pool<DetailBtnData, {}>
+  detailExplPool: Pool<DetailExplData, {}>
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
 
@@ -57,6 +59,7 @@ export class ExecScreen {
     this.animControlBtnPool = mkAnimControlBtnPool(gameRefs);
     this.solTreePool = mkSolTreePool(gameRefs);
     this.detailBtnPool = mkDetailBtnPool(gameRefs);
+    this.detailExplPool = mkDetailExplPool(gameRefs);
   }
 
   reset() {
@@ -341,6 +344,7 @@ export class ExecScreen {
     this.abilityPool.clear();
     this.statsTextPool.clear();
     this.detailBtnPool.clear();
+    this.detailExplPool.clear();
 
     const textPos = createPosition(
       "left", 650, 150,
@@ -361,18 +365,29 @@ export class ExecScreen {
   
           if (showUnit.type === "friendly") {
             const frUnit = <FrStUnit>unit;
+
+            const detailBtnPos = createPosition(
+              "left", 500, 150,
+              "bot", 50, 150,
+            );
+            this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "CardId", cardId: frUnit.cardId } });
+
             frUnit.abilities.forEach((ability, abilityIndex) => {
               const abPos = createPosition(
                 "left", 650 + 200 * abilityIndex, 150,
                 "bot", 50, 150,
               );
               this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
+
+              const desc = intentDescription(ability.intent);
+              desc.forEach((descSprite, descIndex) => {
+                const explPos = createPosition(
+                  "left", 900 + 80 * descIndex, 80,
+                  "bot", 50, 80,
+                );
+                this.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSprite });
+              });
             });
-            const detailBtnPos = createPosition(
-              "left", 900, 150,
-              "bot", 50, 150,
-            );
-            this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "CardId", cardId: frUnit.cardId } });
           } else if (showUnit.type === "enemy") {
             const enUnit = <EnStUnit>unit;
           }
@@ -607,6 +622,7 @@ export class ExecScreen {
     this.gameRefs.game.tweens.removeFrom(this.statsTextPool.texts, true);
     this.gameRefs.game.tweens.removeFrom(this.unitTextPool.texts, true);
     this.gameRefs.game.tweens.removeFrom(this.logTextPool.texts, true);
+    this.gameRefs.game.tweens.removeFrom(this.detailExplPool, true);
   }
 }
 
@@ -1000,6 +1016,31 @@ function mkDetailBtnPool(
         click: (self) => {
           changePage(gameRefs, self.data.type);
         },
+      },
+    },
+  );
+}
+
+type DetailExplData = {
+  sprite: string,
+};
+
+function mkDetailExplPool(
+  gameRefs: GameRefs,
+): Pool<DetailExplData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return self.data.sprite;
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
       },
     },
   );
