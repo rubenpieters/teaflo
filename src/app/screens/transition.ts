@@ -19,6 +19,7 @@ export class ScreenSchem {
 
 export class ScreenCodex {
   constructor(
+    public readonly page: undefined | { tag: "CardId", cardId: string } = undefined,
     public readonly tag: "ScreenCodex" = "ScreenCodex",
   ) {}
 }
@@ -123,6 +124,10 @@ export function transitionScreen(
         }
         case "ScreenCodex": {
           gameRefs.saveData.act.activeScreen = "codex";
+          if (newScreen.page !== undefined) {
+            gameRefs.screens.codexScreen.page = newScreen.page;
+          }
+          gameRefs.screens.codexScreen.drawPage();
           break;
         }
         case "ScreenSettings": {

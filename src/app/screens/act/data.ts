@@ -29,7 +29,7 @@ const a1l1: LevelData = {
   enemyIds: ["en_unit_a1_l2_01"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
-  boxSprite: "select3.png",
+  boxSprite: "select3_f.png",
   supplyLocations: [{ x: 300, y: 100 }, { x: 150, y: 500 }, { x: 450, y: 500 }],
 };
 

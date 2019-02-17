@@ -16,6 +16,7 @@ import { drawPositions, Location } from "../../../shared/tree";
 import { Solution } from "../../../shared/game/solution";
 import { changePage } from "../codex/events";
 import { intentDescription } from "../../util/intentDesc";
+import { transitionScreen, ScreenCodex } from "../transition";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -1014,7 +1015,7 @@ function mkDetailBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          changePage(gameRefs, self.data.type);
+          transitionScreen(gameRefs, new ScreenCodex(self.data.type));
         },
       },
     },

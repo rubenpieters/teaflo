@@ -69,3 +69,4 @@ textures/expl_target.png
 textures/expl_target_status.png
 textures/expl_target_unit.png
 textures/expl_th.png
+textures/select3_f.png
