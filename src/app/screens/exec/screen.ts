@@ -186,6 +186,7 @@ export class ExecScreen {
             type: "hp",
           }
         );
+        unitHpSprite.width = 75;
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
         // draw hp changing animation
         if (prevState !== undefined) {
@@ -228,19 +229,25 @@ export class ExecScreen {
             type: "ch",
           }
         );
+        unitChSprite.width = 75;
         unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
 
         // TH
-        /*let i = 0;
-        for (const enId of enIds) {
-          const unitThPos = relativeTo(unitPos,
-            "below", 250 + 100 * i,
-            150, 50,
+        enIds.forEach((enId, enIndex) => {
+          const unitThPos = createPosition(
+            "left", 650 + 160 * unitIndex + 35 * enIndex, 75,
+            "top", 375, 300,
           );
-          unitThPos.xMax = unitThPos.xMin + (unitThPos.xMax - unitThPos.xMin) * (unit.threatMap[enId] / maxThreat);
-          createUnitResource(game, gameRefs, unitThPos, "th");
-          i += 1;
-        }*/
+          const unitThSprite = this.unitResPool.newSprite(unitThPos.xMin, unitThPos.yMin, {},
+            { cardId: unit.cardId,
+              globalId: new GlobalId(unit.id, "friendly"),
+              type: "th",
+            }
+          );
+          const threat = unit.threatMap[enId] === undefined ? 0 : unit.threatMap[enId];
+          unitThSprite.width = 30;
+          unitThSprite.height = threat / maxThreat * 50;
+        });
       }
     });
     state.enUnits.forEach((unit, unitIndex) => {
@@ -268,6 +275,7 @@ export class ExecScreen {
             type: "hp",
           }
         );
+        unitHpSprite.width = 75;
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
         // draw hp changing animation
         if (prevState !== undefined) {
@@ -310,15 +318,12 @@ export class ExecScreen {
             type: "ch",
           }
         );
+        unitChSprite.width = 75;
         unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
       }
     });
 
-    const textPos = createPosition(
-      "left", 650, 150,
-      "top", 300, 300,
-    );
-    this.unitTextPool.newText(textPos, "Aether");
+    // AETHER
     triggerOrder.forEach((tag, tagIndex) => {
       state.triggers[tag].forEach((trigger, triggerIndex) => {
         const triggerPos = createPosition(
@@ -744,7 +749,7 @@ function mkUnitPool(
 type UnitResData = {
   cardId: string,
   globalId: GlobalId<"friendly" | "enemy">,
-  type: "hp" | "ch" | "res_anim",
+  type: "hp" | "ch" | "th" | "res_anim",
 };
 
 function mkUnitResPool(
@@ -755,6 +760,9 @@ function mkUnitResPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
+        if (self.data.type === "th") {
+          return "ch.png";
+        }
         return `${self.data.type}.png`;
       },
       introAnim: [
