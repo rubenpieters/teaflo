@@ -128,6 +128,7 @@ export function transitionScreen(
           if (newScreen.page !== undefined) {
             gameRefs.screens.codexScreen.page = newScreen.page;
           }
+          gameRefs.screens.codexScreen.reset();
           gameRefs.screens.codexScreen.drawPage();
           break;
         }

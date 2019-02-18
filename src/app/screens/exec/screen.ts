@@ -1068,9 +1068,6 @@ function mkDetailExplPool(
         return self.data.sprite;
       },
       introAnim: [
-        (self, tween) => {
-          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
-        },
       ],
       callbacks: {
       },
