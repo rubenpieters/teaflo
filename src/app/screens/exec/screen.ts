@@ -361,22 +361,30 @@ export class ExecScreen {
             "bot", 200, 300,
           );
           this.statsTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
+          const pos2 = createPosition(
+            "left", 850, 150,
+            "bot", 200, 300,
+          );
+          this.statsTextPool.newText(pos2, `${unit.charges} / ${unit.maxCharges}`);
   
           if (showUnit.type === "friendly") {
             const frUnit = <FrStUnit>unit;
 
             // go to codex button
             const detailBtnPos = createPosition(
-              "left", 500, 150,
+              "left", 350, 150,
               "bot", 100, 150,
             );
             this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "CardId", cardId: frUnit.cardId } });
 
             // abilities
             frUnit.abilities.forEach((ability, abilityIndex) => {
+              const flagTop = abilityIndex % 2;
+              const flagLeft = abilityIndex < 2 ? 0 : 1;
+              if (abilityIndex >= 4) { throw "ability index should be below 4" };
               const abPos = createPosition(
-                "left", 650, 150,
-                "bot", 100 - 200 * abilityIndex, 150,
+                "left", 500 + 125 * flagLeft, 100,
+                "bot", 200 - 125 * flagTop, 100,
               );
               this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
 

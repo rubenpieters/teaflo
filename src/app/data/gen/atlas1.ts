@@ -196,44 +196,50 @@ export type Atlas1 = {
     "fr_unit_a1_l1_01_ab1.png": {
         "x": 2250,
         "y": 0,
-        "width": 150,
-        "height": 150
+        "width": 100,
+        "height": 100
     },
     "fr_unit_a1_l1_01_ab2.png": {
-        "x": 2400,
+        "x": 2350,
         "y": 0,
-        "width": 150,
-        "height": 150
+        "width": 100,
+        "height": 100
     },
     "fr_unit_a1_l2_01_ab1.png": {
+        "x": 2450,
+        "y": 0,
+        "width": 100,
+        "height": 100
+    },
+    "menu_btn2.png": {
         "x": 2550,
         "y": 0,
         "width": 150,
         "height": 150
     },
-    "menu_btn2.png": {
-        "x": 2700,
-        "y": 0,
-        "width": 150,
-        "height": 150
-    },
     "btn_level_neutral.png": {
-        "x": 2850,
+        "x": 2700,
         "y": 0,
         "width": 400,
         "height": 200
     },
     "btn_level_click.png": {
-        "x": 3250,
+        "x": 3100,
         "y": 0,
         "width": 400,
         "height": 200
     },
     "btn_level_hover.png": {
-        "x": 3650,
+        "x": 3500,
         "y": 0,
         "width": 400,
         "height": 200
+    },
+    "menu_btn_half1.png": {
+        "x": 3900,
+        "y": 0,
+        "width": 125,
+        "height": 250
     },
     "unit1.png": {
         "x": 0,
@@ -259,159 +265,153 @@ export type Atlas1 = {
         "width": 220,
         "height": 220
     },
-    "menu_btn_half1.png": {
+    "menu_btn_half2.png": {
         "x": 820,
         "y": 80,
         "width": 125,
         "height": 250
     },
-    "menu_btn_half2.png": {
-        "x": 945,
-        "y": 80,
-        "width": 125,
-        "height": 250
-    },
     "menu_btn_joined.png": {
-        "x": 1070,
+        "x": 945,
         "y": 80,
         "width": 250,
         "height": 250
     },
     "menu_btn_joined1.png": {
-        "x": 1320,
+        "x": 1195,
         "y": 80,
         "width": 300,
         "height": 250
     },
     "menu_btn_joined2.png": {
-        "x": 1620,
+        "x": 1495,
         "y": 80,
         "width": 350,
         "height": 250
     },
-    "en_unit_a1_l1_01.png": {
-        "x": 1970,
-        "y": 80,
-        "width": 150,
-        "height": 300
-    },
-    "hp.png": {
-        "x": 2120,
-        "y": 80,
-        "width": 75,
-        "height": 300
-    },
     "menu_btn_joined3.png": {
-        "x": 2195,
-        "y": 150,
+        "x": 1845,
+        "y": 80,
         "width": 400,
         "height": 250
     },
+    "en_unit_a1_l1_01.png": {
+        "x": 2245,
+        "y": 100,
+        "width": 150,
+        "height": 300
+    },
     "fr_unit_a1_l1_01.png": {
-        "x": 2595,
+        "x": 2395,
+        "y": 100,
+        "width": 150,
+        "height": 300
+    },
+    "fr_unit_a1_l2_01.png": {
+        "x": 2545,
         "y": 150,
         "width": 150,
         "height": 300
     },
-    "ch.png": {
-        "x": 2745,
-        "y": 150,
-        "width": 75,
-        "height": 300
-    },
     "menu_btn_joined4.png": {
-        "x": 2820,
+        "x": 2695,
         "y": 200,
         "width": 450,
         "height": 250
     },
-    "fr_unit_a1_l2_01.png": {
-        "x": 3270,
-        "y": 200,
-        "width": 150,
-        "height": 300
-    },
     "fr_unit_a1_l2_02.png": {
-        "x": 3420,
+        "x": 3145,
         "y": 200,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_03.png": {
-        "x": 3570,
+        "x": 3295,
         "y": 200,
         "width": 150,
         "height": 300
     },
+    "hp.png": {
+        "x": 3445,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
+    "ch.png": {
+        "x": 3520,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
     "res_anim.png": {
-        "x": 3720,
+        "x": 3595,
         "y": 200,
         "width": 75,
         "height": 300
     },
     "bmark_neutral.png": {
-        "x": 3795,
+        "x": 3670,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
+        "x": 3870,
+        "y": 250,
+        "width": 200,
+        "height": 400
+    },
+    "bmark_hover.png": {
         "x": 0,
         "y": 260,
         "width": 200,
         "height": 400
     },
-    "bmark_hover.png": {
+    "bt_bmark_neutral.png": {
         "x": 200,
         "y": 260,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_neutral.png": {
+    "bt_bmark_click.png": {
         "x": 400,
         "y": 280,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_click.png": {
+    "bt_bmark_hover.png": {
         "x": 600,
         "y": 300,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_hover.png": {
-        "x": 800,
-        "y": 330,
-        "width": 200,
-        "height": 400
-    },
     "select3_f.png": {
-        "x": 1000,
+        "x": 800,
         "y": 330,
         "width": 818,
         "height": 714
     },
     "menu_bar.png": {
-        "x": 1818,
-        "y": 380,
+        "x": 1618,
+        "y": 330,
         "width": 300,
         "height": 1080
     },
     "box.png": {
-        "x": 2118,
+        "x": 1918,
         "y": 450,
         "width": 640,
         "height": 1080
     },
     "select3.png": {
-        "x": 2758,
+        "x": 2558,
         "y": 500,
         "width": 720,
         "height": 1080
     },
     "sel_act1.png": {
         "x": 0,
-        "y": 1460,
+        "y": 1530,
         "width": 1920,
         "height": 1080
     },
@@ -423,7 +423,7 @@ export type Atlas1 = {
     },
     "sel_level2.png": {
         "x": 0,
-        "y": 2540,
+        "y": 2610,
         "width": 1920,
         "height": 1080
     },
@@ -631,44 +631,50 @@ export const atlas1: Atlas1 = {
     "fr_unit_a1_l1_01_ab1.png": {
         "x": 2250,
         "y": 0,
-        "width": 150,
-        "height": 150
+        "width": 100,
+        "height": 100
     },
     "fr_unit_a1_l1_01_ab2.png": {
-        "x": 2400,
+        "x": 2350,
         "y": 0,
-        "width": 150,
-        "height": 150
+        "width": 100,
+        "height": 100
     },
     "fr_unit_a1_l2_01_ab1.png": {
+        "x": 2450,
+        "y": 0,
+        "width": 100,
+        "height": 100
+    },
+    "menu_btn2.png": {
         "x": 2550,
         "y": 0,
         "width": 150,
         "height": 150
     },
-    "menu_btn2.png": {
-        "x": 2700,
-        "y": 0,
-        "width": 150,
-        "height": 150
-    },
     "btn_level_neutral.png": {
-        "x": 2850,
+        "x": 2700,
         "y": 0,
         "width": 400,
         "height": 200
     },
     "btn_level_click.png": {
-        "x": 3250,
+        "x": 3100,
         "y": 0,
         "width": 400,
         "height": 200
     },
     "btn_level_hover.png": {
-        "x": 3650,
+        "x": 3500,
         "y": 0,
         "width": 400,
         "height": 200
+    },
+    "menu_btn_half1.png": {
+        "x": 3900,
+        "y": 0,
+        "width": 125,
+        "height": 250
     },
     "unit1.png": {
         "x": 0,
@@ -694,159 +700,153 @@ export const atlas1: Atlas1 = {
         "width": 220,
         "height": 220
     },
-    "menu_btn_half1.png": {
+    "menu_btn_half2.png": {
         "x": 820,
         "y": 80,
         "width": 125,
         "height": 250
     },
-    "menu_btn_half2.png": {
-        "x": 945,
-        "y": 80,
-        "width": 125,
-        "height": 250
-    },
     "menu_btn_joined.png": {
-        "x": 1070,
+        "x": 945,
         "y": 80,
         "width": 250,
         "height": 250
     },
     "menu_btn_joined1.png": {
-        "x": 1320,
+        "x": 1195,
         "y": 80,
         "width": 300,
         "height": 250
     },
     "menu_btn_joined2.png": {
-        "x": 1620,
+        "x": 1495,
         "y": 80,
         "width": 350,
         "height": 250
     },
-    "en_unit_a1_l1_01.png": {
-        "x": 1970,
-        "y": 80,
-        "width": 150,
-        "height": 300
-    },
-    "hp.png": {
-        "x": 2120,
-        "y": 80,
-        "width": 75,
-        "height": 300
-    },
     "menu_btn_joined3.png": {
-        "x": 2195,
-        "y": 150,
+        "x": 1845,
+        "y": 80,
         "width": 400,
         "height": 250
     },
+    "en_unit_a1_l1_01.png": {
+        "x": 2245,
+        "y": 100,
+        "width": 150,
+        "height": 300
+    },
     "fr_unit_a1_l1_01.png": {
-        "x": 2595,
+        "x": 2395,
+        "y": 100,
+        "width": 150,
+        "height": 300
+    },
+    "fr_unit_a1_l2_01.png": {
+        "x": 2545,
         "y": 150,
         "width": 150,
         "height": 300
     },
-    "ch.png": {
-        "x": 2745,
-        "y": 150,
-        "width": 75,
-        "height": 300
-    },
     "menu_btn_joined4.png": {
-        "x": 2820,
+        "x": 2695,
         "y": 200,
         "width": 450,
         "height": 250
     },
-    "fr_unit_a1_l2_01.png": {
-        "x": 3270,
-        "y": 200,
-        "width": 150,
-        "height": 300
-    },
     "fr_unit_a1_l2_02.png": {
-        "x": 3420,
+        "x": 3145,
         "y": 200,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_03.png": {
-        "x": 3570,
+        "x": 3295,
         "y": 200,
         "width": 150,
         "height": 300
     },
+    "hp.png": {
+        "x": 3445,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
+    "ch.png": {
+        "x": 3520,
+        "y": 200,
+        "width": 75,
+        "height": 300
+    },
     "res_anim.png": {
-        "x": 3720,
+        "x": 3595,
         "y": 200,
         "width": 75,
         "height": 300
     },
     "bmark_neutral.png": {
-        "x": 3795,
+        "x": 3670,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
+        "x": 3870,
+        "y": 250,
+        "width": 200,
+        "height": 400
+    },
+    "bmark_hover.png": {
         "x": 0,
         "y": 260,
         "width": 200,
         "height": 400
     },
-    "bmark_hover.png": {
+    "bt_bmark_neutral.png": {
         "x": 200,
         "y": 260,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_neutral.png": {
+    "bt_bmark_click.png": {
         "x": 400,
         "y": 280,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_click.png": {
+    "bt_bmark_hover.png": {
         "x": 600,
         "y": 300,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_hover.png": {
-        "x": 800,
-        "y": 330,
-        "width": 200,
-        "height": 400
-    },
     "select3_f.png": {
-        "x": 1000,
+        "x": 800,
         "y": 330,
         "width": 818,
         "height": 714
     },
     "menu_bar.png": {
-        "x": 1818,
-        "y": 380,
+        "x": 1618,
+        "y": 330,
         "width": 300,
         "height": 1080
     },
     "box.png": {
-        "x": 2118,
+        "x": 1918,
         "y": 450,
         "width": 640,
         "height": 1080
     },
     "select3.png": {
-        "x": 2758,
+        "x": 2558,
         "y": 500,
         "width": 720,
         "height": 1080
     },
     "sel_act1.png": {
         "x": 0,
-        "y": 1460,
+        "y": 1530,
         "width": 1920,
         "height": 1080
     },
@@ -858,7 +858,7 @@ export const atlas1: Atlas1 = {
     },
     "sel_level2.png": {
         "x": 0,
-        "y": 2540,
+        "y": 2610,
         "width": 1920,
         "height": 1080
     },

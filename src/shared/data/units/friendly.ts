@@ -441,7 +441,81 @@ export const unit1: FrUnit = {
     },
   ],
   vital: true,
-}
+};
+
+export const test4_ab: FrUnit = {
+  hp: 20,
+  maxHp: 20,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(1),
+        ),
+        I.thDamage(
+          new I.FromInput(0),
+          new I.Static(20),
+        ),
+      ]),
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab2",
+    },
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(1),
+        ),
+        I.thDamage(
+          new I.FromInput(0),
+          new I.Static(5),
+        ),
+      ]),
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab1",
+    },
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(1),
+        ),
+        I.thDamage(
+          new I.FromInput(0),
+          new I.Static(5),
+        ),
+      ]),
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab1",
+    },
+    {
+      intent: new I.CombinedIntent([
+        new I.UseChargeI(
+          I.mkSelf(),
+          new I.Static(1),
+        ),
+        I.thDamage(
+          new I.FromInput(0),
+          new I.Static(20),
+        ),
+      ]),
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "fr_unit_a1_l1_01_ab2",
+    },
+  ],
+  vital: true,
+};
 
 export const frUnitMap: {
   [key: string]: FrUnit,
@@ -464,4 +538,5 @@ export const frUnitMap: {
   "card1": unit1,
   "card2": unit1,
   "card3": unit1,
+  "test4ab": test4_ab,
 }

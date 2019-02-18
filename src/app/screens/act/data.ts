@@ -58,7 +58,7 @@ const a2l1: LevelData = {
 const a3l1: LevelData = {
   name: "A3 level1",
   id: "a3l1",
-  cardIds: [],
+  cardIds: ["test4ab"],
   enemyIds: ["en_unit_a1_l2_01"],
   slots: 1,
   selectLocation: { x: 200, y: 200 },
