@@ -389,13 +389,25 @@ export class ExecScreen {
               this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
 
               if (this.showAbilityIndex !== undefined && this.showAbilityIndex === abilityIndex) {
+                let y = 0;
+                let xOffset = 0;
                 const desc = intentDescription(ability.intent);
-                desc.forEach((descSprite, descIndex) => {
+                desc.forEach((descSym, descIndex) => {
                   const explPos = createPosition(
-                    "left", 850 + 80 * descIndex, 80,
-                    "bot", 150, 80,
+                    "left", 750 + 80 * (descIndex - xOffset), 80,
+                    "bot", 250 - y * 80, 80,
                   );
-                  this.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSprite });
+                  switch (descSym.tag) {
+                    case "DescSeparator": {
+                      y += 1;
+                      xOffset = descIndex + 1;
+                      break;
+                    }
+                    case "DescSymbol": {
+                      this.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
+                      break;
+                    }
+                  }
                 });
               }
             });

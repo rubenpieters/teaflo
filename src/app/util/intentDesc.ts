@@ -1,14 +1,37 @@
 import { Intent, IntentVar } from "../../shared/game/intent";
 import { Trigger, triggerToFragmentValue } from "../../shared/game/trigger";
 
+export class DescSymbol {
+  constructor(
+    public readonly sym: string,
+    public readonly tag: "DescSymbol" = "DescSymbol",
+  ) {}
+}
+
+export class DescSeparator {
+  constructor(
+    public readonly tag: "DescSeparator" = "DescSeparator",
+  ) {}
+}
+
+type DescToken
+  = DescSymbol
+  | DescSeparator
+
+function singleton(
+  str: string,
+): DescToken[] {
+  return [new DescSymbol(str)];
+}
+
 export function intentDescription(
   intent: Intent
-): string[] {
+): DescToken[] {
   switch (intent.tag) {
     case "AddThreatI": {
       return intentVarDescription(intent.value, x => intentVarNumber(x, "positive"))
         .concat(intentVarDescription(intent.atEnemy, intentVarTarget))
-        .concat(["expl_th.png"])
+        .concat([new DescSymbol("expl_th.png")])
         .concat(intentVarDescription(intent.toFriendly, intentVarTarget))
         ;
     }
@@ -18,14 +41,18 @@ export function intentDescription(
         ;
     }
     case "CombinedIntent": {
-      const desc: string[] = intent.intents.reduce((acc, x) => {
-        return acc.concat(intentDescription(x));
-      }, <string[]>[]);
+      const desc: DescToken[] = intent.intents.reduce((acc, x) => {
+        if (acc.length === 0) {
+          return acc.concat(intentDescription(x));
+        } else {
+          return acc.concat(new DescSeparator()).concat(intentDescription(x));
+        }
+      }, <DescToken[]>[]);
       return desc;
     }
     case "DamageI": {
       return intentVarDescription(intent.value, x => intentVarNumber(x, "negative"))
-        .concat(["expl_hp.png"])
+        .concat(new DescSymbol("expl_hp.png"))
         .concat(intentVarDescription(intent.target, intentVarTarget))
         ;
     }
@@ -37,7 +64,7 @@ export function intentDescription(
     }
     case "UseChargeI": {
       return intentVarDescription(intent.value, x => intentVarNumber(x, "negative"))
-        .concat(["expl_ch.png"])
+        .concat(new DescSymbol("expl_ch.png"))
         .concat(intentVarDescription(intent.target, intentVarTarget))
         ;
     }
@@ -46,7 +73,7 @@ export function intentDescription(
 
 export function triggerDescription(
   trigger: Trigger,
-): string[] {
+): DescToken[] {
   switch (trigger.tag) {
     case "Weak": {
       return []
@@ -73,9 +100,9 @@ export function triggerDescription(
       return []
     }
     case "Armor": {
-      return ["expl_plus.png"]
+      return singleton("expl_plus.png")
         .concat(numberDescription(Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5)))
-        .concat(["expl_armor.png"])
+        .concat(new DescSymbol("expl_armor.png"))
         ;
     }
   }
@@ -83,7 +110,7 @@ export function triggerDescription(
 
 function intentVarTarget(
   x: any
-) {
+): DescToken[] {
   // TODO: implement
   return [];
 }
@@ -91,27 +118,27 @@ function intentVarTarget(
 function intentVarNumber(
   x: number,
   sign: "positive" | "negative",
-) {
+): DescToken[] {
   if (sign === "positive") {
-    return ["expl_plus.png"].concat(numberDescription(x));
+    return singleton("expl_plus.png").concat(numberDescription(x));
   } else {
-    return ["expl_minus.png"].concat(numberDescription(x));
+    return singleton("expl_minus.png").concat(numberDescription(x));
   }
 }
 
 export function intentVarDescription<A>(
   intentVar: IntentVar<A>,
-  f: (a: A) => string[]
+  f: (a: A) => DescToken[]
 ) {
   switch (intentVar.tag) {
     case "Static": {
       return f(intentVar.a);
     }
     case "AllAlly": {
-      return ["expl_all_friendly.png"];
+      return [new DescSymbol("expl_all_friendly.png")];
     }
     case "AllEnemy": {
-      return ["expl_all_enemy.png"];
+      return [new DescSymbol("expl_all_enemy.png")];
     }
     case "AllExceptSelf": {
       return [];
@@ -120,32 +147,32 @@ export function intentVarDescription<A>(
       return [];
     }
     case "FromInput": {
-      return ["expl_target.png"];
+      return [new DescSymbol("expl_target.png")];
     }
     case "HighestThreat": {
-      return ["expl_target_status.png"];
+      return [new DescSymbol("expl_target_status.png")];
     }
     case "Self": {
-      return ["expl_self.png"];
+      return [new DescSymbol("expl_self.png")];
     }
   }
 }
 
 export function numberDescription(
   x: number,
-): string[] {
+): DescToken[] {
   return _numberDescription(x, []);
 }
 
 function _numberDescription(
   x: number,
-  acc: string[],
-): string[] {
+  acc: DescToken[],
+): DescToken[] {
   const digit = x % 10;
   const next = Math.round((x / 10) - 0.5);
   if (next >= 1) {
-    return _numberDescription(next, acc).concat([`expl_${digit}.png`]);
+    return _numberDescription(next, acc).concat([new DescSymbol(`expl_${digit}.png`)]);
   } else {
-    return acc.concat([`expl_${digit}.png`]);
+    return acc.concat([new DescSymbol(`expl_${digit}.png`)]);
   }
 }
