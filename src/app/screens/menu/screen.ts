@@ -64,14 +64,14 @@ export class MenuScreen {
               "right", 250, 250,
               "top", 270 * i, 250,
             );
-            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "open", { type, index: i, });
+            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "open", { type, index: i, originalX: pos.xMin });
           } else {
             // this is not the currently selected act
             const pos = createPosition(
               "right", 50, 250,
               "top", 270 * i, 250,
             );
-            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "closed", { type, index: i, });
+            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "closed", { type, index: i, originalX: pos.xMin });
           }
           return sprite;
         },
@@ -90,6 +90,7 @@ export class MenuScreen {
 type MenuBtnData = {
   type: "menu" | "schem" | "codex" | "settings",
   index: number,
+  originalX: number,
 }
 
 function mkMenuBtnPool(
@@ -139,14 +140,15 @@ function mkMenuBtnPool(
           if (! (gameRefs.saveData.act.activeScreen === self.data.type
             || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined)
           ) {
+            gameRefs.game.tweens.removeFrom(self);
             const tween1 = createTween(gameRefs.game, self, x => x.to({}, 10, Phaser.Easing.Linear.None, false, 0));
-            tween1.onComplete.add(() => { self.frameName = "menu_btn_joined1.png"; self.x -= 50; });
+            tween1.onComplete.add(() => { self.frameName = "menu_btn_joined1.png"; self.x = self.data.originalX - 50; });
             const tween2 = createTween(gameRefs.game, self, x => x.to({}, 10, Phaser.Easing.Linear.None, false, 0));
-            tween2.onComplete.add(() => { self.frameName = "menu_btn_joined2.png"; self.x -= 50; });
+            tween2.onComplete.add(() => { self.frameName = "menu_btn_joined2.png"; self.x = self.data.originalX - 100; });
             const tween3 = createTween(gameRefs.game, self, x => x.to({}, 10, Phaser.Easing.Linear.None, false, 0));
-            tween3.onComplete.add(() => { self.frameName = "menu_btn_joined3.png"; self.x -= 50; });
+            tween3.onComplete.add(() => { self.frameName = "menu_btn_joined3.png"; self.x = self.data.originalX - 150; });
             const tween4 = createTween(gameRefs.game, self, x => x.to({}, 10, Phaser.Easing.Linear.None, false, 0));
-            tween4.onComplete.add(() => { self.frameName = "menu_btn_joined4.png"; self.x -= 50; });
+            tween4.onComplete.add(() => { self.frameName = "menu_btn_joined4.png"; self.x = self.data.originalX - 200; });
             tween1.chain(tween2, tween3, tween4);
             tween1.start();
           }
@@ -155,16 +157,17 @@ function mkMenuBtnPool(
           if (! (gameRefs.saveData.act.activeScreen === self.data.type
             || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined)
           ) {
-              const tween1 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
-              tween1.onComplete.add(() => { self.frameName = "menu_btn_joined3.png"; self.x += 50; });
-              const tween2 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
-              tween2.onComplete.add(() => { self.frameName = "menu_btn_joined2.png"; self.x += 50; });
-              const tween3 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
-              tween3.onComplete.add(() => { self.frameName = "menu_btn_joined1.png"; self.x += 50; });
-              const tween4 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
-              tween4.onComplete.add(() => { self.frameName = "menu_btn_joined.png"; self.x += 50; });
-              tween1.chain(tween2, tween3, tween4);
-              tween1.start();
+            gameRefs.game.tweens.removeFrom(self);
+            const tween1 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
+            tween1.onComplete.add(() => { self.frameName = "menu_btn_joined3.png"; self.x = self.data.originalX - 150; });
+            const tween2 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
+            tween2.onComplete.add(() => { self.frameName = "menu_btn_joined2.png"; self.x = self.data.originalX - 100; });
+            const tween3 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
+            tween3.onComplete.add(() => { self.frameName = "menu_btn_joined1.png"; self.x = self.data.originalX - 50; });
+            const tween4 = createTween(gameRefs.game, self, x => x.to({}, 11, Phaser.Easing.Linear.None, false, 0));
+            tween4.onComplete.add(() => { self.frameName = "menu_btn_joined.png"; self.x = self.data.originalX; });
+            tween1.chain(tween2, tween3, tween4);
+            tween1.start();
           }
         },
       },

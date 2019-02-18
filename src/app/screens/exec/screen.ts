@@ -41,6 +41,7 @@ export class ExecScreen {
   log: Log | undefined
   hoveredUnit: UnitSelection | undefined
   selectedUnit: UnitSelection | undefined
+  showAbilityIndex: number | undefined
   clickState: { ability: Ability, inputs: any[], origin: UnitId } | undefined
   intermediate: { type: LogKeys, index: number } | undefined
 
@@ -68,6 +69,7 @@ export class ExecScreen {
     this.log = undefined;
     this.hoveredUnit = undefined;
     this.selectedUnit = undefined;
+    this.showAbilityIndex = undefined;
     this.clickState = undefined;
     this.intermediate = undefined;
     this.logActionPool.clear();
@@ -347,47 +349,47 @@ export class ExecScreen {
     this.detailBtnPool.clear();
     this.detailExplPool.clear();
 
-    const textPos = createPosition(
-      "left", 650, 150,
-      "bot", 200, 300,
-    );
-    this.statsTextPool.newText(textPos, "Detail");
-
+    // DETAIL
     const showUnit = this.hoveredUnit !== undefined ? this.hoveredUnit : this.selectedUnit;
     if (showUnit !== undefined) {
       if (showUnit.type === "friendly" || showUnit.type === "enemy") {
         const unit = getUnit(showUnit, state);
         if (unit !== undefined) {
+          // hp/ch/th text
           const pos1 = createPosition(
             "left", 650, 150,
-            "bot", 100, 300,
+            "bot", 200, 300,
           );
           this.statsTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
   
           if (showUnit.type === "friendly") {
             const frUnit = <FrStUnit>unit;
 
+            // go to codex button
             const detailBtnPos = createPosition(
               "left", 500, 150,
-              "bot", 50, 150,
+              "bot", 100, 150,
             );
             this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "CardId", cardId: frUnit.cardId } });
 
+            // abilities
             frUnit.abilities.forEach((ability, abilityIndex) => {
               const abPos = createPosition(
-                "left", 650 + 200 * abilityIndex, 150,
-                "bot", 50, 150,
+                "left", 650, 150,
+                "bot", 100 - 200 * abilityIndex, 150,
               );
               this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
 
-              const desc = intentDescription(ability.intent);
-              desc.forEach((descSprite, descIndex) => {
-                const explPos = createPosition(
-                  "left", 900 + 80 * descIndex, 80,
-                  "bot", 50, 80,
-                );
-                this.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSprite });
-              });
+              if (this.showAbilityIndex !== undefined && this.showAbilityIndex === abilityIndex) {
+                const desc = intentDescription(ability.intent);
+                desc.forEach((descSprite, descIndex) => {
+                  const explPos = createPosition(
+                    "left", 850 + 80 * descIndex, 80,
+                    "bot", 150, 80,
+                  );
+                  this.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSprite });
+                });
+              }
             });
           } else if (showUnit.type === "enemy") {
             const enUnit = <EnStUnit>unit;
@@ -789,6 +791,7 @@ function mkAbilityPool(
       ],
       callbacks: {
         click: (self) => {
+          gameRefs.screens.execScreen.showAbilityIndex = self.data.index;
           if (gameRefs.screens.execScreen.canExtendState() && gameRefs.screens.execScreen.clickState === undefined) {
             gameRefs.screens.execScreen.clickState = {
               ability: self.data.ability,
@@ -799,6 +802,14 @@ function mkAbilityPool(
               extendLevelSolution(gameRefs, gameRefs.screens.execScreen.clickState!);
             }
           }
+        },
+        hoverOver: (self) => {
+          gameRefs.screens.execScreen.showAbilityIndex = self.data.index;
+          gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
+        },
+        hoverOut: (self) => {
+          gameRefs.screens.execScreen.showAbilityIndex = undefined;
+          gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
         },
       },
     },
