@@ -2,6 +2,7 @@ import { SelectedBuildSchem, SelectedExecSchem, SelectedActMenu, SelectedLevelMe
 import { GameRefs } from "../states/game";
 import { clearPools } from "./util";
 import { updateSolutionRep } from "./exec/events";
+import { CodexTypes } from "./codex/screen";
 
 export class ScreenAct {
   constructor(
@@ -19,7 +20,7 @@ export class ScreenSchem {
 
 export class ScreenCodex {
   constructor(
-    public readonly page: undefined | { tag: "CardId", cardId: string } = undefined,
+    public readonly page: CodexTypes | undefined = undefined,
     public readonly tag: "ScreenCodex" = "ScreenCodex",
   ) {}
 }

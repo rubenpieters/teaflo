@@ -14,9 +14,9 @@ import { Action } from "../../../shared/game/action";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution } from "../../../shared/game/solution";
-import { changePage } from "../codex/events";
 import { intentDescription } from "../../util/intentDesc";
 import { transitionScreen, ScreenCodex } from "../transition";
+import { CodexTypes } from "../codex/screen";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -375,7 +375,7 @@ export class ExecScreen {
               "left", 350, 150,
               "bot", 100, 150,
             );
-            this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "CardId", cardId: frUnit.cardId } });
+            this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "FrCardId", cardId: frUnit.cardId } });
 
             // abilities
             frUnit.abilities.forEach((ability, abilityIndex) => {
@@ -1026,7 +1026,7 @@ function mkSolTreePool(
 }
 
 type DetailBtnData = {
-  type: { tag: "CardId", cardId: string }
+  type: CodexTypes
 };
 
 function mkDetailBtnPool(
