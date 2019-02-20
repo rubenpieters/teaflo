@@ -391,12 +391,12 @@ export class ExecScreen {
                 "left", 500 + 125 * flagLeft, 100,
                 "bot", 200 - 125 * flagTop, 100,
               );
-              this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
+              this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { tag: "FrAbilityData", spriteId: ability.spriteId, ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
 
               if (this.showAbilityIndex !== undefined && this.showAbilityIndex === abilityIndex) {
+                const desc = intentDescription(ability.intent);
                 let y = 0;
                 let xOffset = 0;
-                const desc = intentDescription(ability.intent);
                 desc.forEach((descSym, descIndex) => {
                   const explPos = createPosition(
                     "left", 750 + 80 * (descIndex - xOffset), 80,
@@ -418,6 +418,34 @@ export class ExecScreen {
             });
           } else if (showUnit.type === "enemy") {
             const enUnit = <EnStUnit>unit;
+            const abPos = createPosition(
+              "left", 500, 100,
+              "bot", 200, 100,
+            );
+            const ability = enUnit.ai[enUnit.currentAI];
+            console.log(`ABILITY: ${JSON.stringify(ability.intent)}`);
+            this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { tag: "EnAbilityData", spriteId: ability.spriteId });
+
+            const desc = intentDescription(ability.intent);
+            let y = 0;
+            let xOffset = 0;
+            desc.forEach((descSym, descIndex) => {
+              const explPos = createPosition(
+                "left", 750 + 80 * (descIndex - xOffset), 80,
+                "bot", 250 - y * 80, 80,
+              );
+              switch (descSym.tag) {
+                case "DescSeparator": {
+                  y += 1;
+                  xOffset = descIndex + 1;
+                  break;
+                }
+                case "DescSymbol": {
+                  this.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
+                  break;
+                }
+              }
+            });
           }
         }
       } else {
@@ -796,11 +824,20 @@ function mkUnitResPool(
   );
 }
 
-type AbilityData = {
+type FrAbilityData = {
   ability: Ability,
+  spriteId: string,
   index: number,
   globalId: GlobalId<"friendly" | "enemy">,
-};
+  tag: "FrAbilityData",
+}
+
+type EnAbilityData = {
+  spriteId: string,
+  tag: "EnAbilityData",
+}
+
+type AbilityData = FrAbilityData | EnAbilityData;
 
 function mkAbilityPool(
   gameRefs: GameRefs,
@@ -810,7 +847,7 @@ function mkAbilityPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return `${self.data.ability.spriteId}.png`;
+        return `${self.data.spriteId}.png`;
       },
       introAnim: [
         (self, tween) => {
@@ -819,25 +856,31 @@ function mkAbilityPool(
       ],
       callbacks: {
         click: (self) => {
-          gameRefs.screens.execScreen.showAbilityIndex = self.data.index;
-          if (gameRefs.screens.execScreen.canExtendState() && gameRefs.screens.execScreen.clickState === undefined) {
-            gameRefs.screens.execScreen.clickState = {
-              ability: self.data.ability,
-              inputs: [],
-              origin: self.data.globalId,
-            }
-            if (self.data.ability.inputs.length === 0) {
-              extendLevelSolution(gameRefs, gameRefs.screens.execScreen.clickState!);
+          if (self.data.tag === "FrAbilityData") {
+            gameRefs.screens.execScreen.showAbilityIndex = self.data.index;
+            if (gameRefs.screens.execScreen.canExtendState() && gameRefs.screens.execScreen.clickState === undefined) {
+              gameRefs.screens.execScreen.clickState = {
+                ability: self.data.ability,
+                inputs: [],
+                origin: self.data.globalId,
+              }
+              if (self.data.ability.inputs.length === 0) {
+                extendLevelSolution(gameRefs, gameRefs.screens.execScreen.clickState!);
+              }
             }
           }
         },
         hoverOver: (self) => {
-          gameRefs.screens.execScreen.showAbilityIndex = self.data.index;
-          gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
+          if (self.data.tag === "FrAbilityData") {
+            gameRefs.screens.execScreen.showAbilityIndex = self.data.index;
+            gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
+          }
         },
         hoverOut: (self) => {
-          gameRefs.screens.execScreen.showAbilityIndex = undefined;
-          gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
+          if (self.data.tag === "FrAbilityData") {
+            gameRefs.screens.execScreen.showAbilityIndex = undefined;
+            gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
+          }
         },
       },
     },
