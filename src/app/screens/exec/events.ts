@@ -6,6 +6,7 @@ import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
 import { UnitSelection } from "./screen";
 import { loadLevel } from "../level/events";
 import { Location } from "../../../shared/tree";
+import { firstLogKey } from "../../../shared/game/log";
 
 export function drawCurrentLevel(
   gameRefs: GameRefs,
@@ -39,9 +40,9 @@ export function updateSolutionRep(
     gameRefs.screens.execScreen.drawAnimControlBtns();
     gameRefs.screens.execScreen.drawClearBtn();
   }
-  const firstLogKey = gameRefs.screens.execScreen.firstLogKey();
-  if (firstLogKey !== undefined) {
-    gameRefs.screens.execScreen.drawIntermediateLog(firstLogKey, true);
+  const frstLogKey = firstLogKey(solResult.state, solResult.log);
+  if (frstLogKey !== undefined) {
+    gameRefs.screens.execScreen.drawIntermediateLog(frstLogKey, true);
   } else {
     gameRefs.screens.execScreen.drawState(solResult.state);
     gameRefs.screens.execScreen.drawStats(solResult.state);

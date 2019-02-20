@@ -155,7 +155,7 @@ function runPhases(
         enActionResult.log
           .concat(enForwardAIResult.log)
           .filter(x => x.action.tag !== "CombinedAction");
-      log = focus(log, over(x => x.en, x => x.concat(filteredLog)));
+      log = focus(log, set(x => x.en[i], filteredLog));
     }
   });
 
