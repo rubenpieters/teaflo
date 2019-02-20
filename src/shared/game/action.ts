@@ -1,10 +1,11 @@
 import { focus, over, set } from "../iassign-util";
-import { UnitId, overUnit, overFriendly, killUnit, getUnit, posToString, findIndex, TargetId, toGlobalId, UnitType, GlobalId, getStatus, killStatus } from "./entityId";
+import { UnitId, overUnit, overFriendly, killUnit, getUnit, posToString, findIndex, TargetId, toGlobalId, UnitType, GlobalId, getStatus, killStatus, overEnemy } from "./entityId";
 import { GameState, FrStUnit, findStatus } from "./state";
 import { addThreat } from "./threat";
 import { Trigger, loseFragments, addFragments, Armor, StTrigger, HasOwner } from "./trigger";
 import { damage, heal, useCharge } from "./unit";
 import { HasId } from "./hasId";
+import { nextAI } from "./ai";
 
 export class Damage {
   constructor(
@@ -81,6 +82,13 @@ export class StartTurn {
   ) {}
 }
 
+export class NextAI {
+  constructor(
+    public readonly target: GlobalId<"enemy">,
+    public readonly tag: "NextAI" = "NextAI",
+  ) {}
+}
+
 export type Action
   = Damage
   | Heal
@@ -92,6 +100,7 @@ export type Action
   | Invalid
   | SwapHPWithExcess
   | StartTurn
+  | NextAI
   ;
 
 export function applyAction(
@@ -282,6 +291,16 @@ export function applyAction(
         actions: [],
       }
     }
+    case "NextAI": {
+      return {
+        state: overEnemy(action.target,
+          state,
+          x => nextAI(state, x, action.target),
+          x => x,
+        ),
+        actions: [],
+      };
+    }
   }
 }
 
@@ -320,6 +339,9 @@ export function actionText(
     }
     case "StartTurn": {
       return `StartTurn`;
+    }
+    case "NextAI": {
+      return `NEXTAI ${posToString(action.target)}`;
     }
   }
 }

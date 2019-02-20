@@ -2,7 +2,7 @@ import { focus, over, set } from "../iassign-util";
 import { Tree, extendTree, Location, cutTree, emptyTree } from "../tree";
 import { Ability } from "./ability";
 import { GameState, filteredEn, filteredFr } from "./state";
-import { applyAction, Action, StartTurn } from "./action";
+import { applyAction, Action, StartTurn, NextAI } from "./action";
 import { nextAI } from "./ai";
 import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction, Intent, Context } from "./intent";
@@ -143,15 +143,18 @@ function runPhases(
     if (enUnit !== undefined) {
       const enIntent = enUnit.ai[enUnit.currentAI].intent;
       // apply action
-      const enUnitSelf: UnitId = new GlobalId(enUnit.id, "enemy");
+      const enUnitSelf: GlobalId<"enemy"> = new GlobalId(enUnit.id, "enemy");
       const enActionResult = applyIntentToSolution(enIntent, { self: enUnitSelf }, state);
       state = enActionResult.state;
       // forward enUnit AI
-      state = overEnemy(enUnitSelf, state,
-        x => nextAI(state, x, enUnitSelf),
-        x => x,
+      const enForwardAIResult = applyActionsToSolution(
+        [new NextAI(enUnitSelf)], { self: enUnitSelf }, state, []
       );
-      const filteredLog = enActionResult.log.filter(x => x.action.tag !== "CombinedAction");
+      state = enForwardAIResult.state;
+      const filteredLog =
+        enActionResult.log
+          .concat(enForwardAIResult.log)
+          .filter(x => x.action.tag !== "CombinedAction");
       log = focus(log, over(x => x.en, x => x.concat(filteredLog)));
     }
   });

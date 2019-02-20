@@ -423,7 +423,6 @@ export class ExecScreen {
               "bot", 200, 100,
             );
             const ability = enUnit.ai[enUnit.currentAI];
-            console.log(`ABILITY: ${JSON.stringify(ability.intent)}`);
             this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { tag: "EnAbilityData", spriteId: ability.spriteId });
 
             const desc = intentDescription(ability.intent);
