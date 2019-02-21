@@ -393,6 +393,14 @@ export class ExecScreen {
             });
           } else if (showUnit.type === "enemy") {
             const enUnit = <EnStUnit>unit;
+
+            // go to codex button
+            const detailBtnPos = createPosition(
+              "left", 350, 150,
+              "bot", 100, 150,
+            );
+            this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "EnCardId", cardId: enUnit.cardId } });
+
             const abPos = createPosition(
               "left", 500, 100,
               "bot", 200, 100,

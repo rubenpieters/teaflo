@@ -8,6 +8,7 @@ import { GlobalId } from "../../../shared/game/entityId";
 import { Pool } from "../../phaser/pool";
 import { Unit } from "../../../shared/game/unit";
 import { intentDescription } from "../../util/intentDesc";
+import { Intent } from "src/shared/game/intent";
 
 export type CodexTypes
   = { tag: "FrCardId", cardId: string }
@@ -48,7 +49,7 @@ export class CodexScreen {
           break;
         }
         case "EnCardId": {
-          //this.drawFrCardIdPage(this.page.cardId);
+          this.drawEnCardIdPage(this.page.cardId);
           break;
         }
       }
@@ -58,9 +59,7 @@ export class CodexScreen {
   drawFrCardIdPage(
     cardId: string,
   ) {
-    if (enUnitMap[cardId] !== undefined) {
-      throw `wrong card id: ${cardId}`;
-    } else if (frUnitMap[cardId] !== undefined) {
+    if (frUnitMap[cardId] !== undefined) {
       const unit = frUnitMap[cardId];
       /*const pos = createPosition(
         "left", 400, 200,
@@ -78,13 +77,48 @@ export class CodexScreen {
       );
       this.pageTextPool.newText(pos2, `${unit.charges} / ${unit.maxCharges}`);
       
-      unit.abilities.forEach((ability, abilityIndex) => {
+      unit.abilities.forEach(({ intent, spriteId, inputs }, abilityIndex) => {
         const pos = createPosition(
           "left", 550 + 125 * abilityIndex, 100,
           "top", 350, 100,
         );
-        this.abilityPool.newSprite(pos.xMin, pos.yMin, {}, { ability, index: abilityIndex });
+        this.abilityPool.newSprite(pos.xMin, pos.yMin, {}, { intent, spriteId, index: abilityIndex });
       });
+    } else {
+      throw `wrong card id: ${cardId}`;
+    }
+  }
+
+  drawEnCardIdPage(
+    cardId: string,
+  ) {
+    if (enUnitMap[cardId] !== undefined) {
+      const unit = enUnitMap[cardId];
+      /*const pos = createPosition(
+        "left", 400, 200,
+        "top", 50, 200,
+      );
+      this.pageTextPool.newText(pos, `${cardId}`);*/
+      const pos1 = createPosition(
+        "left", 550, 150,
+        "top", 50, 150,
+      );
+      this.pageTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
+      const pos2 = createPosition(
+        "left", 550, 150,
+        "top", 200, 150,
+      );
+      this.pageTextPool.newText(pos2, `${unit.charges} / ${unit.maxCharges}`);
+      
+      unit.ai.forEach(({ intent, spriteId, outs }, aiIndex) => {
+        const pos = createPosition(
+          "left", 550 + 125 * aiIndex, 100,
+          "top", 350, 100,
+        );
+        this.abilityPool.newSprite(pos.xMin, pos.yMin, {}, { intent, spriteId, index: aiIndex });
+      });
+    } else {
+      throw `wrong card id: ${cardId}`;
     }
   }
 
@@ -120,6 +154,33 @@ export class CodexScreen {
             });
           }
         });
+      } else if (this.page.tag === "EnCardId") {
+        const unit = enUnitMap[this.page.cardId];
+        
+        unit.ai.forEach((ai, abilityIndex) => {
+          if (this.showAbilityIndex !== undefined && this.showAbilityIndex === abilityIndex) {
+            let y = 0;
+            let xOffset = 0;
+            const desc = intentDescription(ai.intent);
+            desc.forEach((descSym, descIndex) => {
+              const explPos = createPosition(
+                "left", 150 + 80 * (descIndex - xOffset), 80,
+                "bot", 250 - y * 80, 80,
+              );
+              switch (descSym.tag) {
+                case "DescSeparator": {
+                  y += 1;
+                  xOffset = descIndex + 1;
+                  break;
+                }
+                case "DescSymbol": {
+                  this.abilityDescPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
+                  break;
+                }
+              }
+            });
+          }
+        });
       }
     }
   }
@@ -133,7 +194,8 @@ export class CodexScreen {
 }
 
 type AbilityData = {
-  ability: Ability,
+  intent: Intent,
+  spriteId: string,
   index: number,
 };
 
@@ -145,7 +207,7 @@ function mkAbilityPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return `${self.data.ability.spriteId}.png`;
+        return `${self.data.spriteId}.png`;
       },
       introAnim: [
         (self, tween) => {
