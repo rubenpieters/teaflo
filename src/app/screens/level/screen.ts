@@ -8,6 +8,15 @@ import { cardMap } from "../../data/cardMap";
 import { moveCard, moveCardToFirstFree, loadLevel, newExecLevel, levelStats } from "../level/events";
 import { filterUndefined } from "../../util/util";
 
+const colors =
+  [
+    0x469990,
+    0xfabebe,
+    0x42d4f4,
+    0x800000,
+    0x800000,
+  ]
+
 export class LevelScreen {
   boxPool: Pool<BoxData, {}>
   box: Phaser.Sprite | undefined

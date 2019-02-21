@@ -385,51 +385,51 @@ export type Atlas1 = {
         "width": 200,
         "height": 400
     },
-    "select3_f.png": {
+    "box.png": {
         "x": 800,
         "y": 330,
-        "width": 818,
-        "height": 714
+        "width": 640,
+        "height": 1080
     },
     "menu_bar.png": {
-        "x": 1618,
+        "x": 1440,
         "y": 330,
         "width": 300,
         "height": 1080
     },
-    "box.png": {
-        "x": 1918,
-        "y": 450,
-        "width": 640,
+    "select3.png": {
+        "x": 1740,
+        "y": 400,
+        "width": 720,
         "height": 1080
     },
-    "select3.png": {
-        "x": 2558,
-        "y": 500,
-        "width": 720,
+    "select3_f.png": {
+        "x": 2460,
+        "y": 600,
+        "width": 1221,
         "height": 1080
     },
     "sel_act1.png": {
         "x": 0,
-        "y": 1530,
+        "y": 1480,
         "width": 1920,
         "height": 1080
     },
     "sel_level1.png": {
         "x": 1920,
-        "y": 1580,
+        "y": 1680,
         "width": 1920,
         "height": 1080
     },
     "sel_level2.png": {
         "x": 0,
-        "y": 2610,
+        "y": 2560,
         "width": 1920,
         "height": 1080
     },
     "sel_level3.png": {
         "x": 1920,
-        "y": 2660,
+        "y": 2760,
         "width": 1920,
         "height": 1080
     }
@@ -820,51 +820,51 @@ export const atlas1: Atlas1 = {
         "width": 200,
         "height": 400
     },
-    "select3_f.png": {
+    "box.png": {
         "x": 800,
         "y": 330,
-        "width": 818,
-        "height": 714
+        "width": 640,
+        "height": 1080
     },
     "menu_bar.png": {
-        "x": 1618,
+        "x": 1440,
         "y": 330,
         "width": 300,
         "height": 1080
     },
-    "box.png": {
-        "x": 1918,
-        "y": 450,
-        "width": 640,
+    "select3.png": {
+        "x": 1740,
+        "y": 400,
+        "width": 720,
         "height": 1080
     },
-    "select3.png": {
-        "x": 2558,
-        "y": 500,
-        "width": 720,
+    "select3_f.png": {
+        "x": 2460,
+        "y": 600,
+        "width": 1221,
         "height": 1080
     },
     "sel_act1.png": {
         "x": 0,
-        "y": 1530,
+        "y": 1480,
         "width": 1920,
         "height": 1080
     },
     "sel_level1.png": {
         "x": 1920,
-        "y": 1580,
+        "y": 1680,
         "width": 1920,
         "height": 1080
     },
     "sel_level2.png": {
         "x": 0,
-        "y": 2610,
+        "y": 2560,
         "width": 1920,
         "height": 1080
     },
     "sel_level3.png": {
         "x": 1920,
-        "y": 2660,
+        "y": 2760,
         "width": 1920,
         "height": 1080
     }
