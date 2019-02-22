@@ -4,7 +4,7 @@ import { mkGameState } from "../../../shared/game/state";
 import { runSolution, extendSolution, SolutionData } from "../../../shared/game/solution";
 import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
 import { UnitSelection } from "./screen";
-import { loadLevel } from "../level/events";
+import { loadLevel, createDeployArray } from "../level/events";
 import { Location } from "../../../shared/tree";
 import { firstLogKey } from "../../../shared/game/log";
 
@@ -26,7 +26,7 @@ export function updateSolutionRep(
     return;
   }
 
-  const frUnits = sol.deploy;
+  const frUnits = createDeployArray(sol.supply);
   const enUnits = levelData[schem.levelId].enemyIds;
   const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solInfo.solution, sol.solInfo.loc, initState);
@@ -112,6 +112,9 @@ export function clearSolution(
 ) {
   const schem = selectedSchem(gameRefs);
   if (schem !== undefined) {
+    gameRefs.saveData.act.levels[schem.levelId][schem.solId].supply.forEach(x => {
+      x.deployPos = undefined;
+    });
     gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo = undefined;
   }
   drawCurrentLevel(gameRefs);

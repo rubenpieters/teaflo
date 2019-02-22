@@ -37,7 +37,7 @@ export function newExecLevel(
   }
 }
 
-export function moveCardToFirstFree(
+/*export function moveCardToFirstFree(
   gameRefs: GameRefs,
   from: { type: "supply" | "deploy", index: number },
   to: { type: "supply" | "deploy" },
@@ -66,6 +66,59 @@ export function moveCard(
 
     gameRefs.screens.levelScreen.redrawBox();
   }
+}*/
+
+export function toggleDeploy(
+  gameRefs: GameRefs,
+  supplyIndex: number,
+) {
+  const sol = currentSchemSol(gameRefs);
+  if (sol !== undefined) {
+    if (sol.supply[supplyIndex].deployPos === undefined) {
+      // deploy this card
+
+      // increase the deployPos for each card
+      sol.supply.forEach(x => {
+        if (x.deployPos !== undefined) {
+          x.deployPos += 1;
+        }
+      });
+
+      // set newly deployed card to 0
+      sol.supply[supplyIndex].deployPos = 0;
+    } else {
+      // undeploy this card
+
+      // get threshold
+      const threshold = sol.supply[supplyIndex].deployPos;
+
+      // unset deployPos
+      sol.supply[supplyIndex].deployPos = undefined;
+
+      // decrease all deployPos above threshold
+      sol.supply.forEach(x => {
+        if (x.deployPos !== undefined && x.deployPos > threshold!) {
+          x.deployPos -= 1;
+        }
+      });
+    }
+
+    gameRefs.screens.levelScreen.redrawBox();
+  }
+}
+
+export function createDeployArray(
+  supply: { cardId: string, deployPos: number | undefined }[],
+): string[] {
+  const sorted = supply.filter(x => x.deployPos !== undefined).sort((x, y) => {
+    if (x.deployPos! < y.deployPos!) {
+      return -1;
+    } else if (x.deployPos! > y.deployPos!) {
+      return 1;
+    }
+    return 0;
+  });
+  return sorted.map(x => x.cardId);
 }
 
 export function levelStats(
@@ -82,7 +135,7 @@ export function levelStats(
     };
   }
 
-  const frUnits = sol.deploy;
+  const frUnits = createDeployArray(sol.supply);
   const enUnits = levelData[levelId].enemyIds;
   const initState = mkGameState(frUnits, enUnits);
   const finalStates = endStates(sol.solInfo.solution.tree, initState);

@@ -5,7 +5,7 @@ import { addText, DataSprite } from "../../phaser/datasprite";
 import { chainSpriteCreation, createTween } from "../../phaser/animation";
 import { currentSchemSol, selectedSchem, levelData } from "../act/data";
 import { cardMap } from "../../data/cardMap";
-import { moveCard, moveCardToFirstFree, loadLevel, newExecLevel, levelStats } from "../level/events";
+import { loadLevel, newExecLevel, levelStats, toggleDeploy } from "../level/events";
 import { filterUndefined } from "../../util/util";
 
 const colors =
@@ -20,7 +20,7 @@ const colors =
 export class LevelScreen {
   boxPool: Pool<BoxData, {}>
   box: Phaser.Sprite | undefined
-  buildCardPool: Pool<BuildCardData | BuildSlotData, {}>
+  buildCardPool: Pool<BuildCardData, {}>
   execStartBtnPool: Pool<{}, "neutral" | "hover" | "down">
 
   constructor(
@@ -74,9 +74,8 @@ export class LevelScreen {
       },
     };
 
-    const supplyF = solData === undefined ? [] : solData.supply.map((cardId, cardIndex) => {
-      const data: BuildCardData | BuildSlotData = cardId === undefined ?
-        { tag: "slot", index: cardIndex } : { tag: "card", cardId, type: "supply", index: cardIndex };
+    const supplyF = solData === undefined ? [] : solData.supply.map(({ cardId, deployPos }, cardIndex) => {
+      let data: BuildCardData = { tag: "card", cardId, deployPos, index: cardIndex };
       return {
         create: () => {
           const loc = levelData[schem!.levelId].supplyLocations[cardIndex];
@@ -84,36 +83,23 @@ export class LevelScreen {
           if (animation) {
             sprite.alpha = 0;
           }
-          return sprite;
-        },
-        introTween: (sprite: DataSprite<BuildCardData | BuildSlotData>) => {
-          return this.buildCardPool.introTween(sprite);
-        },
-      };
-    });
-    const deployF = solData === undefined ? [] : solData.deploy.map((cardId, cardIndex) => {
-      const data: BuildCardData | BuildSlotData = cardId === undefined ?
-        { tag: "slot", index: cardIndex } : { tag: "card", cardId, type: "deploy", index: cardIndex };
-      return {
-        create: () => {
-          const pos = createPosition(
-            "left", 840 + cardIndex * 200, 150,
-            "top", 80, 300,
-          );
-          const sprite = this.buildCardPool.newSprite(pos.xMin, pos.yMin, {}, data);
-          if (animation) {
-            sprite.alpha = 0;
+          if (deployPos === undefined) {
+            sprite.tint = 0xAAAAAA;
+            sprite.alpha = 1;
+          } else {
+            sprite.tint = colors[deployPos];
+            sprite.alpha = 0.5;
           }
           return sprite;
         },
-        introTween: (sprite: DataSprite<BuildCardData | BuildSlotData>) => {
+        introTween: (sprite: DataSprite<BuildCardData>) => {
           return this.buildCardPool.introTween(sprite);
         },
       };
     });
 
     spriteFs = [boxF];
-    spriteFs = spriteFs.concat(supplyF).concat(deployF);
+    spriteFs = spriteFs.concat(supplyF); //.concat(deployF);
     chainSpriteCreation(spriteFs, animation);
     //chainSpriteCreation(deployF, animation);
   }
@@ -176,27 +162,19 @@ function mkBoxPool(
 type BuildCardData = {
   tag: "card",
   cardId: string,
-  type: "supply" | "deploy",
-  index: number,
-}
-
-type BuildSlotData = {
-  tag: "slot",
+  deployPos: number | undefined,
   index: number,
 }
 
 function mkBuildCardPool(
   gameRefs: GameRefs,
-): Pool<BuildCardData | BuildSlotData, {}> {
+): Pool<BuildCardData, {}> {
   return new Pool(
     gameRefs.game,
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        switch (self.data.tag) {
-          case "card": return cardMap[self.data.cardId];
-          case "slot": return "en_unit_a1_l1_01.png";
-        }
+        return cardMap[self.data.cardId];
       },
       introAnim: [
         (self, tween) => {
@@ -205,20 +183,7 @@ function mkBuildCardPool(
       ],
       callbacks: {
         click: (self) => {
-          switch (self.data.tag) {
-            case "card": {
-              const opposite = self.data.type === "supply" ? "deploy" : "supply";
-              moveCardToFirstFree(gameRefs, {
-                type: self.data.type, index: self.data.index,
-              }, {
-                type: opposite
-              });
-              break;
-            }
-            case "slot": {
-              return;
-            }
-          }
+          toggleDeploy(gameRefs, self.data.index);
         },
       },
     },

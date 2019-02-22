@@ -30,7 +30,7 @@ const a1l1: LevelData = {
   slots: 3,
   selectLocation: { x: 200, y: 200 },
   boxSprite: "select3_f.png",
-  supplyLocations: [{ x: 300, y: 100 }, { x: 150, y: 500 }, { x: 450, y: 500 }],
+  supplyLocations: [{ x: 485, y: 0 }, { x: 60, y: 680 }, { x: 900, y: 700 }],
 };
 
 const a1l2: LevelData = {
@@ -135,8 +135,7 @@ export function mkActSaveData(): ActSaveData {
 
 export type SolutionData = {
   name: string,
-  supply: (string | undefined )[],
-  deploy: (string | undefined )[],
+  supply: { cardId: string, deployPos: number | undefined }[],
   solInfo: {
     solution: Solution,
     loc: Location
@@ -146,10 +145,10 @@ export type SolutionData = {
 export function mkSolutionData(
   levelId: string,
 ): SolutionData {
+  const supply = levelData[levelId].cardIds.map(cardId => { return { cardId, deployPos: undefined }});
   return {
     name: "New_Sol",
-    supply: levelData[levelId].cardIds.concat(),
-    deploy: repeat(levelData[levelId].slots, undefined),
+    supply,
     solInfo: undefined,
   };
 }
