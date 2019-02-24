@@ -6,7 +6,7 @@ import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit, findStatus } fro
 import { Log, LogEntry, LogKeys, LogIndex, LogKeySt, LogKeyFr, LogKeyEn, allLogIndices, getLogEntry, logIndexLt, logIndexEq, nextLogKey, getPrevLogEntry } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
-import { getUnit, GlobalId, UnitId, getStatus, findIndex } from "../../../shared/game/entityId";
+import { getUnit, GlobalId, UnitId, getStatus, findIndex, TargetId } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution } from "./events";
 import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog } from "../../../shared/game/trigger";
@@ -559,35 +559,49 @@ export class ExecScreen {
   ): Position {
     switch (action.tag) {
       case "Damage": {
-        const id = action.target;
-        switch (id.type) {
-          case "status": {
-            const index = findStatus(state, id);
-            return createPosition(
-              "left", 650 + 80 * index!.index, 100,
-              "top", 400 + 80 * triggerOrder.findIndex(x => x === index!.group), 100,
-            );
-          }
-          case "enemy": {
-            const index = findIndex(state, id);
-            return createPosition(
-              "left", 1300 + 160 * index!, 100,
-              "top", 200, 100,
-            );
-          }
-          case "friendly": {
-            const index = findIndex(state, id);
-            return createPosition(
-              "left", 650 + 160 * index!, 100,
-              "top", 200, 100,
-            );
-          }
-        }
-        throw "should not happen";
+        return this.onTargetPos(state, action.target);
+      }
+      case "AddThreat": {
+        return this.onTargetPos(state, action.toFriendly);
+      }
+      case "UseCharge": {
+        return this.onTargetPos(state, action.target);
+      }
+      case "AddTrigger": {
+        return this.onTargetPos(state, action.target);
       }
       default: {
         return createPosition(
           "left", 380, 100,
+          "top", 200, 100,
+        );
+      }
+    }
+  }
+
+  onTargetPos(
+    state: GameState,
+    id: TargetId,
+  ) {
+    switch (id.type) {
+      case "status": {
+        const index = findStatus(state, id);
+        return createPosition(
+          "left", 650 + 80 * index!.index, 100,
+          "top", 400 + 80 * triggerOrder.findIndex(x => x === index!.group), 100,
+        );
+      }
+      case "enemy": {
+        const index = findIndex(state, id);
+        return createPosition(
+          "left", 1300 + 160 * index!, 100,
+          "top", 200, 100,
+        );
+      }
+      case "friendly": {
+        const index = findIndex(state, id);
+        return createPosition(
+          "left", 650 + 160 * index!, 100,
           "top", 200, 100,
         );
       }
