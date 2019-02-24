@@ -2,19 +2,19 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
-import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit } from "../../../shared/game/state";
+import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit, findStatus } from "../../../shared/game/state";
 import { Log, LogEntry, LogKeys, LogIndex, LogKeySt, LogKeyFr, LogKeyEn, allLogIndices, getLogEntry, logIndexLt, logIndexEq, nextLogKey, getPrevLogEntry } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
-import { getUnit, GlobalId, UnitId, getStatus } from "../../../shared/game/entityId";
+import { getUnit, GlobalId, UnitId, getStatus, findIndex } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution } from "./events";
 import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
-import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType } from "../../../app/phaser/animation";
+import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution } from "../../../shared/game/solution";
-import { intentDescription } from "../../util/intentDesc";
+import { intentDescription, actionDescription } from "../../util/intentDesc";
 import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
 
@@ -29,6 +29,7 @@ export class ExecScreen {
   statsTextPool: TextPool
   triggerPool: Pool<TriggerData, {}>
   logTextPool: TextPool
+  logTextSpritePool: Pool<LogTextSpriteData, {}>
   logActionPool: Pool<LogActionData, {}>
   logTriggerPool: Pool<LogTriggerData, {}>
   solTreePool: Pool<SolTreeData, {}>
@@ -62,6 +63,7 @@ export class ExecScreen {
     this.solTreePool = mkSolTreePool(gameRefs);
     this.detailBtnPool = mkDetailBtnPool(gameRefs);
     this.detailExplPool = mkDetailExplPool(gameRefs);
+    this.logTextSpritePool = mkLogTextSpritePool(gameRefs);
   }
 
   reset() {
@@ -74,6 +76,7 @@ export class ExecScreen {
     this.intermediate = undefined;
     this.logActionPool.clear();
     this.logTextPool.clear();
+    this.logTextSpritePool.clear();
     this.logTriggerPool.clear();
   }
 
@@ -449,6 +452,7 @@ export class ExecScreen {
   ) {
     this.logActionPool.clear();
     this.logTextPool.clear();
+    this.logTextSpritePool.clear();
     this.logTriggerPool.clear();
 
     this.intermediate = upto;
@@ -520,18 +524,17 @@ export class ExecScreen {
       introTween: (sprite: DataSprite<LogActionData>) => {
         const tween = this.logActionPool.introTween(sprite);
         if (tween !== undefined) {
-          const textPos = createPosition(
-            "left", 680, 100,
-            "top", 200, 100,
-          );
-          addTextPopup(
+          const loc = this.logLocation(entry.action, entry.state);
+          addSpritePopup(
             this.gameRefs,
             tween.first,
             () => {
-              return this.logTextPool.newText(textPos, JSON.stringify(entry.action));
+              const parent = this.logTextSpritePool.newSprite(loc.xMin, loc.yMin, {}, { sprite: "btn_level_neutral.png" });
+              this.createLogTextSprite(entry.action, parent);
+              return parent;
             },
             tween => {
-              tween.to({ y: textPos.yMin - 100 }, 1000);
+              tween.to({ y: loc.yMin - 100 }, 1000);
             },
             "log",
           );
@@ -548,6 +551,74 @@ export class ExecScreen {
         return tween;
       },
     };
+  }
+
+  logLocation(
+    action: Action,
+    state: GameState,
+  ): Position {
+    switch (action.tag) {
+      case "Damage": {
+        const id = action.target;
+        switch (id.type) {
+          case "status": {
+            const index = findStatus(state, id);
+            return createPosition(
+              "left", 650 + 80 * index!.index, 100,
+              "top", 400 + 80 * triggerOrder.findIndex(x => x === index!.group), 100,
+            );
+          }
+          case "enemy": {
+            const index = findIndex(state, id);
+            return createPosition(
+              "left", 1300 + 160 * index!, 100,
+              "top", 200, 100,
+            );
+          }
+          case "friendly": {
+            const index = findIndex(state, id);
+            return createPosition(
+              "left", 650 + 160 * index!, 100,
+              "top", 200, 100,
+            );
+          }
+        }
+        throw "should not happen";
+      }
+      default: {
+        return createPosition(
+          "left", 380, 100,
+          "top", 200, 100,
+        );
+      }
+    }
+  }
+
+  createLogTextSprite(
+    action: Action,
+    parent: Phaser.Sprite,
+  ) {
+    const desc = actionDescription(action);
+    let y = 0;
+    let xOffset = 0;
+    desc.forEach((descSym, descIndex) => {
+      switch (descSym.tag) {
+        case "DescSeparator": {
+          y += 1;
+          xOffset = descIndex + 1;
+          break;
+        }
+        case "DescSymbol": {
+          //const xPos = startPos.xMin + 80 * (descIndex - xOffset);
+          //const yPos = startPos.yMin - y * 80;
+          const xPos = 80 * (descIndex - xOffset);
+          const yPos = - y * 80;
+          const sprite = this.logTextSpritePool.newSprite(xPos, yPos, {}, { sprite: descSym.sym });
+          parent.addChild(sprite);
+          break;
+        }
+      }
+    });
   }
 
   createTriggerEntryAnim(
@@ -1069,6 +1140,28 @@ type DetailExplData = {
 function mkDetailExplPool(
   gameRefs: GameRefs,
 ): Pool<DetailExplData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return self.data.sprite;
+      },
+      introAnim: [
+      ],
+      callbacks: {
+      },
+    },
+  );
+}
+
+type LogTextSpriteData = {
+  sprite: string,
+};
+
+function mkLogTextSpritePool(
+  gameRefs: GameRefs,
+): Pool<LogTextSpriteData, {}> {
   return new Pool(
     gameRefs.game,
     {

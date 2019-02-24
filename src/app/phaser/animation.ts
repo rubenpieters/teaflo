@@ -1,5 +1,6 @@
 import { DataSprite } from "./datasprite";
 import { GameRefs } from "../states/game";
+import { Pool } from "./pool";
 
 export function createTween(
   game: Phaser.Game,
@@ -111,5 +112,24 @@ export function addTextPopup(
       text.destroy()
     });
     textTween.start();
+  });
+}
+
+export function addSpritePopup(
+  gameRefs: GameRefs,
+  tween: Phaser.Tween,
+  create: () => Phaser.Sprite,
+  textAnimation: (tween: Phaser.Tween) => void,
+  type?: "log",
+): void {
+  tween.onStart.add(() => {
+    const sprite = create();
+    const spriteTween = createTypeTween(gameRefs, sprite, textAnimation, type);
+    spriteTween.onComplete.add(() => {
+      sprite.kill();
+      sprite.removeChildren();
+      // TODO: call .kill() on all children?
+    });
+    spriteTween.start();
   });
 }

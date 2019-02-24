@@ -1,5 +1,6 @@
 import { Intent, IntentVar } from "../../shared/game/intent";
 import { Trigger, triggerToFragmentValue } from "../../shared/game/trigger";
+import { Action } from "../../shared/game/action";
 
 export class DescSymbol {
   constructor(
@@ -24,14 +25,58 @@ function singleton(
   return [new DescSymbol(str)];
 }
 
+export function actionDescription(
+  action: Action,
+): DescToken[] {
+  switch (action.tag) {
+    case "AddThreat": {
+      return singleton("expl_plus.png")
+        .concat(numberDescription(action.value))
+        .concat(new DescSymbol("expl_th.png"))
+        ;
+    }
+    case "AddTrigger": {
+      return singleton("expl_plus.png")
+        ;
+    }
+    case "CombinedAction": {
+      throw "should not happen";
+    }
+    case "Damage": {
+      return singleton("expl_minus.png")
+      .concat(numberDescription(action.value))
+      .concat(new DescSymbol("expl_hp.png"))
+      ;
+    }
+    case "Heal": {
+      return singleton("expl_plus.png")
+      .concat(numberDescription(action.value))
+      .concat(new DescSymbol("expl_hp.png"))
+      ;
+    }
+    case "SwapHPWithExcess": {
+      return [];
+    }
+    case "UseCharge": {
+      return singleton("expl_minus.png")
+      .concat(numberDescription(action.value))
+      .concat(new DescSymbol("expl_ch.png"))
+      ;
+    }
+    default: {
+      return [];
+    }
+  }
+}
+
 export function intentDescription(
-  intent: Intent
+  intent: Intent,
 ): DescToken[] {
   switch (intent.tag) {
     case "AddThreatI": {
       return intentVarDescription(intent.value, x => intentVarNumber(x, "positive"))
         .concat(intentVarDescription(intent.atEnemy, intentVarTarget))
-        .concat([new DescSymbol("expl_th.png")])
+        .concat(new DescSymbol("expl_th.png"))
         .concat(intentVarDescription(intent.toFriendly, intentVarTarget))
         ;
     }
