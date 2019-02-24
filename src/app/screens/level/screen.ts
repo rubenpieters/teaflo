@@ -23,6 +23,7 @@ export class LevelScreen {
   box: Phaser.Sprite | undefined
   buildCardPool: Pool<BuildCardData, {}>
   execStartBtnPool: Pool<{}, "neutral" | "hover" | "down">
+  circPool: Pool<{}, {}>
   lineGraphicsPool: Phaser.Graphics
 
   constructor(
@@ -31,6 +32,7 @@ export class LevelScreen {
     this.boxPool = mkBoxPool(gameRefs);
     this.buildCardPool = mkBuildCardPool(gameRefs);
     this.execStartBtnPool = mkExecStartBtnPool(gameRefs);
+    this.circPool = mkCircPool(gameRefs);
     this.lineGraphicsPool = gameRefs.game.add.graphics();
   }
 
@@ -49,6 +51,7 @@ export class LevelScreen {
     this.boxPool.clear();
     this.buildCardPool.clear();
     this.lineGraphicsPool.clear();
+    this.circPool.clear();
     this.createBox(false);
   }
 
@@ -96,10 +99,15 @@ export class LevelScreen {
 
             // draw line
             this.lineGraphicsPool.beginFill();
-            this.lineGraphicsPool.lineStyle(8) //, colors[deployPos], 1);
+            this.lineGraphicsPool.lineStyle(8); //, colors[deployPos], 1);
             this.lineGraphicsPool.moveTo(loc.x + 200, loc.y + 100);
             this.lineGraphicsPool.lineTo(settings.gameWidth - 550 + 60 * deployPos, 500);
             this.lineGraphicsPool.endFill();
+
+            // draw circle
+            const circ = this.circPool.newSprite(settings.gameWidth - 550 + 60 * deployPos - 15, 500 - 15, {}, {});
+            circ.animations.add("anim", ["sel_circ_1.png", "sel_circ_2.png", "sel_circ_3.png", "sel_circ_4.png"], 8, true);
+            circ.animations.play("anim");
           }
           return sprite;
         },
@@ -242,5 +250,27 @@ function mkExecStartBtnPool(
       },
     },
     self => { return false; }
+  );
+}
+
+
+function mkCircPool(
+  gameRefs: GameRefs,
+): Pool<{}, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return "sel_circ_1.png";
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.to({ alpha: 1 }, 20, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+      },
+    },
   );
 }
