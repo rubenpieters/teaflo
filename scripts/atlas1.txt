@@ -70,3 +70,7 @@ textures/expl_target_status.png
 textures/expl_target_unit.png
 textures/expl_th.png
 textures/select3_f.png
+textures/sel_circ_1.png
+textures/sel_circ_2.png
+textures/sel_circ_3.png
+textures/sel_circ_4.png

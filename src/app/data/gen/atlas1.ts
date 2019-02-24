@@ -19,227 +19,245 @@ export type Atlas1 = {
         "width": 20,
         "height": 20
     },
-    "icon_a.png": {
+    "sel_circ_1.png": {
         "x": 60,
         "y": 0,
-        "width": 60,
-        "height": 60
+        "width": 30,
+        "height": 30
     },
-    "icon_b.png": {
+    "sel_circ_2.png": {
+        "x": 90,
+        "y": 0,
+        "width": 30,
+        "height": 30
+    },
+    "sel_circ_3.png": {
         "x": 120,
         "y": 0,
-        "width": 60,
-        "height": 60
+        "width": 30,
+        "height": 30
     },
-    "icon_c.png": {
+    "sel_circ_4.png": {
+        "x": 150,
+        "y": 0,
+        "width": 30,
+        "height": 30
+    },
+    "icon_a.png": {
         "x": 180,
         "y": 0,
         "width": 60,
         "height": 60
     },
-    "icon_d.png": {
+    "icon_b.png": {
         "x": 240,
         "y": 0,
         "width": 60,
         "height": 60
     },
-    "icon_e.png": {
+    "icon_c.png": {
         "x": 300,
         "y": 0,
         "width": 60,
         "height": 60
     },
-    "icon_f.png": {
+    "icon_d.png": {
         "x": 360,
         "y": 0,
         "width": 60,
         "height": 60
     },
-    "menu_btn1.png": {
+    "icon_e.png": {
         "x": 420,
+        "y": 0,
+        "width": 60,
+        "height": 60
+    },
+    "icon_f.png": {
+        "x": 480,
+        "y": 0,
+        "width": 60,
+        "height": 60
+    },
+    "menu_btn1.png": {
+        "x": 540,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "expl_0.png": {
-        "x": 490,
+        "x": 610,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_1.png": {
-        "x": 570,
+        "x": 690,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_2.png": {
-        "x": 650,
+        "x": 770,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_3.png": {
-        "x": 730,
+        "x": 850,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_4.png": {
-        "x": 810,
+        "x": 930,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_5.png": {
-        "x": 890,
+        "x": 1010,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_6.png": {
-        "x": 970,
+        "x": 1090,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_7.png": {
-        "x": 1050,
+        "x": 1170,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_8.png": {
-        "x": 1130,
+        "x": 1250,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_9.png": {
-        "x": 1210,
+        "x": 1330,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_enemy.png": {
-        "x": 1290,
+        "x": 1410,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_friendly.png": {
-        "x": 1370,
+        "x": 1490,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_armor.png": {
-        "x": 1450,
+        "x": 1570,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_ch.png": {
-        "x": 1530,
+        "x": 1650,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_hp.png": {
-        "x": 1610,
+        "x": 1730,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_minus.png": {
-        "x": 1690,
+        "x": 1810,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_plus.png": {
-        "x": 1770,
+        "x": 1890,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_self.png": {
-        "x": 1850,
+        "x": 1970,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target.png": {
-        "x": 1930,
+        "x": 2050,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_status.png": {
-        "x": 2010,
+        "x": 2130,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_unit.png": {
-        "x": 2090,
+        "x": 2210,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_th.png": {
-        "x": 2170,
+        "x": 2290,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "fr_unit_a1_l1_01_ab1.png": {
-        "x": 2250,
+        "x": 2370,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l1_01_ab2.png": {
-        "x": 2350,
+        "x": 2470,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l2_01_ab1.png": {
-        "x": 2450,
+        "x": 2570,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "menu_btn2.png": {
-        "x": 2550,
+        "x": 2670,
         "y": 0,
         "width": 150,
         "height": 150
     },
     "btn_level_neutral.png": {
-        "x": 2700,
+        "x": 2820,
         "y": 0,
         "width": 400,
         "height": 200
     },
     "btn_level_click.png": {
-        "x": 3100,
+        "x": 3220,
         "y": 0,
         "width": 400,
         "height": 200
     },
     "btn_level_hover.png": {
-        "x": 3500,
+        "x": 3620,
         "y": 0,
         "width": 400,
         "height": 200
-    },
-    "menu_btn_half1.png": {
-        "x": 3900,
-        "y": 0,
-        "width": 125,
-        "height": 250
     },
     "unit1.png": {
         "x": 0,
@@ -255,7 +273,7 @@ export type Atlas1 = {
     },
     "unit3.png": {
         "x": 400,
-        "y": 80,
+        "y": 70,
         "width": 200,
         "height": 200
     },
@@ -265,153 +283,159 @@ export type Atlas1 = {
         "width": 220,
         "height": 220
     },
-    "menu_btn_half2.png": {
+    "hp.png": {
+        "x": 4020,
+        "y": 0,
+        "width": 75,
+        "height": 300
+    },
+    "menu_btn_half1.png": {
         "x": 820,
         "y": 80,
         "width": 125,
         "height": 250
     },
-    "menu_btn_joined.png": {
+    "menu_btn_half2.png": {
         "x": 945,
+        "y": 80,
+        "width": 125,
+        "height": 250
+    },
+    "menu_btn_joined.png": {
+        "x": 1070,
         "y": 80,
         "width": 250,
         "height": 250
     },
     "menu_btn_joined1.png": {
-        "x": 1195,
+        "x": 1320,
         "y": 80,
         "width": 300,
         "height": 250
     },
     "menu_btn_joined2.png": {
-        "x": 1495,
+        "x": 1620,
         "y": 80,
         "width": 350,
         "height": 250
     },
     "menu_btn_joined3.png": {
-        "x": 1845,
+        "x": 1970,
         "y": 80,
         "width": 400,
         "height": 250
     },
     "en_unit_a1_l1_01.png": {
-        "x": 2245,
+        "x": 2370,
         "y": 100,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l1_01.png": {
-        "x": 2395,
+        "x": 2520,
         "y": 100,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_01.png": {
-        "x": 2545,
+        "x": 2670,
         "y": 150,
         "width": 150,
         "height": 300
     },
     "menu_btn_joined4.png": {
-        "x": 2695,
+        "x": 2820,
         "y": 200,
         "width": 450,
         "height": 250
     },
     "fr_unit_a1_l2_02.png": {
-        "x": 3145,
+        "x": 3270,
         "y": 200,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_03.png": {
-        "x": 3295,
+        "x": 3420,
         "y": 200,
         "width": 150,
         "height": 300
     },
-    "hp.png": {
-        "x": 3445,
-        "y": 200,
-        "width": 75,
-        "height": 300
-    },
     "ch.png": {
-        "x": 3520,
+        "x": 3570,
         "y": 200,
         "width": 75,
         "height": 300
     },
     "res_anim.png": {
-        "x": 3595,
+        "x": 3645,
         "y": 200,
         "width": 75,
         "height": 300
     },
     "bmark_neutral.png": {
-        "x": 3670,
+        "x": 3720,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
-        "x": 3870,
-        "y": 250,
-        "width": 200,
-        "height": 400
-    },
-    "bmark_hover.png": {
         "x": 0,
         "y": 260,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_neutral.png": {
+    "bmark_hover.png": {
         "x": 200,
         "y": 260,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_click.png": {
+    "bt_bmark_neutral.png": {
         "x": 400,
-        "y": 280,
+        "y": 270,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_hover.png": {
+    "bt_bmark_click.png": {
         "x": 600,
         "y": 300,
         "width": 200,
         "height": 400
     },
-    "box.png": {
+    "bt_bmark_hover.png": {
         "x": 800,
+        "y": 330,
+        "width": 200,
+        "height": 400
+    },
+    "box.png": {
+        "x": 1000,
         "y": 330,
         "width": 640,
         "height": 1080
     },
     "menu_bar.png": {
-        "x": 1440,
+        "x": 1640,
         "y": 330,
         "width": 300,
         "height": 1080
     },
     "select3.png": {
-        "x": 1740,
+        "x": 1940,
         "y": 400,
         "width": 720,
         "height": 1080
     },
     "select3_f.png": {
-        "x": 2460,
+        "x": 2660,
         "y": 600,
         "width": 1221,
         "height": 1080
     },
     "sel_act1.png": {
         "x": 0,
-        "y": 1480,
+        "y": 1410,
         "width": 1920,
         "height": 1080
     },
@@ -423,7 +447,7 @@ export type Atlas1 = {
     },
     "sel_level2.png": {
         "x": 0,
-        "y": 2560,
+        "y": 2490,
         "width": 1920,
         "height": 1080
     },
@@ -454,227 +478,245 @@ export const atlas1: Atlas1 = {
         "width": 20,
         "height": 20
     },
-    "icon_a.png": {
+    "sel_circ_1.png": {
         "x": 60,
         "y": 0,
-        "width": 60,
-        "height": 60
+        "width": 30,
+        "height": 30
     },
-    "icon_b.png": {
+    "sel_circ_2.png": {
+        "x": 90,
+        "y": 0,
+        "width": 30,
+        "height": 30
+    },
+    "sel_circ_3.png": {
         "x": 120,
         "y": 0,
-        "width": 60,
-        "height": 60
+        "width": 30,
+        "height": 30
     },
-    "icon_c.png": {
+    "sel_circ_4.png": {
+        "x": 150,
+        "y": 0,
+        "width": 30,
+        "height": 30
+    },
+    "icon_a.png": {
         "x": 180,
         "y": 0,
         "width": 60,
         "height": 60
     },
-    "icon_d.png": {
+    "icon_b.png": {
         "x": 240,
         "y": 0,
         "width": 60,
         "height": 60
     },
-    "icon_e.png": {
+    "icon_c.png": {
         "x": 300,
         "y": 0,
         "width": 60,
         "height": 60
     },
-    "icon_f.png": {
+    "icon_d.png": {
         "x": 360,
         "y": 0,
         "width": 60,
         "height": 60
     },
-    "menu_btn1.png": {
+    "icon_e.png": {
         "x": 420,
+        "y": 0,
+        "width": 60,
+        "height": 60
+    },
+    "icon_f.png": {
+        "x": 480,
+        "y": 0,
+        "width": 60,
+        "height": 60
+    },
+    "menu_btn1.png": {
+        "x": 540,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "expl_0.png": {
-        "x": 490,
+        "x": 610,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_1.png": {
-        "x": 570,
+        "x": 690,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_2.png": {
-        "x": 650,
+        "x": 770,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_3.png": {
-        "x": 730,
+        "x": 850,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_4.png": {
-        "x": 810,
+        "x": 930,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_5.png": {
-        "x": 890,
+        "x": 1010,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_6.png": {
-        "x": 970,
+        "x": 1090,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_7.png": {
-        "x": 1050,
+        "x": 1170,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_8.png": {
-        "x": 1130,
+        "x": 1250,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_9.png": {
-        "x": 1210,
+        "x": 1330,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_enemy.png": {
-        "x": 1290,
+        "x": 1410,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_friendly.png": {
-        "x": 1370,
+        "x": 1490,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_armor.png": {
-        "x": 1450,
+        "x": 1570,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_ch.png": {
-        "x": 1530,
+        "x": 1650,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_hp.png": {
-        "x": 1610,
+        "x": 1730,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_minus.png": {
-        "x": 1690,
+        "x": 1810,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_plus.png": {
-        "x": 1770,
+        "x": 1890,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_self.png": {
-        "x": 1850,
+        "x": 1970,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target.png": {
-        "x": 1930,
+        "x": 2050,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_status.png": {
-        "x": 2010,
+        "x": 2130,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_unit.png": {
-        "x": 2090,
+        "x": 2210,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_th.png": {
-        "x": 2170,
+        "x": 2290,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "fr_unit_a1_l1_01_ab1.png": {
-        "x": 2250,
+        "x": 2370,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l1_01_ab2.png": {
-        "x": 2350,
+        "x": 2470,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l2_01_ab1.png": {
-        "x": 2450,
+        "x": 2570,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "menu_btn2.png": {
-        "x": 2550,
+        "x": 2670,
         "y": 0,
         "width": 150,
         "height": 150
     },
     "btn_level_neutral.png": {
-        "x": 2700,
+        "x": 2820,
         "y": 0,
         "width": 400,
         "height": 200
     },
     "btn_level_click.png": {
-        "x": 3100,
+        "x": 3220,
         "y": 0,
         "width": 400,
         "height": 200
     },
     "btn_level_hover.png": {
-        "x": 3500,
+        "x": 3620,
         "y": 0,
         "width": 400,
         "height": 200
-    },
-    "menu_btn_half1.png": {
-        "x": 3900,
-        "y": 0,
-        "width": 125,
-        "height": 250
     },
     "unit1.png": {
         "x": 0,
@@ -690,7 +732,7 @@ export const atlas1: Atlas1 = {
     },
     "unit3.png": {
         "x": 400,
-        "y": 80,
+        "y": 70,
         "width": 200,
         "height": 200
     },
@@ -700,153 +742,159 @@ export const atlas1: Atlas1 = {
         "width": 220,
         "height": 220
     },
-    "menu_btn_half2.png": {
+    "hp.png": {
+        "x": 4020,
+        "y": 0,
+        "width": 75,
+        "height": 300
+    },
+    "menu_btn_half1.png": {
         "x": 820,
         "y": 80,
         "width": 125,
         "height": 250
     },
-    "menu_btn_joined.png": {
+    "menu_btn_half2.png": {
         "x": 945,
+        "y": 80,
+        "width": 125,
+        "height": 250
+    },
+    "menu_btn_joined.png": {
+        "x": 1070,
         "y": 80,
         "width": 250,
         "height": 250
     },
     "menu_btn_joined1.png": {
-        "x": 1195,
+        "x": 1320,
         "y": 80,
         "width": 300,
         "height": 250
     },
     "menu_btn_joined2.png": {
-        "x": 1495,
+        "x": 1620,
         "y": 80,
         "width": 350,
         "height": 250
     },
     "menu_btn_joined3.png": {
-        "x": 1845,
+        "x": 1970,
         "y": 80,
         "width": 400,
         "height": 250
     },
     "en_unit_a1_l1_01.png": {
-        "x": 2245,
+        "x": 2370,
         "y": 100,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l1_01.png": {
-        "x": 2395,
+        "x": 2520,
         "y": 100,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_01.png": {
-        "x": 2545,
+        "x": 2670,
         "y": 150,
         "width": 150,
         "height": 300
     },
     "menu_btn_joined4.png": {
-        "x": 2695,
+        "x": 2820,
         "y": 200,
         "width": 450,
         "height": 250
     },
     "fr_unit_a1_l2_02.png": {
-        "x": 3145,
+        "x": 3270,
         "y": 200,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_03.png": {
-        "x": 3295,
+        "x": 3420,
         "y": 200,
         "width": 150,
         "height": 300
     },
-    "hp.png": {
-        "x": 3445,
-        "y": 200,
-        "width": 75,
-        "height": 300
-    },
     "ch.png": {
-        "x": 3520,
+        "x": 3570,
         "y": 200,
         "width": 75,
         "height": 300
     },
     "res_anim.png": {
-        "x": 3595,
+        "x": 3645,
         "y": 200,
         "width": 75,
         "height": 300
     },
     "bmark_neutral.png": {
-        "x": 3670,
+        "x": 3720,
         "y": 200,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
-        "x": 3870,
-        "y": 250,
-        "width": 200,
-        "height": 400
-    },
-    "bmark_hover.png": {
         "x": 0,
         "y": 260,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_neutral.png": {
+    "bmark_hover.png": {
         "x": 200,
         "y": 260,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_click.png": {
+    "bt_bmark_neutral.png": {
         "x": 400,
-        "y": 280,
+        "y": 270,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_hover.png": {
+    "bt_bmark_click.png": {
         "x": 600,
         "y": 300,
         "width": 200,
         "height": 400
     },
-    "box.png": {
+    "bt_bmark_hover.png": {
         "x": 800,
+        "y": 330,
+        "width": 200,
+        "height": 400
+    },
+    "box.png": {
+        "x": 1000,
         "y": 330,
         "width": 640,
         "height": 1080
     },
     "menu_bar.png": {
-        "x": 1440,
+        "x": 1640,
         "y": 330,
         "width": 300,
         "height": 1080
     },
     "select3.png": {
-        "x": 1740,
+        "x": 1940,
         "y": 400,
         "width": 720,
         "height": 1080
     },
     "select3_f.png": {
-        "x": 2460,
+        "x": 2660,
         "y": 600,
         "width": 1221,
         "height": 1080
     },
     "sel_act1.png": {
         "x": 0,
-        "y": 1480,
+        "y": 1410,
         "width": 1920,
         "height": 1080
     },
@@ -858,7 +906,7 @@ export const atlas1: Atlas1 = {
     },
     "sel_level2.png": {
         "x": 0,
-        "y": 2560,
+        "y": 2490,
         "width": 1920,
         "height": 1080
     },
