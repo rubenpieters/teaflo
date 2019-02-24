@@ -7,6 +7,7 @@ import { currentSchemSol, selectedSchem, levelData } from "../act/data";
 import { cardMap } from "../../data/cardMap";
 import { loadLevel, newExecLevel, levelStats, toggleDeploy } from "../level/events";
 import { filterUndefined } from "../../util/util";
+import { settings } from "../../data/settings";
 
 const colors =
   [
@@ -22,6 +23,7 @@ export class LevelScreen {
   box: Phaser.Sprite | undefined
   buildCardPool: Pool<BuildCardData, {}>
   execStartBtnPool: Pool<{}, "neutral" | "hover" | "down">
+  lineGraphicsPool: Phaser.Graphics
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -29,6 +31,7 @@ export class LevelScreen {
     this.boxPool = mkBoxPool(gameRefs);
     this.buildCardPool = mkBuildCardPool(gameRefs);
     this.execStartBtnPool = mkExecStartBtnPool(gameRefs);
+    this.lineGraphicsPool = gameRefs.game.add.graphics();
   }
 
   drawBox(
@@ -43,8 +46,9 @@ export class LevelScreen {
 
   redrawBox(
   ) {
-    this.boxPool.killAll();
-    this.buildCardPool.killAll();
+    this.boxPool.clear();
+    this.buildCardPool.clear();
+    this.lineGraphicsPool.clear();
     this.createBox(false);
   }
 
@@ -89,6 +93,13 @@ export class LevelScreen {
           } else {
             sprite.tint = colors[deployPos];
             sprite.alpha = 0.5;
+
+            // draw line
+            this.lineGraphicsPool.beginFill();
+            this.lineGraphicsPool.lineStyle(8) //, colors[deployPos], 1);
+            this.lineGraphicsPool.moveTo(loc.x + 200, loc.y + 100);
+            this.lineGraphicsPool.lineTo(settings.gameWidth - 550 + 60 * deployPos, 500);
+            this.lineGraphicsPool.endFill();
           }
           return sprite;
         },
@@ -115,8 +126,8 @@ export class LevelScreen {
     this.execStartBtnPool.killAll();
 
     const pos = createPosition(
-      "right", 400, 400,
-      "bot", 300, 200,
+      "right", 425, 400,
+      "bot", 100, 200,
     );
     const sprite = this.execStartBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", {});
     addText(this.gameRefs, sprite, pos, "Start", "#000000", 40);
