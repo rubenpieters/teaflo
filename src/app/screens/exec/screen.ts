@@ -142,8 +142,8 @@ export class ExecScreen {
     state.frUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
         const unitPos = createPosition(
-          "left", 650 + 160 * unitIndex, 150,
-          "top", 50, 300,
+          "left", 250 + 170 * unitIndex, 150,
+          "top", 20, 150,
         );
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
@@ -153,8 +153,8 @@ export class ExecScreen {
 
         // HP
         const unitHpPos = createPosition(
-          "left", 650 + 160 * unitIndex, 75,
-          "top", 50, 300,
+          "left", 245 + 170 * unitIndex, 10,
+          "top", 20, 150,
         );
         const hpHeight = unitHpPos.yMax - unitHpPos.yMin;
         unitHpPos.yMin = unitHpPos.yMin + hpHeight * ((unit.maxHp - unit.hp) / unit.maxHp);
@@ -164,15 +164,15 @@ export class ExecScreen {
             type: "hp",
           }
         );
-        unitHpSprite.width = 75;
+        unitHpSprite.width = 10;
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
         // draw hp changing animation
         if (prevState !== undefined) {
           const prevUnit = getUnit(new GlobalId(unit.id, "friendly"), prevState);
           if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
             const prevUnitHpPos = createPosition(
-              "left", 650 + 160 * unitIndex, 75,
-              "top", 50, 300,
+              "left", 245 + 170 * unitIndex, 10,
+              "top", 20, 150,
             );
             const prevDiff = hpHeight * ((prevUnit.maxHp - prevUnit.hp) / prevUnit.maxHp);
             prevUnitHpPos.yMax = unitHpPos.yMin;
@@ -183,6 +183,7 @@ export class ExecScreen {
                 type: "res_anim",
               }
             );
+            prevUnitHpSprite.width = 10;
             prevUnitHpSprite.height = prevUnitHpPos.yMax - prevUnitHpPos.yMin;
             const tween = createTween(this.gameRefs.game, prevUnitHpSprite,
               tween => {
@@ -196,8 +197,8 @@ export class ExecScreen {
 
         // CH
         const unitChPos = createPosition(
-          "left", 725 + 160 * unitIndex, 75,
-          "top", 50, 300,
+          "left", 395 + 170 * unitIndex, 10,
+          "top", 20, 150,
         );
         const chHeight = unitChPos.yMax - unitChPos.yMin;
         unitChPos.yMin = unitChPos.yMin + chHeight * ((unit.maxCharges - unit.charges) / unit.maxCharges);
@@ -207,14 +208,14 @@ export class ExecScreen {
             type: "ch",
           }
         );
-        unitChSprite.width = 75;
+        unitChSprite.width = 10;
         unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
 
         // TH
         enIds.forEach((enId, enIndex) => {
           const unitThPos = createPosition(
-            "left", 650 + 160 * unitIndex + 35 * enIndex, 75,
-            "top", 375, 300,
+            "left", 245 + 170 * unitIndex + 30 * enIndex, 25,
+            "top", 240, 100,
           );
           const unitThSprite = this.unitResPool.newSprite(unitThPos.xMin, unitThPos.yMin, {},
             { cardId: unit.cardId,
@@ -223,7 +224,7 @@ export class ExecScreen {
             }
           );
           const threat = unit.threatMap[enId] === undefined ? 0 : unit.threatMap[enId];
-          unitThSprite.width = 30;
+          unitThSprite.width = 25;
           unitThSprite.height = threat / maxThreat * 50;
         });
       }
@@ -231,8 +232,8 @@ export class ExecScreen {
     state.enUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
         const unitPos = createPosition(
-          "left", 1300 + 160 * unitIndex, 150,
-          "top", 50, 300,
+          "left", 1000 + 170 * unitIndex, 150,
+          "top", 20, 150,
         );
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
@@ -242,8 +243,8 @@ export class ExecScreen {
 
         // HP
         const unitHpPos = createPosition(
-          "left", 1300 + 160 * unitIndex, 75,
-          "top", 50, 300,
+          "left", 995 + 170 * unitIndex, 10,
+          "top", 20, 150,
         );
         const hpHeight = unitHpPos.yMax - unitHpPos.yMin;
         unitHpPos.yMin = unitHpPos.yMin + hpHeight * ((unit.maxHp - unit.hp) / unit.maxHp);
@@ -253,15 +254,15 @@ export class ExecScreen {
             type: "hp",
           }
         );
-        unitHpSprite.width = 75;
+        unitHpSprite.width = 10;
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
         // draw hp changing animation
         if (prevState !== undefined) {
           const prevUnit = getUnit(new GlobalId(unit.id, "enemy"), prevState);
           if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
             const prevUnitHpPos = createPosition(
-              "left", 1300 + 160 * unitIndex, 75,
-              "top", 50, 300,
+              "left", 995 + 170 * unitIndex, 10,
+              "top", 20, 150,
             );
             const prevDiff = hpHeight * ((prevUnit.maxHp - prevUnit.hp) / prevUnit.maxHp);
             prevUnitHpPos.yMax = unitHpPos.yMin;
@@ -272,6 +273,7 @@ export class ExecScreen {
                 type: "res_anim",
               }
             );
+            prevUnitHpSprite.width = 10;
             prevUnitHpSprite.height = prevUnitHpPos.yMax - prevUnitHpPos.yMin;
             const tween = createTween(this.gameRefs.game, prevUnitHpSprite,
               tween => {
@@ -285,8 +287,8 @@ export class ExecScreen {
 
         // CH
         const unitChPos = createPosition(
-          "left", 1375 + 160 * unitIndex, 75,
-          "top", 50, 300,
+          "left", 1145 + 170 * unitIndex, 10,
+          "top", 20, 150,
         );
         const chHeight = unitChPos.yMax - unitChPos.yMin;
         unitChPos.yMin = unitChPos.yMin + chHeight * ((unit.maxCharges - unit.charges) / unit.maxCharges);
@@ -296,7 +298,7 @@ export class ExecScreen {
             type: "ch",
           }
         );
-        unitChSprite.width = 75;
+        unitChSprite.width = 10;
         unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
       }
     });
@@ -594,14 +596,14 @@ export class ExecScreen {
       case "enemy": {
         const index = findIndex(state, id);
         return createPosition(
-          "left", 1300 + 160 * index!, 100,
+          "left", 1300 + 170 * index!, 100,
           "top", 200, 100,
         );
       }
       case "friendly": {
         const index = findIndex(state, id);
         return createPosition(
-          "left", 650 + 160 * index!, 100,
+          "left", 650 + 170 * index!, 100,
           "top", 200, 100,
         );
       }
