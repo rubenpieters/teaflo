@@ -6,7 +6,7 @@ import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit, findStatus } fro
 import { Log, LogEntry, LogKeys, LogIndex, LogKeySt, LogKeyFr, LogKeyEn, allLogIndices, getLogEntry, logIndexLt, logIndexEq, nextLogKey, getPrevLogEntry } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
-import { getUnit, GlobalId, UnitId, getStatus, findIndex, TargetId } from "../../../shared/game/entityId";
+import { getUnit, GlobalId, UnitId, getStatus, findIndex, TargetId, eqUnitId } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution } from "./events";
 import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog } from "../../../shared/game/trigger";
@@ -35,6 +35,7 @@ export class ExecScreen {
   solTreePool: Pool<SolTreeData, {}>
   detailBtnPool: Pool<DetailBtnData, {}>
   detailExplPool: Pool<DetailExplData, {}>
+  hoverSpritePool: Pool<HoverSpriteData, {}>
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
 
@@ -64,6 +65,7 @@ export class ExecScreen {
     this.detailBtnPool = mkDetailBtnPool(gameRefs);
     this.detailExplPool = mkDetailExplPool(gameRefs);
     this.logTextSpritePool = mkLogTextSpritePool(gameRefs);
+    this.hoverSpritePool = mkHoverSpritePool(gameRefs);
   }
 
   reset() {
@@ -129,6 +131,7 @@ export class ExecScreen {
     this.unitResPool.clear();
     this.triggerPool.clear();
     this.unitTextPool.clear();
+    this.hoverSpritePool.clear();
 
     // calculate max threat value
     const enIds = filteredEn(state)
@@ -150,6 +153,19 @@ export class ExecScreen {
             globalId: new GlobalId(unit.id, "friendly"),
           }
         );
+
+        // hover bar
+        if (
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "friendly"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "friendly")))
+        ) {
+          const hoverBarPos = createPosition(
+            "left", 245 + 170 * unitIndex, 10,
+            "top", 15, 150,
+          );
+          const sprite = this.hoverSpritePool.newSprite(hoverBarPos.xMin, hoverBarPos.yMin, {}, {});
+          sprite.inputEnabled = false;
+        }
 
         // HP
         const unitHpPos = createPosition(
@@ -229,6 +245,7 @@ export class ExecScreen {
         });
       }
     });
+
     state.enUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
         const unitPos = createPosition(
@@ -240,6 +257,19 @@ export class ExecScreen {
             globalId: new GlobalId(unit.id, "enemy"),
           }
         );
+
+        // hover bar
+        if (
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "enemy"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "enemy")))
+        ) {
+          const hoverBarPos = createPosition(
+            "left", 995 + 170 * unitIndex, 10,
+            "top", 15, 150,
+          );
+          const sprite = this.hoverSpritePool.newSprite(hoverBarPos.xMin, hoverBarPos.yMin, {}, {});
+          sprite.inputEnabled = false;
+        }
 
         // HP
         const unitHpPos = createPosition(
@@ -333,6 +363,43 @@ export class ExecScreen {
     this.statsTextPool.clear();
     this.detailBtnPool.clear();
     this.detailExplPool.clear();
+    this.hoverSpritePool.clear();
+
+    console.log("STATS");
+
+    // hover bar
+    state.frUnits.forEach((unit, unitIndex) => {
+      if (unit !== undefined) {
+        // hover bar
+        if (
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "friendly"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "friendly")))
+        ) {
+          const hoverBarPos = createPosition(
+            "left", 245 + 170 * unitIndex, 10,
+            "top", 15, 150,
+          );
+          const sprite = this.hoverSpritePool.newSprite(hoverBarPos.xMin, hoverBarPos.yMin, {}, {});
+          sprite.inputEnabled = false;
+        }
+      }
+    });
+    state.enUnits.forEach((unit, unitIndex) => {
+      if (unit !== undefined) {
+        // hover bar
+        if (
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "enemy"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "enemy")))
+        ) {
+          const hoverBarPos = createPosition(
+            "left", 995 + 170 * unitIndex, 10,
+            "top", 15, 150,
+          );
+          const sprite = this.hoverSpritePool.newSprite(hoverBarPos.xMin, hoverBarPos.yMin, {}, {});
+          sprite.inputEnabled = false;
+        }
+      }
+    });
 
     // DETAIL
     const showUnit = this.hoveredUnit !== undefined ? this.hoveredUnit : this.selectedUnit;
@@ -1184,6 +1251,28 @@ function mkLogTextSpritePool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         return self.data.sprite;
+      },
+      introAnim: [
+      ],
+      callbacks: {
+      },
+    },
+  );
+}
+
+type HoverSpriteData = {
+
+};
+
+function mkHoverSpritePool(
+  gameRefs: GameRefs,
+): Pool<HoverSpriteData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return "bar_hover.png";
       },
       introAnim: [
       ],
