@@ -337,8 +337,8 @@ export class ExecScreen {
     triggerOrder.forEach((tag, tagIndex) => {
       state.triggers[tag].forEach((trigger, triggerIndex) => {
         const triggerPos = createPosition(
-          "left", 650 + 80 * triggerIndex, 150,
-          "top", 400 + 80 * tagIndex, 300,
+          "left", 240 + 50 * triggerIndex, 40,
+          "top", 400 + 50 * tagIndex, 40,
         );
         this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { trigger });
       });
@@ -364,8 +364,6 @@ export class ExecScreen {
     this.detailBtnPool.clear();
     this.detailExplPool.clear();
     this.hoverSpritePool.clear();
-
-    console.log("STATS");
 
     // hover bar
     state.frUnits.forEach((unit, unitIndex) => {
@@ -538,12 +536,12 @@ export class ExecScreen {
       const typeIndex = x.typeIndex;
       const entry = getLogEntry(this.log!, x.logIndex);
       const pos = createPosition(
-        "left", 40 + entryIndex * 70, 150,
-        "top", 40 + 110 * typeIndex, 300,
+        "left", 20 + 50 * entryIndex, 40,
+        "top", 20 + 80 * typeIndex, 40,
       );
       if (logIndexLt(x.logIndex, upto)) {
         const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ logIndex: x.logIndex }});
-        sprite.tint = 0xFFFFFF;
+        sprite.alpha = 1;
       } else if (logIndexEq(x.logIndex, upto)) {
         const logAction = this.createLogEntryAnim(entry, x.logIndex, pos, undefined);
         spriteFs.push(logAction);
@@ -570,7 +568,7 @@ export class ExecScreen {
         }
       } else {
         const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ logIndex: x.logIndex }});
-        sprite.tint = 0xAAAAAA;
+        sprite.alpha = 0.5;
       }
     });
     this.drawCurrentState();
@@ -1012,7 +1010,13 @@ function mkTriggerPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return `icon_a.png`;
+        switch (self.data.trigger.tag) {
+          case "Armor": return "icon_armor.png";
+          case "Weak": return "icon_weak.png";
+          case "Strong": return "icon_strong.png";
+          case "Fragile": return "icon_fragile.png";
+          default: return "icon_a.png";
+        }
       },
       introAnim: [
         (self, tween) => {
@@ -1061,7 +1065,15 @@ function mkLogActionPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return `icon_b.png`;
+        switch (self.data.action.tag) {
+          case "Damage": return "icon_hp_minus.png";
+          case "UseCharge": return "icon_ch_minus.png";
+          case "AddThreat": return "icon_th_plus.png";
+          case "NextAI": return "icon_ai.png";
+          case "StartTurn": return "icon_start_turn.png";
+          case "AddTrigger": return "icon_add_status.png";
+          default: return "icon_b.png";
+        }
       },
       introAnim: [
         (self, tween) => {
@@ -1139,7 +1151,12 @@ function mkAnimControlBtnPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return `icon_a.png`;
+        switch (self.data.type) {
+          case "pause": return "icon_anim_pause.png";
+          case "play": return "icon_anim_play.png";
+          case "fast": return "icon_anim_ff.png";
+          case "skip": return "icon_anim_skip.png";
+        }
       },
       introAnim: [
         (self, tween) => {
