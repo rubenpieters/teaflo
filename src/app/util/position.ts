@@ -106,3 +106,12 @@ export function relativeTo(
     }
   }
 }
+
+export function center(
+  pos: Position,
+): { x: number, y: number } {
+  return {
+    x: pos.xMin + ((pos.xMax - pos.xMin) / 2),
+    y: pos.yMin + ((pos.yMax - pos.yMin) / 2),
+  }
+}

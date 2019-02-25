@@ -1,12 +1,12 @@
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
-import { createPosition, relativeTo, Position } from "../../util/position";
+import { createPosition, relativeTo, Position, center } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
 import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit, findStatus } from "../../../shared/game/state";
 import { Log, LogEntry, LogKeys, LogIndex, LogKeySt, LogKeyFr, LogKeyEn, allLogIndices, getLogEntry, logIndexLt, logIndexEq, nextLogKey, getPrevLogEntry } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
-import { getUnit, GlobalId, UnitId, getStatus, findIndex, TargetId, eqUnitId } from "../../../shared/game/entityId";
+import { getUnit, GlobalId, UnitId, getStatus, findIndex, TargetId, eqUnitId, EntityId, toPositionId, PositionId } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution } from "./events";
 import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog } from "../../../shared/game/trigger";
@@ -36,6 +36,7 @@ export class ExecScreen {
   detailBtnPool: Pool<DetailBtnData, {}>
   detailExplPool: Pool<DetailExplData, {}>
   hoverSpritePool: Pool<HoverSpriteData, {}>
+  hoverGraphicsPool: Phaser.Graphics
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
 
@@ -66,6 +67,7 @@ export class ExecScreen {
     this.detailExplPool = mkDetailExplPool(gameRefs);
     this.logTextSpritePool = mkLogTextSpritePool(gameRefs);
     this.hoverSpritePool = mkHoverSpritePool(gameRefs);
+    this.hoverGraphicsPool = gameRefs.game.add.graphics();
   }
 
   reset() {
@@ -122,6 +124,17 @@ export class ExecScreen {
     addText(this.gameRefs, sprite, pos, "Clear", "#000000", 40);
   }
 
+  friendlyUnitPos(
+    state: GameState,
+    unitId: EntityId<"friendly">,
+  ) {
+    const positionId = toPositionId(state, unitId);
+    return createPosition(
+      "left", 250 + 170 * positionId.id, 150,
+      "top", 20, 150,
+    );
+  }
+
   drawState(
     state: GameState,
     prevState?: GameState,
@@ -132,6 +145,7 @@ export class ExecScreen {
     this.triggerPool.clear();
     this.unitTextPool.clear();
     this.hoverSpritePool.clear();
+    this.hoverGraphicsPool.clear();
 
     // calculate max threat value
     const enIds = filteredEn(state)
@@ -144,10 +158,7 @@ export class ExecScreen {
 
     state.frUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
-        const unitPos = createPosition(
-          "left", 250 + 170 * unitIndex, 150,
-          "top", 20, 150,
-        );
+        const unitPos = this.friendlyUnitPos(state, new PositionId(unitIndex, "friendly"));
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: new GlobalId(unit.id, "friendly"),
@@ -341,6 +352,22 @@ export class ExecScreen {
           "top", 400 + 50 * tagIndex, 40,
         );
         this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { trigger });
+
+        // hover graphics
+        if (
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(trigger.id, "status"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(trigger.id, "status")))
+        ) {
+          this.hoverGraphicsPool.beginFill();
+          this.hoverGraphicsPool.lineStyle(4);
+          const centerTriggerPos = center(triggerPos);
+          this.hoverGraphicsPool.moveTo(centerTriggerPos.x, centerTriggerPos.y);
+          if (trigger.owner.type === "friendly") {
+            const ownerPosCenter = center(this.friendlyUnitPos(state, new GlobalId(trigger.owner.id, "friendly")));
+            this.hoverGraphicsPool.lineTo(ownerPosCenter.x, ownerPosCenter.y); 
+          }
+          this.hoverGraphicsPool.endFill();
+        }
       });
     });
   }
@@ -364,6 +391,7 @@ export class ExecScreen {
     this.detailBtnPool.clear();
     this.detailExplPool.clear();
     this.hoverSpritePool.clear();
+    this.hoverGraphicsPool.clear();
 
     // hover bar
     state.frUnits.forEach((unit, unitIndex) => {
@@ -397,6 +425,29 @@ export class ExecScreen {
           sprite.inputEnabled = false;
         }
       }
+    });
+    triggerOrder.forEach((tag, tagIndex) => {
+      state.triggers[tag].forEach((trigger, triggerIndex) => {
+        const triggerPos = createPosition(
+          "left", 240 + 50 * triggerIndex, 40,
+          "top", 400 + 50 * tagIndex, 40,
+        );
+        // hover graphics
+        if (
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(trigger.id, "status"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(trigger.id, "status")))
+        ) {
+          this.hoverGraphicsPool.beginFill();
+          this.hoverGraphicsPool.lineStyle(4);
+          const centerTriggerPos = center(triggerPos);
+          this.hoverGraphicsPool.moveTo(centerTriggerPos.x, centerTriggerPos.y);
+          if (trigger.owner.type === "friendly") {
+            const ownerPosCenter = center(this.friendlyUnitPos(state, new GlobalId(trigger.owner.id, "friendly")));
+            this.hoverGraphicsPool.lineTo(ownerPosCenter.x, ownerPosCenter.y); 
+          }
+          this.hoverGraphicsPool.endFill();
+        }
+      });
     });
 
     // DETAIL

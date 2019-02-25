@@ -263,7 +263,7 @@ export function eqUnitId(
     if (id2.tag === "PositionId") {
       return false;
     } else {
-      return id2.type === id1.type;
+      return id2.type === id1.type && id1.id === id2.id;
     }
   } else if (id2.type === "status") {
     // id1 is not a status target, but id2 is: always false
