@@ -170,9 +170,9 @@ export class ExecScreen {
           (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "friendly"))) ||
           (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "friendly")))
         ) {
-          const hoverBarPos = createPosition(
-            "left", 245 + 170 * unitIndex, 10,
-            "top", 15, 150,
+          const hoverBarPos = relativeTo(unitPos,
+            [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
+            10, 150,
           );
           const sprite = this.hoverSpritePool.newSprite(hoverBarPos.xMin, hoverBarPos.yMin, {}, {});
           sprite.inputEnabled = false;

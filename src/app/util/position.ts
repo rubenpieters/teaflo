@@ -66,6 +66,15 @@ export function inPosition(
 
 export function relativeTo(
   parentPos: Position,
+  relative: ({ type: "below" | "above" | "right" | "left", amt: number })[],
+  width: number,
+  height: number,
+): Position {
+  return relative.reduce((acc, { type, amt }) => _relativeTo(acc, type, amt, width, height), parentPos);
+}
+
+export function _relativeTo(
+  parentPos: Position,
   relativeType: "below" | "above" | "right" | "left",
   relativeAmt: number,
   width: number,
