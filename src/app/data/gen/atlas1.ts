@@ -43,417 +43,591 @@ export type Atlas1 = {
         "width": 30,
         "height": 30
     },
-    "icon_a.png": {
+    "icon_ai.png": {
         "x": 180,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_anim_ff.png": {
+        "x": 220,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_anim_pause.png": {
+        "x": 260,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_anim_play.png": {
+        "x": 300,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_anim_skip.png": {
+        "x": 340,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_armor.png": {
+        "x": 380,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ch_minus.png": {
+        "x": 420,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ch_plus.png": {
+        "x": 460,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ch.png": {
+        "x": 500,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_fragile.png": {
+        "x": 540,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_hp_minus.png": {
+        "x": 580,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_hp_plus.png": {
+        "x": 620,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_hp.png": {
+        "x": 660,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_start_turn.png": {
+        "x": 700,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_strong.png": {
+        "x": 740,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_th_minus.png": {
+        "x": 780,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_th_plus.png": {
+        "x": 820,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_th.png": {
+        "x": 860,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_weak.png": {
+        "x": 900,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_add_status.png": {
+        "x": 940,
+        "y": 0,
+        "width": 50,
+        "height": 50
+    },
+    "icon_a.png": {
+        "x": 1350,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_b.png": {
-        "x": 240,
+        "x": 1410,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_c.png": {
-        "x": 300,
+        "x": 1470,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_d.png": {
-        "x": 360,
+        "x": 1530,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_e.png": {
-        "x": 420,
+        "x": 1590,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_f.png": {
-        "x": 480,
+        "x": 1650,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "menu_btn1.png": {
-        "x": 540,
+        "x": 1710,
+        "y": 0,
+        "width": 70,
+        "height": 70
+    },
+    "ab1.png": {
+        "x": 1780,
+        "y": 0,
+        "width": 70,
+        "height": 70
+    },
+    "ab2.png": {
+        "x": 1850,
+        "y": 0,
+        "width": 70,
+        "height": 70
+    },
+    "ab3.png": {
+        "x": 1920,
+        "y": 0,
+        "width": 70,
+        "height": 70
+    },
+    "ab4.png": {
+        "x": 1990,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "expl_0.png": {
-        "x": 610,
+        "x": 2060,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_1.png": {
-        "x": 690,
+        "x": 2140,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_2.png": {
-        "x": 770,
+        "x": 2220,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_3.png": {
-        "x": 850,
+        "x": 2300,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_4.png": {
-        "x": 930,
+        "x": 2380,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_5.png": {
-        "x": 1010,
+        "x": 2460,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_6.png": {
-        "x": 1090,
+        "x": 2540,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_7.png": {
-        "x": 1170,
+        "x": 2620,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_8.png": {
-        "x": 1250,
+        "x": 2700,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_9.png": {
-        "x": 1330,
+        "x": 2780,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_enemy.png": {
-        "x": 1410,
+        "x": 2860,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_friendly.png": {
-        "x": 1490,
+        "x": 2940,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_armor.png": {
-        "x": 1570,
+        "x": 3020,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_ch.png": {
-        "x": 1650,
+        "x": 3100,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_hp.png": {
-        "x": 1730,
+        "x": 3180,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_minus.png": {
-        "x": 1810,
+        "x": 3260,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_plus.png": {
-        "x": 1890,
+        "x": 3340,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_self.png": {
-        "x": 1970,
+        "x": 3420,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target.png": {
-        "x": 2050,
+        "x": 3500,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_status.png": {
-        "x": 2130,
+        "x": 3580,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_unit.png": {
-        "x": 2210,
+        "x": 3660,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_th.png": {
-        "x": 2290,
+        "x": 3740,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "fr_unit_a1_l1_01_ab1.png": {
-        "x": 2370,
+        "x": 3820,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l1_01_ab2.png": {
-        "x": 2470,
+        "x": 3920,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l2_01_ab1.png": {
-        "x": 2570,
-        "y": 0,
+        "x": 0,
+        "y": 30,
         "width": 100,
         "height": 100
     },
-    "menu_btn2.png": {
-        "x": 2670,
+    "bar_hp.png": {
+        "x": 4020,
         "y": 0,
+        "width": 10,
+        "height": 150
+    },
+    "bar_ch.png": {
+        "x": 4030,
+        "y": 0,
+        "width": 10,
+        "height": 150
+    },
+    "menu_btn2.png": {
+        "x": 100,
+        "y": 40,
         "width": 150,
         "height": 150
     },
+    "unit1.png": {
+        "x": 250,
+        "y": 40,
+        "width": 150,
+        "height": 150
+    },
+    "unit2.png": {
+        "x": 400,
+        "y": 40,
+        "width": 150,
+        "height": 150
+    },
+    "unit3.png": {
+        "x": 550,
+        "y": 40,
+        "width": 150,
+        "height": 150
+    },
+    "unit4.png": {
+        "x": 700,
+        "y": 40,
+        "width": 150,
+        "height": 150
+    },
+    "bar_hover.png": {
+        "x": 850,
+        "y": 60,
+        "width": 160,
+        "height": 160
+    },
     "btn_level_neutral.png": {
-        "x": 2820,
-        "y": 0,
+        "x": 1010,
+        "y": 60,
         "width": 400,
         "height": 200
     },
     "btn_level_click.png": {
-        "x": 3220,
-        "y": 0,
+        "x": 1410,
+        "y": 70,
         "width": 400,
         "height": 200
     },
     "btn_level_hover.png": {
-        "x": 3620,
-        "y": 0,
+        "x": 1810,
+        "y": 80,
         "width": 400,
         "height": 200
     },
-    "unit1.png": {
-        "x": 0,
-        "y": 60,
-        "width": 200,
-        "height": 200
-    },
-    "unit2.png": {
-        "x": 200,
-        "y": 60,
-        "width": 200,
-        "height": 200
-    },
-    "unit3.png": {
-        "x": 400,
-        "y": 70,
-        "width": 200,
-        "height": 200
-    },
     "menu_btn3.png": {
-        "x": 600,
+        "x": 2210,
         "y": 80,
         "width": 220,
         "height": 220
     },
-    "hp.png": {
-        "x": 4020,
-        "y": 0,
-        "width": 75,
-        "height": 300
-    },
     "menu_btn_half1.png": {
-        "x": 820,
+        "x": 2430,
         "y": 80,
         "width": 125,
         "height": 250
     },
     "menu_btn_half2.png": {
-        "x": 945,
+        "x": 2555,
         "y": 80,
         "width": 125,
         "height": 250
     },
     "menu_btn_joined.png": {
-        "x": 1070,
+        "x": 2680,
         "y": 80,
         "width": 250,
         "height": 250
     },
     "menu_btn_joined1.png": {
-        "x": 1320,
+        "x": 2930,
         "y": 80,
         "width": 300,
         "height": 250
     },
     "menu_btn_joined2.png": {
-        "x": 1620,
+        "x": 3230,
         "y": 80,
         "width": 350,
         "height": 250
     },
-    "menu_btn_joined3.png": {
-        "x": 1970,
+    "side_btn.png": {
+        "x": 3580,
         "y": 80,
-        "width": 400,
+        "width": 240,
         "height": 250
     },
     "en_unit_a1_l1_01.png": {
-        "x": 2370,
+        "x": 3820,
         "y": 100,
         "width": 150,
         "height": 300
     },
+    "hp.png": {
+        "x": 0,
+        "y": 130,
+        "width": 75,
+        "height": 300
+    },
+    "menu_btn_joined3.png": {
+        "x": 75,
+        "y": 190,
+        "width": 400,
+        "height": 250
+    },
+    "ch.png": {
+        "x": 3970,
+        "y": 150,
+        "width": 75,
+        "height": 300
+    },
+    "menu_btn_joined4.png": {
+        "x": 475,
+        "y": 220,
+        "width": 450,
+        "height": 250
+    },
+    "res_anim.png": {
+        "x": 925,
+        "y": 220,
+        "width": 75,
+        "height": 300
+    },
     "fr_unit_a1_l1_01.png": {
-        "x": 2520,
-        "y": 100,
+        "x": 1000,
+        "y": 260,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_01.png": {
-        "x": 2670,
-        "y": 150,
+        "x": 1150,
+        "y": 260,
         "width": 150,
         "height": 300
     },
-    "menu_btn_joined4.png": {
-        "x": 2820,
-        "y": 200,
-        "width": 450,
-        "height": 250
-    },
     "fr_unit_a1_l2_02.png": {
-        "x": 3270,
-        "y": 200,
+        "x": 1300,
+        "y": 270,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_03.png": {
-        "x": 3420,
-        "y": 200,
+        "x": 1450,
+        "y": 270,
         "width": 150,
         "height": 300
     },
-    "ch.png": {
-        "x": 3570,
-        "y": 200,
-        "width": 75,
-        "height": 300
-    },
-    "res_anim.png": {
-        "x": 3645,
-        "y": 200,
-        "width": 75,
-        "height": 300
-    },
     "bmark_neutral.png": {
-        "x": 3720,
-        "y": 200,
-        "width": 200,
-        "height": 400
-    },
-    "bmark_click.png": {
-        "x": 0,
-        "y": 260,
-        "width": 200,
-        "height": 400
-    },
-    "bmark_hover.png": {
-        "x": 200,
-        "y": 260,
-        "width": 200,
-        "height": 400
-    },
-    "bt_bmark_neutral.png": {
-        "x": 400,
+        "x": 1600,
         "y": 270,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_click.png": {
-        "x": 600,
+    "bmark_click.png": {
+        "x": 1800,
+        "y": 280,
+        "width": 200,
+        "height": 400
+    },
+    "bmark_hover.png": {
+        "x": 2000,
+        "y": 280,
+        "width": 200,
+        "height": 400
+    },
+    "bt_bmark_neutral.png": {
+        "x": 2200,
         "y": 300,
         "width": 200,
         "height": 400
     },
+    "bt_bmark_click.png": {
+        "x": 2400,
+        "y": 330,
+        "width": 200,
+        "height": 400
+    },
     "bt_bmark_hover.png": {
-        "x": 800,
+        "x": 2600,
         "y": 330,
         "width": 200,
         "height": 400
     },
     "box.png": {
-        "x": 1000,
+        "x": 2800,
         "y": 330,
         "width": 640,
         "height": 1080
     },
     "menu_bar.png": {
-        "x": 1640,
+        "x": 3440,
         "y": 330,
         "width": 300,
         "height": 1080
     },
     "select3.png": {
-        "x": 1940,
-        "y": 400,
+        "x": 0,
+        "y": 470,
         "width": 720,
         "height": 1080
     },
     "select3_f.png": {
-        "x": 2660,
-        "y": 600,
+        "x": 720,
+        "y": 680,
         "width": 1221,
         "height": 1080
     },
     "sel_act1.png": {
-        "x": 0,
+        "x": 1941,
         "y": 1410,
         "width": 1920,
         "height": 1080
     },
     "sel_level1.png": {
-        "x": 1920,
-        "y": 1680,
+        "x": 0,
+        "y": 1760,
         "width": 1920,
         "height": 1080
     },
     "sel_level2.png": {
-        "x": 0,
+        "x": 1920,
         "y": 2490,
         "width": 1920,
         "height": 1080
     },
     "sel_level3.png": {
-        "x": 1920,
-        "y": 2760,
+        "x": 0,
+        "y": 2840,
         "width": 1920,
         "height": 1080
     }
@@ -502,417 +676,591 @@ export const atlas1: Atlas1 = {
         "width": 30,
         "height": 30
     },
-    "icon_a.png": {
+    "icon_ai.png": {
         "x": 180,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_anim_ff.png": {
+        "x": 220,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_anim_pause.png": {
+        "x": 260,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_anim_play.png": {
+        "x": 300,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_anim_skip.png": {
+        "x": 340,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_armor.png": {
+        "x": 380,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ch_minus.png": {
+        "x": 420,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ch_plus.png": {
+        "x": 460,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ch.png": {
+        "x": 500,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_fragile.png": {
+        "x": 540,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_hp_minus.png": {
+        "x": 580,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_hp_plus.png": {
+        "x": 620,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_hp.png": {
+        "x": 660,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_start_turn.png": {
+        "x": 700,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_strong.png": {
+        "x": 740,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_th_minus.png": {
+        "x": 780,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_th_plus.png": {
+        "x": 820,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_th.png": {
+        "x": 860,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_weak.png": {
+        "x": 900,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_add_status.png": {
+        "x": 940,
+        "y": 0,
+        "width": 50,
+        "height": 50
+    },
+    "icon_a.png": {
+        "x": 1350,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_b.png": {
-        "x": 240,
+        "x": 1410,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_c.png": {
-        "x": 300,
+        "x": 1470,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_d.png": {
-        "x": 360,
+        "x": 1530,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_e.png": {
-        "x": 420,
+        "x": 1590,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_f.png": {
-        "x": 480,
+        "x": 1650,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "menu_btn1.png": {
-        "x": 540,
+        "x": 1710,
+        "y": 0,
+        "width": 70,
+        "height": 70
+    },
+    "ab1.png": {
+        "x": 1780,
+        "y": 0,
+        "width": 70,
+        "height": 70
+    },
+    "ab2.png": {
+        "x": 1850,
+        "y": 0,
+        "width": 70,
+        "height": 70
+    },
+    "ab3.png": {
+        "x": 1920,
+        "y": 0,
+        "width": 70,
+        "height": 70
+    },
+    "ab4.png": {
+        "x": 1990,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "expl_0.png": {
-        "x": 610,
+        "x": 2060,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_1.png": {
-        "x": 690,
+        "x": 2140,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_2.png": {
-        "x": 770,
+        "x": 2220,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_3.png": {
-        "x": 850,
+        "x": 2300,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_4.png": {
-        "x": 930,
+        "x": 2380,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_5.png": {
-        "x": 1010,
+        "x": 2460,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_6.png": {
-        "x": 1090,
+        "x": 2540,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_7.png": {
-        "x": 1170,
+        "x": 2620,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_8.png": {
-        "x": 1250,
+        "x": 2700,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_9.png": {
-        "x": 1330,
+        "x": 2780,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_enemy.png": {
-        "x": 1410,
+        "x": 2860,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_friendly.png": {
-        "x": 1490,
+        "x": 2940,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_armor.png": {
-        "x": 1570,
+        "x": 3020,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_ch.png": {
-        "x": 1650,
+        "x": 3100,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_hp.png": {
-        "x": 1730,
+        "x": 3180,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_minus.png": {
-        "x": 1810,
+        "x": 3260,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_plus.png": {
-        "x": 1890,
+        "x": 3340,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_self.png": {
-        "x": 1970,
+        "x": 3420,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target.png": {
-        "x": 2050,
+        "x": 3500,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_status.png": {
-        "x": 2130,
+        "x": 3580,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_unit.png": {
-        "x": 2210,
+        "x": 3660,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_th.png": {
-        "x": 2290,
+        "x": 3740,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "fr_unit_a1_l1_01_ab1.png": {
-        "x": 2370,
+        "x": 3820,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l1_01_ab2.png": {
-        "x": 2470,
+        "x": 3920,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l2_01_ab1.png": {
-        "x": 2570,
-        "y": 0,
+        "x": 0,
+        "y": 30,
         "width": 100,
         "height": 100
     },
-    "menu_btn2.png": {
-        "x": 2670,
+    "bar_hp.png": {
+        "x": 4020,
         "y": 0,
+        "width": 10,
+        "height": 150
+    },
+    "bar_ch.png": {
+        "x": 4030,
+        "y": 0,
+        "width": 10,
+        "height": 150
+    },
+    "menu_btn2.png": {
+        "x": 100,
+        "y": 40,
         "width": 150,
         "height": 150
     },
+    "unit1.png": {
+        "x": 250,
+        "y": 40,
+        "width": 150,
+        "height": 150
+    },
+    "unit2.png": {
+        "x": 400,
+        "y": 40,
+        "width": 150,
+        "height": 150
+    },
+    "unit3.png": {
+        "x": 550,
+        "y": 40,
+        "width": 150,
+        "height": 150
+    },
+    "unit4.png": {
+        "x": 700,
+        "y": 40,
+        "width": 150,
+        "height": 150
+    },
+    "bar_hover.png": {
+        "x": 850,
+        "y": 60,
+        "width": 160,
+        "height": 160
+    },
     "btn_level_neutral.png": {
-        "x": 2820,
-        "y": 0,
+        "x": 1010,
+        "y": 60,
         "width": 400,
         "height": 200
     },
     "btn_level_click.png": {
-        "x": 3220,
-        "y": 0,
+        "x": 1410,
+        "y": 70,
         "width": 400,
         "height": 200
     },
     "btn_level_hover.png": {
-        "x": 3620,
-        "y": 0,
+        "x": 1810,
+        "y": 80,
         "width": 400,
         "height": 200
     },
-    "unit1.png": {
-        "x": 0,
-        "y": 60,
-        "width": 200,
-        "height": 200
-    },
-    "unit2.png": {
-        "x": 200,
-        "y": 60,
-        "width": 200,
-        "height": 200
-    },
-    "unit3.png": {
-        "x": 400,
-        "y": 70,
-        "width": 200,
-        "height": 200
-    },
     "menu_btn3.png": {
-        "x": 600,
+        "x": 2210,
         "y": 80,
         "width": 220,
         "height": 220
     },
-    "hp.png": {
-        "x": 4020,
-        "y": 0,
-        "width": 75,
-        "height": 300
-    },
     "menu_btn_half1.png": {
-        "x": 820,
+        "x": 2430,
         "y": 80,
         "width": 125,
         "height": 250
     },
     "menu_btn_half2.png": {
-        "x": 945,
+        "x": 2555,
         "y": 80,
         "width": 125,
         "height": 250
     },
     "menu_btn_joined.png": {
-        "x": 1070,
+        "x": 2680,
         "y": 80,
         "width": 250,
         "height": 250
     },
     "menu_btn_joined1.png": {
-        "x": 1320,
+        "x": 2930,
         "y": 80,
         "width": 300,
         "height": 250
     },
     "menu_btn_joined2.png": {
-        "x": 1620,
+        "x": 3230,
         "y": 80,
         "width": 350,
         "height": 250
     },
-    "menu_btn_joined3.png": {
-        "x": 1970,
+    "side_btn.png": {
+        "x": 3580,
         "y": 80,
-        "width": 400,
+        "width": 240,
         "height": 250
     },
     "en_unit_a1_l1_01.png": {
-        "x": 2370,
+        "x": 3820,
         "y": 100,
         "width": 150,
         "height": 300
     },
+    "hp.png": {
+        "x": 0,
+        "y": 130,
+        "width": 75,
+        "height": 300
+    },
+    "menu_btn_joined3.png": {
+        "x": 75,
+        "y": 190,
+        "width": 400,
+        "height": 250
+    },
+    "ch.png": {
+        "x": 3970,
+        "y": 150,
+        "width": 75,
+        "height": 300
+    },
+    "menu_btn_joined4.png": {
+        "x": 475,
+        "y": 220,
+        "width": 450,
+        "height": 250
+    },
+    "res_anim.png": {
+        "x": 925,
+        "y": 220,
+        "width": 75,
+        "height": 300
+    },
     "fr_unit_a1_l1_01.png": {
-        "x": 2520,
-        "y": 100,
+        "x": 1000,
+        "y": 260,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_01.png": {
-        "x": 2670,
-        "y": 150,
+        "x": 1150,
+        "y": 260,
         "width": 150,
         "height": 300
     },
-    "menu_btn_joined4.png": {
-        "x": 2820,
-        "y": 200,
-        "width": 450,
-        "height": 250
-    },
     "fr_unit_a1_l2_02.png": {
-        "x": 3270,
-        "y": 200,
+        "x": 1300,
+        "y": 270,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_03.png": {
-        "x": 3420,
-        "y": 200,
+        "x": 1450,
+        "y": 270,
         "width": 150,
         "height": 300
     },
-    "ch.png": {
-        "x": 3570,
-        "y": 200,
-        "width": 75,
-        "height": 300
-    },
-    "res_anim.png": {
-        "x": 3645,
-        "y": 200,
-        "width": 75,
-        "height": 300
-    },
     "bmark_neutral.png": {
-        "x": 3720,
-        "y": 200,
-        "width": 200,
-        "height": 400
-    },
-    "bmark_click.png": {
-        "x": 0,
-        "y": 260,
-        "width": 200,
-        "height": 400
-    },
-    "bmark_hover.png": {
-        "x": 200,
-        "y": 260,
-        "width": 200,
-        "height": 400
-    },
-    "bt_bmark_neutral.png": {
-        "x": 400,
+        "x": 1600,
         "y": 270,
         "width": 200,
         "height": 400
     },
-    "bt_bmark_click.png": {
-        "x": 600,
+    "bmark_click.png": {
+        "x": 1800,
+        "y": 280,
+        "width": 200,
+        "height": 400
+    },
+    "bmark_hover.png": {
+        "x": 2000,
+        "y": 280,
+        "width": 200,
+        "height": 400
+    },
+    "bt_bmark_neutral.png": {
+        "x": 2200,
         "y": 300,
         "width": 200,
         "height": 400
     },
+    "bt_bmark_click.png": {
+        "x": 2400,
+        "y": 330,
+        "width": 200,
+        "height": 400
+    },
     "bt_bmark_hover.png": {
-        "x": 800,
+        "x": 2600,
         "y": 330,
         "width": 200,
         "height": 400
     },
     "box.png": {
-        "x": 1000,
+        "x": 2800,
         "y": 330,
         "width": 640,
         "height": 1080
     },
     "menu_bar.png": {
-        "x": 1640,
+        "x": 3440,
         "y": 330,
         "width": 300,
         "height": 1080
     },
     "select3.png": {
-        "x": 1940,
-        "y": 400,
+        "x": 0,
+        "y": 470,
         "width": 720,
         "height": 1080
     },
     "select3_f.png": {
-        "x": 2660,
-        "y": 600,
+        "x": 720,
+        "y": 680,
         "width": 1221,
         "height": 1080
     },
     "sel_act1.png": {
-        "x": 0,
+        "x": 1941,
         "y": 1410,
         "width": 1920,
         "height": 1080
     },
     "sel_level1.png": {
-        "x": 1920,
-        "y": 1680,
+        "x": 0,
+        "y": 1760,
         "width": 1920,
         "height": 1080
     },
     "sel_level2.png": {
-        "x": 0,
+        "x": 1920,
         "y": 2490,
         "width": 1920,
         "height": 1080
     },
     "sel_level3.png": {
-        "x": 1920,
-        "y": 2760,
+        "x": 0,
+        "y": 2840,
         "width": 1920,
         "height": 1080
     }

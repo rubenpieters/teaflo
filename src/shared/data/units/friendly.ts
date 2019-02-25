@@ -49,7 +49,7 @@ export const fr_unit_a1_l2_01: FrUnit = {
       inputs: [
         new TargetInput(),
       ],
-      spriteId: "fr_unit_a1_l1_01_ab1",
+      spriteId: "ab3",
     },
   ],
   vital: true,
@@ -74,7 +74,7 @@ export const fr_unit_a1_l2_02: FrUnit = {
         ),
       ]),
       inputs: [],
-      spriteId: "fr_unit_a1_l2_01_ab1",
+      spriteId: "ab1",
     },
   ],
   vital: true,
@@ -100,7 +100,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
       inputs: [
         new TargetInput(),
       ],
-      spriteId: "fr_unit_a1_l1_01_ab2",
+      spriteId: "ab2",
     },
   ],
   vital: true,

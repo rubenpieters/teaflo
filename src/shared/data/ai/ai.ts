@@ -30,7 +30,7 @@ export const ai2: AI = [
           T.full(new T.Weak(1)),
         ),
       ),
-      spriteId: "fr_unit_a1_l2_01_ab1",
+      spriteId: "ab4",
       outs: [
           {
             aiOut: new O.ToX(1),
@@ -43,7 +43,7 @@ export const ai2: AI = [
         I.mkHighestThreat(),
         new I.Static(15),
       ),
-      spriteId: "fr_unit_a1_l1_01_ab1",
+      spriteId: "ab3",
       outs: [
           {
             aiOut: new O.ToX(0),
