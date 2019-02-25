@@ -13,11 +13,12 @@ export class TextPool {
   public newText(
     pos: Position,
     textContent: string,
+    fontSize: number = 70,
   ): Phaser.Text {
     const text = this.game.add.text(
       pos.xMin, pos.yMin, textContent, {
         fill: "#000000",
-        fontSize: 70,
+        fontSize,
         boundsAlignH: "center",
         boundsAlignV: "middle",
       }

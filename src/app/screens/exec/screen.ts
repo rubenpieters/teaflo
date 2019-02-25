@@ -27,6 +27,7 @@ export class ExecScreen {
   abilityPool: Pool<AbilityData, {}>
   unitTextPool: TextPool
   statsTextPool: TextPool
+  stateTextPool: TextPool
   triggerPool: Pool<TriggerData, {}>
   logTextPool: TextPool
   logTextSpritePool: Pool<LogTextSpriteData, {}>
@@ -56,6 +57,7 @@ export class ExecScreen {
     this.unitResPool = mkUnitResPool(gameRefs);
     this.unitTextPool = new TextPool(gameRefs.game);
     this.statsTextPool = new TextPool(gameRefs.game);
+    this.stateTextPool = new TextPool(gameRefs.game);
     this.abilityPool = mkAbilityPool(gameRefs);
     this.triggerPool = mkTriggerPool(gameRefs);
     this.logTextPool = new TextPool(gameRefs.game);
@@ -146,6 +148,7 @@ export class ExecScreen {
     this.unitTextPool.clear();
     this.hoverSpritePool.clear();
     this.hoverGraphicsPool.clear();
+    this.stateTextPool.clear();
 
     // calculate max threat value
     const enIds = filteredEn(state)
@@ -164,6 +167,18 @@ export class ExecScreen {
             globalId: new GlobalId(unit.id, "friendly"),
           }
         );
+
+        // hp/ch numbers
+        const hpTextPos = createPosition(
+          "left", 245 + 170 * unitIndex, 100,
+          "top", 180, 20,
+        );
+        this.stateTextPool.newText(hpTextPos, `${unit.hp} / ${unit.maxHp}`, 20);
+        const chTextPos = createPosition(
+          "left", 245 + 170 * unitIndex, 100,
+          "top", 210, 20,
+        );
+        this.stateTextPool.newText(chTextPos, `${unit.charges} / ${unit.maxCharges}`, 20);
 
         // hover bar
         if (
@@ -242,7 +257,7 @@ export class ExecScreen {
         enIds.forEach((enId, enIndex) => {
           const unitThPos = createPosition(
             "left", 245 + 170 * unitIndex + 30 * enIndex, 25,
-            "top", 240, 100,
+            "top", 240, 50,
           );
           const unitThSprite = this.unitResPool.newSprite(unitThPos.xMin, unitThPos.yMin, {},
             { cardId: unit.cardId,
@@ -253,6 +268,11 @@ export class ExecScreen {
           const threat = unit.threatMap[enId] === undefined ? 0 : unit.threatMap[enId];
           unitThSprite.width = 25;
           unitThSprite.height = threat / maxThreat * 50;
+          const thTextPos = createPosition(
+            "left", 245 + 170 * unitIndex + 30 * enIndex, 25,
+            "top", 300, 20,
+          );
+          this.stateTextPool.newText(thTextPos, `${threat}`, 20);
         });
       }
     });
