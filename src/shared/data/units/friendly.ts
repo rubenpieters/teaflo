@@ -463,7 +463,7 @@ export const test4_ab: FrUnit = {
       inputs: [
         new TargetInput(),
       ],
-      spriteId: "fr_unit_a1_l1_01_ab2",
+      spriteId: "ab1",
     },
     {
       intent: new I.CombinedIntent([
@@ -479,7 +479,7 @@ export const test4_ab: FrUnit = {
       inputs: [
         new TargetInput(),
       ],
-      spriteId: "fr_unit_a1_l1_01_ab1",
+      spriteId: "ab2",
     },
     {
       intent: new I.CombinedIntent([
@@ -495,7 +495,7 @@ export const test4_ab: FrUnit = {
       inputs: [
         new TargetInput(),
       ],
-      spriteId: "fr_unit_a1_l1_01_ab1",
+      spriteId: "ab3",
     },
     {
       intent: new I.CombinedIntent([
@@ -511,7 +511,7 @@ export const test4_ab: FrUnit = {
       inputs: [
         new TargetInput(),
       ],
-      spriteId: "fr_unit_a1_l1_01_ab2",
+      spriteId: "ab4",
     },
   ],
   vital: true,

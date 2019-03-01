@@ -17,6 +17,7 @@ import { Solution } from "../../../shared/game/solution";
 import { intentDescription, actionDescription } from "../../util/intentDesc";
 import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
+import { Intent } from "../../../shared/game/intent";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -45,7 +46,6 @@ export class ExecScreen {
   log: Log | undefined
   hoveredUnit: UnitSelection | undefined
   selectedUnit: UnitSelection | undefined
-  showAbilityIndex: number | undefined
   clickState: { ability: Ability, inputs: any[], origin: UnitId } | undefined
   intermediate: LogIndex | undefined
 
@@ -77,7 +77,6 @@ export class ExecScreen {
     this.log = undefined;
     this.hoveredUnit = undefined;
     this.selectedUnit = undefined;
-    this.showAbilityIndex = undefined;
     this.clickState = undefined;
     this.intermediate = undefined;
     this.logActionPool.clear();
@@ -133,7 +132,18 @@ export class ExecScreen {
     const positionId = toPositionId(state, unitId);
     return createPosition(
       "left", 250 + 170 * positionId.id, 150,
-      "top", 20, 150,
+      "top", 520, 150,
+    );
+  }
+
+  enemyUnitPos(
+    state: GameState,
+    unitId: EntityId<"enemy">,
+  ) {
+    const positionId = toPositionId(state, unitId);
+    return createPosition(
+      "left", 1000 + 170 * positionId.id, 150,
+      "top", 520, 150,
     );
   }
 
@@ -149,6 +159,7 @@ export class ExecScreen {
     this.hoverSpritePool.clear();
     this.hoverGraphicsPool.clear();
     this.stateTextPool.clear();
+    this.abilityPool.clear();
 
     // calculate max threat value
     const enIds = filteredEn(state)
@@ -171,12 +182,12 @@ export class ExecScreen {
         // hp/ch numbers
         const hpTextPos = createPosition(
           "left", 245 + 170 * unitIndex, 100,
-          "top", 180, 20,
+          "top", 680, 20,
         );
         this.stateTextPool.newText(hpTextPos, `${unit.hp} / ${unit.maxHp}`, 20);
         const chTextPos = createPosition(
           "left", 245 + 170 * unitIndex, 100,
-          "top", 210, 20,
+          "top", 710, 20,
         );
         this.stateTextPool.newText(chTextPos, `${unit.charges} / ${unit.maxCharges}`, 20);
 
@@ -187,7 +198,7 @@ export class ExecScreen {
         ) {
           const hoverBarPos = relativeTo(unitPos,
             [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
-            10, 150,
+            0, 0,
           );
           const sprite = this.hoverSpritePool.newSprite(hoverBarPos.xMin, hoverBarPos.yMin, {}, {});
           sprite.inputEnabled = false;
@@ -196,7 +207,7 @@ export class ExecScreen {
         // HP
         const unitHpPos = createPosition(
           "left", 245 + 170 * unitIndex, 10,
-          "top", 20, 150,
+          "top", 520, 150,
         );
         const hpHeight = unitHpPos.yMax - unitHpPos.yMin;
         unitHpPos.yMin = unitHpPos.yMin + hpHeight * ((unit.maxHp - unit.hp) / unit.maxHp);
@@ -214,7 +225,7 @@ export class ExecScreen {
           if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
             const prevUnitHpPos = createPosition(
               "left", 245 + 170 * unitIndex, 10,
-              "top", 20, 150,
+              "top", 520, 150,
             );
             const prevDiff = hpHeight * ((prevUnit.maxHp - prevUnit.hp) / prevUnit.maxHp);
             prevUnitHpPos.yMax = unitHpPos.yMin;
@@ -240,7 +251,7 @@ export class ExecScreen {
         // CH
         const unitChPos = createPosition(
           "left", 395 + 170 * unitIndex, 10,
-          "top", 20, 150,
+          "top", 520, 150,
         );
         const chHeight = unitChPos.yMax - unitChPos.yMin;
         unitChPos.yMin = unitChPos.yMin + chHeight * ((unit.maxCharges - unit.charges) / unit.maxCharges);
@@ -257,7 +268,7 @@ export class ExecScreen {
         enIds.forEach((enId, enIndex) => {
           const unitThPos = createPosition(
             "left", 245 + 170 * unitIndex + 30 * enIndex, 25,
-            "top", 240, 50,
+            "top", 740, 50,
           );
           const unitThSprite = this.unitResPool.newSprite(unitThPos.xMin, unitThPos.yMin, {},
             { cardId: unit.cardId,
@@ -270,19 +281,31 @@ export class ExecScreen {
           unitThSprite.height = threat / maxThreat * 50;
           const thTextPos = createPosition(
             "left", 245 + 170 * unitIndex + 30 * enIndex, 25,
-            "top", 300, 20,
+            "top", 800, 20,
           );
           this.stateTextPool.newText(thTextPos, `${threat}`, 20);
+        });
+
+        // abilities
+        unit.abilities.forEach((ability, abilityIndex) => {
+          if (abilityIndex >= 4) { throw "ability index should be below 4" };
+          const flagTop = abilityIndex % 2;
+          const flagLeft = abilityIndex < 2 ? 0 : 1;
+          const abPos = createPosition(
+            "left", 250 + 170 * unitIndex + 75 * flagLeft, 70,
+            "top", 830 + 75 * flagTop, 70,
+          );
+          this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
+            { tag: "FrAbilityData", spriteId: ability.spriteId, ability, index: abilityIndex,
+              globalId: new GlobalId(unit.id, "friendly") }
+          );
         });
       }
     });
 
     state.enUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
-        const unitPos = createPosition(
-          "left", 1000 + 170 * unitIndex, 150,
-          "top", 20, 150,
-        );
+        const unitPos = this.enemyUnitPos(state, new PositionId(unitIndex, "enemy"));
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: new GlobalId(unit.id, "enemy"),
@@ -294,9 +317,9 @@ export class ExecScreen {
           (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "enemy"))) ||
           (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "enemy")))
         ) {
-          const hoverBarPos = createPosition(
-            "left", 995 + 170 * unitIndex, 10,
-            "top", 15, 150,
+          const hoverBarPos = relativeTo(unitPos,
+            [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
+            0, 0,
           );
           const sprite = this.hoverSpritePool.newSprite(hoverBarPos.xMin, hoverBarPos.yMin, {}, {});
           sprite.inputEnabled = false;
@@ -305,7 +328,7 @@ export class ExecScreen {
         // HP
         const unitHpPos = createPosition(
           "left", 995 + 170 * unitIndex, 10,
-          "top", 20, 150,
+          "top", 520, 150,
         );
         const hpHeight = unitHpPos.yMax - unitHpPos.yMin;
         unitHpPos.yMin = unitHpPos.yMin + hpHeight * ((unit.maxHp - unit.hp) / unit.maxHp);
@@ -323,7 +346,7 @@ export class ExecScreen {
           if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
             const prevUnitHpPos = createPosition(
               "left", 995 + 170 * unitIndex, 10,
-              "top", 20, 150,
+              "top", 520, 150,
             );
             const prevDiff = hpHeight * ((prevUnit.maxHp - prevUnit.hp) / prevUnit.maxHp);
             prevUnitHpPos.yMax = unitHpPos.yMin;
@@ -349,7 +372,7 @@ export class ExecScreen {
         // CH
         const unitChPos = createPosition(
           "left", 1145 + 170 * unitIndex, 10,
-          "top", 20, 150,
+          "top", 520, 150,
         );
         const chHeight = unitChPos.yMax - unitChPos.yMin;
         unitChPos.yMin = unitChPos.yMin + chHeight * ((unit.maxCharges - unit.charges) / unit.maxCharges);
@@ -361,6 +384,17 @@ export class ExecScreen {
         );
         unitChSprite.width = 10;
         unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
+
+        // next intent
+        const abPos = createPosition(
+          "left", 1040 + 170 * unitIndex, 70,
+          "top", 700, 70,
+        );
+        const ai = unit.ai[unit.currentAI];
+        this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
+          { tag: "EnAbilityData", spriteId: ai.spriteId, currentIntent: ai.intent }
+        );
+
       }
     });
 
@@ -369,7 +403,7 @@ export class ExecScreen {
       state.triggers[tag].forEach((trigger, triggerIndex) => {
         const triggerPos = createPosition(
           "left", 240 + 50 * triggerIndex, 40,
-          "top", 400 + 50 * tagIndex, 40,
+          "top", 50 + 50 * tagIndex, 40,
         );
         this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { trigger });
 
@@ -406,7 +440,6 @@ export class ExecScreen {
   drawStats(
     state: GameState,
   ) {
-    this.abilityPool.clear();
     this.statsTextPool.clear();
     this.detailBtnPool.clear();
     this.detailExplPool.clear();
@@ -421,9 +454,10 @@ export class ExecScreen {
           (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "friendly"))) ||
           (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "friendly")))
         ) {
-          const hoverBarPos = createPosition(
-            "left", 245 + 170 * unitIndex, 10,
-            "top", 15, 150,
+          const unitPos = this.friendlyUnitPos(state, new PositionId(unitIndex, "friendly"));
+          const hoverBarPos = relativeTo(unitPos,
+            [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
+            0, 0,
           );
           const sprite = this.hoverSpritePool.newSprite(hoverBarPos.xMin, hoverBarPos.yMin, {}, {});
           sprite.inputEnabled = false;
@@ -437,9 +471,10 @@ export class ExecScreen {
           (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "enemy"))) ||
           (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "enemy")))
         ) {
-          const hoverBarPos = createPosition(
-            "left", 995 + 170 * unitIndex, 10,
-            "top", 15, 150,
+          const unitPos = this.enemyUnitPos(state, new PositionId(unitIndex, "enemy"));
+          const hoverBarPos = relativeTo(unitPos,
+            [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
+            0, 0,
           );
           const sprite = this.hoverSpritePool.newSprite(hoverBarPos.xMin, hoverBarPos.yMin, {}, {});
           sprite.inputEnabled = false;
@@ -450,7 +485,7 @@ export class ExecScreen {
       state.triggers[tag].forEach((trigger, triggerIndex) => {
         const triggerPos = createPosition(
           "left", 240 + 50 * triggerIndex, 40,
-          "top", 400 + 50 * tagIndex, 40,
+          "top", 50 + 50 * tagIndex, 40,
         );
         // hover graphics
         if (
@@ -475,74 +510,21 @@ export class ExecScreen {
     if (showUnit !== undefined) {
       if (showUnit.type === "friendly" || showUnit.type === "enemy") {
         const unit = getUnit(showUnit, state);
-        if (unit !== undefined) {
-          // hp/ch/th text
-          const pos1 = createPosition(
-            "left", 650, 150,
-            "bot", 200, 300,
-          );
-          this.statsTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
-          const pos2 = createPosition(
-            "left", 850, 150,
-            "bot", 200, 300,
-          );
-          this.statsTextPool.newText(pos2, `${unit.charges} / ${unit.maxCharges}`);
-  
+        if (unit !== undefined) {  
           if (showUnit.type === "friendly") {
             const frUnit = <FrStUnit>unit;
 
-            // go to codex button
-            const detailBtnPos = createPosition(
-              "left", 350, 150,
-              "bot", 100, 150,
-            );
-            this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "FrCardId", cardId: frUnit.cardId } });
-
-            // abilities
-            frUnit.abilities.forEach((ability, abilityIndex) => {
-              const flagTop = abilityIndex % 2;
-              const flagLeft = abilityIndex < 2 ? 0 : 1;
-              if (abilityIndex >= 4) { throw "ability index should be below 4" };
-              const abPos = createPosition(
-                "left", 500 + 125 * flagLeft, 100,
-                "bot", 200 - 125 * flagTop, 100,
-              );
-              this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {}, { tag: "FrAbilityData", spriteId: ability.spriteId, ability, index: abilityIndex, globalId:  new GlobalId(unit.id, "friendly") });
-
-              if (this.showAbilityIndex !== undefined && this.showAbilityIndex === abilityIndex) {
-                const desc = intentDescription(ability.intent);
-                let y = 0;
-                let xOffset = 0;
-                desc.forEach((descSym, descIndex) => {
-                  const explPos = createPosition(
-                    "left", 750 + 80 * (descIndex - xOffset), 80,
-                    "bot", 250 - y * 80, 80,
-                  );
-                  switch (descSym.tag) {
-                    case "DescSeparator": {
-                      y += 1;
-                      xOffset = descIndex + 1;
-                      break;
-                    }
-                    case "DescSymbol": {
-                      this.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
-                      break;
-                    }
-                  }
-                });
-              }
-            });
           } else if (showUnit.type === "enemy") {
             const enUnit = <EnStUnit>unit;
 
             // go to codex button
-            const detailBtnPos = createPosition(
+            /*const detailBtnPos = createPosition(
               "left", 350, 150,
               "bot", 100, 150,
             );
-            this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "EnCardId", cardId: enUnit.cardId } });
+            this.detailBtnPool.newSprite(detailBtnPos.xMin, detailBtnPos.yMin, {}, { type: { tag: "EnCardId", cardId: enUnit.cardId } });*/
 
-            const abPos = createPosition(
+            /*const abPos = createPosition(
               "left", 500, 100,
               "bot", 200, 100,
             );
@@ -568,7 +550,7 @@ export class ExecScreen {
                   break;
                 }
               }
-            });
+            });*/
           }
         }
       } else {
@@ -726,22 +708,14 @@ export class ExecScreen {
         const index = findStatus(state, id);
         return createPosition(
           "left", 650 + 80 * index!.index, 100,
-          "top", 400 + 80 * triggerOrder.findIndex(x => x === index!.group), 100,
+          "top", 50 + 80 * triggerOrder.findIndex(x => x === index!.group), 100,
         );
       }
       case "enemy": {
-        const index = findIndex(state, id);
-        return createPosition(
-          "left", 1300 + 170 * index!, 100,
-          "top", 200, 100,
-        );
+        return this.enemyUnitPos(state, id as EntityId<"enemy">);
       }
       case "friendly": {
-        const index = findIndex(state, id);
-        return createPosition(
-          "left", 650 + 170 * index!, 100,
-          "top", 200, 100,
-        );
+        return this.friendlyUnitPos(state, id as EntityId<"friendly">);
       }
     }
   }
@@ -1016,6 +990,7 @@ type FrAbilityData = {
 
 type EnAbilityData = {
   spriteId: string,
+  currentIntent: Intent,
   tag: "EnAbilityData",
 }
 
@@ -1039,7 +1014,6 @@ function mkAbilityPool(
       callbacks: {
         click: (self) => {
           if (self.data.tag === "FrAbilityData") {
-            gameRefs.screens.execScreen.showAbilityIndex = self.data.index;
             if (gameRefs.screens.execScreen.canExtendState() && gameRefs.screens.execScreen.clickState === undefined) {
               gameRefs.screens.execScreen.clickState = {
                 ability: self.data.ability,
@@ -1053,16 +1027,35 @@ function mkAbilityPool(
           }
         },
         hoverOver: (self) => {
+          let intent: Intent;
           if (self.data.tag === "FrAbilityData") {
-            gameRefs.screens.execScreen.showAbilityIndex = self.data.index;
-            gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
+            intent = self.data.ability.intent;
+          } else {
+            intent = self.data.currentIntent;
           }
+          const desc = intentDescription(intent);
+          let y = 0;
+          let xOffset = 0;
+          desc.forEach((descSym, descIndex) => {
+            const explPos = createPosition(
+              "left", 750 + 80 * (descIndex - xOffset), 80,
+              "bot", 225 - y * 80, 80,
+            );
+            switch (descSym.tag) {
+              case "DescSeparator": {
+                y += 1;
+                xOffset = descIndex + 1;
+                break;
+              }
+              case "DescSymbol": {
+                gameRefs.screens.execScreen.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
+                break;
+              }
+            }
+          });
         },
         hoverOut: (self) => {
-          if (self.data.tag === "FrAbilityData") {
-            gameRefs.screens.execScreen.showAbilityIndex = undefined;
-            gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
-          }
+          gameRefs.screens.execScreen.detailExplPool.clear();
         },
       },
     },
