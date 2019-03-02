@@ -14,7 +14,7 @@ import { Action } from "../../../shared/game/action";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution } from "../../../shared/game/solution";
-import { intentDescription, actionDescription } from "../../util/intentDesc";
+import { intentDescription, actionDescription, triggerTagDescription, DescToken } from "../../util/intentDesc";
 import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
 import { Intent } from "../../../shared/game/intent";
@@ -1153,8 +1153,19 @@ function mkLogActionPool(
           );
         },
         hoverOver: (self) => {
+          // change state/stats
           gameRefs.screens.execScreen.drawState(self.data.state);
           gameRefs.screens.execScreen.drawStats(self.data.state);
+
+          // change hover info
+          //drawDescriptionToHoverInfo(gameRefs, actionDescription(self.data.action), 50, 0);
+          self.data.transforms.forEach((transform, transformIndex) => {
+            drawDescriptionToHoverInfo(gameRefs, actionDescription(transform.before), 50, 50 * transformIndex);
+            if (transformIndex === self.data.transforms.length) {
+              drawDescriptionToHoverInfo(gameRefs, actionDescription(transform.after), 50, 50 * (transformIndex + 1));
+            }
+            drawDescriptionToHoverInfo(gameRefs, triggerTagDescription(transform.tag), 0, 50 * (transformIndex + 1));
+          });
         },
         hoverOut: (self) => {
           gameRefs.screens.execScreen.drawCurrentState();
@@ -1162,6 +1173,33 @@ function mkLogActionPool(
       },
     },
   );
+}
+
+function drawDescriptionToHoverInfo(
+  gameRefs: GameRefs,
+  desc: DescToken[],
+  startX: number = 0,
+  startY: number = 0,
+) {
+  let y = 0;
+  let xOffset = 0;
+  desc.forEach((descSym, descIndex) => {
+    const explPos = createPosition(
+      "left", 750 + startX + 80 * (descIndex - xOffset), 80,
+      "bot", 225 - startY - y * 80, 80,
+    );
+    switch (descSym.tag) {
+      case "DescSeparator": {
+        y += 1;
+        xOffset = descIndex + 1;
+        break;
+      }
+      case "DescSymbol": {
+        gameRefs.screens.execScreen.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
+        break;
+      }
+    }
+  });
 }
 
 type LogTriggerData = {

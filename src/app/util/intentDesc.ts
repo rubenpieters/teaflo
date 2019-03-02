@@ -15,7 +15,7 @@ export class DescSeparator {
   ) {}
 }
 
-type DescToken
+export type DescToken
   = DescSymbol
   | DescSeparator
 
@@ -121,7 +121,10 @@ export function triggerDescription(
 ): DescToken[] {
   switch (trigger.tag) {
     case "Weak": {
-      return []
+      return singleton("expl_plus.png")
+        .concat(numberDescription(Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5)))
+        .concat(new DescSymbol("icon_weak.png"))
+        ;
     }
     case "AllyWeakSelfArmor": {
       return []
@@ -130,13 +133,19 @@ export function triggerDescription(
       return []
     }
     case "Fragile": {
-      return []
+      return singleton("expl_plus.png")
+        .concat(numberDescription(Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5)))
+        .concat(new DescSymbol("icon_fragile.png"))
+        ;
     }
     case "Grow": {
       return []
     }
     case "Strong": {
-      return []
+      return singleton("expl_plus.png")
+        .concat(numberDescription(Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5)))
+        .concat(new DescSymbol("icon_strong.png"))
+        ;
     }
     case "StrongLowHP": {
       return []
@@ -147,8 +156,43 @@ export function triggerDescription(
     case "Armor": {
       return singleton("expl_plus.png")
         .concat(numberDescription(Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5)))
-        .concat(new DescSymbol("expl_armor.png"))
+        .concat(new DescSymbol("icon_armor.png"))
         ;
+    }
+  }
+}
+
+
+export function triggerTagDescription(
+  tag: Trigger["tag"],
+): DescToken[] {
+  switch (tag) {
+    case "Weak": {
+      return singleton("icon_weak.png");
+    }
+    case "AllyWeakSelfArmor": {
+      return []
+    }
+    case "Explode": {
+      return []
+    }
+    case "Fragile": {
+      return singleton("icon_fragile.png");
+    }
+    case "Grow": {
+      return []
+    }
+    case "Strong": {
+      return singleton("icon_strong.png");
+    }
+    case "StrongLowHP": {
+      return []
+    }
+    case "ThreatOnAllyDamage": {
+      return []
+    }
+    case "Armor": {
+      return singleton("icon_armor.png");
     }
   }
 }
