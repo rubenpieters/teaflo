@@ -679,12 +679,10 @@ export class ExecScreen {
             this.gameRefs,
             tween.first,
             () => {
-              const parent = this.logTextSpritePool.newSprite(loc.xMin, loc.yMin, {}, { sprite: "btn_level_neutral.png" });
-              this.createLogTextSprite(entry.action, parent);
-              return parent;
+              return this.createLogTextSprite(loc.xMin, loc.yMin, entry.action);
             },
             tween => {
-              tween.to({ y: loc.yMin - 100 }, 1000);
+              tween.from({ y: loc.yMin - 100 }, 1000);
             },
             "log",
           );
@@ -751,12 +749,19 @@ export class ExecScreen {
   }
 
   createLogTextSprite(
+    parentX: number,
+    parentY: number,
     action: Action,
-    parent: Phaser.Sprite,
   ) {
     const desc = actionDescription(action);
     let y = 0;
     let xOffset = 0;
+    const dataList: {
+      x: number,
+      y: number,
+      frameType: {},
+      data: LogTextSpriteData,
+    }[] = [];
     desc.forEach((descSym, descIndex) => {
       switch (descSym.tag) {
         case "DescSeparator": {
@@ -765,16 +770,14 @@ export class ExecScreen {
           break;
         }
         case "DescSymbol": {
-          //const xPos = startPos.xMin + 80 * (descIndex - xOffset);
-          //const yPos = startPos.yMin - y * 80;
-          const xPos = 80 * (descIndex - xOffset);
-          const yPos = - y * 80;
-          const sprite = this.logTextSpritePool.newSprite(xPos, yPos, {}, { sprite: descSym.sym });
-          parent.addChild(sprite);
+          const xPos = parentX + 80 * (descIndex - xOffset);
+          const yPos = parentY - y * 80;
+          dataList.push({ x: xPos, y: yPos, frameType: {}, data: { sprite: descSym.sym} });
           break;
         }
       }
     });
+    return this.logTextSpritePool.newGroup(dataList);
   }
 
   createTriggerEntryAnim(

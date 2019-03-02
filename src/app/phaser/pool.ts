@@ -1,5 +1,6 @@
 import { DataSprite } from "./datasprite";
 import { createTween, createChainedTween } from "./animation";
+import { Group } from "phaser-ce";
 
 // FrameType:
 // custom type to characterize different frames
@@ -23,7 +24,10 @@ export type SpriteCallbacks<Data> = {
 }
 
 export class Pool<Data, FrameType> extends Phaser.Group {
+  // pool information shared by each element in this pool
   poolInfo: PoolInfo<Data, FrameType>
+  // currently registered groups in the pool
+  groups: Phaser.Group[] = []
 
   constructor(
     game: Phaser.Game,
@@ -110,6 +114,32 @@ export class Pool<Data, FrameType> extends Phaser.Group {
     return sprite;
   }
 
+  public newGroup(
+    dataList: {
+      x: number,
+      y: number,
+      frameType: FrameType,
+      data: Data,
+    }[]
+  ): Phaser.Group {
+    const group = new Group(this.game);
+
+    dataList.forEach(data => {
+      const sprite = this.newSprite(data.x, data.y, data.frameType, data.data);
+      group.add(sprite);
+    });
+
+    group.onDestroy.add(() => {
+      // free the children into the general pool
+      group.children.forEach(child => {
+        (child as DataSprite<Data>).kill();
+        this.add(child);
+      });
+    });
+
+    return group;
+  }
+
   // NOTE: only give a sprite belonging to this pool as parameter
   public setFrame(
     sprite: DataSprite<Data>,
@@ -138,6 +168,8 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   }
 
   public clear() {
+    this.groups.forEach(x => x.destroy);
+    // kill all sprites
     this.killAll();
   }
 }

@@ -118,18 +118,16 @@ export function addTextPopup(
 export function addSpritePopup(
   gameRefs: GameRefs,
   tween: Phaser.Tween,
-  create: () => Phaser.Sprite,
+  create: () => Phaser.Group,
   textAnimation: (tween: Phaser.Tween) => void,
   type?: "log",
 ): void {
   tween.onStart.add(() => {
-    const sprite = create();
-    const spriteTween = createTypeTween(gameRefs, sprite, textAnimation, type);
-    spriteTween.onComplete.add(() => {
-      sprite.kill();
-      sprite.removeChildren();
-      // TODO: call .kill() on all children?
+    const group = create();
+    const groupTween = createTypeTween(gameRefs, group, textAnimation, type);
+    groupTween.onComplete.add(() => {
+      group.destroy();
     });
-    spriteTween.start();
+    groupTween.start();
   });
 }
