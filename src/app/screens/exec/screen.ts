@@ -442,8 +442,8 @@ export class ExecScreen {
     const types: ["pause", "play", "fast", "skip"] = ["pause", "play", "fast", "skip"];
     types.map((type, typeIndex) => {
       const pos = createPosition(
-        "left", 50 + 70 * typeIndex, 60,
-        "bot", 50, 60,
+        "left", 20 + 61 * typeIndex, 60,
+        "top", 50, 60,
       );
       this.animControlBtnPool.newSprite(pos.xMin, pos.yMin, {}, { type });
     });
@@ -602,7 +602,7 @@ export class ExecScreen {
       const entry = getLogEntry(this.log!, x.logIndex);
       const pos = createPosition(
         "left", 20 + 50 * entryIndex, 40,
-        "top", 20 + 80 * typeIndex, 40,
+        "top", 120 + 80 * typeIndex, 40,
       );
       if (logIndexLt(x.logIndex, upto)) {
         const sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ logIndex: x.logIndex }});
@@ -801,7 +801,7 @@ export class ExecScreen {
     this.solTreePool.clear();
 
     const x = 100;
-    const y = 750;
+    const y = 950;
 
     const initialNodeType = solInfo.loc.length === 0 ? "node_full" : "node";
     const sprite = this.solTreePool.newSprite(x - 50, y, {}, { type: initialNodeType, loc: [] });
