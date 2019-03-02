@@ -135,6 +135,12 @@ export function triggerToFragmentValue(
   }
 }
 
+export function triggerValue(
+  trigger: Trigger,
+) {
+  return Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5);
+}
+
 export function full(
   trigger: Trigger,
 ): Trigger {
@@ -205,11 +211,11 @@ export function applyTrigger(
   transformed: Action,
   triggerLog?: TriggerLog,
 } {
-  const triggerValue = Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5);
+  const triggerVal = triggerValue(trigger);
   switch (trigger.tag) {
     case "Weak": {
       if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, trigger.owner)) {
-        const subtr = action.value - triggerValue;;
+        const subtr = action.value - triggerVal;;
         const newValue = subtr > 0 ? subtr : 0;
         const transformed = new Damage(
           action.target,
@@ -230,7 +236,7 @@ export function applyTrigger(
     }
     case "Strong": {
       if (action.tag === "Damage" && context.self !== undefined && eqUnitId(state, context.self, trigger.owner)) {
-        const newValue = action.value + triggerValue;
+        const newValue = action.value + triggerVal;
         const transformed = new Damage(
           action.target,
           newValue,
@@ -250,7 +256,7 @@ export function applyTrigger(
     }
     case "Armor": {
       if (action.tag === "Damage" && eqUnitId(state, action.target, trigger.owner)) {
-        let newValue = action.value - triggerValue;
+        let newValue = action.value - triggerVal;
         newValue = newValue < 0 ? 0 : newValue;
         const transformed = new Damage(
           action.target,
@@ -277,7 +283,7 @@ export function applyTrigger(
     case "StrongLowHP": {
       const self = context.self;
       if (action.tag === "Damage" && self !== undefined && eqUnitId(state, self, trigger.owner)) {
-        const multiplier = triggerValue;
+        const multiplier = triggerVal;
         const selfUnit = getUnit(self, state);
         if (selfUnit !== undefined) {
           const missingHp = selfUnit.maxHp - selfUnit.hp;
@@ -300,7 +306,7 @@ export function applyTrigger(
       return { transformed: action, actions: [] };
     }
     case "Grow": {
-      const multiplier = triggerValue;
+      const multiplier = triggerVal;
       const growAction = new AddTrigger(
         trigger.owner,
         focus(trigger.trigger, over(x => x.fragments, x => x * multiplier)),
@@ -324,7 +330,7 @@ export function applyTrigger(
       ) {
         const armorAction = new AddTrigger(
           trigger.owner,
-          new Armor(triggerValue),
+          new Armor(triggerVal),
         );
         return {
           transformed: action,
@@ -353,7 +359,7 @@ export function applyTrigger(
         self !== undefined &&
         ! eqUnitId(state, action.target, trigger.owner)
       ) {
-        const actions = filteredEn(state).map(x => new AddThreat(self, new GlobalId(x.id, "enemy"), triggerValue));
+        const actions = filteredEn(state).map(x => new AddThreat(self, new GlobalId(x.id, "enemy"), triggerVal));
         const threatAction = new CombinedAction(actions);
         return { transformed: action, actions: [threatAction] };
       }
@@ -361,7 +367,7 @@ export function applyTrigger(
     }
     case "Fragile": {
       if (action.tag === "Damage" && eqUnitId(state, action.target, trigger.owner)) {
-        let newValue = action.value + triggerValue;
+        let newValue = action.value + triggerVal;
         const transformed = new Damage(
           action.target,
           newValue,

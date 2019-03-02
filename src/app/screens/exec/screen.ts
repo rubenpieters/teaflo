@@ -9,7 +9,7 @@ import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId, getStatus, findIndex, TargetId, eqUnitId, EntityId, toPositionId, PositionId } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution } from "./events";
 import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
-import { triggerOrder, StTrigger, Trigger, TriggerLog } from "../../../shared/game/trigger";
+import { triggerOrder, StTrigger, Trigger, TriggerLog, triggerValue } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
@@ -312,6 +312,18 @@ export class ExecScreen {
           }
         );
 
+        // hp/ch numbers
+        const hpTextPos = createPosition(
+          "left", 1000 + 170 * unitIndex, 100,
+          "top", 680, 20,
+        );
+        this.stateTextPool.newText(hpTextPos, `${unit.hp} / ${unit.maxHp}`, 20);
+        const chTextPos = createPosition(
+          "left", 1000 + 170 * unitIndex, 100,
+          "top", 710, 20,
+        );
+        this.stateTextPool.newText(chTextPos, `${unit.charges} / ${unit.maxCharges}`, 20);
+
         // hover bar
         if (
           (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "enemy"))) ||
@@ -388,7 +400,7 @@ export class ExecScreen {
         // next intent
         const abPos = createPosition(
           "left", 1040 + 170 * unitIndex, 70,
-          "top", 700, 70,
+          "top", 800, 70,
         );
         const ai = unit.ai[unit.currentAI];
         this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
@@ -560,7 +572,7 @@ export class ExecScreen {
             "left", 650, 150,
             "bot", 100, 300,
           );
-          this.statsTextPool.newText(pos1, `${unit.tag}: ${unit.fragments}`);
+          this.statsTextPool.newText(pos1, `${unit.tag}: ${triggerValue(unit)} (${unit.fragments})`);
         }
       }
     }
@@ -1161,7 +1173,7 @@ function mkLogActionPool(
           //drawDescriptionToHoverInfo(gameRefs, actionDescription(self.data.action), 50, 0);
           self.data.transforms.forEach((transform, transformIndex) => {
             drawDescriptionToHoverInfo(gameRefs, actionDescription(transform.before), 50, 50 * transformIndex);
-            if (transformIndex === self.data.transforms.length) {
+            if (transformIndex === self.data.transforms.length - 1) {
               drawDescriptionToHoverInfo(gameRefs, actionDescription(transform.after), 50, 50 * (transformIndex + 1));
             }
             drawDescriptionToHoverInfo(gameRefs, triggerTagDescription(transform.tag), 0, 50 * (transformIndex + 1));

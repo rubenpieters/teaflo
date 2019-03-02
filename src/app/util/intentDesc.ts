@@ -1,5 +1,5 @@
 import { Intent, IntentVar } from "../../shared/game/intent";
-import { Trigger, triggerToFragmentValue } from "../../shared/game/trigger";
+import { Trigger, triggerToFragmentValue, triggerValue } from "../../shared/game/trigger";
 import { Action } from "../../shared/game/action";
 
 export class DescSymbol {
@@ -36,8 +36,7 @@ export function actionDescription(
         ;
     }
     case "AddTrigger": {
-      return singleton("expl_plus.png")
-        .concat(triggerDescription(action.trigger))
+      return triggerDescription(action.trigger)
         ;
     }
     case "CombinedAction": {
@@ -123,7 +122,7 @@ export function triggerDescription(
   switch (trigger.tag) {
     case "Weak": {
       return singleton("expl_plus.png")
-        .concat(numberDescription(Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5)))
+        .concat(numberDescription(triggerValue(trigger)))
         .concat(new DescSymbol("icon_weak.png"))
         ;
     }
@@ -135,7 +134,7 @@ export function triggerDescription(
     }
     case "Fragile": {
       return singleton("expl_plus.png")
-        .concat(numberDescription(Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5)))
+        .concat(numberDescription(triggerValue(trigger)))
         .concat(new DescSymbol("icon_fragile.png"))
         ;
     }
@@ -144,7 +143,7 @@ export function triggerDescription(
     }
     case "Strong": {
       return singleton("expl_plus.png")
-        .concat(numberDescription(Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5)))
+        .concat(numberDescription(triggerValue(trigger)))
         .concat(new DescSymbol("icon_strong.png"))
         ;
     }
@@ -156,7 +155,7 @@ export function triggerDescription(
     }
     case "Armor": {
       return singleton("expl_plus.png")
-        .concat(numberDescription(Math.round((trigger.fragments / triggerToFragmentValue(trigger)) - 0.5)))
+        .concat(numberDescription(triggerValue(trigger)))
         .concat(new DescSymbol("icon_armor.png"))
         ;
     }
