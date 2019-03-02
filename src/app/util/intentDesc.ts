@@ -37,6 +37,7 @@ export function actionDescription(
     }
     case "AddTrigger": {
       return singleton("expl_plus.png")
+        .concat(triggerDescription(action.trigger))
         ;
     }
     case "CombinedAction": {
