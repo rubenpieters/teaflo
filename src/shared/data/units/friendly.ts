@@ -1,6 +1,6 @@
 import { FrUnit } from "../../game/unit";
 import * as I from "../../game/intent";
-import { TargetInput, StatusInput } from "../../game/ability";
+import { TargetInput, StatusInput, UnitInput } from "../../game/ability";
 import * as T from "../../game/trigger";
 
 export const fr_unit_a1_l1_01: FrUnit = {
@@ -98,7 +98,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
         ),
       ]),
       inputs: [
-        new TargetInput(),
+        new UnitInput(),
       ],
       spriteId: "ab2",
     },

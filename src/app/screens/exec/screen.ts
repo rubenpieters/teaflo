@@ -161,6 +161,9 @@ export class ExecScreen {
     this.stateTextPool.clear();
     this.abilityPool.clear();
 
+    const currentInputType = this.clickState === undefined ? undefined :
+      this.clickState.ability.inputs[this.clickState.inputs.length];
+
     // calculate max threat value
     const enIds = filteredEn(state)
       .map(x => x.id)
@@ -178,6 +181,11 @@ export class ExecScreen {
             globalId: new GlobalId(unit.id, "friendly"),
           }
         );
+        if (currentInputType !== undefined && ! matchUserInput(currentInputType, new GlobalId(unit.id, "friendly"))) {
+          unitSprite.alpha = 0.3;
+        } else {
+          unitSprite.alpha = 1;
+        }
 
         // hp/ch numbers
         const hpTextPos = createPosition(
@@ -311,6 +319,11 @@ export class ExecScreen {
             globalId: new GlobalId(unit.id, "enemy"),
           }
         );
+        if (currentInputType !== undefined && ! matchUserInput(currentInputType, new GlobalId(unit.id, "enemy"))) {
+          unitSprite.alpha = 0.3;
+        } else {
+          unitSprite.alpha = 1;
+        }
 
         // hp/ch numbers
         const hpTextPos = createPosition(
@@ -417,7 +430,12 @@ export class ExecScreen {
           "left", 240 + 50 * triggerIndex, 40,
           "top", 50 + 50 * tagIndex, 40,
         );
-        this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { trigger });
+        const trSprite = this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { trigger });
+        if (currentInputType !== undefined && ! matchUserInput(currentInputType, new GlobalId(trigger.id, "status"))) {
+          trSprite.alpha = 0.3;
+        } else {
+          trSprite.alpha = 1;
+        }
 
         // hover graphics
         if (
@@ -977,6 +995,8 @@ function mkUnitResPool(
               clickState.inputs.push(self.data.globalId);
               if (clickState.inputs.length === clickState.ability.inputs.length) {
                 extendLevelSolution(gameRefs, clickState!);
+              } else {
+                gameRefs.screens.execScreen.drawCurrentState();
               }
             }
           }
@@ -1034,6 +1054,8 @@ function mkAbilityPool(
               }
               if (self.data.ability.inputs.length === 0) {
                 extendLevelSolution(gameRefs, gameRefs.screens.execScreen.clickState!);
+              } else {
+                gameRefs.screens.execScreen.drawCurrentState();
               }
             }
           }
