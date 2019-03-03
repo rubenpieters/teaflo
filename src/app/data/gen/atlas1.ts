@@ -94,281 +94,281 @@ export type Atlas1 = {
     "icon_ch.png": {
         "x": 500,
         "y": 0,
-        "width": 40,
+        "width": 41,
         "height": 40
     },
     "icon_fragile.png": {
-        "x": 540,
+        "x": 541,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_hp_minus.png": {
-        "x": 580,
+        "x": 581,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_hp_plus.png": {
-        "x": 620,
+        "x": 621,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_hp.png": {
-        "x": 660,
+        "x": 661,
         "y": 0,
-        "width": 40,
+        "width": 41,
         "height": 40
     },
     "icon_start_turn.png": {
-        "x": 700,
+        "x": 702,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_strong.png": {
-        "x": 740,
+        "x": 742,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_th_minus.png": {
-        "x": 780,
+        "x": 782,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_th_plus.png": {
-        "x": 820,
+        "x": 822,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_th.png": {
-        "x": 860,
+        "x": 862,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_weak.png": {
-        "x": 900,
+        "x": 902,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_add_status.png": {
-        "x": 940,
+        "x": 942,
         "y": 0,
         "width": 50,
         "height": 50
     },
     "icon_a.png": {
-        "x": 1350,
+        "x": 1352,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_b.png": {
-        "x": 1410,
+        "x": 1412,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_c.png": {
-        "x": 1470,
+        "x": 1472,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_d.png": {
-        "x": 1530,
+        "x": 1532,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_e.png": {
-        "x": 1590,
+        "x": 1592,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_f.png": {
-        "x": 1650,
+        "x": 1652,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "menu_btn1.png": {
-        "x": 1710,
+        "x": 1712,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "ab1.png": {
-        "x": 1780,
+        "x": 1782,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "ab2.png": {
-        "x": 1850,
+        "x": 1852,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "ab3.png": {
-        "x": 1920,
+        "x": 1922,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "ab4.png": {
-        "x": 1990,
+        "x": 1992,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "expl_0.png": {
-        "x": 2060,
+        "x": 2062,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_1.png": {
-        "x": 2140,
+        "x": 2142,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_2.png": {
-        "x": 2220,
+        "x": 2222,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_3.png": {
-        "x": 2300,
+        "x": 2302,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_4.png": {
-        "x": 2380,
+        "x": 2382,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_5.png": {
-        "x": 2460,
+        "x": 2462,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_6.png": {
-        "x": 2540,
+        "x": 2542,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_7.png": {
-        "x": 2620,
+        "x": 2622,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_8.png": {
-        "x": 2700,
+        "x": 2702,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_9.png": {
-        "x": 2780,
+        "x": 2782,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_enemy.png": {
-        "x": 2860,
+        "x": 2862,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_friendly.png": {
-        "x": 2940,
+        "x": 2942,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_armor.png": {
-        "x": 3020,
+        "x": 3022,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_ch.png": {
-        "x": 3100,
+        "x": 3102,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_hp.png": {
-        "x": 3180,
+        "x": 3182,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_minus.png": {
-        "x": 3260,
+        "x": 3262,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_plus.png": {
-        "x": 3340,
+        "x": 3342,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_self.png": {
-        "x": 3420,
+        "x": 3422,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target.png": {
-        "x": 3500,
+        "x": 3502,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_status.png": {
-        "x": 3580,
+        "x": 3582,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_unit.png": {
-        "x": 3660,
+        "x": 3662,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_th.png": {
-        "x": 3740,
+        "x": 3742,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "fr_unit_a1_l1_01_ab1.png": {
-        "x": 3820,
+        "x": 3822,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l1_01_ab2.png": {
-        "x": 3920,
+        "x": 3922,
         "y": 0,
         "width": 100,
         "height": 100
@@ -380,13 +380,13 @@ export type Atlas1 = {
         "height": 100
     },
     "bar_hp.png": {
-        "x": 4020,
+        "x": 4022,
         "y": 0,
         "width": 10,
         "height": 150
     },
     "bar_ch.png": {
-        "x": 4030,
+        "x": 4032,
         "y": 0,
         "width": 10,
         "height": 150
@@ -727,281 +727,281 @@ export const atlas1: Atlas1 = {
     "icon_ch.png": {
         "x": 500,
         "y": 0,
-        "width": 40,
+        "width": 41,
         "height": 40
     },
     "icon_fragile.png": {
-        "x": 540,
+        "x": 541,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_hp_minus.png": {
-        "x": 580,
+        "x": 581,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_hp_plus.png": {
-        "x": 620,
+        "x": 621,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_hp.png": {
-        "x": 660,
+        "x": 661,
         "y": 0,
-        "width": 40,
+        "width": 41,
         "height": 40
     },
     "icon_start_turn.png": {
-        "x": 700,
+        "x": 702,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_strong.png": {
-        "x": 740,
+        "x": 742,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_th_minus.png": {
-        "x": 780,
+        "x": 782,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_th_plus.png": {
-        "x": 820,
+        "x": 822,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_th.png": {
-        "x": 860,
+        "x": 862,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_weak.png": {
-        "x": 900,
+        "x": 902,
         "y": 0,
         "width": 40,
         "height": 40
     },
     "icon_add_status.png": {
-        "x": 940,
+        "x": 942,
         "y": 0,
         "width": 50,
         "height": 50
     },
     "icon_a.png": {
-        "x": 1350,
+        "x": 1352,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_b.png": {
-        "x": 1410,
+        "x": 1412,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_c.png": {
-        "x": 1470,
+        "x": 1472,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_d.png": {
-        "x": 1530,
+        "x": 1532,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_e.png": {
-        "x": 1590,
+        "x": 1592,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "icon_f.png": {
-        "x": 1650,
+        "x": 1652,
         "y": 0,
         "width": 60,
         "height": 60
     },
     "menu_btn1.png": {
-        "x": 1710,
+        "x": 1712,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "ab1.png": {
-        "x": 1780,
+        "x": 1782,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "ab2.png": {
-        "x": 1850,
+        "x": 1852,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "ab3.png": {
-        "x": 1920,
+        "x": 1922,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "ab4.png": {
-        "x": 1990,
+        "x": 1992,
         "y": 0,
         "width": 70,
         "height": 70
     },
     "expl_0.png": {
-        "x": 2060,
+        "x": 2062,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_1.png": {
-        "x": 2140,
+        "x": 2142,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_2.png": {
-        "x": 2220,
+        "x": 2222,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_3.png": {
-        "x": 2300,
+        "x": 2302,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_4.png": {
-        "x": 2380,
+        "x": 2382,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_5.png": {
-        "x": 2460,
+        "x": 2462,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_6.png": {
-        "x": 2540,
+        "x": 2542,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_7.png": {
-        "x": 2620,
+        "x": 2622,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_8.png": {
-        "x": 2700,
+        "x": 2702,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_9.png": {
-        "x": 2780,
+        "x": 2782,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_enemy.png": {
-        "x": 2860,
+        "x": 2862,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_all_friendly.png": {
-        "x": 2940,
+        "x": 2942,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_armor.png": {
-        "x": 3020,
+        "x": 3022,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_ch.png": {
-        "x": 3100,
+        "x": 3102,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_hp.png": {
-        "x": 3180,
+        "x": 3182,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_minus.png": {
-        "x": 3260,
+        "x": 3262,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_plus.png": {
-        "x": 3340,
+        "x": 3342,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_self.png": {
-        "x": 3420,
+        "x": 3422,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target.png": {
-        "x": 3500,
+        "x": 3502,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_status.png": {
-        "x": 3580,
+        "x": 3582,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_target_unit.png": {
-        "x": 3660,
+        "x": 3662,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "expl_th.png": {
-        "x": 3740,
+        "x": 3742,
         "y": 0,
         "width": 80,
         "height": 80
     },
     "fr_unit_a1_l1_01_ab1.png": {
-        "x": 3820,
+        "x": 3822,
         "y": 0,
         "width": 100,
         "height": 100
     },
     "fr_unit_a1_l1_01_ab2.png": {
-        "x": 3920,
+        "x": 3922,
         "y": 0,
         "width": 100,
         "height": 100
@@ -1013,13 +1013,13 @@ export const atlas1: Atlas1 = {
         "height": 100
     },
     "bar_hp.png": {
-        "x": 4020,
+        "x": 4022,
         "y": 0,
         "width": 10,
         "height": 150
     },
     "bar_ch.png": {
-        "x": 4030,
+        "x": 4032,
         "y": 0,
         "width": 10,
         "height": 150

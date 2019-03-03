@@ -30,7 +30,7 @@ const a1l1: LevelData = {
   slots: 3,
   selectLocation: { x: 200, y: 200 },
   boxSprite: "select3_f.png",
-  supplyLocations: [{ x: 485, y: 0 }, { x: 60, y: 680 }, { x: 900, y: 700 }],
+  supplyLocations: [{ x: 518, y: 27 }, { x: 70, y: 680 }, { x: 915, y: 715 }],
 };
 
 const a1l2: LevelData = {

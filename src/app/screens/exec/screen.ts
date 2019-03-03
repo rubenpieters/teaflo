@@ -39,6 +39,7 @@ export class ExecScreen {
   detailExplPool: Pool<DetailExplData, {}>
   hoverSpritePool: Pool<HoverSpriteData, {}>
   hoverGraphicsPool: Phaser.Graphics
+  stateIconPool: Pool<StateIconData, {}>
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
 
@@ -70,6 +71,7 @@ export class ExecScreen {
     this.logTextSpritePool = mkLogTextSpritePool(gameRefs);
     this.hoverSpritePool = mkHoverSpritePool(gameRefs);
     this.hoverGraphicsPool = gameRefs.game.add.graphics();
+    this.stateIconPool = mkStateIconPool(gameRefs);
   }
 
   reset() {
@@ -160,6 +162,7 @@ export class ExecScreen {
     this.hoverGraphicsPool.clear();
     this.stateTextPool.clear();
     this.abilityPool.clear();
+    this.stateIconPool.clear();
 
     const currentInputType = this.clickState === undefined ? undefined :
       this.clickState.ability.inputs[this.clickState.inputs.length];
@@ -188,11 +191,21 @@ export class ExecScreen {
         }
 
         // hp/ch numbers
+        const hpIconPos = createPosition(
+          "left", 220 + 170 * unitIndex, 70,
+          "top", 660, 70,
+        );
+        this.stateIconPool.newSprite(hpIconPos.xMin, hpIconPos.yMin, {}, { sprite: "icon_hp.png"});
         const hpTextPos = createPosition(
           "left", 245 + 170 * unitIndex, 100,
           "top", 680, 20,
         );
         this.stateTextPool.newText(hpTextPos, `${unit.hp} / ${unit.maxHp}`, 20);
+        const chIconPos = createPosition(
+          "left", 220 + 170 * unitIndex, 70,
+          "top", 690, 70,
+        );
+        this.stateIconPool.newSprite(chIconPos.xMin, chIconPos.yMin, {}, { sprite: "icon_ch.png"});
         const chTextPos = createPosition(
           "left", 245 + 170 * unitIndex, 100,
           "top", 710, 20,
@@ -1429,6 +1442,28 @@ function mkHoverSpritePool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         return "bar_hover.png";
+      },
+      introAnim: [
+      ],
+      callbacks: {
+      },
+    },
+  );
+}
+
+type StateIconData = {
+  sprite: string,
+};
+
+function mkStateIconPool(
+  gameRefs: GameRefs,
+): Pool<StateIconData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return self.data.sprite;
       },
       introAnim: [
       ],
