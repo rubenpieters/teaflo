@@ -118,7 +118,7 @@ export function addTextPopup(
 export function addSpritePopup(
   gameRefs: GameRefs,
   tween: Phaser.Tween,
-  create: () => Phaser.Group,
+  create: () => Phaser.Sprite,
   textAnimation: (tween: Phaser.Tween) => void,
   type?: "log",
 ): void {

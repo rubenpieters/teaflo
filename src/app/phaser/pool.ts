@@ -63,10 +63,9 @@ export class Pool<Data, FrameType> extends Phaser.Group {
         sprite.frameName = frameName;
       }
     }
+    sprite.inputEnabled = true;
     // initialize sprite if not initialized yet
     if (sprite.props === undefined || sprite.props.init === false) {
-      sprite.inputEnabled = true;
-      
       sprite.events.onInputDown.removeAll();
       sprite.events.onInputDown.add(() => {
         if (sprite.props !== undefined) {
@@ -121,15 +120,16 @@ export class Pool<Data, FrameType> extends Phaser.Group {
       frameType: FrameType,
       data: Data,
     }[]
-  ): Phaser.Group {
-    const group = new Group(this.game);
+  ): Phaser.Sprite {
+    const group = new Phaser.Sprite(this.game, 0, 0, undefined);
 
+    // TODO: the data section should only be added to the parent
     dataList.forEach(data => {
       const sprite = this.newSprite(data.x, data.y, data.frameType, data.data);
-      group.add(sprite);
+      group.addChild(sprite);
     });
 
-    group.onDestroy.add(() => {
+    group.events.onDestroy.add(() => {
       // free the children into the general pool
       group.children.forEach(child => {
         (child as DataSprite<Data>).kill();

@@ -47,7 +47,7 @@ export class ExecScreen {
   log: Log | undefined
   hoveredUnit: UnitSelection | undefined
   selectedUnit: UnitSelection | undefined
-  clickState: { ability: Ability, inputs: any[], origin: UnitId } | undefined
+  clickState: { ability: Ability, inputs: any[], origin: UnitId, index: number } | undefined
   intermediate: LogIndex | undefined
 
   constructor(
@@ -320,6 +320,13 @@ export class ExecScreen {
             { tag: "FrAbilityData", spriteId: ability.spriteId, ability, index: abilityIndex,
               globalId: new GlobalId(unit.id, "friendly") }
           );
+          if (this.clickState !== undefined &&
+            eqUnitId(state, this.clickState.origin, new GlobalId(unit.id, "friendly")) &&
+            abilityIndex === this.clickState.index
+          ) {
+            const indicator = this.abilityPool.newSprite(abPos.xMin + 5, abPos.yMin + 5, {}, { tag: "Indicator"});
+            indicator.inputEnabled = false;
+          }
         });
       }
     });
@@ -1042,7 +1049,11 @@ type EnAbilityData = {
   tag: "EnAbilityData",
 }
 
-type AbilityData = FrAbilityData | EnAbilityData;
+type IndicatorData = {
+  tag: "Indicator"
+}
+
+type AbilityData = FrAbilityData | EnAbilityData | IndicatorData;
 
 function mkAbilityPool(
   gameRefs: GameRefs,
@@ -1052,7 +1063,12 @@ function mkAbilityPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return `${self.data.spriteId}.png`;
+        switch (self.data.tag) {
+          case "EnAbilityData": return `${self.data.spriteId}.png`;
+          case "FrAbilityData": return `${self.data.spriteId}.png`;
+          case "Indicator" : return "icon_add_status.png";
+        }
+        
       },
       introAnim: [
         (self, tween) => {
@@ -1062,47 +1078,62 @@ function mkAbilityPool(
       callbacks: {
         click: (self) => {
           if (self.data.tag === "FrAbilityData") {
-            if (gameRefs.screens.execScreen.canExtendState() && gameRefs.screens.execScreen.clickState === undefined) {
+            if (
+              gameRefs.screens.execScreen.canExtendState() &&
+              gameRefs.screens.execScreen.clickState === undefined
+            ) {
+              // start using ability, if applicable
               gameRefs.screens.execScreen.clickState = {
                 ability: self.data.ability,
                 inputs: [],
                 origin: self.data.globalId,
+                index: self.data.index,
               }
               if (self.data.ability.inputs.length === 0) {
                 extendLevelSolution(gameRefs, gameRefs.screens.execScreen.clickState!);
               } else {
                 gameRefs.screens.execScreen.drawCurrentState();
               }
+            } else if (
+              gameRefs.screens.execScreen.clickState !== undefined &&
+              eqUnitId(gameRefs.screens.execScreen.currentState(), gameRefs.screens.execScreen.clickState.origin, self.data.globalId) &&
+              gameRefs.screens.execScreen.clickState.index === self.data.index
+            ) {
+              // cancel using ability, if applicable
+              gameRefs.screens.execScreen.clickState = undefined;
+              gameRefs.screens.execScreen.drawCurrentState();
             }
           }
         },
         hoverOver: (self) => {
-          let intent: Intent;
-          if (self.data.tag === "FrAbilityData") {
-            intent = self.data.ability.intent;
-          } else {
-            intent = self.data.currentIntent;
-          }
-          const desc = intentDescription(intent);
-          let y = 0;
-          let xOffset = 0;
-          desc.forEach((descSym, descIndex) => {
-            const explPos = createPosition(
-              "left", 750 + 80 * (descIndex - xOffset), 80,
-              "bot", 225 - y * 80, 80,
-            );
-            switch (descSym.tag) {
-              case "DescSeparator": {
-                y += 1;
-                xOffset = descIndex + 1;
-                break;
-              }
-              case "DescSymbol": {
-                gameRefs.screens.execScreen.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
-                break;
-              }
+          if (self.data.tag === "FrAbilityData" || self.data.tag === "EnAbilityData") {
+            let intent: Intent;
+            if (self.data.tag === "FrAbilityData") {
+              intent = self.data.ability.intent;
+            } else {
+              intent = self.data.currentIntent;
             }
-          });
+            const desc = intentDescription(intent);
+            let y = 0;
+            let xOffset = 0;
+            desc.forEach((descSym, descIndex) => {
+              const explPos = createPosition(
+                "left", 750 + 80 * (descIndex - xOffset), 80,
+                "bot", 225 - y * 80, 80,
+              );
+              switch (descSym.tag) {
+                case "DescSeparator": {
+                  y += 1;
+                  xOffset = descIndex + 1;
+                  break;
+                }
+                case "DescSymbol": {
+                  gameRefs.screens.execScreen.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
+                  break;
+                }
+              }
+            });
+          }
         },
         hoverOut: (self) => {
           gameRefs.screens.execScreen.detailExplPool.clear();
