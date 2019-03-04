@@ -2,6 +2,84 @@ import { DataSprite } from "./datasprite";
 import { GameRefs } from "../states/game";
 import { Pool } from "./pool";
 
+export class Create {
+  constructor(
+    public readonly f: () => any,
+    public readonly k: (self: any) => Animation,
+    public readonly tag: "Create" = "Create",
+  ) {}
+}
+
+export class BaseAnimation {
+  constructor(
+    public readonly length: number,
+    public readonly f: (tween: Phaser.Tween) => void,
+    public readonly tag: "BaseAnimation" = "BaseAnimation",
+  ) {}
+}
+
+export class SeqAnimation {
+  constructor(
+    public readonly list: Animation[],
+    public readonly tag: "SeqAnimation" = "SeqAnimation",
+  ) {}
+}
+
+export class ParAnimation {
+  constructor(
+    public readonly list: Animation[],
+    public readonly tag: "ParAnimation" = "ParAnimation",
+  ) {}
+}
+
+export type Animation
+  = BaseAnimation
+  | Create
+  | SeqAnimation
+  | ParAnimation
+  ;
+
+export function _runAsTween(
+  game: Phaser.Game,
+  animation: Animation,
+  onComplete: () => void,
+): void {
+  switch (animation.tag) {
+    case "Create": {
+      const obj = animation.f();
+      _runAsTween(game, animation.k(obj), () => { return; });
+      break;
+    }
+    case "BaseAnimation": {
+      const tween = createTween(game, self, t => animation.f(t));
+      tween.onComplete.add(onComplete);
+      tween.start();
+      break;
+    }
+    case "ParAnimation": {
+      animation.list.forEach(childAnimation => {
+        _runAsTween(game, childAnimation, () => { return; });
+      });
+      break;
+    }
+    case "SeqAnimation": {
+      runSeqAsTween(game, animation);
+      break;
+    }
+  }
+}
+
+function runSeqAsTween(
+  game: Phaser.Game,
+  seqAnimation: SeqAnimation,
+) {
+  const list = seqAnimation.list;
+  if (list.length !== 0) {
+    _runAsTween(game, list[0], () => runSeqAsTween(game, new SeqAnimation(list.slice(1))));
+  }
+  return;
+}
+
 export function createTween(
   game: Phaser.Game,
   obj: any,
