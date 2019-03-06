@@ -1,8 +1,8 @@
 import { actData, selectedActId, selectedMenu, SelectedActMenu, SelectedLevelMenu, LevelData } from "../../screens/act/data";
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
-import { createPosition } from "../../util/position";
-import { createTween, chainSpriteCreation } from "../../phaser/animation";
+import { createPosition, Position } from "../../util/position";
+import { createTween, chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween, ParAnimation, Create } from "../../phaser/animation";
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
 import { addText, DataSprite } from "../../phaser/datasprite";
@@ -41,35 +41,51 @@ export class ActScreen {
   }
 
   drawActBtn() {
-    this.redrawActBtn();
-    this.actBtnPool.playIntroAnimations();
+    const anim = this.redrawActBtn();
+    runAsTween(this.gameRefs.game, anim);
   }
 
-  redrawActBtn() {
+  redrawActBtn(): Animation {
     this.actBtnPool.killAll();
 
     const selActId = selectedActId(this.gameRefs);
+
+    const anims: Animation[] = [];
+
     let i = 0;
     for (const actKey in actData) {
       const actId = Number(actKey);
-      
+
+      let pos: Position;
+      let frame: "down" | "neutral" | "hover";
       if (selActId !== undefined && selActId === actId) {
         // this is the currently selected act
-        const pos = createPosition(
+        pos = createPosition(
           "left", 100 + 210 * i, 200,
           "top", -100, 400,
         );
-        this.actBtnPool.newSprite(pos.xMin, pos.yMin, "down", { actId, actIndex: i, });
+        frame = "down";
       } else {
-        const pos = createPosition(
+        // this is not the currently selected act
+        pos = createPosition(
           "left", 100 + 210 * i, 400,
           "top", -200, 200,
         );
-        // this is not the currently selected act
-        this.actBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { actId, actIndex: i, });
+        frame = "neutral";
       }
+      const anim: Animation = new Create(() => {
+        return this.actBtnPool.newSprite(pos.xMin, pos.yMin, frame, { actId, actIndex: i, });
+      }, self => {
+        return new BaseAnimation(150, self, tween => {
+          tween.from({ y: -400 }, 150, Phaser.Easing.Linear.None, false, 30 * self.data.actIndex);
+        });
+      });
+      anims.push(anim);
       i += 1;
     }
+
+    const parAnim = new ParAnimation(anims);
+    return parAnim;
   }
 
   drawLevelBtn(

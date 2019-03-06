@@ -13,6 +13,7 @@ export class Create {
 export class BaseAnimation {
   constructor(
     public readonly length: number,
+    public readonly self: any,
     public readonly f: (tween: Phaser.Tween) => void,
     public readonly tag: "BaseAnimation" = "BaseAnimation",
   ) {}
@@ -39,7 +40,14 @@ export type Animation
   | ParAnimation
   ;
 
-export function _runAsTween(
+export function runAsTween(
+  game: Phaser.Game,
+  animation: Animation,
+): void {
+  _runAsTween(game, animation, () => { return; });
+}
+
+function _runAsTween(
   game: Phaser.Game,
   animation: Animation,
   onComplete: () => void,
@@ -47,19 +55,28 @@ export function _runAsTween(
   switch (animation.tag) {
     case "Create": {
       const obj = animation.f();
-      _runAsTween(game, animation.k(obj), () => { return; });
+      _runAsTween(game, animation.k(obj), onComplete);
       break;
     }
     case "BaseAnimation": {
-      const tween = createTween(game, self, t => animation.f(t));
+      const tween = createTween(game, animation.self, t => animation.f(t));
       tween.onComplete.add(onComplete);
       tween.start();
       break;
     }
     case "ParAnimation": {
-      animation.list.forEach(childAnimation => {
-        _runAsTween(game, childAnimation, () => { return; });
-      });
+      if (animation.list.length > 0) {
+        const maxAnimT = maxAnimTime(animation.list);
+        let onCompleteSet = false;
+        animation.list.forEach(childAnimation => {
+          if (! onCompleteSet) {
+            _runAsTween(game, childAnimation, () => onComplete);
+            onCompleteSet = true;
+          } else {
+            _runAsTween(game, childAnimation, () => { return; });
+          }
+        });
+      }
       break;
     }
     case "SeqAnimation": {
@@ -75,9 +92,28 @@ function runSeqAsTween(
 ) {
   const list = seqAnimation.list;
   if (list.length !== 0) {
-    _runAsTween(game, list[0], () => runSeqAsTween(game, new SeqAnimation(list.slice(1))));
+    _runAsTween(game, list[0], () => {
+      runSeqAsTween(game, new SeqAnimation(list.slice(1)));
+    });
   }
   return;
+}
+
+function animTime(
+  animation: Animation,
+): number {
+  switch (animation.tag) {
+    case "Create": return 0;
+    case "BaseAnimation": return animation.length;
+    case "SeqAnimation": return animation.list.reduce((acc, prev) => animTime(prev) + acc, 0);
+    case "ParAnimation": return maxAnimTime(animation.list);
+  }
+}
+
+function maxAnimTime(
+  animations: Animation[],
+): number {
+  return Math.max(...animations.map(animTime));
 }
 
 export function createTween(
