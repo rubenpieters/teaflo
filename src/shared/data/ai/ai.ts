@@ -3,7 +3,7 @@ import { AI} from "../../game/ai";
 import * as O  from "../../game/ai";
 import { GameState } from "../../game/state";
 import * as I from "../../game/intent";
-import { PositionId, UnitId, getUnit } from "../../game/entityId";
+import { PositionId, UnitId, getUnit, getStatus, eqUnitId } from "../../game/entityId";
 import * as T from "../../game/trigger";
 
 export const ai1: AI = [
@@ -16,7 +16,7 @@ export const ai1: AI = [
       outs: [
           {
             aiOut: new O.ToSelf(),
-            condition: (state: GameState) => true,
+            condition: () => true,
           },
         ],
     },
@@ -34,7 +34,7 @@ export const ai2: AI = [
       outs: [
           {
             aiOut: new O.ToX(1),
-            condition: (state: GameState) => true,
+            condition: () => true,
           },
         ],
     },
@@ -47,7 +47,7 @@ export const ai2: AI = [
       outs: [
           {
             aiOut: new O.ToX(0),
-            condition: (state: GameState) => true,
+            condition: () => true,
           },
         ],
     },
@@ -76,7 +76,7 @@ export const ai3: AI = [
         },
         {
           aiOut: new O.ToSelf,
-          condition: (state: GameState) => true,
+          condition: () => true,
         },
       ],
   },
@@ -89,7 +89,7 @@ export const ai3: AI = [
     outs: [
         {
           aiOut: new O.ToSelf(),
-          condition: (state: GameState) => true,
+          condition: () => true,
         },
       ],
   },
@@ -108,7 +108,7 @@ export const ai4: AI = [
     outs: [
         {
           aiOut: new O.ToSelf(),
-          condition: (state: GameState) => true,
+          condition: () => true,
         },
       ],
   },
@@ -126,7 +126,7 @@ export const ai5: AI = [
     outs: [
         {
           aiOut: new O.ToX(1),
-          condition: (state: GameState) => true,
+          condition: () => true,
         },
       ],
   },
@@ -139,7 +139,64 @@ export const ai5: AI = [
     outs: [
         {
           aiOut: new O.ToX(0),
-          condition: (state: GameState) => true,
+          condition: () => true,
+        },
+      ],
+  },
+];
+
+export const ai6: AI = [
+  {
+    intent: new I.AddTriggerI(
+      I.mkSelf(),
+      new I.Static(
+        T.full(new T.Strong(4)),
+      ),
+    ),
+    spriteId: "ab4",
+    outs: [
+        {
+          aiOut: new O.ToX(1),
+          condition: (state: GameState, selfId: UnitId) => {
+            const thId = I.getHighestThreat(state, selfId);
+            const thUnit = getUnit(thId, state);
+            const strongTrs = state.triggers.strong.filter(x => eqUnitId(state, x.owner, selfId));
+            let strongVal = 0;
+            if (strongTrs.length > 0) {
+              strongVal = T.triggerValue(strongTrs[0]);
+            }
+            return (thUnit !== undefined && thUnit.hp < 6) || strongVal >= 10;
+          },
+        },
+        {
+          aiOut: new O.ToSelf,
+          condition: () => true,
+        },
+      ],
+  },
+  {
+    intent: new I.DamageI(
+      I.mkHighestThreat(),
+      new I.Static(10),
+    ),
+    spriteId: "ab3",
+    outs: [
+        {
+          aiOut: new O.ToX(0),
+          condition: (state: GameState, selfId: UnitId) => {
+            const thId = I.getHighestThreat(state, selfId);
+            const thUnit = getUnit(thId, state);
+            const strongTrs = state.triggers.strong.filter(x => eqUnitId(state, x.owner, selfId));
+            let strongVal = 0;
+            if (strongTrs.length > 0) {
+              strongVal = T.triggerValue(strongTrs[0]);
+            }
+            return (thUnit !== undefined && thUnit.hp < 6) || strongVal >= 10;
+          },
+        },
+        {
+          aiOut: new O.ToSelf,
+          condition: () => true,
         },
       ],
   },

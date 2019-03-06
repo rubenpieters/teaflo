@@ -1,4 +1,4 @@
-import { UnitId, isGlobalId, isPositionId, UnitType, GlobalId, PositionId } from "./entityId";
+import { UnitId, isGlobalId, isPositionId, UnitType, GlobalId, PositionId, EntityId, toGlobalId } from "./entityId";
 import { GameState, filteredEn, filteredFr, FrStUnit } from "./state";
 import { Action } from "./action";
 import * as A from "./action";
@@ -325,7 +325,7 @@ function evaluateIntentVar<A>(
         console.log("evaluateIntentVar: no self given");
         throw "evaluateIntentVar: no self given";
       }
-      return <A>(<any>context.self);
+      return context.self as any;
     }
     case "AllEnemy": {
       console.log("AllEnemy: Internal Intent Var");
@@ -345,27 +345,7 @@ function evaluateIntentVar<A>(
         console.log("evaluateIntentVar: self not enemy");
         throw "evaluateIntentVar: self not enemy";
       }
-      const threat = filteredFr(state)
-        .reduce((prev, curr) => {
-          if (prev === undefined) {
-            return curr;
-          }
-          if (prev.threatMap[self.id] === undefined) {
-            return curr;
-          }
-          if (curr.threatMap[self.id] === undefined) {
-            return prev;
-          }
-          if (curr.threatMap[self.id] >= prev.threatMap[self.id]) {
-            return curr;
-          }
-          return prev;
-        }, <FrStUnit | undefined>undefined);
-      if (threat === undefined) {
-        return <A>(<any>new PositionId(0, "friendly"));
-      } else {
-        return <A>(<any>new GlobalId(threat.id, "friendly"));
-      }
+      return getHighestThreat(state, self) as any;
     }
     case "AllExceptSelf": {
       console.log("AllExceptSelf: Internal Intent Var");
@@ -375,6 +355,34 @@ function evaluateIntentVar<A>(
       console.log("AllyExceptSelf: Internal Intent Var");
       throw "AllyExceptSelf: Internal Intent Var";
     }
+  }
+}
+
+export function getHighestThreat(
+  state: GameState,
+  self: EntityId<"friendly" | "enemy">,
+): EntityId<"friendly" | "enemy"> {
+  const globalId = toGlobalId(state, self);
+  const threat = filteredFr(state)
+    .reduce((prev, curr) => {
+      if (prev === undefined) {
+        return curr;
+      }
+      if (prev.threatMap[globalId.id] === undefined) {
+        return curr;
+      }
+      if (curr.threatMap[globalId.id] === undefined) {
+        return prev;
+      }
+      if (curr.threatMap[globalId.id] >= prev.threatMap[globalId.id]) {
+        return curr;
+      }
+      return prev;
+    }, <FrStUnit | undefined>undefined);
+  if (threat === undefined) {
+    return new PositionId(0, "friendly");
+  } else {
+    return new GlobalId(threat.id, "friendly");
   }
 }
 

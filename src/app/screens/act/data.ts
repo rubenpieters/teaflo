@@ -44,6 +44,17 @@ const a1l2: LevelData = {
   supplyLocations: [{ x: 300, y: 100 }, { x: 150, y: 500 }, { x: 450, y: 500 }],
 };
 
+const a1l3: LevelData = {
+  name: "A1 level3",
+  id: "a1l3",
+  cardIds: ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
+  enemyIds: ["en_unit_a1_l4_01"],
+  slots: 2,
+  selectLocation: { x: 500, y: 500 },
+  boxSprite: "select3.png",
+  supplyLocations: [{ x: 300, y: 100 }, { x: 150, y: 500 }, { x: 450, y: 500 }],
+};
+
 const a2l1: LevelData = {
   name: "A2 level1",
   id: "a2l1",
@@ -72,7 +83,7 @@ export const actData: {
   0: {
     shortName: "1",
     longName: "Act 1",
-    levels: [a1l1, a1l2],
+    levels: [a1l1, a1l2, a1l3],
     bgSprite: "sel_act1.png",
   },
   1: {
@@ -94,6 +105,7 @@ export const levelData: {
 } = {
   "a1l1": a1l1,
   "a1l2": a1l2,
+  "a1l3": a1l3,
   "a2l1": a2l1,
   "a3l1": a3l1,
 }

@@ -8,6 +8,7 @@ export const cardMap: {
   "en_unit_a1_l2_01": "unit4.png",
   "en_unit_a1_l3_01": "unit4.png",
   "en_unit_a1_l3_02": "unit4.png",
+  "en_unit_a1_l4_01": "unit4.png",
   // test
   "test4ab": "unit4.png",
 }
