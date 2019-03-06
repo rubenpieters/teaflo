@@ -69,7 +69,7 @@ function _runAsTween(
         const maxAnimT = maxAnimTime(animation.list);
         let onCompleteSet = false;
         animation.list.forEach(childAnimation => {
-          if (! onCompleteSet) {
+          if (! onCompleteSet && animTime(childAnimation) === maxAnimT) {
             _runAsTween(game, childAnimation, () => onComplete);
             onCompleteSet = true;
           } else {
