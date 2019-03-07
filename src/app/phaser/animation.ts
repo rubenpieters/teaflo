@@ -86,6 +86,26 @@ function _runAsTween(
   }
 }
 
+export function runCreateOnly(
+  animation: Animation,
+): void {
+  switch (animation.tag) {
+    case "Create": {
+      const obj = animation.f();
+      runCreateOnly(animation.k(obj));
+      break;
+    }
+    case "BaseAnimation": break;
+    case "SeqAnimation": // fallthrough
+    case "ParAnimation": {
+      animation.list.forEach(childAnimation => {
+        runCreateOnly(childAnimation);
+      });
+      break;
+    }
+  }
+}
+
 function runSeqAsTween(
   game: Phaser.Game,
   seqAnimation: SeqAnimation,
