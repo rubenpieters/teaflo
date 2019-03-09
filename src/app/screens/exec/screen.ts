@@ -11,7 +11,7 @@ import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, 
 import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog, triggerValue } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
-import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup } from "../../../app/phaser/animation";
+import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution } from "../../../shared/game/solution";
 import { intentDescription, actionDescription, triggerTagDescription, DescToken } from "../../util/intentDesc";
@@ -127,6 +127,8 @@ export class ExecScreen {
     addText(this.gameRefs, sprite, pos, "Clear", "#000000", 40);
   }
 
+  // POSITION FUNCTIONS
+
   friendlyUnitPos(
     state: GameState,
     unitId: EntityId<"friendly">,
@@ -149,11 +151,12 @@ export class ExecScreen {
     );
   }
 
+  // DRAW STATE
+
   drawState(
     state: GameState,
     prevState?: GameState,
   ) {
-    // when drawing elements: if difference with previous state, play animation
     this.unitPool.clear();
     this.unitResPool.clear();
     this.triggerPool.clear();
@@ -164,18 +167,19 @@ export class ExecScreen {
     this.abilityPool.clear();
     this.stateIconPool.clear();
 
+    // the input type of the click state
+    // undefined if the clickstate is undefined
     const currentInputType = this.clickState === undefined ? undefined :
       this.clickState.ability.inputs[this.clickState.inputs.length];
 
     // calculate max threat value
-    const enIds = filteredEn(state)
-      .map(x => x.id)
-      ;
+    const enIds = filteredEn(state).map(x => x.id);
     const maxThreat = filteredFr(state)
       .map(x => Object.values(x.threatMap))
       .reduce((acc, curr) => Math.max(...curr.concat(acc)), 1)
       ;
 
+    // draw friendly units
     state.frUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
         const unitPos = this.friendlyUnitPos(state, new PositionId(unitIndex, "friendly"));
@@ -616,6 +620,92 @@ export class ExecScreen {
     }
   }
 
+  drawIntermediateActions(
+    state: GameState,
+    log: Log,
+  ): Animation {
+    const anims = allLogIndices(state, log).map(x => {
+      return new Create(
+        () => {
+          return {};
+        },
+        () => {
+          return this.drawIntermediateAction(x.logIndex);
+        }
+      );
+    });
+    return new SeqAnimation(anims);
+  }
+
+  drawIntermediateAction(
+    intermediate: LogIndex,
+  ): Animation {
+    this.logActionPool.clear();
+    this.logTextPool.clear();
+    this.logTextSpritePool.clear();
+    this.logTriggerPool.clear();
+
+    console.log(`INTERMEDIATE: ${JSON.stringify(intermediate)}`);
+    this.intermediate = intermediate;
+    
+    const state = this.currentState();
+    const log = this.log!;
+    // draw log icons
+    const anims = allLogIndices(state, log).map(x => {
+      const entryIndex = x.entryIndex;
+      const typeIndex = x.typeIndex;
+      const entry = getLogEntry(this.log!, x.logIndex);
+
+      const pos = createPosition(
+        "left", 20 + 50 * entryIndex, 40,
+        "top", 120 + 80 * typeIndex, 40,
+      );
+
+      if (logIndexLt(x.logIndex, intermediate)) {
+        return new Create(() => {
+          let sprite: Phaser.Sprite;
+          sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ logIndex: x.logIndex }});
+          sprite.alpha = 1;
+          return sprite;
+        }, self => {
+          return new BaseAnimation(0, self, t => { return; } );
+        });
+      } else if (logIndexEq(x.logIndex, intermediate)) {
+        return new Create(() => {
+          let sprite: Phaser.Sprite;
+          sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ logIndex: x.logIndex }});
+          sprite.alpha = 0.5;
+          return sprite;
+        }, self => {
+          return new BaseAnimation(500, self, t => { t.to({ alpha: 1.0 }, 500); } );
+        });
+      } else {
+        return new Create(() => {
+          let sprite: Phaser.Sprite;
+          sprite = this.logActionPool.newSprite(pos.xMin, pos.yMin, {}, {...entry, ...{ logIndex: x.logIndex }});
+          sprite.alpha = 0.5;
+          return sprite;
+        }, self => {
+          return new BaseAnimation(0, self, t => { return; } );
+        });
+      }
+    });
+
+    // draw action popup text
+    const action = getLogEntry(log, intermediate).action;
+    const actionAnimPos = this.logLocation(action, state);
+    const actionAnim = new Create(() => {
+      return this.createLogTextSprite(actionAnimPos.xMin, actionAnimPos.yMin, action);
+    }, self => {
+      return new BaseAnimation(1000, self, t => {
+        t.to({ y: actionAnimPos.yMin - 100 }, 1000);
+        t.onComplete.add(() => self.destroy());
+      });
+    });
+
+    return new ParAnimation(anims.concat(actionAnim));
+  }
+
   drawIntermediateLog(
     upto: LogIndex,
     animation: boolean,
@@ -772,7 +862,7 @@ export class ExecScreen {
     parentX: number,
     parentY: number,
     action: Action,
-  ) {
+  ): Phaser.Sprite {
     const desc = actionDescription(action);
     let y = 0;
     let xOffset = 0;
@@ -790,14 +880,14 @@ export class ExecScreen {
           break;
         }
         case "DescSymbol": {
-          const xPos = parentX + 80 * (descIndex - xOffset);
-          const yPos = parentY - y * 80;
-          dataList.push({ x: xPos, y: yPos, frameType: {}, data: { sprite: descSym.sym} });
+          const xPos = 80 * (descIndex - xOffset);
+          const yPos = - y * 80;
+          dataList.push({ x: xPos, y: yPos, frameType: {}, data: { sprite: descSym.sym } });
           break;
         }
       }
     });
-    return this.logTextSpritePool.newGroup(dataList);
+    return this.logTextSpritePool.newGroup(parentX, parentY, dataList);
   }
 
   createTriggerEntryAnim(

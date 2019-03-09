@@ -114,6 +114,8 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   }
 
   public newGroup(
+    parentX: number,
+    parentY: number,
     dataList: {
       x: number,
       y: number,
@@ -121,9 +123,8 @@ export class Pool<Data, FrameType> extends Phaser.Group {
       data: Data,
     }[]
   ): Phaser.Sprite {
-    const group = new Phaser.Sprite(this.game, 0, 0, undefined);
+    const group = this.game.add.sprite(parentX, parentY);
 
-    // TODO: the data section should only be added to the parent
     dataList.forEach(data => {
       const sprite = this.newSprite(data.x, data.y, data.frameType, data.data);
       group.addChild(sprite);

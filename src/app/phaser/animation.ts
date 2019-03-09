@@ -44,13 +44,13 @@ export function runAsTween(
   game: Phaser.Game,
   animation: Animation,
 ): void {
-  _runAsTween(game, animation, () => { return; });
+  _runAsTween(game, animation, undefined);
 }
 
 function _runAsTween(
   game: Phaser.Game,
   animation: Animation,
-  onComplete: () => void,
+  onComplete: (() => void) | undefined,
 ): void {
   switch (animation.tag) {
     case "Create": {
@@ -60,7 +60,9 @@ function _runAsTween(
     }
     case "BaseAnimation": {
       const tween = createTween(game, animation.self, t => animation.f(t));
-      tween.onComplete.add(onComplete);
+      if (onComplete !== undefined) {
+        tween.onComplete.add(onComplete);
+      }
       tween.start();
       break;
     }
@@ -70,17 +72,17 @@ function _runAsTween(
         let onCompleteSet = false;
         animation.list.forEach(childAnimation => {
           if (! onCompleteSet && animTime(childAnimation) === maxAnimT) {
-            _runAsTween(game, childAnimation, () => onComplete);
+            _runAsTween(game, childAnimation, onComplete);
             onCompleteSet = true;
           } else {
-            _runAsTween(game, childAnimation, () => { return; });
+            _runAsTween(game, childAnimation, undefined);
           }
         });
       }
       break;
     }
     case "SeqAnimation": {
-      runSeqAsTween(game, animation);
+      runSeqAsTween(game, animation, onComplete);
       break;
     }
   }
@@ -109,21 +111,25 @@ export function runCreateOnly(
 function runSeqAsTween(
   game: Phaser.Game,
   seqAnimation: SeqAnimation,
+  onComplete: (() => void) | undefined,
 ) {
   const list = seqAnimation.list;
   if (list.length !== 0) {
     _runAsTween(game, list[0], () => {
-      runSeqAsTween(game, new SeqAnimation(list.slice(1)));
+      runSeqAsTween(game, new SeqAnimation(list.slice(1)), onComplete);
     });
+  } else {
+    if (onComplete !== undefined) {
+      onComplete();
+    }
   }
-  return;
 }
 
 function animTime(
   animation: Animation,
 ): number {
   switch (animation.tag) {
-    case "Create": return 0;
+    case "Create": return animTime(animation.k(undefined));
     case "BaseAnimation": return animation.length;
     case "SeqAnimation": return animation.list.reduce((acc, prev) => animTime(prev) + acc, 0);
     case "ParAnimation": return maxAnimTime(animation.list);
