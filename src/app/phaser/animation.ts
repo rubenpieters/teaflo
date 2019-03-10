@@ -54,16 +54,13 @@ function _runAsTween(
 ): void {
   switch (animation.tag) {
     case "Create": {
-      console.log("Create");
       const obj = animation.f();
       _runAsTween(game, animation.k(obj), onComplete);
       break;
     }
     case "BaseAnimation": {
-      console.log("BaseAnimation");
       const tween = createTween(game, animation.self, t => animation.f(t));
       if (onComplete !== undefined) {
-        console.log("TEST");
         tween.onComplete.add(onComplete);
       }
       tween.start();
@@ -85,7 +82,6 @@ function _runAsTween(
       break;
     }
     case "SeqAnimation": {
-      console.log("SeqAnimation");
       runSeqAsTween(game, animation, onComplete);
       break;
     }
@@ -118,14 +114,12 @@ function runSeqAsTween(
   onComplete: (() => void) | undefined,
 ) {
   const list = seqAnimation.list;
-  console.log(`LENGTH: ${list.length}`);
   if (list.length !== 0) {
     _runAsTween(game, list[0], () => {
       runSeqAsTween(game, new SeqAnimation(list.slice(1)), onComplete);
     });
   } else {
     if (onComplete !== undefined) {
-      console.log("SEQ COMPLETE");
       onComplete();
     }
   }

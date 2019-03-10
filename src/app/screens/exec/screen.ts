@@ -626,15 +626,9 @@ export class ExecScreen {
   ): Animation {
     const anims = allLogIndices(state, log).map(x => {
       return new Create(
-        () => { return {}; },
+        () => { return; },
         () => {
-          return new SeqAnimation([
-            this.drawIntermediateAction(x.logIndex),
-            new Create(
-              () => { this.drawCurrentState(); return {}; },
-              () => { return new BaseAnimation(1, {}, t => { t.from({}, 1); }); }
-            ),
-          ]);
+          return this.drawIntermediateAction(x.logIndex);
         }
       );
     });
@@ -648,10 +642,11 @@ export class ExecScreen {
     this.logTextPool.clear();
     this.logTextSpritePool.clear();
     this.logTriggerPool.clear();
-
+    
     console.log(`INTERMEDIATE: ${JSON.stringify(intermediate)}`);
     this.intermediate = intermediate;
-    
+    this.drawCurrentState();
+
     const state = this.currentState();
     const log = this.log!;
     // draw log icons
