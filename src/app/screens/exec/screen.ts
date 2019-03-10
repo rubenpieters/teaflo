@@ -626,11 +626,15 @@ export class ExecScreen {
   ): Animation {
     const anims = allLogIndices(state, log).map(x => {
       return new Create(
+        () => { return {}; },
         () => {
-          return {};
-        },
-        () => {
-          return this.drawIntermediateAction(x.logIndex);
+          return new SeqAnimation([
+            this.drawIntermediateAction(x.logIndex),
+            new Create(
+              () => { this.drawCurrentState(); return {}; },
+              () => { return new BaseAnimation(1, {}, t => { t.from({}, 1); }); }
+            ),
+          ]);
         }
       );
     });
