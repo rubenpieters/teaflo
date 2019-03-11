@@ -109,3 +109,5 @@ textures/ab2.png
 textures/ab3.png
 textures/ab4.png
 textures/side_btn.png
+textures/frame_in.png
+textures/frame_out.png

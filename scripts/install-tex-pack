@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo "-- apt"
 apt-get install libpng12-dev
 echo "-- mkdir"

@@ -81,10 +81,6 @@ export class ExecScreen {
     this.selectedUnit = undefined;
     this.clickState = undefined;
     this.intermediate = undefined;
-    this.logActionPool.clear();
-    this.logTextPool.clear();
-    this.logTextSpritePool.clear();
-    this.logTriggerPool.clear();
   }
 
   canExtendState(): boolean {
