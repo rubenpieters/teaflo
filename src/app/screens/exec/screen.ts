@@ -649,6 +649,8 @@ export class ExecScreen {
 
     const state = this.currentState();
     const log = this.log!;
+    const prevLog = getPrevLogEntry(log, intermediate);
+
     // draw log icons
     const anims = allLogIndices(state, log).map(x => {
       const entryIndex = x.entryIndex;
@@ -701,6 +703,11 @@ export class ExecScreen {
         t.onComplete.add(() => self.destroy());
       });
     });
+
+    // draw difference with prev log
+    if (prevLog !== undefined) {
+      console.log(`PREV: ${JSON.stringify(prevLog.action)}`)
+    }
 
     return new ParAnimation(anims.concat(actionAnim));
   }
