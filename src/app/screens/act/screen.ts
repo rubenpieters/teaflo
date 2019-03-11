@@ -42,7 +42,7 @@ export class ActScreen {
 
   drawActBtn() {
     const anim = this.redrawActBtn();
-    runAsTween(this.gameRefs.game, anim);
+    runAsTween(this.gameRefs, anim);
   }
 
   redrawActBtn(): Animation {

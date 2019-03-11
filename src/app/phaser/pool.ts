@@ -27,7 +27,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   // pool information shared by each element in this pool
   poolInfo: PoolInfo<Data, FrameType>
   // currently registered groups in the pool
-  groups: Phaser.Group[] = []
+  groups: (Phaser.Sprite | undefined)[] = []
 
   constructor(
     game: Phaser.Game,
@@ -130,7 +130,13 @@ export class Pool<Data, FrameType> extends Phaser.Group {
       group.addChild(sprite);
     });
 
+    // TODO: check whether this constantly growing list is a problem
+    const index = this.groups.length;
+    this.groups.push(group);
+
     group.events.onDestroy.add(() => {
+      // remove self from groups
+      this.groups[index] = undefined;
       // free the children into the general pool
       group.children.forEach(child => {
         (child as DataSprite<Data>).kill();
@@ -169,9 +175,23 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   }
 
   public clear() {
-    this.groups.forEach(x => x.destroy);
+    this.groups.forEach(x => {
+      if (x !== undefined) {
+        x.destroy
+      }
+    });
     // kill all sprites
     this.killAll();
+  }
+
+  // clear the animations of the groups in this pool
+  public clearGroupAnimations() {
+    this.groups.forEach(group => {
+      if (group !== undefined) {
+        this.game.tweens.removeFrom(group);
+        group.destroy();
+      }
+    });
   }
 }
 

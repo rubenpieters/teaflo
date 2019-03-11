@@ -43,9 +43,7 @@ export function updateSolutionRep(
   }
   const frstLogKey = firstLogKey(solResult.state, solResult.log);
   if (frstLogKey !== undefined) {
-    //gameRefs.screens.execScreen.drawIntermediateLog(frstLogKey, true);
-    console.log("X");
-    runAsTween(gameRefs.game, gameRefs.screens.execScreen.drawIntermediateActions(solResult.state, solResult.log));
+    runAsTween(gameRefs, gameRefs.screens.execScreen.drawIntermediateActions(solResult.state, solResult.log), "log");
   } else {
     gameRefs.screens.execScreen.drawState(solResult.state);
     gameRefs.screens.execScreen.drawStats(solResult.state);

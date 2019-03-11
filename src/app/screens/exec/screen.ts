@@ -150,6 +150,25 @@ export class ExecScreen {
     );
   }
 
+  statusPos(
+    state: GameState,
+    statusId: GlobalId<"status">,
+    // x index, the index within its status group
+    triggerIndex?: number,
+    // y index, to which status group it belongs
+    tagIndex?: number,
+  ) {
+    if (triggerIndex === undefined || tagIndex === undefined) {
+      const index = findStatus(state, statusId);
+      triggerIndex = index!.index;
+      tagIndex = triggerOrder.findIndex(x => x === index!.group);
+    }
+    return createPosition(
+      "left", 240 + 50 * triggerIndex, 40,
+      "top", 50 + 50 * tagIndex, 40,
+    );
+  }
+
   // DRAW STATE
 
   drawState(
@@ -449,10 +468,7 @@ export class ExecScreen {
     // AETHER
     triggerOrder.forEach((tag, tagIndex) => {
       state.triggers[tag].forEach((trigger, triggerIndex) => {
-        const triggerPos = createPosition(
-          "left", 240 + 50 * triggerIndex, 40,
-          "top", 50 + 50 * tagIndex, 40,
-        );
+        const triggerPos = this.statusPos(state, new GlobalId(trigger.id, "status"), triggerIndex, tagIndex);
         const trSprite = this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { trigger });
         if (currentInputType !== undefined && ! matchUserInput(currentInputType, new GlobalId(trigger.id, "status"))) {
           trSprite.alpha = 0.3;
@@ -835,17 +851,13 @@ export class ExecScreen {
     state: GameState,
   ): Position {
     switch (action.tag) {
+      case "AddTrigger": // fallthrough
+      case "UseCharge": // fallthrough
       case "Damage": {
         return this.onTargetPos(state, action.target);
       }
       case "AddThreat": {
         return this.onTargetPos(state, action.toFriendly);
-      }
-      case "UseCharge": {
-        return this.onTargetPos(state, action.target);
-      }
-      case "AddTrigger": {
-        return this.onTargetPos(state, action.target);
       }
       default: {
         return createPosition(
@@ -862,11 +874,7 @@ export class ExecScreen {
   ) {
     switch (id.type) {
       case "status": {
-        const index = findStatus(state, id);
-        return createPosition(
-          "left", 650 + 80 * index!.index, 100,
-          "top", 50 + 80 * triggerOrder.findIndex(x => x === index!.group), 100,
-        );
+        return this.statusPos(state, id);
       }
       case "enemy": {
         return this.enemyUnitPos(state, id as EntityId<"enemy">);
@@ -981,9 +989,12 @@ export class ExecScreen {
     type: "out" | "in",
   ): Create {
     const pos = this.onTargetPos(state, id);
+    const sprite = id.type === "status"
+      ? "icon_add_status.png"
+      : `frame_${type}.png`;
     return new Create(
       () => {
-        return this.framePool.newSprite(pos.xMin - 5, pos.yMin - 5, {}, { sprite: `frame_${type}.png` });
+        return this.framePool.newSprite(pos.xMin - 5, pos.yMin - 5, {}, { sprite });
       },
       self => {
         return new BaseAnimation(1000, self, t => {
@@ -1048,26 +1059,6 @@ export class ExecScreen {
     this.animControlBtnPool.visible = visibility;
     this.solTreePool.visible = visibility;
     this.detailBtnPool.visible = visibility;
-  }
-
-  clear() {
-    
-  }
-
-  clearAnimations() {
-    this.gameRefs.game.tweens.removeFrom(this.clearBtnPool, true);
-    this.gameRefs.game.tweens.removeFrom(this.unitPool, true);
-    this.gameRefs.game.tweens.removeFrom(this.unitResPool, true);
-    this.gameRefs.game.tweens.removeFrom(this.abilityPool, true);
-    this.gameRefs.game.tweens.removeFrom(this.triggerPool, true);
-    this.gameRefs.game.tweens.removeFrom(this.logActionPool, true);
-    this.gameRefs.game.tweens.removeFrom(this.logTriggerPool, true);
-    this.gameRefs.game.tweens.removeFrom(this.solTreePool, true);
-    this.gameRefs.game.tweens.removeFrom(this.detailBtnPool, true);
-    this.gameRefs.game.tweens.removeFrom(this.statsTextPool.texts, true);
-    this.gameRefs.game.tweens.removeFrom(this.unitTextPool.texts, true);
-    this.gameRefs.game.tweens.removeFrom(this.logTextPool.texts, true);
-    this.gameRefs.game.tweens.removeFrom(this.detailExplPool, true);
   }
 }
 

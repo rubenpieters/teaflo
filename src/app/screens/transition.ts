@@ -1,6 +1,6 @@
 import { SelectedBuildSchem, SelectedExecSchem, SelectedActMenu, SelectedLevelMenu, currentScreen } from "./act/data";
 import { GameRefs } from "../states/game";
-import { clearPools } from "./util";
+import { clearPools, clearAnimations } from "./util";
 import { updateSolutionRep } from "./exec/events";
 import { CodexTypes } from "./codex/screen";
 
@@ -45,25 +45,28 @@ export function transitionScreen(
 ) {
   const oldScreen = currentScreen(gameRefs);
   // clear old screen
+  clearAnimations(gameRefs.game, gameRefs.screens.bgScreen);
   clearPools(gameRefs.screens.menuScreen);
-  gameRefs.screens.bgScreen.clearAnimations();
   switch (oldScreen.tag) {
     case "ScreenAct": {
-      gameRefs.screens.actScreen.clearAnimations();
+      clearAnimations(gameRefs.game, gameRefs.screens.actScreen);
       clearPools(gameRefs.screens.actScreen);
       break;
     }
     case "ScreenSchem": {
-      gameRefs.screens.execScreen.clearAnimations();
+      clearAnimations(gameRefs.game, gameRefs.screens.levelScreen);
+      clearAnimations(gameRefs.game, gameRefs.screens.execScreen);
       clearPools(gameRefs.screens.levelScreen);
       clearPools(gameRefs.screens.execScreen);
       break;
     }
     case "ScreenCodex": {
+      clearAnimations(gameRefs.game, gameRefs.screens.codexScreen);
       clearPools(gameRefs.screens.codexScreen);
       break;
     }
     case "ScreenSettings": {
+      clearAnimations(gameRefs.game, gameRefs.screens.settingsScreen);
       clearPools(gameRefs.screens.settingsScreen);
       break;
     }

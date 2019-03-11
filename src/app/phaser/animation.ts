@@ -41,25 +41,27 @@ export type Animation
   ;
 
 export function runAsTween(
-  game: Phaser.Game,
+  gameRefs: GameRefs,
   animation: Animation,
+  type?: "log",
 ): void {
-  _runAsTween(game, animation, undefined);
+  _runAsTween(gameRefs, animation, undefined, type);
 }
 
 function _runAsTween(
-  game: Phaser.Game,
+  gameRefs: GameRefs,
   animation: Animation,
   onComplete: (() => void) | undefined,
+  type?: "log",
 ): void {
   switch (animation.tag) {
     case "Create": {
       const obj = animation.f();
-      _runAsTween(game, animation.k(obj), onComplete);
+      _runAsTween(gameRefs, animation.k(obj), onComplete);
       break;
     }
     case "BaseAnimation": {
-      const tween = createTween(game, animation.self, t => animation.f(t));
+      const tween = createTypeTween(gameRefs, animation.self, t => animation.f(t), type);
       if (onComplete !== undefined) {
         tween.onComplete.add(onComplete);
       }
@@ -72,17 +74,17 @@ function _runAsTween(
         let onCompleteSet = false;
         animation.list.forEach(childAnimation => {
           if (! onCompleteSet && animTime(childAnimation) === maxAnimT) {
-            _runAsTween(game, childAnimation, onComplete);
+            _runAsTween(gameRefs, childAnimation, onComplete);
             onCompleteSet = true;
           } else {
-            _runAsTween(game, childAnimation, undefined);
+            _runAsTween(gameRefs, childAnimation, undefined);
           }
         });
       }
       break;
     }
     case "SeqAnimation": {
-      runSeqAsTween(game, animation, onComplete);
+      runSeqAsTween(gameRefs, animation, onComplete);
       break;
     }
   }
@@ -109,14 +111,14 @@ export function runCreateOnly(
 }
 
 function runSeqAsTween(
-  game: Phaser.Game,
+  gameRefs: GameRefs,
   seqAnimation: SeqAnimation,
   onComplete: (() => void) | undefined,
 ) {
   const list = seqAnimation.list;
   if (list.length !== 0) {
-    _runAsTween(game, list[0], () => {
-      runSeqAsTween(game, new SeqAnimation(list.slice(1)), onComplete);
+    _runAsTween(gameRefs, list[0], () => {
+      runSeqAsTween(gameRefs, new SeqAnimation(list.slice(1)), onComplete);
     });
   } else {
     if (onComplete !== undefined) {
