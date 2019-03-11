@@ -997,10 +997,12 @@ export class ExecScreen {
         return this.framePool.newSprite(pos.xMin - 5, pos.yMin - 5, {}, { sprite });
       },
       self => {
-        return new BaseAnimation(1000, self, t => {
-          t.from({ x: pos.xMin - 5 }, 50);
-          t.to({ x: pos.xMin + 5 }, 50);
-          t.repeat(10);
+        return new BaseAnimation(999, self, t => {
+          t.to({ x: pos.xMin - 5 }, 125);
+          t.to({ x: pos.xMin + 5 }, 250);
+          t.to({ x: pos.xMin - 5 }, 250);
+          t.to({ x: pos.xMin + 5 }, 250);
+          t.to({ x: pos.xMin }, 125);
           t.onComplete.add(() => self.kill());
         });
       }
