@@ -132,7 +132,10 @@ function runPhases(
   const frActionResult = applyIntentToSolution(frAbility.intent, { input: frInputs, self: solData.origin }, state);
   state = frActionResult.state;
   const filteredLog = frActionResult.log.filter(x => x.action.tag !== "CombinedAction");
-  log = focus(log, over(x => x.fr, x => x.concat(filteredLog)));
+  log = focus(log,
+    over(x => x.fr.entries, x => x.concat(filteredLog)),
+    set(x => x.fr.id, solData.origin),
+  );
 
   if (state.state === "invalid") {
     return { state, log: log, win: false };

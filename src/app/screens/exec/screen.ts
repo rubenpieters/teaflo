@@ -30,6 +30,7 @@ export class ExecScreen {
   statsTextPool: TextPool
   stateTextPool: TextPool
   triggerPool: Pool<TriggerData, {}>
+  framePool: Pool<FrameData, {}>
   logTextPool: TextPool
   logTextSpritePool: Pool<LogTextSpriteData, {}>
   logActionPool: Pool<LogActionData, {}>
@@ -40,6 +41,7 @@ export class ExecScreen {
   hoverSpritePool: Pool<HoverSpriteData, {}>
   hoverGraphicsPool: Phaser.Graphics
   stateIconPool: Pool<StateIconData, {}>
+
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
 
@@ -61,6 +63,7 @@ export class ExecScreen {
     this.stateTextPool = new TextPool(gameRefs.game);
     this.abilityPool = mkAbilityPool(gameRefs);
     this.triggerPool = mkTriggerPool(gameRefs);
+    this.framePool = mkFramePool(gameRefs);
     this.logTextPool = new TextPool(gameRefs.game);
     this.logActionPool = mkLogActionPool(gameRefs);
     this.logTriggerPool = mkLogTriggerPool(gameRefs);
@@ -648,7 +651,7 @@ export class ExecScreen {
     const prevLog = getPrevLogEntry(log, intermediate);
 
     // draw log icons
-    const anims = allLogIndices(state, log).map(x => {
+    const anims: Animation[] = allLogIndices(state, log).map(x => {
       const entryIndex = x.entryIndex;
       const typeIndex = x.typeIndex;
       const entry = getLogEntry(this.log!, x.logIndex);
@@ -699,13 +702,27 @@ export class ExecScreen {
         t.onComplete.add(() => self.destroy());
       });
     });
-
+    
+    // draw frames
+    let frameAnim: Animation = <any>undefined;
+    switch (intermediate.type) {
+      case "en": {
+        frameAnim = this.drawFrames(state, action, new PositionId(intermediate.enIndex, "enemy"));
+        break;
+      }
+      case "fr": {
+        frameAnim = this.drawFrames(state, action, intermediate.id);
+        break;
+      }
+      case "st": frameAnim = this.drawFrames(state, action, undefined);
+    }
+    
     // draw difference with prev log
     if (prevLog !== undefined) {
       console.log(`PREV: ${JSON.stringify(prevLog.action)}`)
     }
 
-    return new ParAnimation(anims.concat(actionAnim));
+    return new ParAnimation(anims.concat(frameAnim).concat(actionAnim));
   }
 
   drawIntermediateLog(
@@ -923,6 +940,60 @@ export class ExecScreen {
         return tween;
       },
     };
+  }
+
+  drawFrames(
+    state: GameState,
+    action: Action,
+    origin: TargetId | undefined,
+  ): Animation {
+    let targetFrames: Animation;
+    switch (action.tag) {
+      case "Damage": // fallthrough
+      case "AddTrigger": // fallthrough
+      case "UseCharge": {
+        targetFrames = this.createFrame(state, action.target, "in");
+        break;
+      }
+      case "AddThreat": {
+        targetFrames = this.createFrame(state, action.atEnemy, "in");
+        break;
+      }
+      default: {
+        targetFrames = new SeqAnimation([]);
+        break;
+      }
+    }
+
+    const originFrames: Animation = origin === undefined
+      ? new SeqAnimation([])
+      : this.createFrame(state, origin, "out");
+
+    return new ParAnimation([
+      targetFrames,
+      originFrames,
+    ]);
+  }
+
+  createFrame(
+    state: GameState,
+    id: TargetId,
+    type: "out" | "in",
+  ): Create {
+    const pos = this.onTargetPos(state, id);
+    return new Create(
+      () => {
+        return this.framePool.newSprite(pos.xMin - 5, pos.yMin - 5, {}, { sprite: `frame_${type}.png` });
+      },
+      self => {
+        return new BaseAnimation(1000, self, t => {
+          t.from({ x: pos.xMin - 5 }, 50);
+          t.to({ x: pos.xMin + 5 }, 50);
+          t.repeat(10);
+          t.onComplete.add(() => self.kill());
+        });
+      }
+    );
   }
 
   drawTree(
@@ -1581,6 +1652,28 @@ type StateIconData = {
 function mkStateIconPool(
   gameRefs: GameRefs,
 ): Pool<StateIconData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return self.data.sprite;
+      },
+      introAnim: [
+      ],
+      callbacks: {
+      },
+    },
+  );
+}
+
+type FrameData = {
+  sprite: string,
+};
+
+function mkFramePool(
+  gameRefs: GameRefs,
+): Pool<FrameData, {}> {
   return new Pool(
     gameRefs.game,
     {

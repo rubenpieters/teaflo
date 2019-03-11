@@ -2,6 +2,7 @@ import { Action } from "./action";
 import { GameState } from "./state";
 import { TriggerLog } from "./trigger";
 import { Omit } from "../type-util";
+import { GlobalId } from "./entityId";
 
 export type LogEntry = {
   action: Action,
@@ -18,6 +19,7 @@ export type LogKeySt = {
 
 export type LogKeyFr = {
   index: number,
+  id: GlobalId<"friendly">,
   type: "fr",
 }
 
@@ -44,7 +46,7 @@ export function getPrevLogEntry(
       case "fr": return log.st[log.st.length - 1];
       case "en": {
         if (logIndex.enIndex === 0) {
-          return log.fr[log.fr.length - 1];
+          return log.fr.entries[log.fr.entries.length - 1];
         } else {
           const prevEnLog = log.en[logIndex.enIndex - 1];
           return prevEnLog[prevEnLog.length - 1];
@@ -54,6 +56,8 @@ export function getPrevLogEntry(
   } else {
     if (logIndex.type === "en") {
       return log[logIndex.type][logIndex.enIndex][logIndex.index - 1];
+    } else if (logIndex.type === "fr") {
+      return log[logIndex.type].entries[logIndex.index - 1];
     } else {
       return log[logIndex.type][logIndex.index - 1];
     }
@@ -67,6 +71,8 @@ export function getLogEntry(
 ): LogEntry {
   if (logIndex.type === "en") {
     return log[logIndex.type][logIndex.enIndex][logIndex.index];
+  } else if (logIndex.type === "fr") {
+    return log[logIndex.type].entries[logIndex.index];
   }
   return log[logIndex.type][logIndex.index];
 }
@@ -186,6 +192,8 @@ export function nextLogKey(
     } else {
       len = log[index.type][index.enIndex].length;
     }
+  } else if (index.type === "fr") {
+    len = log[index.type].entries.length;
   } else {
     len = log[index.type].length;
   }
@@ -216,8 +224,14 @@ export function nextLogKey(
           index: -1,
           enIndex: 0,
         });
+      } else if (logTypes[newLogTypeIndex] === "fr") {
+        return nextLogKey(state, log, <LogKeyFr>{
+          type: logTypes[newLogTypeIndex],
+          id: log.fr.id,
+          index: -1,
+        });
       } else {
-        return nextLogKey(state, log, <LogKeySt | LogKeyFr>{
+        return nextLogKey(state, log, <LogKeySt>{
           type: logTypes[newLogTypeIndex],
           index: -1,
         });
@@ -232,8 +246,14 @@ export function nextLogKey(
         index: newIndex,
         enIndex: index.enIndex,
       };
+    } else if (index.type === "fr") {
+      return <LogKeyFr>{
+        type: index.type,
+        id: log.fr.id,
+        index: newIndex,
+      };
     } else {
-      return <LogKeySt | LogKeyFr>{
+      return <LogKeySt>{
         type: index.type,
         index: newIndex,
       };
@@ -243,7 +263,12 @@ export function nextLogKey(
 
 export type Log = {
   st: LogEntry[]
-  fr: LogEntry[]
+  fr: {
+    // id of origin unit
+    id: GlobalId<"friendly"> | undefined,
+    // log entries
+    entries: LogEntry[],
+  },
   en: {
     // a list of log entries for each enemy
     [key: number]: LogEntry[]
@@ -253,7 +278,10 @@ export type Log = {
 export function emptyLog(): Log {
   return {
     st: [],
-    fr: [],
+    fr: {
+      id: undefined,
+      entries: [],
+    },
     en: [],
   };
 }
