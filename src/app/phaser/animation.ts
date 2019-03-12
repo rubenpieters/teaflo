@@ -57,7 +57,7 @@ function _runAsTween(
   switch (animation.tag) {
     case "Create": {
       const obj = animation.f();
-      _runAsTween(gameRefs, animation.k(obj), onComplete);
+      _runAsTween(gameRefs, animation.k(obj), onComplete, type);
       break;
     }
     case "BaseAnimation": {
@@ -74,17 +74,17 @@ function _runAsTween(
         let onCompleteSet = false;
         animation.list.forEach(childAnimation => {
           if (! onCompleteSet && animTime(childAnimation) === maxAnimT) {
-            _runAsTween(gameRefs, childAnimation, onComplete);
+            _runAsTween(gameRefs, childAnimation, onComplete, type);
             onCompleteSet = true;
           } else {
-            _runAsTween(gameRefs, childAnimation, undefined);
+            _runAsTween(gameRefs, childAnimation, undefined, type);
           }
         });
       }
       break;
     }
     case "SeqAnimation": {
-      runSeqAsTween(gameRefs, animation, onComplete);
+      runSeqAsTween(gameRefs, animation, onComplete, type);
       break;
     }
   }
@@ -114,12 +114,13 @@ function runSeqAsTween(
   gameRefs: GameRefs,
   seqAnimation: SeqAnimation,
   onComplete: (() => void) | undefined,
+  type?: "log",
 ) {
   const list = seqAnimation.list;
   if (list.length !== 0) {
     _runAsTween(gameRefs, list[0], () => {
-      runSeqAsTween(gameRefs, new SeqAnimation(list.slice(1)), onComplete);
-    });
+      runSeqAsTween(gameRefs, new SeqAnimation(list.slice(1)), onComplete, type);
+    }, type);
   } else {
     if (onComplete !== undefined) {
       onComplete();
