@@ -39,6 +39,7 @@ export function updateSolutionRep(
   gameRefs.screens.execScreen.drawTree(sol.solInfo!);
   if (prevState === undefined) {
     gameRefs.screens.execScreen.drawAnimControlBtns();
+    gameRefs.screens.execScreen.drawTreeControlBtns();
     gameRefs.screens.execScreen.drawClearBtn();
   }
   const frstLogKey = firstLogKey(solResult.state, solResult.log);

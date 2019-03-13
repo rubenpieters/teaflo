@@ -42,8 +42,8 @@ export class ExecScreen {
   hoverGraphicsPool: Phaser.Graphics
   stateIconPool: Pool<StateIconData, {}>
 
-
   animControlBtnPool: Pool<AnimControlBtn, {}>
+  treeControlBtnPool: Pool<TreeControlBtn, {}>
 
   state: GameState | undefined
   log: Log | undefined
@@ -51,6 +51,8 @@ export class ExecScreen {
   selectedUnit: UnitSelection | undefined
   clickState: { ability: Ability, inputs: any[], origin: UnitId, index: number } | undefined
   intermediate: LogIndex | undefined
+
+  treeCtrl: "remove" | undefined
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -68,6 +70,7 @@ export class ExecScreen {
     this.logActionPool = mkLogActionPool(gameRefs);
     this.logTriggerPool = mkLogTriggerPool(gameRefs);
     this.animControlBtnPool = mkAnimControlBtnPool(gameRefs);
+    this.treeControlBtnPool = mkTreeControlBtnPool(gameRefs);
     this.solTreePool = mkSolTreePool(gameRefs);
     this.detailBtnPool = mkDetailBtnPool(gameRefs);
     this.detailExplPool = mkDetailExplPool(gameRefs);
@@ -84,6 +87,7 @@ export class ExecScreen {
     this.selectedUnit = undefined;
     this.clickState = undefined;
     this.intermediate = undefined;
+    this.treeCtrl = undefined;
   }
 
   canExtendState(): boolean {
@@ -503,6 +507,22 @@ export class ExecScreen {
         "top", 50, 60,
       );
       this.animControlBtnPool.newSprite(pos.xMin, pos.yMin, {}, { type });
+    });
+  }
+
+  drawTreeControlBtns() {
+    this.treeControlBtnPool.clear();
+    const types: ["remove"] = ["remove"];
+    types.map((type, typeIndex) => {
+      const pos = createPosition(
+        "left", 50, 60,
+        "top", 1000 + 50 * typeIndex, 60,
+      );
+      this.treeControlBtnPool.newSprite(pos.xMin, pos.yMin, {}, { type, tag: "TreeControlBtnData", });
+      if (this.treeCtrl !== undefined && this.treeCtrl === type) {
+        const indicator = this.treeControlBtnPool.newSprite(pos.xMin - 5, pos.yMin - 5, {}, { tag: "Indicator"});
+        indicator.inputEnabled = false;
+      }
     });
   }
 
@@ -1043,6 +1063,13 @@ export class ExecScreen {
         tween.timeScale = speedTypeToSpeed(speed);
       }
     });
+  }
+
+  setTreeControl(
+    control: "remove" | undefined
+  ) {
+    this.treeCtrl = control;
+    this.drawTreeControlBtns();
   }
 
   setVisibility(
@@ -1677,6 +1704,53 @@ function mkFramePool(
       introAnim: [
       ],
       callbacks: {
+      },
+    },
+  );
+}
+
+type TreeControlBtnData = {
+  type: "remove",
+  tag: "TreeControlBtnData",
+};
+
+type TreeControlBtn = TreeControlBtnData | IndicatorData;
+
+function mkTreeControlBtnPool(
+  gameRefs: GameRefs,
+): Pool<TreeControlBtn, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        if (self.data.tag === "Indicator") {
+          return "icon_add_status.png";
+        } else {
+          switch (self.data.type) {
+            case "remove": return "icon_anim_pause.png";
+          }
+          throw "mkTreeControlBtnPool: impossible";
+        }
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+          switch (gameRefs.screens.execScreen.treeCtrl) {
+            case undefined: {
+              gameRefs.screens.execScreen.setTreeControl("remove");
+              break;
+            }
+            case "remove": {
+              gameRefs.screens.execScreen.setTreeControl(undefined);
+              break;
+            }
+          }
+        },
       },
     },
   );
