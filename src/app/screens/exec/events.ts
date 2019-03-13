@@ -1,7 +1,7 @@
 import { GameRefs } from "../../../app/states/game";
 import { currentSolution, currentSchemSol, selectedSchem, levelData, setSolution, setLocation } from "../act/data";
 import { mkGameState } from "../../../shared/game/state";
-import { runSolution, extendSolution, SolutionData } from "../../../shared/game/solution";
+import { runSolution, extendSolution, SolutionData, cutSolution } from "../../../shared/game/solution";
 import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
 import { UnitSelection } from "./screen";
 import { loadLevel, createDeployArray } from "../level/events";
@@ -102,6 +102,21 @@ export function changeLevelLoc(
   const solInfo = currentSolution(gameRefs);
   if (solInfo !== undefined) {
     setLocation(gameRefs, loc);
+
+    updateSolutionRep(gameRefs);
+    gameRefs.screens.execScreen.clickState = undefined;
+    gameRefs.screens.execScreen.intermediate = undefined;
+  }
+}
+
+export function cutLevelSolution(
+  gameRefs: GameRefs,
+  loc: Location,
+) {
+  const solInfo = currentSolution(gameRefs);
+  if (solInfo !== undefined) {
+    const newSolution = cutSolution(solInfo.solution, loc);
+    setSolution(gameRefs, newSolution);
 
     updateSolutionRep(gameRefs);
     gameRefs.screens.execScreen.clickState = undefined;

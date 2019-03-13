@@ -7,7 +7,7 @@ import { Log, LogEntry, LogKeys, LogIndex, LogKeySt, LogKeyFr, LogKeyEn, allLogI
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId, getStatus, findIndex, TargetId, eqUnitId, EntityId, toPositionId, PositionId } from "../../../shared/game/entityId";
-import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution } from "./events";
+import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution, cutLevelSolution } from "./events";
 import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog, triggerValue } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
@@ -678,7 +678,7 @@ export class ExecScreen {
     this.logTextSpritePool.clear();
     this.logTriggerPool.clear();
     
-    console.log(`INTERMEDIATE: ${JSON.stringify(intermediate)}`);
+    // console.log(`INTERMEDIATE: ${JSON.stringify(intermediate)}`);
     this.intermediate = intermediate;
     this.drawCurrentState();
 
@@ -755,7 +755,7 @@ export class ExecScreen {
     
     // draw difference with prev log
     if (prevLog !== undefined) {
-      console.log(`PREV: ${JSON.stringify(prevLog.action)}`)
+      // console.log(`PREV: ${JSON.stringify(prevLog.action)}`)
     }
 
     return new ParAnimation(anims.concat(frameAnim).concat(actionAnim));
@@ -1564,7 +1564,12 @@ function mkSolTreePool(
       ],
       callbacks: {
         click: (self) => {
-          changeLevelLoc(gameRefs, self.data.loc);
+          if (gameRefs.screens.execScreen.treeCtrl === undefined) {
+            changeLevelLoc(gameRefs, self.data.loc);
+          } else if (gameRefs.screens.execScreen.treeCtrl === "remove") {
+            cutLevelSolution(gameRefs, self.data.loc);
+            gameRefs.screens.execScreen.setTreeControl(undefined);
+          }
         },
       },
     },
