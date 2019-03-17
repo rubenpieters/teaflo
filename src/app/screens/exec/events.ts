@@ -6,7 +6,7 @@ import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
 import { UnitSelection } from "./screen";
 import { loadLevel, createDeployArray } from "../level/events";
 import { Location } from "../../../shared/tree";
-import { firstLogKey } from "../../../shared/game/log";
+import { firstLogIndex } from "../../../shared/game/log";
 import { runAsTween } from "../../phaser/animation";
 
 export function drawCurrentLevel(
@@ -42,8 +42,8 @@ export function updateSolutionRep(
     gameRefs.screens.execScreen.drawTreeControlBtns();
     gameRefs.screens.execScreen.drawClearBtn();
   }
-  const frstLogKey = firstLogKey(solResult.state, solResult.log);
-  if (frstLogKey !== undefined) {
+  const logIndex = firstLogIndex();
+  if (logIndex !== undefined) {
     runAsTween(gameRefs, gameRefs.screens.execScreen.drawIntermediateActions(solResult.state, solResult.log), "log");
   } else {
     gameRefs.screens.execScreen.drawState(solResult.state);

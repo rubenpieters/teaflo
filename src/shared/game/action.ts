@@ -304,7 +304,6 @@ export function applyAction(
   }
 }
 
-
 export function actionText(
   action: Action
 ): string {
@@ -344,4 +343,10 @@ export function actionText(
       return `NEXTAI ${posToString(action.target)}`;
     }
   }
+}
+
+export function ignoreTag(
+  tag: Action["tag"],
+): boolean {
+  return tag === "CombinedAction";
 }

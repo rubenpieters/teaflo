@@ -3,285 +3,100 @@ import { GameState } from "./state";
 import { TriggerLog } from "./trigger";
 import { Omit } from "../type-util";
 import { GlobalId } from "./entityId";
+import { Context } from "./intent";
+
+export type Log = LogEntry[];
 
 export type LogEntry = {
   action: Action,
   state: GameState,
   transforms: TriggerLog[],
-}
+  originalContext: Context,
+  context: Context,
+  entryIndex: number, // start turn: 0, friendly action: 1, then +1 for each enemy action
+  typeIndex: number,
+  actionIndex: number, // on original action: 0, then +1 for each trigger
+};
 
-export type LogKeys = "st" | "fr" | "en";
+export type LogEntryI = LogEntry & { logIndex: number };
 
 export type LogKeySt = {
-  index: number,
   type: "st",
-}
+};
 
 export type LogKeyFr = {
-  index: number,
-  id: GlobalId<"friendly">,
-  type: "fr",
-}
+  type: "st",
+  frIndex: number,
+};
 
 export type LogKeyEn = {
-  index: number,
-  enIndex: number,
   type: "en",
-}
+  enIndex: number,
+};
 
-export type LogIndex
+export type LogKey
   = LogKeySt
   | LogKeyFr
   | LogKeyEn
   ;
 
-// TODO: this assumes that logs are non-empty
-export function getPrevLogEntry(
-  log: Log,
-  logIndex: LogIndex,
-): LogEntry | undefined {
-  if (logIndex.index === 0) {
-    switch (logIndex.type) {
-      case "st": return undefined;
-      case "fr": return log.st[log.st.length - 1];
-      case "en": {
-        if (logIndex.enIndex === 0) {
-          return log.fr.entries[log.fr.entries.length - 1];
-        } else {
-          const prevEnLog = log.en[logIndex.enIndex - 1];
-          return prevEnLog[prevEnLog.length - 1];
-        }
-      }
-    }
-  } else {
-    if (logIndex.type === "en") {
-      return log[logIndex.type][logIndex.enIndex][logIndex.index - 1];
-    } else if (logIndex.type === "fr") {
-      return log[logIndex.type].entries[logIndex.index - 1];
-    } else {
-      return log[logIndex.type][logIndex.index - 1];
-    }
-  }
-  throw `getPrevLogEntry -- impossible ${JSON.stringify(logIndex)}`;
+export type LogIndex = number;
+
+export function emptyLog(): Log {
+  return [];
 }
 
 export function getLogEntry(
   log: Log,
   logIndex: LogIndex,
 ): LogEntry {
-  if (logIndex.type === "en") {
-    return log[logIndex.type][logIndex.enIndex][logIndex.index];
-  } else if (logIndex.type === "fr") {
-    return log[logIndex.type].entries[logIndex.index];
-  }
-  return log[logIndex.type][logIndex.index];
+  return log[logIndex];
+}
+
+export function allLogIndices(
+  log: Log,
+): LogEntryI[] {
+  return log.map((logEntry, i) => {
+    return { ...logEntry, logIndex: i }
+  });
 }
 
 export function logIndexLt(
   logIndex1: LogIndex,
   logIndex2: LogIndex,
 ): boolean {
-  const logTypes: ["st", "fr", "en"] = ["st", "fr", "en"];
-  if (logTypes.indexOf(logIndex1.type) < logTypes.indexOf(logIndex2.type)) {
-    return true;
-  }
-  if (logTypes.indexOf(logIndex1.type) > logTypes.indexOf(logIndex2.type)) {
-    return false;
-  }
-  if (
-    logIndex1.type === "en" && logIndex2.type === "en" &&
-    logIndex1.enIndex < logIndex2.enIndex
-  ) {
-    return true;
-  }
-  if (
-    logIndex1.type === "en" && logIndex2.type === "en" &&
-    logIndex1.enIndex > logIndex2.enIndex
-  ) {
-    return false;
-  }
-  if (logIndex1.index < logIndex2.index) {
-    return true;
-  }
-  return false;
+  return logIndex1 < logIndex2;
 }
 
 export function logIndexEq(
   logIndex1: LogIndex,
   logIndex2: LogIndex,
 ): boolean {
-  const logTypes: ["st", "fr", "en"] = ["st", "fr", "en"];
-  if (logTypes.indexOf(logIndex1.type) < logTypes.indexOf(logIndex2.type)) {
-    return false;
-  }
-  if (logTypes.indexOf(logIndex1.type) > logTypes.indexOf(logIndex2.type)) {
-    return false;
-  }
-  if (
-    logIndex1.type === "en" && logIndex2.type === "en" &&
-    logIndex1.enIndex < logIndex2.enIndex
-  ) {
-    return false;
-  }
-  if (
-    logIndex1.type === "en" && logIndex2.type === "en" &&
-    logIndex1.enIndex > logIndex2.enIndex
-  ) {
-    return false;
-  }
-  if (logIndex1.index === logIndex2.index) {
-    return true;
-  }
-  return false;
+  return logIndex1 === logIndex2;
 }
 
-export function allLogIndices(
-  state: GameState,
+export function getPrevLogEntry(
   log: Log,
-): { logIndex: LogIndex, typeIndex: number, entryIndex: number }[] {
-  let x: LogIndex | undefined = { type: "st", index: -1 };
-  let l: { logIndex: LogIndex, typeIndex: number, entryIndex: number }[] = [];
-  let prevTypeIndex = 0;
-  let entryIndex = 0;
-  while (x !== undefined) {
-    x = nextLogKey(state, log, x);
-    if (x !== undefined) {
-      if (prevTypeIndex !== logTypeIndex(x)) {
-        prevTypeIndex = logTypeIndex(x);
-        entryIndex = 0;
-      } else {
-        entryIndex += 1;
-      }
-      l.push({
-        logIndex: x,
-        typeIndex: logTypeIndex(x),
-        entryIndex,
-      });
-    }
+  logIndex: LogIndex,
+): LogEntry | undefined {
+  if (logIndex === 0) {
+    return undefined;
   }
-  return l;
+  return log[logIndex - 1];
 }
 
-export function logTypeIndex(
-  logIndex: LogIndex
-): number {
-  switch (logIndex.type) {
-    case "st": return 0;
-    case "fr": return 1;
-    case "en": return logIndex.enIndex + 2;
-  }
+export function firstLogIndex(
+): LogIndex {
+  return 0;
 }
 
-export function firstLogKey(
-  state: GameState,
+export function nextLogIndex(
   log: Log,
+  logIndex: LogIndex,
 ): LogIndex | undefined {
-  return nextLogKey(state, log, { type: "st", index: -1 });
-}
-
-export function nextLogKey(
-  state: GameState,
-  log: Log,
-  index: LogIndex,
-): LogIndex | undefined {
-  const logTypes: ["st", "fr", "en"] = ["st", "fr", "en"];
-  let len: number;
-  if (index.type === "en") {
-    if (log[index.type][index.enIndex] === undefined) {
-      len = 0;
-    } else {
-      len = log[index.type][index.enIndex].length;
-    }
-  } else if (index.type === "fr") {
-    len = log[index.type].entries.length;
-  } else {
-    len = log[index.type].length;
+  const newIndex = logIndex + 1;
+  if (newIndex >= log.length) {
+    return undefined;
   }
-  const newIndex = index.index + 1;
-  if (newIndex >= len) {
-    // the newIndex exceeds the log length
-    if (index.type === "en") {
-      const enemyCount = state.enUnits.length;
-      const newEnIndex = index.enIndex + 1;
-      if (newEnIndex < enemyCount) {
-        // the newEnIndex does not exceed the enemy count
-        return nextLogKey(state, log, <LogKeyEn>{
-          type: "en",
-          index: -1,
-          enIndex: newEnIndex,
-        });
-      }
-      // else: fallthrough to the next part, which increases the type of the index
-    }
-    // we go to the next log type
-    const newLogTypeIndex = logTypes.indexOf(index.type) + 1;
-    if (newLogTypeIndex >= logTypes.length) {
-      return undefined;
-    } else {
-      if (logTypes[newLogTypeIndex] === "en") {
-        return nextLogKey(state, log, <LogKeyEn>{
-          type: logTypes[newLogTypeIndex],
-          index: -1,
-          enIndex: 0,
-        });
-      } else if (logTypes[newLogTypeIndex] === "fr") {
-        return nextLogKey(state, log, <LogKeyFr>{
-          type: logTypes[newLogTypeIndex],
-          id: log.fr.id,
-          index: -1,
-        });
-      } else {
-        return nextLogKey(state, log, <LogKeySt>{
-          type: logTypes[newLogTypeIndex],
-          index: -1,
-        });
-      }
-    }
-  } else {
-    // the newIndex does not exceed the index log
-    // we keep all other parameters
-    if (index.type === "en") {
-      return <LogKeyEn>{
-        type: index.type,
-        index: newIndex,
-        enIndex: index.enIndex,
-      };
-    } else if (index.type === "fr") {
-      return <LogKeyFr>{
-        type: index.type,
-        id: log.fr.id,
-        index: newIndex,
-      };
-    } else {
-      return <LogKeySt>{
-        type: index.type,
-        index: newIndex,
-      };
-    }
-  }
-}
-
-export type Log = {
-  st: LogEntry[]
-  fr: {
-    // id of origin unit
-    id: GlobalId<"friendly"> | undefined,
-    // log entries
-    entries: LogEntry[],
-  },
-  en: {
-    // a list of log entries for each enemy
-    [key: number]: LogEntry[]
-  }
-};
-
-export function emptyLog(): Log {
-  return {
-    st: [],
-    fr: {
-      id: undefined,
-      entries: [],
-    },
-    en: [],
-  };
+  return newIndex;
 }

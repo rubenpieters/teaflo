@@ -2,7 +2,7 @@ import { focus, over, set } from "../iassign-util";
 import { Tree, extendTree, Location, cutTree, emptyTree } from "../tree";
 import { Ability } from "./ability";
 import { GameState, filteredEn, filteredFr } from "./state";
-import { applyAction, Action, StartTurn, NextAI } from "./action";
+import { applyAction, Action, StartTurn, NextAI, ignoreTag } from "./action";
 import { nextAI } from "./ai";
 import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction, Intent, Context } from "./intent";
@@ -70,8 +70,12 @@ export function runSolution(
   loc: Location,
   state: GameState,
 ): { state: GameState, log: Log, win: boolean } {
-  // console.log(solution);
-  return _runSolution(solution.tree, loc, state, emptyLog(), false);
+  if (loc.length === 0) {
+    const result = runInitialTurn(state);
+    return { state: result.state, log: result.log, win: false };
+  } else {
+    return _runSolution(solution.tree, loc, state, emptyLog(), false);
+  }
 }
 
 export function _runSolution(
@@ -110,6 +114,22 @@ export function endStates(
   }
 }
 
+function runInitialTurn(
+  state: GameState,
+) {
+  let log: Log = emptyLog();
+
+  const startTurnResult = applyActionsToSolution([new StartTurn], {}, {}, state, [], 0);
+  state = startTurnResult.state;
+  const stFilteredLog = startTurnResult.log.filter(x => ! ignoreTag(x.action.tag));
+  log = log.concat(stFilteredLog);
+
+  if (state.state === "invalid") {
+    return { state, log: log, win: false };
+  }
+  return { state, log };
+}
+
 function runPhases(
   state: GameState,
   solData: SolutionData,
@@ -117,10 +137,9 @@ function runPhases(
   let log: Log = emptyLog();
 
   // Start Turn Phase
-  const startTurnResult = applyActionsToSolution([new StartTurn], { }, state, []);
+  const startTurnResult = runInitialTurn(state);
   state = startTurnResult.state;
-  const stFilteredLog = startTurnResult.log.filter(x => x.action.tag !== "CombinedAction");
-  log = focus(log, over(x => x.st, x => x.concat(stFilteredLog)));
+  log = log.concat(startTurnResult.log);
 
   if (state.state === "invalid") {
     return { state, log: log, win: false };
@@ -129,13 +148,10 @@ function runPhases(
   // Action (Fr) Phase
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
-  const frActionResult = applyIntentToSolution(frAbility.intent, { input: frInputs, self: solData.origin }, state);
+  const frActionResult = applyIntentToSolution(frAbility.intent, { input: frInputs, self: solData.origin }, state, 1);
   state = frActionResult.state;
-  const filteredLog = frActionResult.log.filter(x => x.action.tag !== "CombinedAction");
-  log = focus(log,
-    over(x => x.fr.entries, x => x.concat(filteredLog)),
-    set(x => x.fr.id, solData.origin),
-  );
+  const frFilteredLog = frActionResult.log.filter(x => ! ignoreTag(x.action.tag));
+  log = log.concat(frFilteredLog);
 
   if (state.state === "invalid") {
     return { state, log: log, win: false };
@@ -147,18 +163,19 @@ function runPhases(
       const enIntent = enUnit.ai[enUnit.currentAI].intent;
       // apply action
       const enUnitSelf: GlobalId<"enemy"> = new GlobalId(enUnit.id, "enemy");
-      const enActionResult = applyIntentToSolution(enIntent, { self: enUnitSelf }, state);
+      const enActionResult = applyIntentToSolution(enIntent, { self: enUnitSelf }, state, i + 2);
       state = enActionResult.state;
       // forward enUnit AI
+      const context = { self: enUnitSelf };
       const enForwardAIResult = applyActionsToSolution(
-        [new NextAI(enUnitSelf)], { self: enUnitSelf }, state, []
+        [new NextAI(enUnitSelf)], context, context, state, [], i + 2, enActionResult.log.length, Infinity, // TODO: what is a suitable action index?
       );
       state = enForwardAIResult.state;
-      const filteredLog =
+      const enFilteredLog =
         enActionResult.log
           .concat(enForwardAIResult.log)
-          .filter(x => x.action.tag !== "CombinedAction");
-      log = focus(log, set(x => x.en[i], filteredLog));
+          .filter(x => ! ignoreTag(x.action.tag));
+      log = log.concat(enFilteredLog);
     }
   });
 
@@ -182,19 +199,24 @@ function applyIntentToSolution(
   intent: Intent,
   context: Context,
   state: GameState,
+  typeIndex: number,
 ): {
   state: GameState,
   log: LogEntry[],
 } {
   const action = intentToAction(state, context, intent);
-  return applyActionsToSolution([action], context, state, []);
+  return applyActionsToSolution([action], context, context, state, [], typeIndex);
 }
 
 function applyActionsToSolution(
   actions: Action[],
+  originalContext: Context,
   context: Context,
   state: GameState,
   log: LogEntry[],
+  typeIndex: number,
+  entryIndex = 0,
+  actionIndex = 0,
 ): {
   state: GameState,
   log: LogEntry[],
@@ -206,15 +228,21 @@ function applyActionsToSolution(
     const actionResult = applyAction(transformed, state);
     state = actionResult.state;
     newQueue = newQueue.concat(actionResult.actions).concat(actions);
-    addLog.push({ action: transformed, state, transforms });
+    addLog.push({ action: transformed, state, transforms, originalContext, context, typeIndex, entryIndex, actionIndex });
 
     if (state.state === "invalid") {
       return { state, log: log.concat(addLog) };
+    }
+    if (! ignoreTag(action.tag)) {
+      entryIndex = entryIndex + 1;
     }
   }
   if (newQueue.length === 0) {
     return { state, log: log.concat(addLog) };
   } else {
-    return applyActionsToSolution(newQueue, context, state, log.concat(addLog));
+    // TODO: here the original context stays unchanged, but the context should change throughout these calls
+    // for example, the self property should change
+    console.log(`entryIndex2: ${entryIndex}`);
+    return applyActionsToSolution(newQueue, context, context, state, log.concat(addLog), typeIndex, entryIndex, actionIndex + 1);
   }
 }

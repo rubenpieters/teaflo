@@ -3,7 +3,7 @@ import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position, center } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
 import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit, findStatus } from "../../../shared/game/state";
-import { Log, LogEntry, LogKeys, LogIndex, LogKeySt, LogKeyFr, LogKeyEn, allLogIndices, getLogEntry, logIndexLt, logIndexEq, nextLogKey, getPrevLogEntry } from "../../../shared/game/log";
+import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { getUnit, GlobalId, UnitId, getStatus, findIndex, TargetId, eqUnitId, EntityId, toPositionId, PositionId } from "../../../shared/game/entityId";
@@ -659,7 +659,7 @@ export class ExecScreen {
     state: GameState,
     log: Log,
   ): Animation {
-    const anims = allLogIndices(state, log).map(x => {
+    const anims = allLogIndices(log).map(x => {
       return new Create(
         () => { return; },
         () => {
@@ -684,10 +684,11 @@ export class ExecScreen {
 
     const state = this.currentState();
     const log = this.log!;
+    const logEntry = getLogEntry(log, intermediate);
     const prevLog = getPrevLogEntry(log, intermediate);
 
     // draw log icons
-    const anims: Animation[] = allLogIndices(state, log).map(x => {
+    const anims: Animation[] = allLogIndices(log).map(x => {
       const entryIndex = x.entryIndex;
       const typeIndex = x.typeIndex;
       const entry = getLogEntry(this.log!, x.logIndex);
@@ -740,18 +741,7 @@ export class ExecScreen {
     });
     
     // draw frames
-    let frameAnim: Animation = <any>undefined;
-    switch (intermediate.type) {
-      case "en": {
-        frameAnim = this.drawFrames(state, action, new PositionId(intermediate.enIndex, "enemy"));
-        break;
-      }
-      case "fr": {
-        frameAnim = this.drawFrames(state, action, intermediate.id);
-        break;
-      }
-      case "st": frameAnim = this.drawFrames(state, action, undefined);
-    }
+    let frameAnim: Animation = this.drawFrames(state, action, logEntry.context.self);
     
     // draw difference with prev log
     if (prevLog !== undefined) {
@@ -779,9 +769,9 @@ export class ExecScreen {
 
     const state = this.currentState();
     const log = this.log!;
-    allLogIndices(state, log).forEach(x => {
+    allLogIndices(log).forEach(x => {
       const entryIndex = x.entryIndex;
-      const typeIndex = x.typeIndex;
+      const typeIndex = x.entryIndex;
       const entry = getLogEntry(this.log!, x.logIndex);
       const pos = createPosition(
         "left", 20 + 50 * entryIndex, 40,
@@ -801,7 +791,7 @@ export class ExecScreen {
           const logTrigger = this.createTriggerEntryAnim(triggerLog, pos);
           spriteFs.push(logTrigger);
         });
-        const nxtLogKey = nextLogKey(state, log, upto);
+        const nxtLogKey = nextLogIndex(log, upto);
         if (animation && nxtLogKey !== undefined) {
           const last = {
             create: () => {
@@ -1378,12 +1368,7 @@ function mkTriggerPool(
   );
 }
 
-type LogActionData = {
-  action: Action,
-  state: GameState,
-  logIndex: LogIndex,
-  transforms: TriggerLog[],
-};
+type LogActionData = LogEntryI;
 
 function mkLogActionPool(
   gameRefs: GameRefs,
