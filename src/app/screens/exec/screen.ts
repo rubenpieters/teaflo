@@ -771,7 +771,7 @@ export class ExecScreen {
     const log = this.log!;
     allLogIndices(log).forEach(x => {
       const entryIndex = x.entryIndex;
-      const typeIndex = x.entryIndex;
+      const typeIndex = x.typeIndex;
       const entry = getLogEntry(this.log!, x.logIndex);
       const pos = createPosition(
         "left", 20 + 50 * entryIndex, 40,
