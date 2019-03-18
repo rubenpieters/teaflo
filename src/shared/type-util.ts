@@ -4,3 +4,15 @@ export type Overwrite<A extends object, B extends object> =
 
 export type Omit<A extends object, K extends string | number | symbol> =
   Pick<A, Exclude<keyof A, K>>;
+
+
+export type Equal<A, B> =
+  A extends B
+  ? (B extends A
+     ? true
+     : false
+    )
+  : false
+  ;
+
+export type If<Cond, Then, Else> = Cond extends true ? Then : Else;
