@@ -8,11 +8,9 @@ export type Omit<A extends object, K extends string | number | symbol> =
 
 export type Equal<A, B> =
   A extends B
-  ? (B extends A
-     ? true
-     : false
-    )
+  ? ( B extends A ? true : false )
   : false
   ;
 
-export type If<Cond, Then, Else> = Cond extends true ? Then : Else;
+export type If<Cond extends boolean, Then, Else> =
+  Cond extends true ? Then : Else;
