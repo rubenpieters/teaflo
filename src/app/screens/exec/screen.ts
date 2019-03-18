@@ -11,7 +11,7 @@ import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, 
 import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog, triggerValue } from "../../../shared/game/trigger";
 import { Action } from "../../../shared/game/action";
-import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation } from "../../../app/phaser/animation";
+import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation, runAsTween } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution } from "../../../shared/game/solution";
 import { intentDescription, actionDescription, triggerTagDescription, DescToken } from "../../util/intentDesc";
@@ -729,7 +729,7 @@ export class ExecScreen {
     });
 
     // draw action popup text
-    const action = getLogEntry(log, intermediate).action;
+    const action = logEntry.action;
     const actionAnimPos = this.logLocation(action, state);
     const actionAnim = new Create(() => {
       return this.createLogTextSprite(actionAnimPos.xMin, actionAnimPos.yMin, action);
@@ -749,6 +749,31 @@ export class ExecScreen {
     }
 
     return new ParAnimation(anims.concat(frameAnim).concat(actionAnim));
+  }
+
+  drawActionRep(
+    logIndex: LogIndex,
+  ): Animation {
+    const state = this.currentState();
+    const log = this.log!;
+    const logEntry = getLogEntry(log, logIndex);
+    const prevLog = getPrevLogEntry(log, logIndex);
+
+    // draw action popup text
+    const action = logEntry.action;
+    const actionAnimPos = this.logLocation(action, state);
+    const actionAnim = new Create(() => {
+      return this.createLogTextSprite(actionAnimPos.xMin, actionAnimPos.yMin, action);
+    }, self => {
+      return new BaseAnimation(1000, self, t => {
+        t.to({ y: actionAnimPos.yMin - 100 }, 1000);
+        t.onComplete.add(() => self.destroy());
+      });
+    });
+    
+    // draw frames
+    let frameAnim: Animation = this.drawFrames(state, action, logEntry.context.self);
+    return new ParAnimation([frameAnim].concat(actionAnim));
   }
 
   drawIntermediateLog(
@@ -1400,6 +1425,8 @@ function mkLogActionPool(
           gameRefs.screens.execScreen.drawIntermediateLog(
             self.data.logIndex, false,
           );
+
+          runAsTween(gameRefs, gameRefs.screens.execScreen.drawActionRep(self.data.logIndex), "log");
         },
         hoverOver: (self) => {
           // change state/stats
