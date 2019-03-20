@@ -3,6 +3,8 @@ import { Solution } from "../../../shared/game/solution";
 import { Location } from "../../../shared/tree";
 import { SpeedType } from "../../../app/phaser/animation";
 import { ScreenActive, ScreenAct, ScreenSchem, ScreenCodex, ScreenSettings } from "../transition";
+import { FrUnitId } from "../../../shared/data/units/friendly";
+import { EnUnitId } from "../../../shared/data/units/enemy";
 
 export type ActData = {
   shortName: string,
@@ -14,8 +16,8 @@ export type ActData = {
 export type LevelData = {
   name: string,
   id: string,
-  cardIds: string[],
-  enemyIds: string[],
+  cardIds: FrUnitId[],
+  enemyIds: EnUnitId[],
   slots: number,
   selectLocation: { x: number, y: number },
   boxSprite: string,
@@ -147,7 +149,7 @@ export function mkActSaveData(): ActSaveData {
 
 export type SolutionData = {
   name: string,
-  supply: { cardId: string, deployPos: number | undefined }[],
+  supply: { cardId: FrUnitId, deployPos: number | undefined }[],
   solInfo: {
     solution: Solution,
     loc: Location

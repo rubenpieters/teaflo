@@ -3,8 +3,8 @@ import { HasId } from "./hasId";
 import { Unit, FrUnit, EnUnit } from "./unit";
 import { HasAbilities } from "./ability";
 import { HasAI } from "./ai";
-import { frUnitMap } from "../data/units/friendly";
-import { enUnitMap } from "../data/units/enemy";
+import { frUnitMap, FrUnitId } from "../data/units/friendly";
+import { enUnitMap, EnUnitId } from "../data/units/enemy";
 import { HasThreatMap } from "./threat";
 import { UnitType, GlobalId } from "./entityId";
 import { StTrigger, Trigger, TriggerGroup, triggerOrder } from "./trigger";
@@ -35,8 +35,8 @@ export function filteredFr(
 }
 
 export function mkGameState(
-  frUnits: (string | undefined)[],
-  enUnits: (string | undefined)[],
+  frUnits: (FrUnitId | undefined)[],
+  enUnits: (EnUnitId | undefined)[],
 ): GameState {
   let frLastId = 0;
   const frUnitsWithId: (FrStUnit | undefined)[] = frUnits.map((x, i) => {

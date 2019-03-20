@@ -1,7 +1,7 @@
 import { GameRefs } from "../../states/game";
 import { TextPool } from "../../phaser/textpool";
-import { enUnitMap } from "../../../shared/data/units/enemy";
-import { frUnitMap } from "../../../shared/data/units/friendly";
+import { enUnitMap, EnUnitId } from "../../../shared/data/units/enemy";
+import { frUnitMap, FrUnitId } from "../../../shared/data/units/friendly";
 import { createPosition } from "../../util/position";
 import { Ability } from "../../../shared/game/ability";
 import { GlobalId } from "../../../shared/game/entityId";
@@ -11,8 +11,8 @@ import { intentDescription } from "../../util/intentDesc";
 import { Intent } from "src/shared/game/intent";
 
 export type CodexTypes
-  = { tag: "FrCardId", cardId: string }
-  | { tag: "EnCardId", cardId: string }
+  = { tag: "FrCardId", cardId: FrUnitId }
+  | { tag: "EnCardId", cardId: EnUnitId }
 
 export class CodexScreen {
   pageTextPool: TextPool
@@ -57,7 +57,7 @@ export class CodexScreen {
   }
 
   drawFrCardIdPage(
-    cardId: string,
+    cardId: FrUnitId,
   ) {
     if (frUnitMap[cardId] !== undefined) {
       const unit = frUnitMap[cardId];
@@ -90,7 +90,7 @@ export class CodexScreen {
   }
 
   drawEnCardIdPage(
-    cardId: string,
+    cardId: EnUnitId,
   ) {
     if (enUnitMap[cardId] !== undefined) {
       const unit = enUnitMap[cardId];

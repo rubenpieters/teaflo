@@ -1,10 +1,11 @@
 import { GameRefs } from "../../states/game";
-import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt, levelData, selectedSchem } from "../act/data";
+import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt, levelData, selectedSchem, SolutionData } from "../act/data";
 import { emptyTree, Location } from "../../../shared/tree";
 import { updateSolutionRep } from "../exec/events";
 import { mkGameState } from "../../../shared/game/state";
 import { endStates } from "../../../shared/game/solution";
 import { transitionScreen, ScreenSchem } from "../transition";
+import { FrUnitId } from "../../../shared/data/units/friendly";
 
 export function loadLevel(
   gameRefs: GameRefs,
@@ -108,8 +109,8 @@ export function toggleDeploy(
 }
 
 export function createDeployArray(
-  supply: { cardId: string, deployPos: number | undefined }[],
-): string[] {
+  supply: { cardId: FrUnitId, deployPos: number | undefined }[],
+): FrUnitId[] {
   const sorted = supply.filter(x => x.deployPos !== undefined).sort((x, y) => {
     if (x.deployPos! < y.deployPos!) {
       return -1;
@@ -128,7 +129,7 @@ export function levelStats(
 ): {
   win: boolean,
 } {
-  const sol = gameRefs.saveData.act.levels[levelId][solIndex];
+  const sol: SolutionData = gameRefs.saveData.act.levels[levelId][solIndex];
   if (sol === undefined || sol.solInfo === undefined) {
     return {
       win: false,

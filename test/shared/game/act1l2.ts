@@ -4,7 +4,7 @@ import * as Fr from "../../../src/shared/data/units/friendly";
 import { PositionId, GlobalId } from "../../../src/shared/game/entityId";
 
 const initState = mkGameState(
-  ["fr_unit_a1_01", "fr_unit_a1_02", "fr_unit_a1_03"],
+  ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
   ["en_unit_a1_l2_01"],
 );
 

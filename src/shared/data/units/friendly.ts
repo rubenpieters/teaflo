@@ -2,7 +2,7 @@ import { FrUnit } from "../../game/unit";
 import * as I from "../../game/intent";
 import { TargetInput, StatusInput, UnitInput } from "../../game/ability";
 import * as T from "../../game/trigger";
-import { isTrue, Equal } from "src/shared/type-util";
+import { isTrue, Equal } from "../../type-util";
 
 export const fr_unit_a1_l1_01: FrUnit = {
   hp: 20,
@@ -544,3 +544,5 @@ export const frUnitMap = {
   "card3": unit1,
   "test4ab": test4_ab,
 }
+
+export type FrUnitId = keyof (typeof frUnitMap);

@@ -1,6 +1,7 @@
 import { EnUnit } from "../../game/unit";
 import * as AI from "../ai/ai";
 import * as T from "../../game/trigger";
+import { isTrue, Equal } from "../../type-util";
 
 export const en_unit_a1_l1_01: EnUnit = {
   hp: 10,
@@ -65,9 +66,12 @@ export const temp: EnUnit = {
   currentAI: 0,
 }
 
-export const enUnitMap: {
-  [key: string]: EnUnit,
-} = {
+
+// check that values of frUnitMap are all `FrUnit`
+type FrUnitMapValues = (typeof enUnitMap)[keyof (typeof enUnitMap)];
+isTrue<Equal<FrUnitMapValues, EnUnit>>(true);
+
+export const enUnitMap = {
   // act 1 level 1
   "en_unit_a1_l1_01": en_unit_a1_l1_01,
   // act 1 level 2
@@ -83,3 +87,5 @@ export const enUnitMap: {
   "card2": en_unit_a1_l1_01,
   "card3": en_unit_a1_l1_01,
 }
+
+export type EnUnitId = keyof (typeof enUnitMap);
