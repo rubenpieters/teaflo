@@ -2,6 +2,7 @@ import { FrUnit } from "../../game/unit";
 import * as I from "../../game/intent";
 import { TargetInput, StatusInput, UnitInput } from "../../game/ability";
 import * as T from "../../game/trigger";
+import { isTrue, Equal } from "src/shared/type-util";
 
 export const fr_unit_a1_l1_01: FrUnit = {
   hp: 20,
@@ -517,9 +518,12 @@ export const test4_ab: FrUnit = {
   vital: true,
 };
 
-export const frUnitMap: {
-  [key: string]: FrUnit,
-} = {
+
+// check that values of frUnitMap are all `FrUnit`
+type FrUnitMapValues = (typeof frUnitMap)[keyof (typeof frUnitMap)];
+isTrue<Equal<FrUnitMapValues, FrUnit>>(true);
+
+export const frUnitMap = {
   // act 1 level 1
   "fr_unit_a1_l1_01": fr_unit_a1_l1_01,
   // act 1 level 2

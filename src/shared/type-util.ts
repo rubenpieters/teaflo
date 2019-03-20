@@ -14,3 +14,10 @@ export type Equal<A, B> =
 
 export type If<Cond extends boolean, Then, Else> =
   Cond extends true ? Then : Else;
+
+/**
+ * This function is used to test that a type is equal to `true` by the compiler.
+ * 
+ * @param t parameter t should be set to `true`
+ */
+export function isTrue<T extends true>(t: T) { }
