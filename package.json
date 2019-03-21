@@ -11,7 +11,7 @@
   "scripts": {
     "setup": "npm install -g npx@9.7.1 && npm install",
     "lint": "npx tslint -c ./tslint.json --project ./tsconfig.json --format stylish",
-    "test": "npx ts-node test/main.ts",
+    "test": "npx -s sh ts-node test/main.ts",
     "pack-dev": "npx webpack --watch --config webpack.dev.config.js",
     "pack-prod": "npx webpack --config webpack.prod.config.js",
     "heroku-prebuild": "npm run-script setup",

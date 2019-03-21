@@ -103,6 +103,34 @@ export type Trigger
   | Fragile
   ;
 
+function defaultShowTrigger(
+  trigger: Trigger,
+) {
+  return `${trigger.tag}: ${triggerValue(trigger)} (${trigger.fragments})`;
+}
+
+export function showTriggerCompact(
+  trigger: Trigger,
+): string {
+  switch (trigger.tag) {
+    case "Armor": // fallthrough
+    case "Fragile": // fallthrough
+    case "Strong": // fallthrough
+    case "StrongLowHP": // fallthrough
+    case "ThreatOnAllyDamage": // fallthrough
+    case "AllyWeakSelfArmor": // fallthrough
+    case "Weak": {
+      return defaultShowTrigger(trigger);
+    }
+    case "Grow": {
+      return `${defaultShowTrigger(trigger)} ${trigger.tag} - ${showTriggerCompact(trigger.trigger)}`;
+    }
+    case "Explode": {
+      return `${defaultShowTrigger(trigger)} ${trigger.tag} - ${trigger.value}`;
+    }
+  }
+}
+
 export function tagToGroup(
   tag: Trigger["tag"],
 ): TriggerGroup {

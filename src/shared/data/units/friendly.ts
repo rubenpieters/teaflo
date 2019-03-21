@@ -25,6 +25,7 @@ export const fr_unit_a1_l1_01: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
+      name: "dmg5",
     },
   ],
   vital: true,
@@ -51,6 +52,7 @@ export const fr_unit_a1_l2_01: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "ab3",
+      name: "dmg10",
     },
   ],
   vital: true,
@@ -76,6 +78,7 @@ export const fr_unit_a1_l2_02: FrUnit = {
       ]),
       inputs: [],
       spriteId: "ab1",
+      name: "th13_all",
     },
   ],
   vital: true,
@@ -102,6 +105,7 @@ export const fr_unit_a1_l2_03: FrUnit = {
         new UnitInput(),
       ],
       spriteId: "ab2",
+      name: "armor10",
     },
   ],
   vital: true,
@@ -128,6 +132,7 @@ export const fr_unit_a1_l3_01: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
+      name: "dmg5",
     },
     {
       intent: new I.CombinedIntent([
@@ -144,6 +149,7 @@ export const fr_unit_a1_l3_01: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
+      name: "weak1",
     },
   ],
   vital: true,
@@ -168,6 +174,7 @@ export const fr_unit_a2_01: FrUnit = {
       ]),
       inputs: [],
       spriteId: "fr_unit_a1_l1_01_ab1",
+      name: "dmg10_allExceptSelf",
     },
     {
       intent: new I.CombinedIntent([
@@ -185,6 +192,7 @@ export const fr_unit_a2_01: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
+      name: "swapHP",
     },
   ],
   vital: true,
@@ -209,6 +217,7 @@ export const fr_unit_a2_02: FrUnit = {
       ]),
       inputs: [],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "addTr_allyWeakSelfArmor3",
     },
     {
       intent: new I.CombinedIntent([
@@ -223,6 +232,7 @@ export const fr_unit_a2_02: FrUnit = {
       ]),
       inputs: [],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "add_weak2",
     },
   ],
   vital: true,
@@ -254,6 +264,7 @@ export const fr_unit_a2_03: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "dmg7_add10th",
     },
     {
       intent: new I.CombinedIntent([
@@ -274,6 +285,7 @@ export const fr_unit_a2_03: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "add_weak1_strong2",
     },
   ],
   vital: true,
@@ -298,6 +310,7 @@ export const fr_unit_a2_04: FrUnit = {
       ]),
       inputs: [],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "add_explode10/10",
     },
     {
       intent: new I.CombinedIntent([
@@ -319,6 +332,7 @@ export const fr_unit_a2_04: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "dmg_status_add_armor",
     },
   ],
   vital: true,
@@ -355,6 +369,7 @@ export const fr_unit_a2_05: FrUnit = {
         new StatusInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "dmg_2status_heal_status",
     },
     {
       intent: new I.CombinedIntent([
@@ -375,6 +390,7 @@ export const fr_unit_a2_05: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "dmg16_self_weak",
     },
   ],
   vital: true,
@@ -400,6 +416,7 @@ export const fr_unit_a2_06: FrUnit = {
       inputs: [
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "add_threat_on_ally_damage",
     },
     {
       intent: new I.CombinedIntent([
@@ -419,6 +436,7 @@ export const fr_unit_a2_06: FrUnit = {
       inputs: [
       ],
       spriteId: "fr_unit_a1_l1_01_ab2",
+      name: "self_armor_dmg_allyExceptSelf",
     },
   ],
   vital: true,
@@ -439,6 +457,7 @@ export const unit1: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
+      name: "dmg1",
     },
   ],
   vital: true,
@@ -465,6 +484,7 @@ export const test4_ab: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "ab1",
+      name: "ab1",
     },
     {
       intent: new I.CombinedIntent([
@@ -481,6 +501,7 @@ export const test4_ab: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "ab2",
+      name: "ab2",
     },
     {
       intent: new I.CombinedIntent([
@@ -497,6 +518,7 @@ export const test4_ab: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "ab3",
+      name: "ab3",
     },
     {
       intent: new I.CombinedIntent([
@@ -513,6 +535,7 @@ export const test4_ab: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "ab4",
+      name: "ab4",
     },
   ],
   vital: true,

@@ -10,6 +10,7 @@ export type Ability = {
   intent: Intent,
   inputs: UserInput[],
   spriteId: string,
+  name: string,
 };
 
 // user must specify a number

@@ -7,13 +7,20 @@ import { nextAI } from "./ai";
 import { Log, emptyLog, LogEntry } from "./log";
 import { intentToAction, Intent, Context } from "./intent";
 import { Omit } from "../type-util";
-import { UnitId, overEnemy, GlobalId } from "./entityId";
+import { UnitId, overEnemy, GlobalId, posToString } from "./entityId";
 import { applyTriggers } from "./trigger";
 
 export type SolutionData = {
   ability: Ability,
   origin: UnitId | undefined;
   inputs: any[],
+}
+
+export function showSolDataCompact(
+  solData: SolutionData,
+): string {
+  const posString = solData.origin === undefined ? "N/A" : posToString(solData.origin);
+  return `${solData.ability.name} - ${posString} - ${JSON.stringify(solData.inputs)}`;
 }
 
 export type Solution = {
@@ -65,6 +72,9 @@ export function cutSolution(
   }
 }
 
+// ------------------------------
+// Run Solution
+
 export function runSolution(
   solution: Solution,
   loc: Location,
@@ -114,6 +124,9 @@ export function endStates(
   }
 }
 
+// ------------------------------
+// Run Phases
+
 function runInitialTurn(
   state: GameState,
 ) {
@@ -130,7 +143,7 @@ function runInitialTurn(
   return { state, log };
 }
 
-function runPhases(
+export function runPhases(
   state: GameState,
   solData: SolutionData,
 ) {
@@ -179,6 +192,16 @@ function runPhases(
     }
   });
 
+  const win = checkWin(state);
+  if (win) {
+    state = focus(state, set(x => x.state, "win"));
+  }
+  return { state, log, win };
+}
+
+export function checkWin(
+  state: GameState,
+): boolean {
   // Check Win
   const enHps = filteredEn(state)
     .map(x => x.hp)
@@ -187,12 +210,8 @@ function runPhases(
     .filter(x => x <= 0)
     .length
     ;
-  
-  const win = countAllBelow0 === filteredEn(state).length;
-  if (win) {
-    state = focus(state, set(x => x.state, "win"));
-  }
-  return { state, log, win };
+
+  return countAllBelow0 === filteredEn(state).length;
 }
 
 function applyIntentToSolution(
@@ -242,7 +261,6 @@ function applyActionsToSolution(
   } else {
     // TODO: here the original context stays unchanged, but the context should change throughout these calls
     // for example, the self property should change
-    console.log(`entryIndex2: ${entryIndex}`);
     return applyActionsToSolution(newQueue, context, context, state, log.concat(addLog), typeIndex, entryIndex, actionIndex + 1);
   }
 }
