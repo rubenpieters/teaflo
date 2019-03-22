@@ -1,10 +1,11 @@
 import { focus, over, set } from "../iassign-util";
+import { GameState, filteredEn } from "./state";
 import { Action, Damage, AddTrigger, CombinedAction, AddThreat } from "./action";
 import { Context } from "./intent";
 import { UnitId, eqUnitId, GlobalId, getUnit, UnitType } from "./entityId";
-import { GameState, filteredEn } from "./state";
-import { Omit } from "../type-util";
+import { Omit, isTrue } from "../type-util";
 import { HasId } from "./hasId";
+import fc from "fast-check";
 
 export type HasTriggers = {
   triggers: {
@@ -18,13 +19,6 @@ export type TriggerGroup
   | "armor"
   | "other"
   ;
-
-export function emptyTriggers() {
-  return {
-    self: [],
-    other: [],
-  }
-}
 
 export class Weak {
   constructor(
@@ -488,3 +482,45 @@ export function loseFragments(
     }
   }
 }
+
+
+// Arbitrary
+
+const triggerTags
+/*: ["Weak", "Strong", "Armor", "StrongLowHP", "Grow",
+    "AllyWeakSelfArmor", "Explode", "ThreatOnAllyDamage", "Fragile"
+  ]*/
+  = ["Weak", "Strong", "Armor", "Fragile"];
+  /*["Weak", "Strong", "Armor", "StrongLowHP", "Grow",
+     "AllyWeakSelfArmor", "Explode", "ThreatOnAllyDamage", "Fragile",
+    ];*/
+
+const tagArbitrary = fc.constantFrom(...triggerTags);
+
+const fragmentsArbitrary = fc.integer(0, 100000);
+
+export const triggerArbitrary: fc.Arbitrary<Trigger> = tagArbitrary.chain(tag => {
+  switch (tag) {
+    case "Strong": return fragmentsArbitrary.map(x => new Strong(x) as Trigger);
+    case "Weak": return fragmentsArbitrary.map(x => new Weak(x));
+    case "Armor": return fragmentsArbitrary.map(x => new Armor(x));
+    case "Fragile": return fragmentsArbitrary.map(x => new Fragile(x));
+    default: throw "";
+  }
+});
+
+function objArb<A extends {}>(
+  arbitraries: { [K in keyof A]: fc.Arbitrary<A[K]> },
+) {
+  Object.getOwnPropertyNames(arbitraries).forEach(prop => {
+    const arb = (arbitraries as any)[prop] as fc.Arbitrary<any>;
+  });
+}
+
+function objProperties<A extends {}>(
+  a: A,
+): (keyof A)[] {
+  return <any>undefined;
+}
+
+Object.getOwnPropertyNames({ a: 1, b: 2});

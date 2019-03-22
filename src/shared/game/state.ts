@@ -146,25 +146,29 @@ export function triggerById(
   const fr: StTrigger[][] = [];
   const en: StTrigger[][] = [];
   triggerOrder.forEach(tag => {
-    state.triggers[tag].forEach(trigger =>{
-      const posId = toPositionId(state, trigger.owner);
-      switch (posId.type) {
-        case "friendly": {
-          if (fr[posId.id] === undefined) {
-            fr[posId.id] = [trigger];
-          } else {
-            fr[posId.id].push(trigger);
+    state.triggers[tag].forEach(trigger => {
+      try {
+        const posId = toPositionId(state, trigger.owner);
+        switch (posId.type) {
+          case "friendly": {
+            if (fr[posId.id] === undefined) {
+              fr[posId.id] = [trigger];
+            } else {
+              fr[posId.id].push(trigger);
+            }
+            break;
           }
-          break;
-        }
-        case "enemy": {
-          if (en[posId.id] === undefined) {
-            en[posId.id] = [trigger];
-          } else {
-            en[posId.id].push(trigger);
+          case "enemy": {
+            if (en[posId.id] === undefined) {
+              en[posId.id] = [trigger];
+            } else {
+              en[posId.id].push(trigger);
+            }
+            break;
           }
-          break;
         }
+      } catch (e) {
+        
       }
     });
   });

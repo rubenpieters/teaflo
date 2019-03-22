@@ -5,7 +5,7 @@ import { PositionId, GlobalId } from "../../../src/shared/game/entityId";
 import { trySolutions } from "../../util";
 
 const initState = mkGameState(
-  ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
+  ["fr_unit_a1_l2_03", "fr_unit_a1_l2_02", "fr_unit_a1_l2_01"],
   ["en_unit_a1_l3_01", "en_unit_a1_l3_02"],
 );
 
