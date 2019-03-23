@@ -12,28 +12,28 @@ export function trySolutions(
 }
 
 type StateCache = {
-  [hash: number]: GameState[],
+  [hash: number]: string[],
 }
 
 function isInCache(
   state: GameState,
   cache: StateCache,
 ): boolean {
-  const hash = fnv1a(showStateCompact(state));
+  const stateString = showStateCompact(state);
+  const hash = fnv1a(stateString);
   if (cache[hash] === undefined) {
-    cache[hash] = [state];
+    cache[hash] = [stateString];
     return false;
   } else {
-    /*const inCache = cache[hash].some(el => {
-      return deepequal(el, state);
+    const inCache = cache[hash].some(el => {
+      return el === stateString;
     });
     if (inCache) {
       return true;
     } else {
-      cache[hash].push(state);
+      cache[hash].push(stateString);
       return false;
-    }*/
-    return true;
+    }
   }
 }
 
@@ -61,10 +61,11 @@ export function _trySolutions(
       _trySolutions(next.state, depth - 1, newAcc, cache);
     } else if (next.win) {
       const show = newAcc
-        .map((x, i) => `${i}:= ${showSolDataCompact(x)}`)
-        .join("| => |")
+        .map((x, i) => `${showSolDataCompact(x)}`)
+        .join("\n")
         ;
-      console.log(`Win reached (${newAcc.length}): |${show}|`);
+      console.log(showStateCompact(next.state));
+      console.log(`Win reached (${newAcc.length}):\n${show}\n----`);
     }
   });
 }

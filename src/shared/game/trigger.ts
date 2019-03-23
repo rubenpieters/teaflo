@@ -509,18 +509,23 @@ export const triggerArbitrary: fc.Arbitrary<Trigger> = tagArbitrary.chain(tag =>
   }
 });
 
+
+// WIP
+
 function objArb<A extends {}>(
   arbitraries: { [K in keyof A]: fc.Arbitrary<A[K]> },
 ) {
-  Object.getOwnPropertyNames(arbitraries).forEach(prop => {
-    const arb = (arbitraries as any)[prop] as fc.Arbitrary<any>;
-  });
+  const arb = objProperties(arbitraries).reduce((acc, prop) => {
+    return acc.chain(x => {
+      return arbitraries[prop].map(y => [x, y]);
+    });
+  }, fc.constant({}));
 }
 
 function objProperties<A extends {}>(
   a: A,
 ): (keyof A)[] {
-  return <any>undefined;
+  return Object.getOwnPropertyNames(a) as any;
 }
 
-Object.getOwnPropertyNames({ a: 1, b: 2});
+const x = objProperties({ a: 1, b: 2});

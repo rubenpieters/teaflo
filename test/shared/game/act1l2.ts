@@ -3,15 +3,13 @@ import { extendSolution, emptySolution, runSolution, showSolDataCompact } from "
 import * as Fr from "../../../src/shared/data/units/friendly";
 import { PositionId, GlobalId } from "../../../src/shared/game/entityId";
 import { trySolutions } from "../../util";
-import { triggerArbitrary } from "../../../src/shared/game/trigger";
-import fc from "fast-check";
-
-console.log(fc.sample(triggerArbitrary));
 
 const initState = mkGameState(
   ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
   ["en_unit_a1_l2_01"],
 );
+
+console.log(showStateCompact(initState));
 
 trySolutions(initState, 10);
 
