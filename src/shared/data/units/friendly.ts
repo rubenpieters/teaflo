@@ -3,6 +3,8 @@ import * as I from "../../game/intent";
 import { TargetInput, StatusInput, UnitInput } from "../../game/ability";
 import * as T from "../../game/trigger";
 import { isTrue, Equal } from "../../type-util";
+import { thDamage, cost } from "../intents/basic";
+import { trinity_dmg, trinity_support, trinity_tank } from "../frunits/1_trinity";
 
 export const fr_unit_a1_l1_01: FrUnit = {
   hp: 20,
@@ -11,101 +13,17 @@ export const fr_unit_a1_l1_01: FrUnit = {
   maxCharges: 5,
   abilities: [
     {
-      intent: new I.CombinedIntent([
-        new I.UseChargeI(
-          I.mkSelf(),
-          new I.Static(1),
-        ),
-        I.thDamage(
+      intent: cost(1,
+        thDamage(
           new I.FromInput(0),
           new I.Static(5),
         ),
-      ]),
+      ),
       inputs: [
         new TargetInput(),
       ],
       spriteId: "fr_unit_a1_l1_01_ab1",
       name: "dmg5",
-    },
-  ],
-  vital: true,
-};
-
-export const fr_unit_a1_l2_01: FrUnit = {
-  hp: 5,
-  maxHp: 5,
-  charges: 5,
-  maxCharges: 5,
-  abilities: [
-    {
-      intent: new I.CombinedIntent([
-        new I.UseChargeI(
-          I.mkSelf(),
-          new I.Static(1),
-        ),
-        I.thDamage(
-          new I.FromInput(0),
-          new I.Static(10),
-        ),
-      ]),
-      inputs: [
-        new TargetInput(),
-      ],
-      spriteId: "ab3",
-      name: "dmg10",
-    },
-  ],
-  vital: true,
-};
-
-export const fr_unit_a1_l2_02: FrUnit = {
-  hp: 11,
-  maxHp: 11,
-  charges: 5,
-  maxCharges: 5,
-  abilities: [
-    {
-      intent: new I.CombinedIntent([
-        new I.UseChargeI(
-          I.mkSelf(),
-          new I.Static(1),
-        ),
-        new I.AddThreatI(
-          I.mkSelf(),
-          I.mkAllEnemy(),
-          new I.Static(13),
-        ),
-      ]),
-      inputs: [],
-      spriteId: "ab1",
-      name: "th13_all",
-    },
-  ],
-  vital: true,
-};
-
-export const fr_unit_a1_l2_03: FrUnit = {
-  hp: 5,
-  maxHp: 5,
-  charges: 5,
-  maxCharges: 5,
-  abilities: [
-    {
-      intent: new I.CombinedIntent([
-        new I.UseChargeI(
-          I.mkSelf(),
-          new I.Static(1),
-        ),
-        new I.AddTriggerI(
-          new I.FromInput(0),
-          new I.Static(T.full(new T.Armor(10))),
-        ),
-      ]),
-      inputs: [
-        new UnitInput(),
-      ],
-      spriteId: "ab2",
-      name: "armor10",
     },
   ],
   vital: true,
@@ -118,16 +36,12 @@ export const fr_unit_a1_l3_01: FrUnit = {
   maxCharges: 5,
   abilities: [
     {
-      intent: new I.CombinedIntent([
-        new I.UseChargeI(
-          I.mkSelf(),
-          new I.Static(1),
-        ),
-        I.thDamage(
+      intent: cost(1,
+        thDamage(
           new I.FromInput(0),
           new I.Static(5),
         ),
-      ]),
+      ),
       inputs: [
         new TargetInput(),
       ],
@@ -167,7 +81,7 @@ export const fr_unit_a2_01: FrUnit = {
           I.mkSelf(),
           new I.Static(5),
         ),
-        I.thDamage(
+        thDamage(
           I.mkAllExceptSelf(),
           new I.Static(10),
         ),
@@ -254,7 +168,7 @@ export const fr_unit_a2_03: FrUnit = {
           new I.FromInput(0),
           new I.Static(7),
         ),
-        I.thDamage(
+        thDamage(
           new I.FromInput(1),
           new I.Static(10),
         ),
@@ -449,7 +363,7 @@ export const unit1: FrUnit = {
   maxCharges: 5,
   abilities: [
     {
-      intent: I.thDamage(
+      intent: thDamage(
         new I.FromInput(0),
         new I.Static(1),
       ),
@@ -475,7 +389,7 @@ export const test4_ab: FrUnit = {
           I.mkSelf(),
           new I.Static(1),
         ),
-        I.thDamage(
+        thDamage(
           new I.FromInput(0),
           new I.Static(20),
         ),
@@ -492,7 +406,7 @@ export const test4_ab: FrUnit = {
           I.mkSelf(),
           new I.Static(1),
         ),
-        I.thDamage(
+        thDamage(
           new I.FromInput(0),
           new I.Static(5),
         ),
@@ -509,7 +423,7 @@ export const test4_ab: FrUnit = {
           I.mkSelf(),
           new I.Static(1),
         ),
-        I.thDamage(
+        thDamage(
           new I.FromInput(0),
           new I.Static(5),
         ),
@@ -526,7 +440,7 @@ export const test4_ab: FrUnit = {
           I.mkSelf(),
           new I.Static(1),
         ),
-        I.thDamage(
+        thDamage(
           new I.FromInput(0),
           new I.Static(20),
         ),
@@ -550,9 +464,9 @@ export const frUnitMap = {
   // act 1 level 1
   "fr_unit_a1_l1_01": fr_unit_a1_l1_01,
   // act 1 level 2
-  "fr_unit_a1_l2_01": fr_unit_a1_l2_01,
-  "fr_unit_a1_l2_02": fr_unit_a1_l2_02,
-  "fr_unit_a1_l2_03": fr_unit_a1_l2_03,
+  "fr_unit_a1_l2_01": trinity_dmg,
+  "fr_unit_a1_l2_02": trinity_support,
+  "fr_unit_a1_l2_03": trinity_tank,
   // act 1 level 3
   "fr_unit_a1_l3_01": fr_unit_a1_l3_01,
   // act 2

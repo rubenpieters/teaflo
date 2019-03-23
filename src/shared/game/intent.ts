@@ -155,16 +155,6 @@ export type Intent
   | SwapHPWithExcessI
   ;
 
-export function thDamage(
-  target: IntentVar<UnitId>,
-  value: IntentVar<number>,
-) {
-  return new CombinedIntent([
-    new DamageI(target, value),
-    new AddThreatI(mkSelf(), target, value),
-  ]);
-}
-
 export type Context = {
   input?: any[],
   self?: UnitId,
