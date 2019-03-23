@@ -184,14 +184,22 @@ export function applyAction(
       };
     }
     case "UseCharge": {
-      return {
-        state: overUnit(action.target,
+      const unit = getUnit(action.target, state);
+      if (unit !== undefined && unit.charges < action.value) {
+        return {
           state,
-          x => useCharge(x, action.value),
-          x => x,
-        ),
-        actions: [],
-      };
+          actions: [new Invalid],
+        }
+      } else {
+        return {
+          state: overUnit(action.target,
+            state,
+            x => useCharge(x, action.value),
+            x => x,
+          ),
+          actions: [],
+        };
+      }
     }
     case "CombinedAction": {
       return {

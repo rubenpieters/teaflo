@@ -7,7 +7,7 @@ import { frUnitMap, FrUnitId } from "../data/units/friendly";
 import { enUnitMap, EnUnitId } from "../data/units/enemy";
 import { HasThreatMap } from "./threat";
 import { UnitType, GlobalId, TargetId, toPositionId } from "./entityId";
-import { StTrigger, Trigger, TriggerGroup, triggerOrder, showTriggerCompact } from "./trigger";
+import { StTrigger, Trigger, TriggerGroup, triggerOrder, showTriggerCompact, showStTriggerCompact } from "./trigger";
 import { SolutionData } from "./solution";
 
 export type FrStUnit = FrUnit & HasId & { cardId: string } & HasThreatMap;
@@ -41,10 +41,10 @@ export function showStateCompact(
   const en = state.enUnits.map((x, i) => showUnitCompact(x, i)).join(" | ");
   const tr = triggerById(state);
   const frTr = tr.fr.map((l, i) => {
-    return `${i}: ${l.map(x => showTriggerCompact(x)).join(" | ")}`;
+    return `${i}: ${l.map(x => showStTriggerCompact(x)).join(" | ")}`;
   }).join("\n");
   const enTr = tr.en.map((l, i) => {
-    return `${i}: ${l.map(x => showTriggerCompact(x)).join(" | ")}`;
+    return `${i}: ${l.map(x => showStTriggerCompact(x)).join(" | ")}`;
   }).join("\n");
 
   return `state:${state.state}\n${fr}\n${en}\n${frTr}\n${enTr}`;

@@ -2,7 +2,7 @@ import { focus, over, set } from "../iassign-util";
 import { GameState, filteredEn } from "./state";
 import { Action, Damage, AddTrigger, CombinedAction, AddThreat } from "./action";
 import { Context } from "./intent";
-import { UnitId, eqUnitId, GlobalId, getUnit, UnitType } from "./entityId";
+import { UnitId, eqUnitId, GlobalId, getUnit, UnitType, posToString } from "./entityId";
 import { Omit, isTrue } from "../type-util";
 import { HasId } from "./hasId";
 import fc from "fast-check";
@@ -123,6 +123,12 @@ export function showTriggerCompact(
       return `${defaultShowTrigger(trigger)} ${trigger.tag} - ${trigger.value}`;
     }
   }
+}
+
+export function showStTriggerCompact(
+  stTrigger: StTrigger,
+) {
+  return `${showTriggerCompact(stTrigger)} | owner: ${posToString(stTrigger.owner)}`;
 }
 
 export function tagToGroup(

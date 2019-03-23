@@ -24,7 +24,7 @@ export const trinity_dmg: FrUnit = {
   vital: true,
 };
 
-export const trinity_support: FrUnit = {
+export const trinity_tank: FrUnit = {
   hp: 11,
   maxHp: 11,
   charges: 5,
@@ -46,7 +46,7 @@ export const trinity_support: FrUnit = {
   vital: true,
 };
 
-export const trinity_tank: FrUnit = {
+export const trinity_support: FrUnit = {
   hp: 5,
   maxHp: 5,
   charges: 5,

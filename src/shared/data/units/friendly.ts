@@ -4,7 +4,8 @@ import { TargetInput, StatusInput, UnitInput } from "../../game/ability";
 import * as T from "../../game/trigger";
 import { isTrue, Equal } from "../../type-util";
 import { thDamage, cost } from "../intents/basic";
-import { trinity_dmg, trinity_support, trinity_tank } from "../frunits/1_trinity";
+import { trinity_dmg, trinity_tank, trinity_support } from "../frunits/1_trinity";
+import { dmg_1, armor_1 } from "../frunits/0_experiments";
 
 export const fr_unit_a1_l1_01: FrUnit = {
   hp: 20,
@@ -461,12 +462,14 @@ type FrUnitMapValues = (typeof frUnitMap)[keyof (typeof frUnitMap)];
 isTrue<Equal<FrUnitMapValues, FrUnit>>(true);
 
 export const frUnitMap = {
+  "dmg1": dmg_1,
+  "arm1": armor_1,
   // act 1 level 1
   "fr_unit_a1_l1_01": fr_unit_a1_l1_01,
   // act 1 level 2
   "fr_unit_a1_l2_01": trinity_dmg,
-  "fr_unit_a1_l2_02": trinity_support,
-  "fr_unit_a1_l2_03": trinity_tank,
+  "fr_unit_a1_l2_02": trinity_tank,
+  "fr_unit_a1_l2_03": trinity_support,
   // act 1 level 3
   "fr_unit_a1_l3_01": fr_unit_a1_l3_01,
   // act 2

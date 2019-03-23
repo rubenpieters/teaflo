@@ -1,10 +1,27 @@
 import * as A from "../../game/action";
-import { AI} from "../../game/ai";
+import { AI } from "../../game/ai";
 import * as O  from "../../game/ai";
 import { GameState } from "../../game/state";
 import * as I from "../../game/intent";
 import { PositionId, UnitId, getUnit, getStatus, eqUnitId } from "../../game/entityId";
 import * as T from "../../game/trigger";
+
+export const exp1: AI = [
+  {
+    intent: new I.DamageI(
+      new I.Static(new PositionId(0, "friendly")),
+      new I.Static(1),
+    ),
+    spriteId: "fr_unit_a1_l1_01_ab1",
+    outs: [
+        {
+          aiOut: new O.ToSelf(),
+          condition: () => true,
+        },
+      ],
+  },
+];
+
 
 export const ai1: AI = [
     {
