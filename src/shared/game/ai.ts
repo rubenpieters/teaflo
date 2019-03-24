@@ -15,7 +15,7 @@ export type AIRoute = {
   condition: Condition,
 };
 
-type Outs = AIRoute[];
+export type Outs = AIRoute[];
 
 export function routeText(
   route: AIRoute,
@@ -82,5 +82,48 @@ export function nextAI<E extends HasAI>(
   switch (newOut.tag) {
     case "ToSelf": return e;
     case "ToX": return focus(e, set(x => x.currentAI, newOut.x));
+  }
+}
+
+/**
+ * positions:
+ * 0 - 1 - 2
+ * 3 - 4 - 5
+ * 6 - 7 - 8
+ */
+
+export function aiPosition(
+  index: number,
+): { x: number, y: number } {
+  const x = index % 3;
+  const y =  Math.round((index / 3) - 0.5);
+  return { x, y };
+}
+
+export type RouteDirection
+  = "down"
+  | "up"
+  | "left"
+  | "right"
+  | "self"
+  ;
+
+export function routeDirection(
+  from: number,
+  to: number,
+): RouteDirection {
+  if (from === to) {
+    return "self";
+  } else if (from - 3 === to) {
+    return "up";
+  } else if (from + 3 === to) {
+    return "down";
+  } else if (from - 1 === to && from % 3 !== 0) {
+    return "left";
+  } else if (from + 1 === to && from % 3 !== 2) {
+    return "right";
+  } else {
+    console.log("routeDirection: invalid direction");
+    throw "routeDirection: invalid direction";
   }
 }

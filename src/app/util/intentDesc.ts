@@ -1,6 +1,7 @@
 import { Intent, IntentVar } from "../../shared/game/intent";
 import { Trigger, triggerToFragmentValue, triggerValue } from "../../shared/game/trigger";
 import { Action } from "../../shared/game/action";
+import { RouteDirection } from "src/shared/game/ai";
 
 export class DescSymbol {
   constructor(
@@ -263,5 +264,17 @@ function _numberDescription(
     return _numberDescription(next, acc).concat([new DescSymbol(`expl_${digit}.png`)]);
   } else {
     return acc.concat([new DescSymbol(`expl_${digit}.png`)]);
+  }
+}
+
+export function routeDirectionDescription(
+  routeDirection: RouteDirection,
+) {
+  switch (routeDirection) {
+    case "down": return "icon_ai_down.png";
+    case "left": return "icon_ai_left.png";
+    case "right": return "icon_ai_right.png";
+    case "up": return "icon_ai_up.png";
+    case "self": return "icon_self.png";
   }
 }

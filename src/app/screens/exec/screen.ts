@@ -19,6 +19,7 @@ import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
 import { Intent } from "../../../shared/game/intent";
 import { clearAnimations } from "../util";
+import { aiPosition, AIRoute, AI, Outs, RouteDirection, routeDirection } from "../../../shared/game/ai";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -462,16 +463,23 @@ export class ExecScreen {
         unitChSprite.width = 10;
         unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
 
-        // next intent
-        const abPos = createPosition(
-          "left", 1040 + 170 * unitIndex, 70,
-          "top", 800, 70,
-        );
-        const ai = unit.ai[unit.currentAI];
-        this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
-          { tag: "EnAbilityData", spriteId: ai.spriteId, currentIntent: ai.intent }
-        );
-
+        // show ai
+        unit.ai.forEach((ai, aiIndex) => {
+          const posMult = aiPosition(aiIndex);
+          const abPos = createPosition(
+            "left", 970 + 170 * unitIndex + 70 * posMult.x, 70,
+            "top", 760 + 70 * posMult.y, 70,
+          );
+          this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
+            { tag: "EnAbilityData", ai, aiIndex }
+          );
+          if (aiIndex === unit.currentAI) {
+            const sprite = this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
+              { tag: "Indicator" }
+            );
+            sprite.inputEnabled = false;
+          }
+        });
       }
     });
 
@@ -1143,8 +1151,8 @@ type FrAbilityData = {
 }
 
 type EnAbilityData = {
-  spriteId: string,
-  currentIntent: Intent,
+  ai: { intent: Intent, spriteId: string, outs: Outs },
+  aiIndex: number,
   tag: "EnAbilityData",
 }
 
@@ -1163,7 +1171,7 @@ function mkAbilityPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         switch (self.data.tag) {
-          case "EnAbilityData": return `${self.data.spriteId}.png`;
+          case "EnAbilityData": return `${self.data.ai.spriteId}.png`;
           case "FrAbilityData": return `${self.data.spriteId}.png`;
           case "Indicator" : return "icon_add_status.png";
         }
@@ -1210,7 +1218,7 @@ function mkAbilityPool(
             if (self.data.tag === "FrAbilityData") {
               intent = self.data.ability.intent;
             } else {
-              intent = self.data.currentIntent;
+              intent = self.data.ai.intent;
             }
             const desc = intentDescription(intent);
             let y = 0;
@@ -1232,6 +1240,32 @@ function mkAbilityPool(
                 }
               }
             });
+
+            y += 1;
+            const selfData = self.data;
+            if (selfData.tag === "EnAbilityData") {
+              selfData.ai.outs.forEach((out, outIndex) => {
+                const explPos = createPosition(
+                  "left", 750, 80,
+                  "bot", 225 - y * 80, 80,
+                );
+                let direction: RouteDirection = undefined as any;
+                switch (out.aiOut.tag) {
+                  case "ToSelf": {
+                    direction = "self";
+                    break;
+                  }
+                  case "ToX": {
+                    direction = routeDirection(selfData.aiIndex, out.aiOut.x);
+                    break;
+                  }
+                }
+                const dirSprite = direction !== "self" ? `icon_ai_${direction}.png` : "icon_self.png";
+                gameRefs.screens.execScreen.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: dirSprite });  
+
+                y += 1;
+              });
+            }
           }
         },
         hoverOut: (self) => {

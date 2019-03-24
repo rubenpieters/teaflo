@@ -80,6 +80,7 @@ export function tryNextActions(
   const actions = possibleActions(state);
   //console.log(`Trying ${actions.length} actions`);
   return actions.map(action => {
+    //console.log(`Action: ${showSolDataCompact(action)}`);
     const result = runPhases(state, action);
     return { ...result, action, };
   });
