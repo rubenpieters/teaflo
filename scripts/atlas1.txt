@@ -131,3 +131,11 @@ textures/icon_owner.png
 textures/icon_self.png
 textures/icon_transform_action.png
 textures/icon_variable.png
+textures/codex1.png
+textures/options1.png
+textures/schem1.png
+textures/select1.png
+textures/codex2.png
+textures/options2.png
+textures/schem2.png
+textures/select2.png

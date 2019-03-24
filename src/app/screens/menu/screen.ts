@@ -11,7 +11,7 @@ import { transitionScreen, ScreenCodex, ScreenSettings } from "../transition";
 
 export class MenuScreen {
   menuBgPool: Pool<MenuBgData, {}>
-  menuBtnPool: Pool<MenuBtnData, "closed" | "open">
+  menuBtnPool: Pool<MenuBtnData, "selected" | "not_selected">
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -40,7 +40,7 @@ export class MenuScreen {
     const bgF = {
       create: () => {
         const pos = createPosition(
-          "right", 0, 300,
+          "right", 0, 150,
           "top", 0, 1080,
         );
         const sprite = this.menuBgPool.newSprite(pos.xMin, pos.yMin, {}, {});
@@ -58,20 +58,16 @@ export class MenuScreen {
       return {
         create: () => {
           let sprite;
+          const pos = createPosition(
+            "right", 0, 150,
+            "top", 140 + 270 * i, 100,
+          );
           if (this.gameRefs.saveData.act.activeScreen === type) {
             // this is the currently selected menu type
-            const pos = createPosition(
-              "right", 250, 250,
-              "top", 270 * i, 250,
-            );
-            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "open", { type, index: i, originalX: pos.xMin });
+            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "not_selected", { type, index: i, originalX: pos.xMin });
           } else {
             // this is not the currently selected act
-            const pos = createPosition(
-              "right", 50, 250,
-              "top", 270 * i, 250,
-            );
-            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "closed", { type, index: i, originalX: pos.xMin });
+            sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "selected", { type, index: i, originalX: pos.xMin });
           }
           return sprite;
         },
@@ -95,15 +91,18 @@ type MenuBtnData = {
 
 function mkMenuBtnPool(
   gameRefs: GameRefs,
-): Pool<MenuBtnData, "closed" | "open"> {
+): Pool<MenuBtnData, "selected" | "not_selected"> {
   return new Pool(
     gameRefs.game,
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        switch (frameType) {
-          case "closed": return "menu_btn_joined.png";
-          case "open": return "menu_btn_joined4.png";
+        const num = frameType === "selected" ? 2 : 1;
+        switch (self.data.type) {
+          case "menu": return `select${num}.png`;
+          case "schem": return `schem${num}.png`;
+          case "codex": return `codex${num}.png`;
+          case "settings": return `options${num}.png`;
         }
       },
       introAnim: [
@@ -137,7 +136,7 @@ function mkMenuBtnPool(
           }
         },
         hoverOver: (self) => {
-          if (! (gameRefs.saveData.act.activeScreen === self.data.type
+          /*if (! (gameRefs.saveData.act.activeScreen === self.data.type
             || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined)
           ) {
             gameRefs.game.tweens.removeFrom(self);
@@ -151,10 +150,10 @@ function mkMenuBtnPool(
             tween4.onComplete.add(() => { self.frameName = "menu_btn_joined4.png"; self.x = self.data.originalX - 200; });
             tween1.chain(tween2, tween3, tween4);
             tween1.start();
-          }
+          }*/
         },
         hoverOut: (self) => {
-          if (! (gameRefs.saveData.act.activeScreen === self.data.type
+          /*if (! (gameRefs.saveData.act.activeScreen === self.data.type
             || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined)
           ) {
             gameRefs.game.tweens.removeFrom(self);
@@ -168,7 +167,7 @@ function mkMenuBtnPool(
             tween4.onComplete.add(() => { self.frameName = "menu_btn_joined.png"; self.x = self.data.originalX; });
             tween1.chain(tween2, tween3, tween4);
             tween1.start();
-          }
+          }*/
         },
       },
     },
