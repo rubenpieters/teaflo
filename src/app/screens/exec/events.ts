@@ -8,6 +8,7 @@ import { loadLevel, createDeployArray } from "../level/events";
 import { Location } from "../../../shared/tree";
 import { firstLogIndex } from "../../../shared/game/log";
 import { runAsTween } from "../../phaser/animation";
+import { clearAnimations } from "../util";
 
 export function drawCurrentLevel(
   gameRefs: GameRefs,
@@ -36,6 +37,8 @@ export function updateSolutionRep(
   gameRefs.screens.execScreen.state = solResult.state;
   gameRefs.screens.execScreen.log = solResult.log;
   // update tree rep
+  clearAnimations(gameRefs.game, gameRefs.screens.execScreen);
+  gameRefs.screens.execScreen.clearAnimPools();
   gameRefs.screens.execScreen.drawTree(sol.solInfo!);
   if (prevState === undefined) {
     gameRefs.screens.execScreen.drawAnimControlBtns();
