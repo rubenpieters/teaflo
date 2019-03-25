@@ -10,13 +10,12 @@
   "author": "rubenpieters",
   "scripts": {
     "setup": "npm install -g npx@9.7.1 && npm install",
-    "lint": "npx tslint -c ./tslint.json --project ./tsconfig.json --format stylish",
-    "test": "npx -s sh ts-node test/main.ts",
-    "pack-dev": "npx webpack --watch --config webpack.dev.config.js",
-    "pack-prod": "npx webpack --config webpack.prod.config.js",
+    "lint": "npx --no-install tslint -c ./tslint.json --project ./tsconfig.json --format stylish",
+    "test": "npx --no-install -s sh ts-node test/main.ts",
+    "pack-dev": "npx --no-install webpack --watch --config webpack.dev.config.js",
+    "pack-prod": "npx --no-install webpack --config webpack.prod.config.js",
     "heroku-prebuild": "npm run-script setup",
-    "heroku-postbuild": "npm run-script pack-prod",
-    "install-texpack": "chmod +x scripts/install-tex-pack.sh && scripts/install-tex-pack.sh"
+    "heroku-postbuild": "npm run-script pack-prod"
   },
   "dependencies": {
     "deep-equal": "^1.0.1",
@@ -37,6 +36,7 @@
     "expect": "^23.3.0",
     "expose-loader": "^0.7.4",
     "html-webpack-plugin": "^2.30.1",
+    "svgexport": "^0.3.2",
     "ts-loader": "^3.5.0",
     "ts-node": "^5.0.1",
     "tslint": "^5.11.0",

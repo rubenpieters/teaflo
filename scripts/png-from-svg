@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# example usage: png-from-svg test 20 20
+
+SVG=$1
+WIDTH=$2
+HEIGHT=$3
+
+EXPORTNAME=${SVG}_${WIDTH}_${HEIGHT}
+
+npx --no-install svgexport scans/$SVG.svg textures/$EXPORTNAME.png $WIDTH:$HEIGHT pad
