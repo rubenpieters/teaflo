@@ -1,6 +1,6 @@
 import { GameState, findStatus } from "../../../shared/game/state";
 import { EntityId, toPositionId, GlobalId } from "../../../shared/game/entityId";
-import { createPosition } from "../../../app/util/position";
+import { createPosition, relativeTo, Position } from "../../../app/util/position";
 import { triggerOrder } from "../../../shared/game/trigger";
 
 /*
@@ -57,6 +57,43 @@ export function enemyUnitPos(
     "left", unitEnMinX + 170 * positionId.id, unitSizeX,
     "top", unitMinY, unitSizeY,
   );
+}
+
+export function unitUtilityPositions(
+  unitPos: Position,
+): {
+  hpIconPos: Position,
+  hpTextPos: Position,
+  unitHpPos: Position,
+  chIconPos: Position,
+  chTextPos: Position,
+  unitChPos: Position,
+} {
+  const hpIconPos = relativeTo(unitPos,
+    [{ type: "below", amt: 10 }],
+    40, 40,
+  );
+  const hpTextPos = relativeTo(hpIconPos,
+    [{ type: "right", amt: 10 }, { type: "above", amt: -30 }],
+    50, 20,
+  );
+  const chIconPos = relativeTo(unitPos,
+    [{ type: "below", amt: 50 }],
+    40, 40,
+  );
+  const chTextPos = relativeTo(chIconPos,
+    [{ type: "right", amt: 10 }, { type: "above", amt: -30 }],
+    50, 20,
+  );
+  const unitHpPos = relativeTo(unitPos,
+    [{ type: "left", amt: -5 }],
+    10, 150,
+  );
+  const unitChPos = relativeTo(unitPos,
+    [{ type: "right", amt: -5 }],
+    10, 150,
+  );
+  return { hpIconPos, hpTextPos, unitHpPos, chIconPos, chTextPos, unitChPos, };
 }
 
 export function statusPos(

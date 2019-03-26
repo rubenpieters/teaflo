@@ -20,7 +20,7 @@ import { CodexTypes } from "../codex/screen";
 import { Intent } from "../../../shared/game/intent";
 import { clearAnimations } from "../util";
 import { aiPosition, AIRoute, AI, Outs, RouteDirection, routeDirection } from "../../../shared/game/ai";
-import { friendlyUnitPos, enemyUnitPos, statusPos } from "./positions";
+import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions } from "./positions";
 
 export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
 
@@ -170,6 +170,7 @@ export class ExecScreen {
     state.frUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
         const unitPos = friendlyUnitPos(state, new PositionId(unitIndex, "friendly"));
+        const utilityPos = unitUtilityPositions(unitPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: new GlobalId(unit.id, "friendly"),
@@ -182,26 +183,10 @@ export class ExecScreen {
         }
 
         // hp/ch numbers
-        const hpIconPos = relativeTo(unitPos,
-          [{ type: "below", amt: 10 }],
-          40, 40,
-        );
-        this.stateIconPool.newSprite(hpIconPos.xMin, hpIconPos.yMin, {}, { sprite: "icon_hp.png"});
-        const hpTextPos = relativeTo(hpIconPos,
-          [{ type: "right", amt: 10 }, { type: "above", amt: -30 }],
-          50, 20,
-        );
-        this.stateTextPool.newText(hpTextPos, `${unit.hp} / ${unit.maxHp}`, 20);
-        const chIconPos = relativeTo(unitPos,
-          [{ type: "below", amt: 50 }],
-          40, 40,
-        );
-        this.stateIconPool.newSprite(chIconPos.xMin, chIconPos.yMin, {}, { sprite: "icon_ch.png"});
-        const chTextPos = relativeTo(chIconPos,
-          [{ type: "right", amt: 10 }, { type: "above", amt: -30 }],
-          50, 20,
-        );
-        this.stateTextPool.newText(chTextPos, `${unit.charges} / ${unit.maxCharges}`, 20);
+        this.stateIconPool.newSprite(utilityPos.hpIconPos.xMin, utilityPos.hpIconPos.yMin, {}, { sprite: "icon_hp.png"});
+        this.stateTextPool.newText(utilityPos.hpTextPos, `${unit.hp} / ${unit.maxHp}`, 20);
+        this.stateIconPool.newSprite(utilityPos.chIconPos.xMin, utilityPos.chIconPos.yMin, {}, { sprite: "icon_ch.png"});
+        this.stateTextPool.newText(utilityPos.chTextPos, `${unit.charges} / ${unit.maxCharges}`, 20);
 
         // hover bar
         if (
@@ -325,6 +310,7 @@ export class ExecScreen {
     state.enUnits.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
         const unitPos = enemyUnitPos(state, new PositionId(unitIndex, "enemy"));
+        const utilityPos = unitUtilityPositions(unitPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: new GlobalId(unit.id, "enemy"),
@@ -337,26 +323,10 @@ export class ExecScreen {
         }
 
         // hp/ch numbers
-        const hpIconPos = relativeTo(unitPos,
-          [{ type: "below", amt: 10 }],
-          40, 40,
-        );
-        this.stateIconPool.newSprite(hpIconPos.xMin, hpIconPos.yMin, {}, { sprite: "icon_hp.png"});
-        const hpTextPos = relativeTo(hpIconPos,
-          [{ type: "right", amt: 10 }, { type: "above", amt: -30 }],
-          50, 20,
-        );
-        this.stateTextPool.newText(hpTextPos, `${unit.hp} / ${unit.maxHp}`, 20);
-        const chIconPos = relativeTo(unitPos,
-          [{ type: "below", amt: 50 }],
-          40, 40,
-        );
-        this.stateIconPool.newSprite(chIconPos.xMin, chIconPos.yMin, {}, { sprite: "icon_ch.png"});
-        const chTextPos = relativeTo(chIconPos,
-          [{ type: "right", amt: 10 }, { type: "above", amt: -30 }],
-          50, 20,
-        );
-        this.stateTextPool.newText(chTextPos, `${unit.charges} / ${unit.maxCharges}`, 20);
+        this.stateIconPool.newSprite(utilityPos.hpIconPos.xMin, utilityPos.hpIconPos.yMin, {}, { sprite: "icon_hp.png"});
+        this.stateTextPool.newText(utilityPos.hpTextPos, `${unit.hp} / ${unit.maxHp}`, 20);
+        this.stateIconPool.newSprite(utilityPos.chIconPos.xMin, utilityPos.chIconPos.yMin, {}, { sprite: "icon_ch.png"});
+        this.stateTextPool.newText(utilityPos.chTextPos, `${unit.charges} / ${unit.maxCharges}`, 20);
 
         // hover bar
         if (
@@ -554,10 +524,7 @@ export class ExecScreen {
     });
     triggerOrder.forEach((tag, tagIndex) => {
       state.triggers[tag].forEach((trigger, triggerIndex) => {
-        const triggerPos = createPosition(
-          "left", 240 + 50 * triggerIndex, 40,
-          "top", 50 + 50 * tagIndex, 40,
-        );
+        const triggerPos = statusPos(state, new GlobalId(trigger.id, "status"), triggerIndex, tagIndex);
         // hover graphics
         if (
           (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(trigger.id, "status"))) ||
