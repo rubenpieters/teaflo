@@ -162,6 +162,37 @@ export const ai5: AI = [
   },
 ];
 
+export const ai5_2: AI = [
+  {
+    intent: new I.AddTriggerI(
+      I.mkHighestThreat(),
+      new I.Static(
+        T.full(new T.Fragile(3)),
+      ),
+    ),
+    spriteId: "fr_unit_a1_l2_01_ab1",
+    outs: [
+        {
+          aiOut: new O.ToX(1),
+          condition: () => true,
+        },
+      ],
+  },
+  {
+    intent: new I.DamageI(
+      I.mkHighestThreat(),
+      new I.Static(4),
+    ),
+    spriteId: "fr_unit_a1_l1_01_ab1",
+    outs: [
+        {
+          aiOut: new O.ToX(0),
+          condition: () => true,
+        },
+      ],
+  },
+];
+
 export const ai6: AI = [
   {
     intent: new I.AddTriggerI(
