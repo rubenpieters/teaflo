@@ -1,45 +1,30 @@
-import { focus, over, set } from "../iassign-util";
-import { Ability, HasAbilities } from "./ability";
-import { HasAI } from "./ai";
-import { HasThreatMap } from "./threat";
-import { Trigger, HasTriggers } from "./trigger";
+import { Ability } from "./ability";
 
 export type Unit = {
   hp: number,
   maxHp: number,
   charges: number,
   maxCharges: number,
-};
-
-export type FrUnit = Unit & HasAbilities & { vital: boolean };
-export type EnUnit = Unit & HasAI;
-
-export function damage<U extends Unit>(
-  u: U,
-  value: number,
-): U {
-  return focus(u, over(x => x.hp, x => {
-    const newVal = x - value;
-    return newVal < 0 ? 0 : newVal;
-  }));
 }
 
-export function heal<U extends Unit>(
-  u: U,
-  value: number,
-): U {
-  return focus(u, over(x => x.hp, x => {
-    const newVal = x + value;
-    return newVal > u.maxHp ? u.maxHp : newVal;
-  }));
+export type FrAbility = {
+  ability: Ability,
+  inputs: any[],
+  name: string,
+  spriteId: string,
 }
 
-export function useCharge<U extends Unit>(
-  u: U,
-  value: number,
-): U {
-  return focus(u, over(x => x.charges, x => {
-    const newVal = x - value;
-    return newVal < 0 ? 0 : newVal;
-  }));
+export type FrUnit = Unit & {
+  abilities: FrAbility[],
+}
+
+export type EnAbility = {
+  ability: Ability,
+  name: string,
+  spriteId: string,
+}
+
+export type EnUnit = Unit & {
+  abilities: EnAbility[],
+  startingAbility: number,
 }

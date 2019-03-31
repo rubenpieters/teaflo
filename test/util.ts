@@ -2,7 +2,6 @@ import { GameState, possibleActions, showStateCompact } from "../src/shared/game
 import { extendSolution, Solution, runPhases, SolutionData, showSolDataCompact } from "../src/shared/game/solution";
 import { Location, getLocation } from "../src/shared/tree";
 import { fnv1a } from "../src/shared/fnv1a";
-import deepequal from "deep-equal";
 
 export function trySolutions(
   state: GameState,

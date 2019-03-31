@@ -6,7 +6,7 @@ import { GameState, filteredEn, filteredFr, FrStUnit, EnStUnit, findStatus } fro
 import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
-import { getUnit, GlobalId, UnitId, getStatus, findIndex, TargetId, eqUnitId, EntityId, toPositionId, PositionId } from "../../../shared/game/entityId";
+import { getUnit, EntityId, UnitId, getStatus, findIndex, EntityId, eqUnitId, EntityId, toPositionId, PositionId } from "../../../shared/game/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution, cutLevelSolution } from "./events";
 import { Ability, UserInput, matchUserInput } from "../../../shared/game/ability";
 import { triggerOrder, StTrigger, Trigger, TriggerLog, triggerValue } from "../../../shared/game/trigger";
@@ -22,7 +22,7 @@ import { clearAnimations } from "../util";
 import { aiPosition, AIRoute, AI, Outs, RouteDirection, routeDirection } from "../../../shared/game/ai";
 import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions } from "./positions";
 
-export type UnitSelection = GlobalId<"friendly" | "enemy"> | GlobalId<"status">;
+export type UnitSelection = EntityId<"friendly" | "enemy"> | EntityId<"status">;
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
@@ -173,10 +173,10 @@ export class ExecScreen {
         const utilityPos = unitUtilityPositions(unitPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
-            globalId: new GlobalId(unit.id, "friendly"),
+            globalId: new EntityId(unit.id, "friendly"),
           }
         );
-        if (currentInputType !== undefined && ! matchUserInput(currentInputType, new GlobalId(unit.id, "friendly"))) {
+        if (currentInputType !== undefined && ! matchUserInput(currentInputType, new EntityId(unit.id, "friendly"))) {
           unitSprite.alpha = 0.3;
         } else {
           unitSprite.alpha = 1;
@@ -190,8 +190,8 @@ export class ExecScreen {
 
         // hover bar
         if (
-          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "friendly"))) ||
-          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "friendly")))
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new EntityId(unit.id, "friendly"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new EntityId(unit.id, "friendly")))
         ) {
           const hoverBarPos = relativeTo(unitPos,
             [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
@@ -210,7 +210,7 @@ export class ExecScreen {
         unitHpPos.yMin = unitHpPos.yMin + hpHeight * ((unit.maxHp - unit.hp) / unit.maxHp);
         const unitHpSprite = this.unitResPool.newSprite(unitHpPos.xMin, unitHpPos.yMin, {},
           { cardId: unit.cardId,
-            globalId: new GlobalId(unit.id, "friendly"),
+            globalId: new EntityId(unit.id, "friendly"),
             type: "hp",
           }
         );
@@ -218,7 +218,7 @@ export class ExecScreen {
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
         // draw hp changing animation
         if (prevState !== undefined) {
-          const prevUnit = getUnit(new GlobalId(unit.id, "friendly"), prevState);
+          const prevUnit = getUnit(new EntityId(unit.id, "friendly"), prevState);
           if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
             const prevUnitHpPos = createPosition(
               "left", 245 + 170 * unitIndex, 10,
@@ -229,7 +229,7 @@ export class ExecScreen {
             prevUnitHpPos.yMin = prevUnitHpPos.yMin + prevDiff;
             const prevUnitHpSprite = this.unitResPool.newSprite(prevUnitHpPos.xMin, prevUnitHpPos.yMin, {},
               { cardId: unit.cardId,
-                globalId: new GlobalId(unit.id, "friendly"),
+                globalId: new EntityId(unit.id, "friendly"),
                 type: "res_anim",
               }
             );
@@ -254,7 +254,7 @@ export class ExecScreen {
         unitChPos.yMin = unitChPos.yMin + chHeight * ((unit.maxCharges - unit.charges) / unit.maxCharges);
         const unitChSprite = this.unitResPool.newSprite(unitChPos.xMin, unitChPos.yMin, {},
           { cardId: unit.cardId,
-            globalId: new GlobalId(unit.id, "friendly"),
+            globalId: new EntityId(unit.id, "friendly"),
             type: "ch",
           }
         );
@@ -269,7 +269,7 @@ export class ExecScreen {
           );
           const unitThSprite = this.unitResPool.newSprite(unitThPos.xMin, unitThPos.yMin, {},
             { cardId: unit.cardId,
-              globalId: new GlobalId(unit.id, "friendly"),
+              globalId: new EntityId(unit.id, "friendly"),
               type: "th",
             }
           );
@@ -294,10 +294,10 @@ export class ExecScreen {
           );
           this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
             { tag: "FrAbilityData", spriteId: ability.spriteId, ability, index: abilityIndex,
-              globalId: new GlobalId(unit.id, "friendly") }
+              globalId: new EntityId(unit.id, "friendly") }
           );
           if (this.clickState !== undefined &&
-            eqUnitId(state, this.clickState.origin, new GlobalId(unit.id, "friendly")) &&
+            eqUnitId(state, this.clickState.origin, new EntityId(unit.id, "friendly")) &&
             abilityIndex === this.clickState.index
           ) {
             const indicator = this.abilityPool.newSprite(abPos.xMin + 5, abPos.yMin + 5, {}, { tag: "Indicator"});
@@ -313,10 +313,10 @@ export class ExecScreen {
         const utilityPos = unitUtilityPositions(unitPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
-            globalId: new GlobalId(unit.id, "enemy"),
+            globalId: new EntityId(unit.id, "enemy"),
           }
         );
-        if (currentInputType !== undefined && ! matchUserInput(currentInputType, new GlobalId(unit.id, "enemy"))) {
+        if (currentInputType !== undefined && ! matchUserInput(currentInputType, new EntityId(unit.id, "enemy"))) {
           unitSprite.alpha = 0.3;
         } else {
           unitSprite.alpha = 1;
@@ -330,8 +330,8 @@ export class ExecScreen {
 
         // hover bar
         if (
-          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "enemy"))) ||
-          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "enemy")))
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new EntityId(unit.id, "enemy"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new EntityId(unit.id, "enemy")))
         ) {
           const hoverBarPos = relativeTo(unitPos,
             [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
@@ -350,7 +350,7 @@ export class ExecScreen {
         unitHpPos.yMin = unitHpPos.yMin + hpHeight * ((unit.maxHp - unit.hp) / unit.maxHp);
         const unitHpSprite = this.unitResPool.newSprite(unitHpPos.xMin, unitHpPos.yMin, {},
           { cardId: unit.cardId,
-            globalId: new GlobalId(unit.id, "enemy"),
+            globalId: new EntityId(unit.id, "enemy"),
             type: "hp",
           }
         );
@@ -358,7 +358,7 @@ export class ExecScreen {
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
         // draw hp changing animation
         if (prevState !== undefined) {
-          const prevUnit = getUnit(new GlobalId(unit.id, "enemy"), prevState);
+          const prevUnit = getUnit(new EntityId(unit.id, "enemy"), prevState);
           if (prevUnit !== undefined && prevUnit.hp !== unit.hp) {
             const prevUnitHpPos = createPosition(
               "left", 995 + 170 * unitIndex, 10,
@@ -369,7 +369,7 @@ export class ExecScreen {
             prevUnitHpPos.yMin = prevUnitHpPos.yMin + prevDiff;
             const prevUnitHpSprite = this.unitResPool.newSprite(prevUnitHpPos.xMin, prevUnitHpPos.yMin, {},
               { cardId: unit.cardId,
-                globalId: new GlobalId(unit.id, "enemy"),
+                globalId: new EntityId(unit.id, "enemy"),
                 type: "res_anim",
               }
             );
@@ -394,7 +394,7 @@ export class ExecScreen {
         unitChPos.yMin = unitChPos.yMin + chHeight * ((unit.maxCharges - unit.charges) / unit.maxCharges);
         const unitChSprite = this.unitResPool.newSprite(unitChPos.xMin, unitChPos.yMin, {},
           { cardId: unit.cardId,
-            globalId: new GlobalId(unit.id, "enemy"),
+            globalId: new EntityId(unit.id, "enemy"),
             type: "ch",
           }
         );
@@ -424,9 +424,9 @@ export class ExecScreen {
     // AETHER
     triggerOrder.forEach((tag, tagIndex) => {
       state.triggers[tag].forEach((trigger, triggerIndex) => {
-        const triggerPos = statusPos(state, new GlobalId(trigger.id, "status"), triggerIndex, tagIndex);
+        const triggerPos = statusPos(state, new EntityId(trigger.id, "status"), triggerIndex, tagIndex);
         const trSprite = this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { trigger });
-        if (currentInputType !== undefined && ! matchUserInput(currentInputType, new GlobalId(trigger.id, "status"))) {
+        if (currentInputType !== undefined && ! matchUserInput(currentInputType, new EntityId(trigger.id, "status"))) {
           trSprite.alpha = 0.3;
         } else {
           trSprite.alpha = 1;
@@ -434,15 +434,15 @@ export class ExecScreen {
 
         // hover graphics
         if (
-          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(trigger.id, "status"))) ||
-          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(trigger.id, "status")))
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new EntityId(trigger.id, "status"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new EntityId(trigger.id, "status")))
         ) {
           this.hoverGraphicsPool.beginFill();
           this.hoverGraphicsPool.lineStyle(4);
           const centerTriggerPos = center(triggerPos);
           this.hoverGraphicsPool.moveTo(centerTriggerPos.x, centerTriggerPos.y);
           if (trigger.owner.type === "friendly") {
-            const ownerPosCenter = center(friendlyUnitPos(state, new GlobalId(trigger.owner.id, "friendly")));
+            const ownerPosCenter = center(friendlyUnitPos(state, new EntityId(trigger.owner.id, "friendly")));
             this.hoverGraphicsPool.lineTo(ownerPosCenter.x, ownerPosCenter.y); 
           }
           this.hoverGraphicsPool.endFill();
@@ -492,8 +492,8 @@ export class ExecScreen {
       if (unit !== undefined) {
         // hover bar
         if (
-          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "friendly"))) ||
-          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "friendly")))
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new EntityId(unit.id, "friendly"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new EntityId(unit.id, "friendly")))
         ) {
           const unitPos = friendlyUnitPos(state, new PositionId(unitIndex, "friendly"));
           const hoverBarPos = relativeTo(unitPos,
@@ -509,8 +509,8 @@ export class ExecScreen {
       if (unit !== undefined) {
         // hover bar
         if (
-          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(unit.id, "enemy"))) ||
-          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(unit.id, "enemy")))
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new EntityId(unit.id, "enemy"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new EntityId(unit.id, "enemy")))
         ) {
           const unitPos = enemyUnitPos(state, new PositionId(unitIndex, "enemy"));
           const hoverBarPos = relativeTo(unitPos,
@@ -524,18 +524,18 @@ export class ExecScreen {
     });
     triggerOrder.forEach((tag, tagIndex) => {
       state.triggers[tag].forEach((trigger, triggerIndex) => {
-        const triggerPos = statusPos(state, new GlobalId(trigger.id, "status"), triggerIndex, tagIndex);
+        const triggerPos = statusPos(state, new EntityId(trigger.id, "status"), triggerIndex, tagIndex);
         // hover graphics
         if (
-          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new GlobalId(trigger.id, "status"))) ||
-          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new GlobalId(trigger.id, "status")))
+          (this.selectedUnit !== undefined && eqUnitId(state, this.selectedUnit, new EntityId(trigger.id, "status"))) ||
+          (this.hoveredUnit !== undefined && eqUnitId(state, this.hoveredUnit, new EntityId(trigger.id, "status")))
         ) {
           this.hoverGraphicsPool.beginFill();
           this.hoverGraphicsPool.lineStyle(4);
           const centerTriggerPos = center(triggerPos);
           this.hoverGraphicsPool.moveTo(centerTriggerPos.x, centerTriggerPos.y);
           if (trigger.owner.type === "friendly") {
-            const ownerPosCenter = center(friendlyUnitPos(state, new GlobalId(trigger.owner.id, "friendly")));
+            const ownerPosCenter = center(friendlyUnitPos(state, new EntityId(trigger.owner.id, "friendly")));
             this.hoverGraphicsPool.lineTo(ownerPosCenter.x, ownerPosCenter.y); 
           }
           this.hoverGraphicsPool.endFill();
@@ -592,7 +592,7 @@ export class ExecScreen {
           }
         }
       } else {
-        const unit = getStatus(<GlobalId<"status">>showUnit, state);
+        const unit = getStatus(<EntityId<"status">>showUnit, state);
         if (unit !== undefined) {
           const pos1 = createPosition(
             "left", 650, 150,
@@ -749,7 +749,7 @@ export class ExecScreen {
 
   onTargetPos(
     state: GameState,
-    id: TargetId,
+    id: EntityId,
   ) {
     switch (id.type) {
       case "status": {
@@ -832,7 +832,7 @@ export class ExecScreen {
   drawFrames(
     state: GameState,
     action: Action,
-    origin: TargetId | undefined,
+    origin: EntityId | undefined,
   ): Animation {
     let targetFrames: Animation;
     switch (action.tag) {
@@ -864,7 +864,7 @@ export class ExecScreen {
 
   createFrame(
     state: GameState,
-    id: TargetId,
+    id: EntityId,
     type: "out" | "in",
   ): Create {
     const pos = this.onTargetPos(state, id);
@@ -981,7 +981,7 @@ function mkClearBtnPool(
 
 type UnitData = {
   cardId: string,
-  globalId: GlobalId<"friendly" | "enemy">,
+  globalId: EntityId<"friendly" | "enemy">,
 };
 
 function mkUnitPool(
@@ -1027,7 +1027,7 @@ function mkUnitPool(
 
 type UnitResData = {
   cardId: string,
-  globalId: GlobalId<"friendly" | "enemy">,
+  globalId: EntityId<"friendly" | "enemy">,
   type: "hp" | "ch" | "th" | "res_anim",
 };
 
@@ -1081,7 +1081,7 @@ type FrAbilityData = {
   ability: Ability,
   spriteId: string,
   index: number,
-  globalId: GlobalId<"friendly" | "enemy">,
+  globalId: EntityId<"friendly" | "enemy">,
   tag: "FrAbilityData",
 }
 
@@ -1238,7 +1238,7 @@ function mkTriggerPool(
       ],
       callbacks: {
         click: (self) => {
-          const globalId = new GlobalId(self.data.trigger.id, "status");
+          const globalId = new EntityId(self.data.trigger.id, "status");
           const clickState = gameRefs.screens.execScreen.clickState;
           if (clickState === undefined) {
             clickUnit(gameRefs, globalId);
@@ -1253,7 +1253,7 @@ function mkTriggerPool(
           }
         },
         hoverOver: (self) => {
-          hoverUnit(gameRefs, new GlobalId(self.data.trigger.id, "status"));
+          hoverUnit(gameRefs, new EntityId(self.data.trigger.id, "status"));
         },
         hoverOut: (self) => {
           clearHover(gameRefs);

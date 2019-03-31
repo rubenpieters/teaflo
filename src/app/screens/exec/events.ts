@@ -2,7 +2,7 @@ import { GameRefs } from "../../../app/states/game";
 import { currentSolution, currentSchemSol, selectedSchem, levelData, setSolution, setLocation } from "../act/data";
 import { mkGameState } from "../../../shared/game/state";
 import { runSolution, extendSolution, SolutionData, cutSolution } from "../../../shared/game/solution";
-import { GlobalId, eqUnitId } from "../../../shared/game/entityId";
+import { EntityId, eqUnitId } from "../../../shared/game/entityId";
 import { UnitSelection } from "./screen";
 import { loadLevel, createDeployArray } from "../level/events";
 import { Location } from "../../../shared/tree";

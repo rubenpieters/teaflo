@@ -1,5 +1,5 @@
 import { GameState, findStatus } from "../../../shared/game/state";
-import { EntityId, toPositionId, GlobalId } from "../../../shared/game/entityId";
+import { EntityId, toPositionId, EntityId } from "../../../shared/game/entityId";
 import { createPosition, relativeTo, Position } from "../../../app/util/position";
 import { triggerOrder } from "../../../shared/game/trigger";
 
@@ -98,7 +98,7 @@ export function unitUtilityPositions(
 
 export function statusPos(
   state: GameState,
-  statusId: GlobalId<"status">,
+  statusId: EntityId<"status">,
   // x index, the index within its status group
   triggerIndex?: number,
   // y index, to which status group it belongs

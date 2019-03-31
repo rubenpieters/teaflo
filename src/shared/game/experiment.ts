@@ -1,6 +1,6 @@
 import { mkGameState } from "./state";
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
-import { TargetId, GlobalId, UnitType } from "./entityId";
+import { EntityId, UnitType, TargetId, UnitId } from "./entityId";
 import * as fc from "fast-check";
 import { focus, over } from "../iassign-util";
 import { HasOwner } from "./trigger";
@@ -9,7 +9,7 @@ import deepEqual from "deep-equal";
 
 const forCompilationOrder = mkGameState([], []);
 
-declare module "fp-ts/lib/HKT" {
+/*declare module "fp-ts/lib/HKT" {
   interface URI2HKT<A> {
     Ability: IntentVar<A>,
     Action: A,
@@ -64,9 +64,9 @@ class UseCharge<F extends URIS> {
   constructor(
     readonly uri: F,
     readonly value: Type<F, number>,
-    readonly target: Type<F, TargetId>,
+    readonly target: Type<F, UnitId>,
   ) {}
-}
+}*/
 
 export class Weak {
   public readonly tag: "Weak" = "Weak";
@@ -148,9 +148,9 @@ function tagStatusArbitrary(
 
 const statusIdNrArbitrary: fc.Arbitrary<number> = fc.integer(0, 20);
 
-const statusIdArbitrary: fc.Arbitrary<GlobalId<"status">> =
+const statusIdArbitrary: fc.Arbitrary<EntityId<"status">> =
   statusIdNrArbitrary.map(id => {
-    return new GlobalId(id, "status");
+    return new EntityId(id, "status");
   });
 
 const unitIdNrArbitrary: fc.Arbitrary<number>
@@ -158,9 +158,9 @@ const unitIdNrArbitrary: fc.Arbitrary<number>
 const unitTypeArbitrary: fc.Arbitrary<UnitType>
   = fc.constantFrom(...(["friendly", "enemy"] as UnitType[]));
 
-const unitIdArbitrary: fc.Arbitrary<GlobalId<UnitType>> =
+const unitIdArbitrary: fc.Arbitrary<EntityId<UnitType>> =
   unitTypeArbitrary.chain(unitType => {
-    return unitIdNrArbitrary.map(id => new GlobalId(id, unitType));
+    return unitIdNrArbitrary.map(id => new EntityId(id, unitType));
   });
 
 const stStatusArbitrary: fc.Arbitrary<Status & HasId & HasOwner> =
@@ -174,7 +174,7 @@ class AetherRow {
   ) {}
 
   damageFragments(
-    statusId: GlobalId<"status">,
+    statusId: EntityId<"status">,
     value: number,
   ): AetherRow {
     const index = this.statuses.findIndex(x => x.id === statusId.id);
@@ -189,7 +189,7 @@ class AetherRow {
   }
 
   removeStatus(
-    statusId: GlobalId<"status">,
+    statusId: EntityId<"status">,
   ) {
     return focus(this,
       over(x => x.statuses,
@@ -199,7 +199,7 @@ class AetherRow {
 
   addStatus(
     status: Status,
-    ownerId: GlobalId<UnitType>,
+    ownerId: EntityId<UnitType>,
     nextId: () => number,
   ) {
     switch (statusMergeType(status)) {
@@ -246,8 +246,8 @@ function aetherRowInvariant(
 
 const test1 = aetherRowInvariant(
   new AetherRow([
-    {...new Weak(1), ...{ id: 1 }, ...{ owner: new GlobalId(1, "friendly") }},
-    {...new Weak(2), ...{ id: 2 }, ...{ owner: new GlobalId(1, "friendly") }},
+    {...new Weak(1), ...{ id: 1 }, ...{ owner: new EntityId(1, "friendly") }},
+    {...new Weak(2), ...{ id: 2 }, ...{ owner: new EntityId(1, "friendly") }},
   ])
 )
 
