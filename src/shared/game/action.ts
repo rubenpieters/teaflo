@@ -1,6 +1,8 @@
 import { focus, over, set } from "../iassign-util";
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
 import { UnitId, TargetId } from "./entityId";
+import { GameState } from "./state";
+import { damageEntity } from "./entity";
 
 /**
  * HKT boilerplate
@@ -51,6 +53,7 @@ export const actionTags: Action["tag"][]
   = [ "Damage",
       "UseCharge",
     ]
+  ;
 
 /**
  * An Action describes a single step in gamestate transitions.
@@ -58,3 +61,21 @@ export const actionTags: Action["tag"][]
 export type Action
   = ActionF<Action_URI>
   ;
+
+export function applyAction(
+  state: GameState,
+  action: Action,
+) {
+  switch (action.tag) {
+    case "Damage": {
+      const newState = state.overTarget(
+        action.target,
+        x => damageEntity(x, action.value),
+      );
+      return { state: newState, actions: [] };
+    }
+    case "UseCharge": {
+      return;
+    }
+  }
+}

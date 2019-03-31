@@ -2,6 +2,7 @@ import { focus, over } from "../iassign-util";
 import { Status, statusMergeType } from "./status";
 import { StatusId, UnitId, HasId, statusId } from "./entityId";
 import deepEqual from "deep-equal";
+import { damageEntity } from "./entity";
 
 export type StStatus = Status & {
   id: StatusId,
@@ -13,18 +14,26 @@ export class StatusRow {
     public readonly statuses: StStatus[] = [],
   ) {}
 
-  damageFragments(
+  damageStatus(
     statusId: StatusId,
     value: number,
   ): StatusRow {
-    const index = this.statuses.findIndex(x => deepEqual(x.id, statusId));
+    return this.overStatus(statusId, status => damageEntity(status, value));
+  }
+
+  overStatus(
+    id: StatusId,
+    f: (e: StStatus) => StStatus,
+  ): StatusRow {
+    const index = this.statuses.findIndex(e => {
+      if (e === undefined) return false;
+      return deepEqual(e.id, id);
+    });
     if (index === -1) {
-      // if not found, damage fizzles
       return this;
     }
-    // reduce the fragment value of found index
     return focus(this,
-      over(x => x.statuses[index].fragments, x => Math.max(0, x - value)),
+      over(x => x.statuses[index]!, f),
     );
   }
 
@@ -57,8 +66,8 @@ export class StatusRow {
         } {
           // if found, add the fragment values to the existing status
           return focus(this,
-            over(x => x.statuses[index].fragments,
-              x => Math.max(0, x + status.fragments)),
+            over(x => x.statuses[index].hp,
+              x => Math.max(0, x + status.hp)),
           );
         }
       }

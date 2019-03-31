@@ -12,7 +12,7 @@ export class Weak {
   public readonly tag: "Weak" = "Weak";
 
   constructor(
-    public readonly fragments: number,
+    public readonly hp: number,
   ) {}
 }
 
@@ -20,7 +20,7 @@ export class Strong {
   public readonly tag: "Strong" = "Strong";
 
   constructor(
-    public readonly fragments: number,
+    public readonly hp: number,
   ) {}
 }
 
@@ -28,7 +28,7 @@ export class Armor {
   public readonly tag: "Armor" = "Armor";
 
   constructor(
-    public readonly fragments: number,
+    public readonly hp: number,
   ) {}
 }
 
@@ -36,7 +36,7 @@ export class Fragile {
   public readonly tag: "Fragile" = "Fragile";
 
   constructor(
-    public readonly fragments: number,
+    public readonly hp: number,
   ) {}
 }
 

@@ -26,7 +26,7 @@ equalitySanityCheck(statusRowArb);
 fc.assert(fc.property(statusRowArb, (row) => statusRowInvariant(row)));
 fc.assert(fc.property(statusRowArb, statusIdArb, fragmentsArb,
   (row, statusId, value) => {
-    const newRow = row.damageFragments(statusId, value);
+    const newRow = row.damageStatus(statusId, value);
     return statusRowInvariant(newRow) &&
       // other elements are unchanged
       deepEqual(newRow.statuses.filter(x => ! deepEqual(x.id, statusId)), row.statuses.filter(x => ! deepEqual(x.id, statusId)))
@@ -39,8 +39,8 @@ fc.assert(fc.property(statusRowArb, statusArb, unitIdArb,
     return statusRowInvariant(newRow) &&
       // the new status was added
       (newRow.statuses.filter(x => x.id.id === nextId).length === 1 ||
-        // or, the status has 0 fragments
-        status.fragments === 0 ||
+        // or, the status has 0 hp
+        status.hp === 0 ||
         // or, the new status was merged into an existing status
         ! deepEqual(
           newRow.statuses.filter(x => x.tag === status.tag && deepEqual(x.owner, ownerId)),
