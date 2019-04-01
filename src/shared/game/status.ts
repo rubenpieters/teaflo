@@ -51,17 +51,6 @@ export function statusGroup(
   }
 }
 
-export function statusMergeType(
-  status: Status,
-): "on_owner_id" {
-  switch (status.tag) {
-    case "Armor": return "on_owner_id";
-    case "Fragile": return "on_owner_id";
-    case "Strong": return "on_owner_id";
-    case "Weak": return "on_owner_id";
-  }
-}
-
 export type StatusTag = Status["tag"];
 
 export const statusTags: StatusTag[]

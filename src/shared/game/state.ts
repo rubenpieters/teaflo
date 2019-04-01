@@ -2,8 +2,7 @@ import { FrUnit, EnUnit } from "./unit";
 import { HasId, TargetId, TargetType, EntityId, FriendlyId, EnemyId, StatusId } from "./entityId";
 import { UnitRow } from "./unitRow";
 import { StatusRow, StStatus } from "./statusRow";
-import { focus, over } from "../iassign-util";
-import { damageEntity } from "./entity";
+import { focus, over, modifyAndGet } from "../iassign-util";
 
 export type StFrUnit = FrUnit & HasId;
 export type StEnUnit = EnUnit & HasId;
@@ -22,36 +21,99 @@ export class GameState {
   ) {}
 
   overTarget<Type extends TargetType>(
-    target: EntityId<Type>,
-    f: (e: IdToEntityType[Type]) => IdToEntityType[Type],
-  ) {
-    switch (target.type) {
+    _target: EntityId<Type>,
+    _f: (e: IdToEntityType[Type]) => IdToEntityType[Type],
+  ): { state: GameState, entity?: IdToEntityType[Type] } {
+    switch (_target.type) {
       case "friendly": {
-        // compiler does not refine the types for us
-        const frTarget = target as FriendlyId;
-        const frF = f as (e: StFrUnit) => StFrUnit;
+        // compiler does not refine `Type`
+        const target = _target as FriendlyId;
+        const f = _f as (e: StFrUnit) => StFrUnit;
 
-        return focus(this,
-          over(x => x.frUnits, x => x.overUnit(frTarget, frF)),
+        const result = modifyAndGet(this,
+          x => x.frUnits, x => {
+            const result = x.overUnit(target, f);
+            return { a: result.row, b: result.entity };
+          }
         );
+
+        return { state: result.s, entity: result.b };
       }
       case "enemy": {
-        // compiler does not refine the types for us
-        const enTarget = target as EnemyId;
-        const enF = f as (e: StEnUnit) => StEnUnit;
+        // compiler does not refine `Type`
+        const target = _target as EnemyId;
+        const f = _f as (e: StEnUnit) => StEnUnit;
 
-        return focus(this,
-          over(x => x.enUnits, x => x.overUnit(enTarget, enF)),
+        const result = modifyAndGet(this,
+          x => x.enUnits, x => {
+            const result = x.overUnit(target, f);
+            return { a: result.row, b: result.entity };
+          }
         );
+
+        return { state: result.s, entity: result.b };
       }
       case "status": {
-        // compiler does not refine the types for us
-        const stTarget = target as StatusId;
-        const stF = f as (e: StStatus) => StStatus;
-
-        return focus(this,
-          over(x => x.statusRow, x => x.overStatus(stTarget, stF)),
+        // compiler does not refine `Type`
+        const target = _target as StatusId;
+        const f = _f as (e: StStatus) => StStatus;
+        const result = modifyAndGet(this,
+          x => x.statusRow, x => {
+            const result = x.overStatus(target, f);
+            return { a: result.row, b: result.status };
+          }
         );
+
+        return { state: result.s, entity: result.b };
+      }
+      default: {
+        throw "GameState.overTarget: impossible case";
+      }
+    }
+  }
+
+  removeTarget<Type extends TargetType>(
+    _target: EntityId<Type>,
+  ): { state: GameState, entity?: IdToEntityType[Type] } {
+    switch (_target.type) {
+      case "friendly": {
+        // compiler does not refine `Type`
+        const target = _target as FriendlyId;
+
+        const result = modifyAndGet(this,
+          x => x.frUnits, x => {
+            const result = x.removeUnit(target);
+            return { a: result.row, b: result.entity };
+          }
+        );
+
+        return { state: result.s, entity: result.b };
+      }
+      case "enemy": {
+        // compiler does not refine `Type`
+        const target = _target as EnemyId;
+
+        const result = modifyAndGet(this,
+          x => x.enUnits, x => {
+            const result = x.removeUnit(target);
+            return { a: result.row, b: result.entity };
+          }
+        );
+
+        return { state: result.s, entity: result.b };
+      }
+      case "status": {
+        // compiler does not refine `Type`
+        const target = _target as StatusId;
+
+        const result = modifyAndGet(this,
+          x => x.statusRow, x => {
+            const result = x.removeStatus(target);
+            return { a: result.row, b: result.entity };
+          }
+        );
+
+        return { state: result.s, entity: result.b };
       }
       default: {
         throw "GameState.overTarget: impossible case";

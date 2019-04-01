@@ -10,6 +10,20 @@ export function focus<S>(
   return es.reduce((acc, e) => e(gs => iassign(acc, gs.get, gs.modify)), s);
 }
 
+export function modifyAndGet<S, A, B>(
+  s: S,
+  get: (s: S) => A,
+  modify: (a: A) => { a: A, b: B },
+): { s: S, b: B } {
+  let b: B = undefined as any;
+  const newS = iassign(s, get, x => {
+    const result = modify(x);
+    b = result.b;
+    return result.a;
+  });
+  return { s: newS, b };
+}
+
 export function over<S, A>(
   get: (s: S) => A,
   modify: (a: A) => A,

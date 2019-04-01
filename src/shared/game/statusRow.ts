@@ -1,5 +1,5 @@
-import { focus, over } from "../iassign-util";
-import { Status, statusMergeType } from "./status";
+import { focus, over, modifyAndGet } from "../iassign-util";
+import { Status } from "./status";
 import { StatusId, UnitId, HasId, statusId } from "./entityId";
 import deepEqual from "deep-equal";
 import { damageEntity } from "./entity";
@@ -18,60 +18,54 @@ export class StatusRow {
     statusId: StatusId,
     value: number,
   ): StatusRow {
-    return this.overStatus(statusId, status => damageEntity(status, value));
+    return this.overStatus(statusId, status => damageEntity(status, value)).row;
   }
 
   overStatus(
     id: StatusId,
     f: (e: StStatus) => StStatus,
-  ): StatusRow {
+  ): { row: StatusRow, status?: StStatus } {
     const index = this.statuses.findIndex(e => {
       if (e === undefined) return false;
       return deepEqual(e.id, id);
     });
     if (index === -1) {
-      return this;
+      return { row: this };
     }
-    return focus(this,
+    const row = focus(this,
       over(x => x.statuses[index]!, f),
     );
+    return { row, status: row.statuses[index]! };
   }
 
   removeStatus(
     statusId: StatusId,
-  ) {
-    return focus(this,
-      over(x => x.statuses,
-        x => x.filter(x => ! deepEqual(x.id, statusId))),
+  ): { row: StatusRow, entity?: StStatus } {
+    const index = this.statuses.findIndex(x => deepEqual(x.id, statusId));
+    if (index === -1) {
+      return { row: this };
+    }
+
+    const result = modifyAndGet(this,
+      x => x.statuses, x => {
+        const removed = x.splice(index, 1)[0];
+        return { a: x, b: removed };
+      }
     );
+    return { row: result.s, entity: result.b };
   }
 
   addStatus(
     status: Status,
     ownerId: UnitId,
     nextId: () => number,
-  ) {
-    switch (statusMergeType(status)) {
-      case "on_owner_id": {
-        // merging on owner id
-        const index = this.statuses.findIndex(x => deepEqual(x.owner, ownerId) && x.tag === status.tag);
-        if (index === -1) {
-          // if not found, create new status in row
-          const newId = statusId(nextId());
-          const newStatus: StStatus =
-            {...status, owner: ownerId, id: newId };
-          return focus(this,
-              over(x => x.statuses, x => x.concat(newStatus))
-            );
-        } {
-          // if found, add the fragment values to the existing status
-          return focus(this,
-            over(x => x.statuses[index].hp,
-              x => Math.max(0, x + status.hp)),
-          );
-        }
-      }
-    }
+  ): StatusRow {
+    const newId = statusId(nextId());
+    const newStatus: StStatus =
+      {...status, owner: ownerId, id: newId };
+    return focus(this,
+      over(x => x.statuses, x => x.concat(newStatus)),
+    );
   }
 }
 
@@ -85,16 +79,9 @@ export function statusRowInvariant(
   row: StatusRow,
 ): boolean {
   for (const status of row.statuses) {
-    switch (statusMergeType(status)) {
-      case "on_owner_id": {
-        const diff = row.statuses.filter(x => {
-          return deepEqual(x.owner, status.owner) && x.tag === status.tag
-        });
-        // we expect only one status with
-        // the same owner and tag: itself
-        if (diff.length !== 1) return false;
-      }
-    }
+    const amount = row.statuses.filter(x => deepEqual(x.id, status.id)).length;
+    // status ids should be unique
+    if (amount !== 1) return false;
   }
   return true;
 }

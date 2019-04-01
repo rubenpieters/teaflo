@@ -9,7 +9,7 @@ export function damageEntity<E extends Entity>(
   value: number,
 ): E {
   return focus(e,
-    over(x => x.hp, x => Math.max(0, x - value)),
+    over(x => x.hp, x => x - value),
   );
 }
 
