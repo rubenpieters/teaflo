@@ -25,6 +25,9 @@ export type Action_URI = typeof Action_URI;
 export const Target_URI: "Target" = "Target";
 export type Target_URI = typeof Target_URI;
 
+export const Condition_URI: "Cond" = "Cond";
+export type Condition_URI = typeof Condition_URI;
+
 /**
  * A generic shape of actions.
  */
@@ -101,7 +104,7 @@ export type Action
   = ActionF<Action_URI, Action_URI>
   ;
 
-export function applyAction(
+export function resolveAction(
   state: GameState,
   action: Action,
 ): { state: GameState, actions: Action[] } {

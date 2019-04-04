@@ -91,8 +91,8 @@ function resolveAbilityVar<A>(
       return abilityVar.a;
     }
     case "FromInput": {
-      if (context.input === undefined) {
-        throw "resolveAbilityVar: no input for FromInput Ability";
+      if (context.tag !== "FrAbilityContext") {
+        throw `resolveAbilityVar: Invalid Context ${context.tag}, expected FrAbilityContext`;
       }
       if (context.input[abilityVar.input]) {
         throw `resolveAbilityVar: no input at ${abilityVar.input} for FromInput Ability`;
