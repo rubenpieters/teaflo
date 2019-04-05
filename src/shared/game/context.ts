@@ -1,5 +1,6 @@
 import { UnitId } from "./entityId";
 import { Action } from "./action";
+import { Status } from "./status";
 
 /**
  * Context when friendly unit has used an ability.
@@ -21,6 +22,7 @@ export class StatusContext {
 
   constructor(
     public readonly owner: UnitId,
+    public readonly status: Status,
   ) {}
 }
 

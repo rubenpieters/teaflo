@@ -28,6 +28,9 @@ export type Target_URI = typeof Target_URI;
 export const Condition_URI: "Cond" = "Cond";
 export type Condition_URI = typeof Condition_URI;
 
+export const StatusTransform_URI: "ST" = "ST";
+export type StatusTransform_URI = typeof StatusTransform_URI;
+
 /**
  * A generic shape of actions.
  */
@@ -102,6 +105,11 @@ export const actionTags: Action["tag"][]
  */
 export type Action
   = ActionF<Action_URI, Action_URI>
+  ;
+
+export type StActionF<F extends URIS>
+  = ActionF<F, F>
+  & { origin: Type<F, UnitId> }
   ;
 
 export function resolveAction(

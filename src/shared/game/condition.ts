@@ -21,7 +21,7 @@ export function resolveCondition(
   actionCondition: ActionCondition,
   onStackAction: Action,
   context: Context,
-): { condition: boolean, bindings: { [K in number]: any } } {
+): { condition: boolean, bindings: { [K in string]: any } } {
   if (onStackAction.tag === actionCondition.tag) {
     const keys = Object.keys(actionCondition);
     let condition = true;
@@ -32,7 +32,7 @@ export function resolveCondition(
         const val = (onStackAction as any)[key];
         const resolved = resolveConditionVar(state, conditionVar, val, context);
         if (resolved.binding !== undefined) {
-          bindings[key] = resolved.binding;
+          bindings[resolved.binding[0]] = resolved.binding[1];
         }
         if (! resolved.result) {
           condition = false;
@@ -50,7 +50,7 @@ export function resolveConditionVar<A>(
   conditionVar: ConditionVar<A>,
   val: A,
   context: Context,
-): { result: boolean, binding?: A } {
+): { result: boolean, binding?: [string, A] } {
   switch (conditionVar.tag) {
     case "Static": {
       const result = deepEqual(val, conditionVar.a);
@@ -64,7 +64,17 @@ export function resolveConditionVar<A>(
       return { result };
     }
     case "Var": {
-      return { result: true, binding: val };
+      return { result: true, binding: [conditionVar.bindingName, val] };
+    }
+    case "StatusValue": {
+      if (context.tag !== "StatusContext") {
+        throw `resolveConditionVar: Invalid Context ${context.tag}, expected StatusContext`;
+      }
+      // TODO: calculate status value from hp
+      throw "TODO: calculate status value from hp";
+      const statusValue = 1;
+      const result = deepEqual(val, statusValue);
+      return { result };
     }
   }
 }
@@ -87,6 +97,7 @@ export type ConditionVar<A>
   = Static<A>
   | Var
   | StatusOwner
+  | StatusValue
   ;
 
 export class Static<A> {
@@ -101,7 +112,7 @@ export class Var {
   public readonly tag: "Var" = "Var";
 
   constructor(
-
+    public readonly bindingName: string,
   ) {}
 }
 
@@ -115,4 +126,16 @@ export class StatusOwner {
 
 export function statusOwner(): ConditionVar<UnitId> {
   return new StatusOwner();
+}
+
+export class StatusValue {
+  public readonly tag: "StatusValue" = "StatusValue";
+  
+  constructor(
+
+  ) {}
+}
+
+export function statusValue(): ConditionVar<number> {
+  return new StatusValue();
 }
