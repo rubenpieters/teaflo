@@ -25,7 +25,7 @@ export const trinity_dmg: FrUnit = {
         new TargetInput(),
       ],
       spriteId: "ab3",
-      name: "dmg10",
+      name: "trinity_dmg_ab1",
     },
   ],
   essential: true,
@@ -37,12 +37,12 @@ export const trinity_dmg: FrUnit = {
 export const trinity_tnk_ab1: Ability =
 A.combinedAbility([
   new A.UseCharge("Ability", "Target", new Ab.Static(1), new Ab.Self()),
-  new A.Damage("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0)),
+  new A.AddThreat("Ability", "Target", new Ab.Static(13), Ab.self(), Ab.allEnemy()),
 ]);
 
 export const trinity_tnk: FrUnit = {
-hp: 5,
-maxHp: 5,
+hp: 11,
+maxHp: 11,
 charges: 5,
 maxCharges: 5,
 abilities: [
@@ -51,8 +51,8 @@ abilities: [
     inputs: [
       new TargetInput(),
     ],
-    spriteId: "ab3",
-    name: "dmg10",
+    spriteId: "ab1",
+    name: "trinity_tnk_ab1",
   },
 ],
 essential: true,
@@ -64,7 +64,7 @@ essential: true,
 export const trinity_sup_ab1: Ability =
 A.combinedAbility([
   new A.UseCharge("Ability", "Target", new Ab.Static(1), new Ab.Self()),
-  new A.Damage("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0)),
+  // add armor
 ]);
 
 export const trinity_sup: FrUnit = {
@@ -78,8 +78,8 @@ abilities: [
     inputs: [
       new TargetInput(),
     ],
-    spriteId: "ab3",
-    name: "dmg10",
+    spriteId: "ab2",
+    name: "trinity_sup_ab1",
   },
 ],
 essential: true,

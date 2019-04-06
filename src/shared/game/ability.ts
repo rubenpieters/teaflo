@@ -145,6 +145,10 @@ export function resolveAbility(
     case "UseCharge": {
       return resolveToSingleTarget(ability, "target", state);
     }
+    case "AddThreat": {
+      // TODO: should also resolve "forAlly" to single target
+      return resolveToSingleTarget(ability, "atEnemy", state);
+    }
     case "MoveAI": {
       return resolveToSingleTarget(ability, "target", state);
     }

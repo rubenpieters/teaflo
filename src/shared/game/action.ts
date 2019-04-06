@@ -1,7 +1,7 @@
 import { focus, over, set } from "../iassign-util";
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
-import { UnitId, TargetId, EnemyId } from "./entityId";
-import { GameState } from "./state";
+import { UnitId, TargetId, EnemyId, FriendlyId } from "./entityId";
+import { GameState, addThreat } from "./state";
 import { damageEntity } from "./entity";
 import { useChargeUnit, moveAIUnit } from "./unit";
 import { AIDirection } from "./ai";
@@ -88,7 +88,19 @@ export class MoveAI<F extends URIS, G extends URIS> {
     readonly uriF: F,
     readonly uriG: G,
     public readonly dir: Type<F, AIDirection>,
-    public readonly target: Type<G, EnemyId>
+    public readonly target: Type<G, EnemyId>,
+  ) {}
+}
+
+export class AddThreat<F extends URIS, G extends URIS> {
+  public readonly tag: "AddThreat" = "AddThreat";
+
+  constructor(
+    readonly uriF: F,
+    readonly uriG: G,
+    public readonly value: Type<F, number>,
+    public readonly forAlly: Type<G, FriendlyId>,
+    public readonly atEnemy: Type<G, EnemyId>,
   ) {}
 }
 
@@ -111,6 +123,7 @@ export type ActionF<F extends URIS, G extends URIS>
   | Death<G>
   | Combined<F, G>
   | MoveAI<F, G>
+  | AddThreat<F, G>
   ;
 
 export const actionTags: Action["tag"][]
@@ -162,6 +175,13 @@ export function resolveAction(
       }
       return { state: result.state, actions };
     }
+    case "AddThreat": {
+      const result = state.overTarget(
+        action.forAlly,
+        x => addThreat(x, action.atEnemy, action.value),
+      );
+      return { state: result.state, actions: [] };
+    }
     case "MoveAI": {
       const result = state.overTarget(
         action.target,
@@ -206,6 +226,12 @@ export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I e
       const newValue = f(actionF.value);
       const newTarget = g(actionF.target);
       return new UseCharge(newUriF, newUriG, newValue, newTarget);
+    }
+    case "AddThreat": {
+      const newValue = f(actionF.value);
+      const newForAlly = g(actionF.forAlly);
+      const newAtEnemy = g(actionF.atEnemy);
+      return new AddThreat(newUriF, newUriG, newValue, newForAlly, newAtEnemy);
     }
     case "MoveAI": {
       const newDir = f(actionF.dir);
