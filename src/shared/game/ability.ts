@@ -1,5 +1,5 @@
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
-import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, CombinedAction } from "./action";
+import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, CombinedAction, hoistActionF } from "./action";
 import { GameState, StFrUnit, StEnUnit } from "./state";
 import { UnitRow } from "./unitRow";
 import { UnitId, TargetId } from "./entityId";
@@ -57,29 +57,9 @@ export function resolveSingleTargetAbility(
   ability: SingleTargetAbility,
   context: Context,
 ): Action {
-  switch (ability.tag) {
-    case "Damage": {
-      const rValue = resolveAbilityVar(ability.value, context);
-      const rTarget = resolveAbilityVar(ability.target, context);
-      return new Damage("Action", "Action", rValue, rTarget);
-    }
-    case "UseCharge": {
-      const rValue = resolveAbilityVar(ability.value, context);
-      const rTarget = resolveAbilityVar(ability.target, context);
-      return new UseCharge("Action", "Action", rValue, rTarget);
-    }
-    case "Death": {
-      const rTarget = resolveAbilityVar(ability.target, context);
-      return new Death("Action", rTarget);
-    }
-    case "Invalid": {
-      return ability;
-    }
-    case "Combined": {
-      const l = ability.list.map(x => resolveSingleTargetAbility(x, context));
-      return CombinedAction(l);
-    }
-  }
+  const f = <A>(v: AbilityVar<A>) => resolveAbilityVar(v, context);
+  const action = hoistActionF(ability, "Action", "Action", f, f);
+  return action;
 }
 
 function resolveAbilityVar<A>(

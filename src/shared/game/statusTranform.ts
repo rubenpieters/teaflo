@@ -1,5 +1,5 @@
 import { ConditionVar, resolveConditionVar } from "./condition";
-import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, CombinedAction, StatusTransform_URI } from "./action";
+import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, CombinedAction, StatusTransform_URI, hoistActionF } from "./action";
 import { GameState } from "./state";
 import { Context } from "./context";
 
@@ -58,29 +58,9 @@ export function resolveStatusTransform(
   context: Context,
   bindings: { [K in string]: any },
 ): Action {
-  switch (statusTransform.tag) {
-    case "Damage": {
-      const rValue = resolveStatusTransformVar(state, statusTransform.value, context, bindings);
-      const rTarget = resolveStatusTransformVar(state, statusTransform.target, context, bindings);
-      return new Damage("Action", "Action", rValue, rTarget);
-    }
-    case "UseCharge": {
-      const rValue = resolveStatusTransformVar(state, statusTransform.value, context, bindings);
-      const rTarget = resolveStatusTransformVar(state, statusTransform.target, context, bindings);
-      return new UseCharge("Action", "Action", rValue, rTarget);
-    }
-    case "Death": {
-      const rTarget = resolveStatusTransformVar(state, statusTransform.target, context, bindings);
-      return new Death("Action", rTarget);
-    }
-    case "Invalid": {
-      return statusTransform;
-    }
-    case "Combined": {
-      const l = statusTransform.list.map(x => resolveStatusTransform(state, x, context, bindings));
-      return CombinedAction(l);
-    }
-  }
+  const f = <A>(v: StatusTransformVar<A>) => resolveStatusTransformVar(state, v, context, bindings);
+  const action = hoistActionF(statusTransform, "Action", "Action", f, f);
+  return action;
 }
 
 export function resolveStatusTransformVar<A>(

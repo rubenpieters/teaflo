@@ -162,3 +162,33 @@ export function resolveAction(
     }
   }
 }
+
+export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I extends URIS>(
+  actionF: ActionF<F, G>,
+  newUriF: H,
+  newUriG: I,
+  f: <A>(fa: Type<F, A>) => Type<H, A>,
+  g: <A>(fa: Type<G, A>) => Type<I, A>,
+): ActionF<H, I> {
+  switch (actionF.tag) {
+    case "Damage": {
+      const newValue = f(actionF.value);
+      const newTarget = g(actionF.target);
+      return new Damage(newUriF, newUriG, newValue, newTarget);
+    }
+    case "UseCharge": {
+      const newValue = f(actionF.value);
+      const newTarget = g(actionF.target);
+      return new UseCharge(newUriF, newUriG, newValue, newTarget);
+    }
+    case "Invalid": return actionF;
+    case "Death": {
+      const newTarget = g(actionF.target);
+      return new Death(newUriG, newTarget);
+    }
+    case "Combined": {
+      const l = actionF.list.map(x => hoistActionF(x, newUriF, newUriG, f, g));
+      return new Combined(l);
+    }
+  }
+}
