@@ -1,17 +1,19 @@
 import { Ability } from "./ability";
 import { focus, over } from "../iassign-util";
+import { AIPosition, AIDirection, moveAI } from "./ai";
+import { UserInput } from "./input";
 
 export type Unit = {
   hp: number,
   maxHp: number,
   charges: number,
   maxCharges: number,
-  essential: number,
+  essential: boolean,
 }
 
 export type FrAbility = {
   ability: Ability,
-  inputs: any[],
+  inputs: UserInput[],
   name: string,
   spriteId: string,
 }
@@ -28,7 +30,7 @@ export type EnAbility = {
 
 export type EnUnit = Unit & {
   abilities: EnAbility[],
-  startingAbility: number,
+  aiPosition: AIPosition,
 }
 
 export function useChargeUnit<E extends Unit>(
@@ -37,5 +39,14 @@ export function useChargeUnit<E extends Unit>(
 ): E {
   return focus(e,
     over(x => x.charges, x => x - value),
+  );
+}
+
+export function moveAIUnit<E extends EnUnit>(
+  e: E,
+  dir: AIDirection,
+): E {
+  return focus(e,
+    over(x => x.aiPosition, x => moveAI(x, dir)),
   );
 }

@@ -1,5 +1,5 @@
 import { ConditionVar, resolveConditionVar } from "./condition";
-import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, CombinedAction, StatusTransform_URI, hoistActionF } from "./action";
+import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, combinedAction, StatusTransform_URI, hoistActionF } from "./action";
 import { GameState } from "./state";
 import { Context } from "./context";
 

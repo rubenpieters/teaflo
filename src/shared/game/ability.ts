@@ -1,8 +1,8 @@
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
-import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, CombinedAction, hoistActionF } from "./action";
+import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, combinedAction, hoistActionF } from "./action";
 import { GameState, StFrUnit, StEnUnit } from "./state";
 import { UnitRow } from "./unitRow";
-import { UnitId, TargetId } from "./entityId";
+import { UnitId, TargetId, EnemyId, FriendlyId } from "./entityId";
 import { Context } from "./context";
 
 /**
@@ -89,7 +89,8 @@ function resolveAbilityVar<A>(
  */
 type TargetVar<A>
   = AllEnemy
-  | AllAlly
+  | AllFriendly
+  | Self
   ;
 
 export class AllEnemy {
@@ -100,12 +101,32 @@ export class AllEnemy {
   ) {}
 }
 
-export class AllAlly {
+export function allEnemy(): TargetVar<EnemyId> {
+  return new AllEnemy();
+}
+
+export class AllFriendly {
   public readonly tag: "AllAlly" = "AllAlly";
 
   constructor(
 
   ) {}
+}
+
+export function allFriendly(): TargetVar<FriendlyId> {
+  return new AllFriendly();
+}
+
+export class Self {
+  public readonly tag: "Self" = "Self";
+
+  constructor(
+
+  ) {}
+}
+
+export function self(): TargetVar<TargetId> {
+  return new Self();
 }
 
 type StateTargetFragment = {
@@ -124,6 +145,9 @@ export function resolveAbility(
     case "UseCharge": {
       return resolveToSingleTarget(ability, "target", state);
     }
+    case "MoveAI": {
+      return resolveToSingleTarget(ability, "target", state);
+    }
     case "Death": {
       return resolveToSingleTarget(ability, "target", state);
     }
@@ -137,12 +161,13 @@ export function resolveAbility(
   }
 }
 
-function resolveToSingleTarget(
-  ability: Ability,
-  field: string,
+function resolveToSingleTarget<A extends Ability>(
+  _ability: A,
+  field: keyof A,
   state: StateTargetFragment,
 ): SingleTargetAbility[] {
-  const resolved = resolveTargetVar((ability as any)[field], state);
+  const ability = _ability as any;
+  const resolved = resolveTargetVar(ability[field], state);
   switch (resolved.tag) {
     case "ids": {
       return resolved.ids.map(id => {
@@ -167,6 +192,9 @@ function resolveTargetVar<A>(
     }
     case "AllEnemy": {
       return { tag: "ids", ids: state.enUnits.defined().map(r => r.e.id) };
+    }
+    case "Self": {
+      throw "TODO: get self from context";
     }
     default: {
       return { tag: "var", var: targetVar };

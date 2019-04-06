@@ -1,9 +1,10 @@
 import { focus, over, set } from "../iassign-util";
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
-import { UnitId, TargetId } from "./entityId";
+import { UnitId, TargetId, EnemyId } from "./entityId";
 import { GameState } from "./state";
 import { damageEntity } from "./entity";
-import { useChargeUnit } from "./unit";
+import { useChargeUnit, moveAIUnit } from "./unit";
+import { AIDirection } from "./ai";
 
 /**
  * HKT boilerplate
@@ -80,9 +81,26 @@ export class Combined<F extends URIS, G extends URIS> {
   ) {}
 }
 
-export function CombinedAction(
+export class MoveAI<F extends URIS, G extends URIS> {
+  public readonly tag: "MoveAI" = "MoveAI";
+
+  constructor(
+    readonly uriF: F,
+    readonly uriG: G,
+    public readonly dir: Type<F, AIDirection>,
+    public readonly target: Type<G, EnemyId>
+  ) {}
+}
+
+export function combinedAction(
   list: ActionF<"Action", "Action">[],
 ): Combined<"Action", "Action"> {
+  return new Combined(list);
+}
+
+export function combinedAbility(
+  list: ActionF<"Ability", "Target">[],
+): Combined<"Ability", "Target"> {
   return new Combined(list);
 }
 
@@ -92,6 +110,7 @@ export type ActionF<F extends URIS, G extends URIS>
   | Invalid
   | Death<G>
   | Combined<F, G>
+  | MoveAI<F, G>
   ;
 
 export const actionTags: Action["tag"][]
@@ -143,6 +162,13 @@ export function resolveAction(
       }
       return { state: result.state, actions };
     }
+    case "MoveAI": {
+      const result = state.overTarget(
+        action.target,
+        x => moveAIUnit(x, action.dir),
+      );
+      return { state: result.state, actions: [] };
+    }
     case "Invalid": {
       throw "unimplemented";
     }
@@ -180,6 +206,11 @@ export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I e
       const newValue = f(actionF.value);
       const newTarget = g(actionF.target);
       return new UseCharge(newUriF, newUriG, newValue, newTarget);
+    }
+    case "MoveAI": {
+      const newDir = f(actionF.dir);
+      const newTarget = g(actionF.target);
+      return new MoveAI(newUriF, newUriG, newDir, newTarget);
     }
     case "Invalid": return actionF;
     case "Death": {
