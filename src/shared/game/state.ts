@@ -28,6 +28,8 @@ export type IdToEntityType = {
 }
 
 export class GameState {
+  public readonly nextId: number = 0;
+
   constructor(
     public readonly frUnits: UnitRow<"friendly", StFrUnit>,
     public readonly enUnits: UnitRow<"enemy", StEnUnit>,

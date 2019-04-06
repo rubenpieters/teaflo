@@ -32,7 +32,7 @@ fc.assert(fc.property(statusRowArb, statusIdArb, fragmentsArb,
 fc.assert(fc.property(statusRowArb, statusArb, unitIdArb,
   (row, status, ownerId) => {
     const nextId = row.statuses.map(x => x.id.id).reduce((a,b) => a + b, 1);
-    const newRow = row.addStatus(status, ownerId, () => nextId);
+    const newRow = row.addStatus(status, ownerId, nextId);
     return statusRowInvariant(newRow) &&
       // the new status was added
       newRow.statuses.filter(x => x.id.id === nextId).length ===

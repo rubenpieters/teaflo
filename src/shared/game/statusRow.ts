@@ -58,9 +58,9 @@ export class StatusRow {
   addStatus(
     status: Status,
     ownerId: UnitId,
-    nextId: () => number,
+    nextId: number,
   ): StatusRow {
-    const newId = statusId(nextId());
+    const newId = statusId(nextId);
     const newStatus: StStatus =
       {...status, owner: ownerId, id: newId };
     return focus(this,

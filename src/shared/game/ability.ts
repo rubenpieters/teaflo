@@ -91,6 +91,7 @@ type TargetVar<A>
   = AllEnemy
   | AllFriendly
   | Self
+  | HighestThreat
   ;
 
 export class AllEnemy {
@@ -129,6 +130,18 @@ export function self(): TargetVar<TargetId> {
   return new Self();
 }
 
+export class HighestThreat {
+  public readonly tag: "HighestThreat" = "HighestThreat";
+
+  constructor(
+
+  ) {}
+}
+
+export function highestThreat(): TargetVar<FriendlyId> {
+  return new HighestThreat();
+}
+
 type StateTargetFragment = {
   frUnits: UnitRow<"friendly", StFrUnit>,
   enUnits: UnitRow<"enemy", StEnUnit>,
@@ -148,6 +161,9 @@ export function resolveAbility(
     case "AddThreat": {
       // TODO: should also resolve "forAlly" to single target
       return resolveToSingleTarget(ability, "atEnemy", state);
+    }
+    case "AddStatus": {
+      return resolveToSingleTarget(ability, "target", state);
     }
     case "MoveAI": {
       return resolveToSingleTarget(ability, "target", state);
@@ -199,6 +215,9 @@ function resolveTargetVar<A>(
     }
     case "Self": {
       throw "TODO: get self from context";
+    }
+    case "HighestThreat": {
+      throw "TODO: get highest threat";
     }
     default: {
       return { tag: "var", var: targetVar };

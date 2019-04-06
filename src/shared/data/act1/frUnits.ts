@@ -3,6 +3,7 @@ import { TargetInput } from "src/shared/game/input";
 import { Ability } from "src/shared/game/ability";
 import * as Ab from "src/shared/game/ability";
 import * as A from "src/shared/game/action";
+import * as S from "src/shared/game/status";
 
 /**
  * Trinity Dmg Unit
@@ -41,21 +42,20 @@ A.combinedAbility([
 ]);
 
 export const trinity_tnk: FrUnit = {
-hp: 11,
-maxHp: 11,
-charges: 5,
-maxCharges: 5,
-abilities: [
-  {
-    ability: trinity_tnk_ab1,
-    inputs: [
-      new TargetInput(),
-    ],
-    spriteId: "ab1",
-    name: "trinity_tnk_ab1",
-  },
-],
-essential: true,
+  hp: 11,
+  maxHp: 11,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      ability: trinity_tnk_ab1,
+      inputs: [
+      ],
+      spriteId: "ab1",
+      name: "trinity_tnk_ab1",
+    },
+  ],
+  essential: true,
 }
 
 /**
@@ -64,23 +64,23 @@ essential: true,
 export const trinity_sup_ab1: Ability =
 A.combinedAbility([
   new A.UseCharge("Ability", "Target", new Ab.Static(1), new Ab.Self()),
-  // add armor
+  new A.AddStatus("Ability", "Target", new Ab.Static(new S.Armor(10)), new Ab.FromInput(0)),
 ]);
 
 export const trinity_sup: FrUnit = {
-hp: 5,
-maxHp: 5,
-charges: 5,
-maxCharges: 5,
-abilities: [
-  {
-    ability: trinity_dmg_ab1,
-    inputs: [
-      new TargetInput(),
-    ],
-    spriteId: "ab2",
-    name: "trinity_sup_ab1",
-  },
-],
-essential: true,
+  hp: 5,
+  maxHp: 5,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      ability: trinity_sup_ab1,
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "ab2",
+      name: "trinity_sup_ab1",
+    },
+  ],
+  essential: true,
 }

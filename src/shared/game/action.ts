@@ -5,6 +5,7 @@ import { GameState, addThreat } from "./state";
 import { damageEntity } from "./entity";
 import { useChargeUnit, moveAIUnit } from "./unit";
 import { AIDirection } from "./ai";
+import { Status } from "./status";
 
 /**
  * HKT boilerplate
@@ -104,6 +105,17 @@ export class AddThreat<F extends URIS, G extends URIS> {
   ) {}
 }
 
+export class AddStatus<F extends URIS, G extends URIS> {
+  public readonly tag: "AddStatus" = "AddStatus";
+
+  constructor(
+    readonly uriF: F,
+    readonly uriG: G,
+    public readonly status: Type<F, Status>,
+    public readonly target: Type<G, UnitId>,
+  ) {}
+}
+
 export function combinedAction(
   list: ActionF<"Action", "Action">[],
 ): Combined<"Action", "Action"> {
@@ -124,6 +136,7 @@ export type ActionF<F extends URIS, G extends URIS>
   | Combined<F, G>
   | MoveAI<F, G>
   | AddThreat<F, G>
+  | AddStatus<F, G>
   ;
 
 export const actionTags: Action["tag"][]
@@ -182,6 +195,13 @@ export function resolveAction(
       );
       return { state: result.state, actions: [] };
     }
+    case "AddStatus": {
+      const result = focus(state,
+        over(x => x.statusRow, x => x.addStatus(action.status, action.target, state.nextId)),
+        over(x => x.nextId, x => x + 1),
+      );
+      return { state: result, actions: [] };
+    }
     case "MoveAI": {
       const result = state.overTarget(
         action.target,
@@ -232,6 +252,11 @@ export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I e
       const newForAlly = g(actionF.forAlly);
       const newAtEnemy = g(actionF.atEnemy);
       return new AddThreat(newUriF, newUriG, newValue, newForAlly, newAtEnemy);
+    }
+    case "AddStatus": {
+      const newValue = f(actionF.status);
+      const newTarget = g(actionF.target);
+      return new AddStatus(newUriF, newUriG, newValue, newTarget);
     }
     case "MoveAI": {
       const newDir = f(actionF.dir);
