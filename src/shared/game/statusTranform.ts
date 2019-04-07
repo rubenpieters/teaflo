@@ -2,6 +2,7 @@ import { ConditionVar, resolveConditionVar } from "./condition";
 import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, combinedAction, StatusTransform_URI, hoistActionF } from "./action";
 import { GameState } from "./state";
 import { Context } from "./context";
+import { StStatus } from "./statusRow";
 
 export class Monus {
   public readonly tag: "Monus" = "Monus";
@@ -55,10 +56,11 @@ export type StatusTransform = ActionF<StatusTransform_URI, StatusTransform_URI>;
 export function resolveStatusTransform(
   state: GameState,
   statusTransform: StatusTransform,
-  context: Context,
   bindings: { [K in string]: any },
+  status: StStatus,
+  onStackAction: Action,
 ): Action {
-  const f = <A>(v: StatusTransformVar<A>) => resolveStatusTransformVar(state, v, context, bindings);
+  const f = <A>(v: StatusTransformVar<A>) => resolveStatusTransformVar(state, v, bindings, status, onStackAction);
   const action = hoistActionF(statusTransform, "Action", "Action", f, f);
   return action;
 }
@@ -66,19 +68,20 @@ export function resolveStatusTransform(
 export function resolveStatusTransformVar<A>(
   state: GameState,
   statusTransformVar: StatusTransformVar<A>,
-  context: Context,
   bindings: { [K in string]: any },
+  status: StStatus,
+  onStackAction: Action,
 ): A {
   switch (statusTransformVar.tag) {
     case "Add": {
-      const v1 = resolveStatusTransformVar(state, statusTransformVar.v1, context, bindings);
-      const v2 = resolveStatusTransformVar(state, statusTransformVar.v2, context, bindings);
+      const v1 = resolveStatusTransformVar(state, statusTransformVar.v1, bindings, status, onStackAction);
+      const v2 = resolveStatusTransformVar(state, statusTransformVar.v2, bindings, status, onStackAction);
       const val = v1 + v2;
       return val as any;
     }
     case "Monus": {
-      const v1 = resolveStatusTransformVar(state, statusTransformVar.v1, context, bindings);
-      const v2 = resolveStatusTransformVar(state, statusTransformVar.v2, context, bindings);
+      const v1 = resolveStatusTransformVar(state, statusTransformVar.v1, bindings, status, onStackAction);
+      const v2 = resolveStatusTransformVar(state, statusTransformVar.v2, bindings, status, onStackAction);
       const val = v1 - v2;
       return Math.max(0, val) as any;
     }
@@ -86,13 +89,10 @@ export function resolveStatusTransformVar<A>(
       return statusTransformVar.a;
     }
     case "StatusOwner": {
-      if (context.tag !== "StatusContext") {
-        throw `resolveConditionVar: Invalid Context ${context.tag}, expected StatusContext`;
-      }
-      return context.owner as any;
+      return status.owner as any;
     }
     case "StatusValue": {
-      throw "unimpl";
+      return status.value as any;
     }
     case "Var": {
       return bindings[statusTransformVar.bindingName];

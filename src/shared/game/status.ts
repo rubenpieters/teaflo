@@ -4,6 +4,7 @@ import * as ST from "./statusTranform";
 import { GameState } from "./state";
 import { Context } from "./context";
 import { StatusLog } from "./log";
+import { StStatus } from "./statusRow";
 
 /**
  * A status is a lingering effect on the gamestate.
@@ -162,7 +163,7 @@ export function applyStatuses(
 }
 
 export function applyStatus(
-  status: Status,
+  status: StStatus,
   state: GameState,
   onStackAction: Action,
   context: Context,
@@ -175,8 +176,8 @@ export function applyStatus(
   const { condition, bindings } = C.resolveCondition(state, cond, onStackAction, context);
   if (condition) {
     const st = statusToTransform(status);
-    const transformed = ST.resolveStatusTransform(state, st.transform, context, bindings);
-    const actions = st.actions.map(x => ST.resolveStatusTransform(state, x, context, bindings));
+    const transformed = ST.resolveStatusTransform(state, st.transform, bindings, status, onStackAction);
+    const actions = st.actions.map(x => ST.resolveStatusTransform(state, x, bindings, status, onStackAction));
     const statusLog = {
       tag: status.tag,
       before: onStackAction,

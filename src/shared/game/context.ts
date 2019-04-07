@@ -2,6 +2,17 @@ import { UnitId } from "./entityId";
 import { Action } from "./action";
 import { Status } from "./status";
 
+
+/**
+ * Context when friendly unit has used an ability.
+ */
+export class StartTurnContext {
+  public readonly tag: "StartTurnContext" = "StartTurnContext";
+
+  constructor(
+  ) {}
+}
+
 /**
  * Context when friendly unit has used an ability.
  */
@@ -15,18 +26,18 @@ export class FrAbilityContext {
 }
 
 /**
- * Context when a status effect is executed.
+ * Context when friendly unit has used an ability.
  */
-export class StatusContext {
-  public readonly tag: "StatusContext" = "StatusContext";
+export class EnAbilityContext {
+  public readonly tag: "EnAbilityContext" = "EnAbilityContext";
 
   constructor(
-    public readonly owner: UnitId,
-    public readonly status: Status,
+    public readonly self: UnitId,
   ) {}
 }
 
 export type Context
-  = FrAbilityContext
-  | StatusContext
+  = StartTurnContext
+  | FrAbilityContext
+  | EnAbilityContext
   ;

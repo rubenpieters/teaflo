@@ -5,14 +5,14 @@ import { focus, set } from "../iassign-util";
 import { GameState } from "./state";
 import { Log, emptyLog, LogEntry } from "./log";
 import { StartTurn, ignoreTag, Action, resolveAction } from "./action";
-import { Context } from "./context";
+import { Context, StartTurnContext, FrAbilityContext, EnAbilityContext } from "./context";
 import { applyStatuses } from "./status";
 import { aiPosToIndex } from "./ai";
 import { EnAbility } from "./unit";
 
 export type SolutionData = {
   ability: Ability,
-  origin: UnitId | undefined;
+  origin: UnitId,
   inputs: any[],
 }
 
@@ -121,14 +121,14 @@ export function endStates(
  * Run Phases
  */
 
-
 function runInitialTurn(
   state: GameState,
 ) {
   let log: Log = emptyLog();
 
   // The initial turn applies a `StartTurn` action on the game
-  const startTurnResult = applyActionsToSolution([new StartTurn], {}, {}, state, [], 0);
+  const context = new StartTurnContext();
+  const startTurnResult = applyActionsToSolution([new StartTurn], context, context, state, [], 0);
   state = startTurnResult.state;
   const stFilteredLog = startTurnResult.log.filter(x => ! ignoreTag(x.action.tag));
   log = log.concat(stFilteredLog);
@@ -157,7 +157,8 @@ export function runPhases(
   // Action (Fr) Phase
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
-  const frActionResult = applyAbilityToSolution(frAbility, { input: frInputs, self: solData.origin }, state, 1);
+  const frContext = new FrAbilityContext(solData.origin, frInputs);
+  const frActionResult = applyAbilityToSolution(frAbility, frContext, state, 1);
   state = frActionResult.state;
   const frFilteredLog = frActionResult.log.filter(x => ! ignoreTag(x.action.tag));
   log = log.concat(frFilteredLog);
@@ -175,7 +176,8 @@ export function runPhases(
     // the entity can be undefined because an action in this loop caused a change in the state
     if (entity !== undefined) {
       const enAbility: Ability = entity.abilities[aiPosToIndex(entity.aiPosition)].ability;
-      const enActionResult = applyAbilityToSolution(enAbility, { self: enId }, state, i + 2);
+      const enContext = new EnAbilityContext(enId);
+      const enActionResult = applyAbilityToSolution(enAbility, enContext, state, i + 2);
       state = enActionResult.state;
       const enFilteredLog = enActionResult.log.filter(x => ! ignoreTag(x.action.tag));
       log = log.concat(enFilteredLog);
