@@ -75,6 +75,6 @@ export type UnitTarget = UnitId | PositionId<UnitType>;
 /**
  * An entity has an id attached to it.
  */
-export type HasId = {
-  id: TargetId,
+export type HasId<Type extends TargetType> = {
+  id: EntityId<Type>,
 }

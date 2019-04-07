@@ -150,6 +150,15 @@ type StateTargetFragment = {
 export function resolveAbility(
   ability: Ability,
   state: StateTargetFragment,
+  context: Context,
+): Action[] {
+  const l = _resolveAbility(ability, state);
+  return l.map(x => resolveSingleTargetAbility(x, context));
+}
+
+function _resolveAbility(
+  ability: Ability,
+  state: StateTargetFragment,
 ): SingleTargetAbility[] {
   switch (ability.tag) {
     case "Damage": {
@@ -175,8 +184,11 @@ export function resolveAbility(
       return [ability];
     }
     case "Combined": {
-      const l = ability.list.map(x => resolveAbility(x, state));
+      const l = ability.list.map(x => _resolveAbility(x, state));
       return l.reduce((acc, l) => acc.concat(l), []);
+    }
+    case "StartTurn": {
+      return [ability];
     }
   }
 }

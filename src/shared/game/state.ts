@@ -3,9 +3,10 @@ import { HasId, TargetId, TargetType, EntityId, FriendlyId, EnemyId, StatusId } 
 import { UnitRow } from "./unitRow";
 import { StatusRow, StStatus } from "./statusRow";
 import { focus, over, modifyAndGet } from "../iassign-util";
+import { StatusGroup, groupOrder } from "./status";
 
-export type StFrUnit = FrUnit & HasId & { threatMap: ThreatMap };
-export type StEnUnit = EnUnit & HasId;
+export type StFrUnit = FrUnit & HasId<"friendly"> & { threatMap: ThreatMap };
+export type StEnUnit = EnUnit & HasId<"enemy">;
 
 export type HasThreatMap = {
   threatMap: ThreatMap,
@@ -27,14 +28,46 @@ export type IdToEntityType = {
   "status": StStatus,
 }
 
+export type StateType
+  = "invalid"
+  | "win"
+  | "default"
+  ;
+
 export class GameState {
   public readonly nextId: number = 0;
+  public readonly type: StateType = "default";
+  public readonly statusRows: { [K in StatusGroup]: StatusRow };
 
   constructor(
     public readonly frUnits: UnitRow<"friendly", StFrUnit>,
     public readonly enUnits: UnitRow<"enemy", StEnUnit>,
-    public readonly statusRow: StatusRow,
-  ) {}
+  ) {
+    this.statusRows = {} as any;
+    groupOrder.forEach(group => {
+      this.statusRows[group] = new StatusRow();
+    });
+  }
+
+  frFiltered(): { e: StFrUnit, i: number }[] {
+    return this.frUnits.defined();
+  }
+
+  frIds(): { e: FriendlyId, i: number }[] {
+    return this.frFiltered().map(x => {
+      return { e: x.e.id, i: x.i };
+    });
+  }
+
+  enFiltered(): { e: StEnUnit, i: number }[] {
+    return this.enUnits.defined();
+  }
+
+  enIds(): { e: EnemyId, i: number }[] {
+    return this.enFiltered().map(x => {
+      return { e: x.e.id, i: x.i };
+    });
+  }
 
   overTarget<Type extends TargetType>(
     _target: EntityId<Type>,
@@ -73,14 +106,20 @@ export class GameState {
         // compiler does not refine `Type`
         const target = _target as StatusId;
         const f = _f as (e: StStatus) => StStatus;
-        const result = modifyAndGet(this,
-          x => x.statusRow, x => {
-            const result = x.overStatus(target, f);
-            return { a: result.row, b: result.status };
-          }
-        );
 
-        return { state: result.s, entity: result.b };
+        for (const group of groupOrder) {
+          const result = modifyAndGet(this,
+            x => x.statusRows[group], x => {
+              const result = x.overStatus(target, f);
+              return { a: result.row, b: result.status };
+            }
+          );
+          if (result.b !== undefined) {
+            return { state: result.s, entity: result.b };
+          }
+        }
+
+        return { state: this };
       }
       default: {
         throw "GameState.overTarget: impossible case";
@@ -122,14 +161,19 @@ export class GameState {
         // compiler does not refine `Type`
         const target = _target as StatusId;
 
-        const result = modifyAndGet(this,
-          x => x.statusRow, x => {
-            const result = x.removeStatus(target);
-            return { a: result.row, b: result.entity };
+        for (const group of groupOrder) {
+          const result = modifyAndGet(this,
+            x => x.statusRows[group], x => {
+              const result = x.removeStatus(target);
+              return { a: result.row, b: result.entity };
+            }
+          );
+          if (result.b !== undefined) {
+            return { state: result.s, entity: result.b };
           }
-        );
+        }
 
-        return { state: result.s, entity: result.b };
+        return { state: this };
       }
       default: {
         throw "GameState.overTarget: impossible case";

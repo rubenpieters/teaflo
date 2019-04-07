@@ -1,3 +1,10 @@
+import { Damage, Death, Action } from "./action";
+import * as C from "./condition";
+import * as ST from "./statusTranform";
+import { GameState } from "./state";
+import { Context } from "./context";
+import { StatusLog } from "./log";
+
 /**
  * A status is a lingering effect on the gamestate.
  */
@@ -71,6 +78,14 @@ export function statusGroup(
   }
 }
 
+export type StatusGroup
+  = "atk_mod"
+  | "def_mod"
+  ;
+
+export const groupOrder: StatusGroup[]
+  = ["atk_mod", "def_mod"];
+
 export function statusModifier(
   statusTag: StatusTag,
 ): number {
@@ -86,3 +101,89 @@ export type StatusTag = Status["tag"];
 
 export const statusTags: StatusTag[]
   = ["Weak", "Strong", "Armor", "Fragile"];
+
+export function statusToCondition(
+  status: Status,
+): C.ActionCondition {
+  switch (status.tag) {
+    case "Fragile":
+    case "Armor": {
+      return new Damage("Cond", "Cond", new C.Var("1"), C.statusOwner());
+    }
+    default: {
+      throw "unimpl";
+    }
+  }
+}
+
+export function statusToTransform(
+  status: Status,
+): {
+  transform: ST.StatusTransform,
+  actions: ST.StatusTransform[],
+} {
+  switch (status.tag) {
+    case "Armor": {
+      // we actually want to keep all properties, except the damage value
+      const transform = new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), C.statusOwner());
+      const actions: ST.StatusTransform[] = [
+        //new Death("Target", id of the armor status);
+      ];
+      return { transform, actions };
+    }
+    default: {
+      throw "unimpl";
+    }
+  }
+}
+
+export function applyStatuses(
+  onStackAction: Action,
+  state: GameState,
+  context: Context,
+) {
+  let newActions: Action[] = [];
+  let transforms: StatusLog[] = [];
+  for (const group of groupOrder) {
+    for (const status of state.statusRows[group].statuses) {
+      const { transformed, actions, statusLog } = applyStatus(status, state, onStackAction, context);
+      onStackAction = transformed;
+      newActions = newActions.concat(actions);
+      if (statusLog !== undefined) {
+        transforms = transforms.concat(statusLog);
+      }
+    }
+  }
+  return {
+    actions: newActions,
+    transformed: onStackAction,
+    transforms,
+  };
+}
+
+export function applyStatus(
+  status: Status,
+  state: GameState,
+  onStackAction: Action,
+  context: Context,
+): {
+  transformed: Action,
+  actions: Action[],
+  statusLog?: StatusLog,
+} {
+  const cond = statusToCondition(status);
+  const { condition, bindings } = C.resolveCondition(state, cond, onStackAction, context);
+  if (condition) {
+    const st = statusToTransform(status);
+    const transformed = ST.resolveStatusTransform(state, st.transform, context, bindings);
+    const actions = st.actions.map(x => ST.resolveStatusTransform(state, x, context, bindings));
+    const statusLog = {
+      tag: status.tag,
+      before: onStackAction,
+      after: transformed,
+    };
+    return { transformed, actions, statusLog };
+  } else {
+    return { transformed: onStackAction, actions: [] }
+  }
+}

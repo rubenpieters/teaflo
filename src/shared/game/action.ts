@@ -5,7 +5,7 @@ import { GameState, addThreat } from "./state";
 import { damageEntity } from "./entity";
 import { useChargeUnit, moveAIUnit } from "./unit";
 import { AIDirection } from "./ai";
-import { Status } from "./status";
+import { Status, statusGroup } from "./status";
 
 /**
  * HKT boilerplate
@@ -82,6 +82,18 @@ export class Combined<F extends URIS, G extends URIS> {
   ) {}
 }
 
+export function combinedAction(
+  list: ActionF<"Action", "Action">[],
+): Combined<"Action", "Action"> {
+  return new Combined(list);
+}
+
+export function combinedAbility(
+  list: ActionF<"Ability", "Target">[],
+): Combined<"Ability", "Target"> {
+  return new Combined(list);
+}
+
 export class MoveAI<F extends URIS, G extends URIS> {
   public readonly tag: "MoveAI" = "MoveAI";
 
@@ -116,16 +128,11 @@ export class AddStatus<F extends URIS, G extends URIS> {
   ) {}
 }
 
-export function combinedAction(
-  list: ActionF<"Action", "Action">[],
-): Combined<"Action", "Action"> {
-  return new Combined(list);
-}
+export class StartTurn {
+  public readonly tag: "StartTurn" = "StartTurn";
 
-export function combinedAbility(
-  list: ActionF<"Ability", "Target">[],
-): Combined<"Ability", "Target"> {
-  return new Combined(list);
+  constructor(
+  ) {}
 }
 
 export type ActionF<F extends URIS, G extends URIS>
@@ -137,7 +144,10 @@ export type ActionF<F extends URIS, G extends URIS>
   | MoveAI<F, G>
   | AddThreat<F, G>
   | AddStatus<F, G>
+  | StartTurn
   ;
+
+export type ActionTag = ActionF<any, any>["tag"];
 
 export const actionTags: Action["tag"][]
   = [ "Damage",
@@ -196,8 +206,9 @@ export function resolveAction(
       return { state: result.state, actions: [] };
     }
     case "AddStatus": {
+      const group = statusGroup(action.status);
       const result = focus(state,
-        over(x => x.statusRow, x => x.addStatus(action.status, action.target, state.nextId)),
+        over(x => x.statusRows[group], x => x.addStatus(action.status, action.target, state.nextId)),
         over(x => x.nextId, x => x + 1),
       );
       return { state: result, actions: [] };
@@ -210,7 +221,10 @@ export function resolveAction(
       return { state: result.state, actions: [] };
     }
     case "Invalid": {
-      throw "unimplemented";
+      const result = focus(state,
+        set(x => x.type, "invalid"),
+      );
+      return { state: result, actions: [] };
     }
     case "Death": {
       const result = state.removeTarget(action.target);
@@ -225,6 +239,9 @@ export function resolveAction(
     }
     case "Combined": {
      return { state, actions: action.list };
+    }
+    case "StartTurn": {
+      return { state, actions: [] };
     }
   }
 }
@@ -272,5 +289,12 @@ export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I e
       const l = actionF.list.map(x => hoistActionF(x, newUriF, newUriG, f, g));
       return new Combined(l);
     }
+    case "StartTurn": return actionF;
   }
+}
+
+export function ignoreTag(
+  actionTag: ActionTag,
+) {
+  return actionTag === "Combined";
 }
