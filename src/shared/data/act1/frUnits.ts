@@ -1,9 +1,9 @@
-import { FrUnit } from "src/shared/game/unit";
-import { TargetInput } from "src/shared/game/input";
-import { Ability } from "src/shared/game/ability";
-import * as Ab from "src/shared/game/ability";
-import * as A from "src/shared/game/action";
-import * as S from "src/shared/game/status";
+import { FrUnit } from "../../game/unit";
+import { TargetInput } from "../../game/input";
+import { Ability } from "../../game/ability";
+import * as Ab from "../../game/ability";
+import * as A from "../../game/action";
+import * as S from "../../game/status";
 
 /**
  * Trinity Dmg Unit
@@ -30,6 +30,7 @@ export const trinity_dmg: FrUnit = {
     },
   ],
   essential: true,
+  cardId: "trinity_dmg",
 }
 
 /**
@@ -56,6 +57,7 @@ export const trinity_tnk: FrUnit = {
     },
   ],
   essential: true,
+  cardId: "trinity_tnk",
 }
 
 /**
@@ -83,4 +85,5 @@ export const trinity_sup: FrUnit = {
     },
   ],
   essential: true,
+  cardId: "trinity_sup",
 }

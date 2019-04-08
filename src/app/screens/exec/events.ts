@@ -1,14 +1,14 @@
 import { GameRefs } from "../../../app/states/game";
 import { currentSolution, currentSchemSol, selectedSchem, levelData, setSolution, setLocation } from "../act/data";
-import { mkGameState } from "../../../shared/game/state";
 import { runSolution, extendSolution, SolutionData, cutSolution } from "../../../shared/game/solution";
-import { EntityId, eqUnitId } from "../../../shared/game/entityId";
-import { UnitSelection } from "./screen";
 import { loadLevel, createDeployArray } from "../level/events";
 import { Location } from "../../../shared/tree";
 import { firstLogIndex } from "../../../shared/game/log";
 import { runAsTween } from "../../phaser/animation";
 import { clearAnimations } from "../util";
+import { GameState } from "../../../shared/game/state";
+import { TargetId } from "../../../shared/game/entityId";
+import deepEqual from "deep-equal";
 
 export function drawCurrentLevel(
   gameRefs: GameRefs,
@@ -30,7 +30,7 @@ export function updateSolutionRep(
 
   const frUnits = createDeployArray(sol.supply);
   const enUnits = levelData[schem.levelId].enemyIds;
-  const initState = mkGameState(frUnits, enUnits);
+  const initState = GameState.make(frUnits, enUnits);
   const solResult = runSolution(sol.solInfo.solution, sol.solInfo.loc, initState);
 
   const prevState = gameRefs.screens.execScreen.state;
@@ -56,7 +56,7 @@ export function updateSolutionRep(
 
 export function hoverUnit(
   gameRefs: GameRefs,
-  globalId: UnitSelection,
+  globalId: TargetId,
 ) {
   // TODO: only redraw if necessary?
   gameRefs.screens.execScreen.hoveredUnit = globalId;
@@ -72,10 +72,10 @@ export function clearHover(
 
 export function clickUnit(
   gameRefs: GameRefs,
-  globalId: UnitSelection,
+  globalId: TargetId,
 ) {
   const selected = gameRefs.screens.execScreen.selectedUnit;
-  if (selected !== undefined && eqUnitId(gameRefs.screens.execScreen.currentState(), globalId, selected)) {
+  if (selected !== undefined && deepEqual(globalId, selected)) {
     gameRefs.screens.execScreen.selectedUnit = undefined;
   } else {
     gameRefs.screens.execScreen.selectedUnit = globalId;

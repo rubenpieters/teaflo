@@ -67,6 +67,14 @@ export class StatusRow {
       over(x => x.statuses, x => x.concat(newStatus)),
     );
   }
+
+  statusPosition(
+    statusId: StatusId,
+  ): number | undefined {
+    const index = this.statuses.findIndex(x => deepEqual(x.id, statusId));
+    if (index === -1) return undefined;
+    return index;
+  }
 }
 
 /**

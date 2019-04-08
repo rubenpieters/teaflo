@@ -1,7 +1,7 @@
-import { GameState, findStatus } from "../../../shared/game/state";
-import { EntityId, toPositionId, EntityId } from "../../../shared/game/entityId";
+import { GameState } from "../../../shared/game/state";
+import { FriendlyId, EnemyId, StatusId } from "../../../shared/game/entityId";
 import { createPosition, relativeTo, Position } from "../../../app/util/position";
-import { triggerOrder } from "../../../shared/game/trigger";
+import { groupOrder } from "src/shared/game/status";
 
 /*
 
@@ -39,22 +39,40 @@ const unitEnMaxX = unitEnMinX + unitSpaceNeeded;
 
 export function friendlyUnitPos(
   state: GameState,
-  unitId: EntityId<"friendly">,
+  unitId: FriendlyId | number,
 ) {
-  const positionId = toPositionId(state, unitId);
+  let position: number;
+  if (typeof unitId !== "number") {
+    const result = state.position(unitId);
+    if (result === undefined) {
+      throw `friendlyUnitPos: unexpected nonexisting unit ${JSON.stringify(unitId)}`;
+    }
+    position = result;
+  } else {
+    position = unitId;
+  }
   return createPosition(
-    "left", unitFrMinX + 170 * positionId.id, unitSizeX,
+    "left", unitFrMinX + 170 * position, unitSizeX,
     "top", unitMinY, unitSizeY,
   );
 }
 
 export function enemyUnitPos(
   state: GameState,
-  unitId: EntityId<"enemy">,
+  unitId: EnemyId | number,
 ) {
-  const positionId = toPositionId(state, unitId);
+  let position: number;
+  if (typeof unitId !== "number") {
+    const result = state.position(unitId);
+    if (result === undefined) {
+      throw `enemyUnitPos: unexpected nonexisting unit ${JSON.stringify(unitId)}`;
+    }
+    position = result;
+  } else {
+    position = unitId;
+  }
   return createPosition(
-    "left", unitEnMinX + 170 * positionId.id, unitSizeX,
+    "left", unitEnMinX + 170 * position, unitSizeX,
     "top", unitMinY, unitSizeY,
   );
 }
@@ -98,19 +116,22 @@ export function unitUtilityPositions(
 
 export function statusPos(
   state: GameState,
-  statusId: EntityId<"status">,
-  // x index, the index within its status group
-  triggerIndex?: number,
-  // y index, to which status group it belongs
-  tagIndex?: number,
+  statusId: StatusId,
+  // x index, the index within its status row
+  columnPosition?: number,
+  // y index, to which status row it belongs
+  rowPosition?: number,
 ) {
-  if (triggerIndex === undefined || tagIndex === undefined) {
-    const index = findStatus(state, statusId);
-    triggerIndex = index!.index;
-    tagIndex = triggerOrder.findIndex(x => x === index!.group);
+  if (columnPosition === undefined || rowPosition === undefined) {
+    const result = state.statusPosition(statusId);
+    if (result === undefined) {
+      throw `enemyUnitPos: unexpected nonexisting unit ${JSON.stringify(statusId)}`;
+    }
+    columnPosition = result.columnPosition;
+    rowPosition = result.rowPosition;
   }
   return createPosition(
-    "left", 240 + 50 * triggerIndex, 40,
-    "top", 50 + 50 * tagIndex, 40,
+    "left", 240 + 50 * columnPosition, 40,
+    "top", 50 + 50 * rowPosition, 40,
   );
 }

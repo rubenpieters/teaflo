@@ -3,8 +3,8 @@ import { Solution } from "../../../shared/game/solution";
 import { Location } from "../../../shared/tree";
 import { SpeedType } from "../../../app/phaser/animation";
 import { ScreenActive, ScreenAct, ScreenSchem, ScreenCodex, ScreenSettings } from "../transition";
-import { FrUnitId } from "../../../shared/data/units/friendly";
-import { EnUnitId } from "../../../shared/data/units/enemy";
+import { FrUnitId } from "../../../shared/data/frUnitMap";
+import { EnUnitId } from "../../../shared/data/enUnitMap";
 
 export type ActData = {
   shortName: string,
@@ -27,8 +27,8 @@ export type LevelData = {
 const a1l1: LevelData = {
   name: "A1 level1",
   id: "a1l1",
-  cardIds: ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
-  enemyIds: ["en_unit_a1_l2_01"],
+  cardIds: ["trinity_dmg", "trinity_sup", "trinity_tnk"],
+  enemyIds: ["l1_en"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
   boxSprite: "select3_f.png",
@@ -38,8 +38,8 @@ const a1l1: LevelData = {
 const a1l2: LevelData = {
   name: "A1 level2",
   id: "a1l2",
-  cardIds: ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
-  enemyIds: ["en_unit_a1_l3_01", "en_unit_a1_l3_02"],
+  cardIds: ["trinity_dmg", "trinity_sup", "trinity_tnk"],
+  enemyIds: ["l1_en"],
   slots: 3,
   selectLocation: { x: 500, y: 500 },
   boxSprite: "select3.png",
@@ -49,8 +49,8 @@ const a1l2: LevelData = {
 const a1l2_2: LevelData = {
   name: "A1 level2 2",
   id: "a1l2_2",
-  cardIds: ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
-  enemyIds: ["en_unit_a1_l3_01_2", "en_unit_a1_l3_02_2"],
+  cardIds: ["trinity_dmg", "trinity_sup", "trinity_tnk"],
+  enemyIds: ["l1_en"],
   slots: 2,
   selectLocation: { x: 500, y: 500 },
   boxSprite: "select3.png",
@@ -60,8 +60,8 @@ const a1l2_2: LevelData = {
 const a1l3: LevelData = {
   name: "A1 level3",
   id: "a1l3",
-  cardIds: ["fr_unit_a1_l2_01", "fr_unit_a1_l2_02", "fr_unit_a1_l2_03"],
-  enemyIds: ["en_unit_a1_l4_01"],
+  cardIds: ["trinity_dmg", "trinity_sup", "trinity_tnk"],
+  enemyIds: ["l1_en"],
   slots: 2,
   selectLocation: { x: 500, y: 500 },
   boxSprite: "select3.png",
@@ -72,7 +72,7 @@ const a2l1: LevelData = {
   name: "A2 level1",
   id: "a2l1",
   cardIds: [],
-  enemyIds: ["en_unit_a1_l2_01"],
+  enemyIds: [],
   slots: 1,
   selectLocation: { x: 200, y: 200 },
   boxSprite: "select3.png",
@@ -82,8 +82,8 @@ const a2l1: LevelData = {
 const a3l1: LevelData = {
   name: "A3 level1",
   id: "a3l1",
-  cardIds: ["test4ab"],
-  enemyIds: ["en_unit_a1_l2_01"],
+  cardIds: [],
+  enemyIds: [],
   slots: 1,
   selectLocation: { x: 200, y: 200 },
   boxSprite: "select3.png",

@@ -53,7 +53,7 @@ export function _trySolutions(
     const newAcc = acc.concat(next.action);
     if (isInCache(next.state, cache)) {
       //console.log("Skipping, already seen in cache");
-    } else if (next.state.state === "invalid") {
+    } else if (next.state.type === "invalid") {
       //console.log("invalid state");
     } else if (! next.win) {
       //console.log(`Trying branch ${branchIndex}`);

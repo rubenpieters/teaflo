@@ -1,9 +1,9 @@
-import { Ability } from "src/shared/game/ability";
-import * as Ab from "src/shared/game/ability";
-import * as A from "src/shared/game/action";
-import * as S from "src/shared/game/status";
-import { AIDirection } from "src/shared/game/ai";
-import { EnUnit } from "src/shared/game/unit";
+import { Ability } from "../../game/ability";
+import * as Ab from "../../game/ability";
+import * as A from "../../game/action";
+import * as S from "../../game/status";
+import { AIDirection } from "../../game/ai";
+import { EnUnit } from "../../game/unit";
 
 export const l1_en_ab1: Ability =
   A.combinedAbility([
@@ -22,18 +22,19 @@ export const l1_en: EnUnit = {
   maxHp: 5,
   charges: 5,
   maxCharges: 5,
-  abilities: [
-    {
+  abilities: {
+    0: {
       ability: l1_en_ab1,
       spriteId: "ab4",
       name: "l1_en_ab1",
     },
-    {
+    1: {
       ability: l1_en_ab2,
       spriteId: "ab3",
       name: "l1_en_ab2",
     },
-  ],
+  },
   essential: true,
   aiPosition: { x: 0, y: 0 },
+  cardId: "l1_en",
 }

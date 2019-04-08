@@ -1,14 +1,14 @@
 import { GameRefs } from "../../states/game";
 import { TextPool } from "../../phaser/textpool";
-import { enUnitMap, EnUnitId } from "../../../shared/data/units/enemy";
-import { frUnitMap, FrUnitId } from "../../../shared/data/units/friendly";
+import { enUnitMap, EnUnitId } from "../../../shared/data/enUnitMap";
+import { frUnitMap, FrUnitId } from "../../../shared/data/frUnitMap";
 import { createPosition } from "../../util/position";
 import { Ability } from "../../../shared/game/ability";
 import { EntityId } from "../../../shared/game/entityId";
 import { Pool } from "../../phaser/pool";
 import { Unit } from "../../../shared/game/unit";
 import { intentDescription } from "../../util/intentDesc";
-import { Intent } from "src/shared/game/intent";
+import { aiIndices } from "../../../shared/game/ai";
 
 export type CodexTypes
   = { tag: "FrCardId", cardId: FrUnitId }
@@ -77,12 +77,14 @@ export class CodexScreen {
       );
       this.pageTextPool.newText(pos2, `${unit.charges} / ${unit.maxCharges}`);
       
-      unit.abilities.forEach(({ intent, spriteId, inputs }, abilityIndex) => {
+      unit.abilities.forEach((ability, abilityIndex) => {
         const pos = createPosition(
           "left", 550 + 125 * abilityIndex, 100,
           "top", 350, 100,
         );
-        this.abilityPool.newSprite(pos.xMin, pos.yMin, {}, { intent, spriteId, index: abilityIndex });
+        this.abilityPool.newSprite(pos.xMin, pos.yMin, {},
+          { ability: ability.ability, spriteId: ability.spriteId, index: abilityIndex }
+        );
       });
     } else {
       throw `wrong card id: ${cardId}`;
@@ -110,12 +112,17 @@ export class CodexScreen {
       );
       this.pageTextPool.newText(pos2, `${unit.charges} / ${unit.maxCharges}`);
       
-      unit.ai.forEach(({ intent, spriteId, outs }, aiIndex) => {
-        const pos = createPosition(
-          "left", 550 + 125 * aiIndex, 100,
-          "top", 350, 100,
-        );
-        this.abilityPool.newSprite(pos.xMin, pos.yMin, {}, { intent, spriteId, index: aiIndex });
+      aiIndices.forEach(aiIndex => {
+        const ability = unit.abilities[aiIndex];
+        if (ability !== undefined) {
+          const pos = createPosition(
+            "left", 550 + 125 * aiIndex, 100,
+            "top", 350, 100,
+          );
+          this.abilityPool.newSprite(pos.xMin, pos.yMin, {},
+            { ability: ability.ability, spriteId: ability.spriteId, index: aiIndex }
+          );
+        }
       });
     } else {
       throw `wrong card id: ${cardId}`;
@@ -134,7 +141,7 @@ export class CodexScreen {
           if (this.showAbilityIndex !== undefined && this.showAbilityIndex === abilityIndex) {
             let y = 0;
             let xOffset = 0;
-            const desc = intentDescription(ability.intent);
+            const desc = intentDescription(ability.ability);
             desc.forEach((descSym, descIndex) => {
               const explPos = createPosition(
                 "left", 150 + 80 * (descIndex - xOffset), 80,
@@ -157,28 +164,31 @@ export class CodexScreen {
       } else if (this.page.tag === "EnCardId") {
         const unit = enUnitMap[this.page.cardId];
         
-        unit.ai.forEach((ai, abilityIndex) => {
-          if (this.showAbilityIndex !== undefined && this.showAbilityIndex === abilityIndex) {
-            let y = 0;
-            let xOffset = 0;
-            const desc = intentDescription(ai.intent);
-            desc.forEach((descSym, descIndex) => {
-              const explPos = createPosition(
-                "left", 150 + 80 * (descIndex - xOffset), 80,
-                "bot", 250 - y * 80, 80,
-              );
-              switch (descSym.tag) {
-                case "DescSeparator": {
-                  y += 1;
-                  xOffset = descIndex + 1;
-                  break;
+        aiIndices.forEach(aiIndex => {
+          const ability = unit.abilities[aiIndex];
+          if (ability !== undefined) {
+            if (this.showAbilityIndex !== undefined && this.showAbilityIndex === aiIndex) {
+              let y = 0;
+              let xOffset = 0;
+              const desc = intentDescription(ability.ability);
+              desc.forEach((descSym, descIndex) => {
+                const explPos = createPosition(
+                  "left", 150 + 80 * (descIndex - xOffset), 80,
+                  "bot", 250 - y * 80, 80,
+                );
+                switch (descSym.tag) {
+                  case "DescSeparator": {
+                    y += 1;
+                    xOffset = descIndex + 1;
+                    break;
+                  }
+                  case "DescSymbol": {
+                    this.abilityDescPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
+                    break;
+                  }
                 }
-                case "DescSymbol": {
-                  this.abilityDescPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
-                  break;
-                }
-              }
-            });
+              });
+            }
           }
         });
       }
@@ -194,7 +204,7 @@ export class CodexScreen {
 }
 
 type AbilityData = {
-  intent: Intent,
+  ability: Ability,
   spriteId: string,
   index: number,
 };

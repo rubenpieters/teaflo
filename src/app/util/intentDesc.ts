@@ -1,7 +1,7 @@
-import { Intent, IntentVar } from "../../shared/game/intent";
-import { Trigger, triggerToFragmentValue, triggerValue } from "../../shared/game/trigger";
+import { Ability, TargetVar, AbilityVar } from "../../shared/game/ability";
+import { Status, StatusTag } from "../../shared/game/status";
 import { Action } from "../../shared/game/action";
-import { RouteDirection } from "src/shared/game/ai";
+import { AIDirection } from "src/shared/game/ai";
 
 export class DescSymbol {
   constructor(
@@ -36,11 +36,11 @@ export function actionDescription(
         .concat(new DescSymbol("expl_th.png"))
         ;
     }
-    case "AddTrigger": {
-      return triggerDescription(action.trigger)
+    case "AddStatus": {
+      return triggerDescription(action.status)
         ;
     }
-    case "CombinedAction": {
+    case "Combined": {
       throw "should not happen";
     }
     case "Damage": {
@@ -48,15 +48,6 @@ export function actionDescription(
       .concat(numberDescription(action.value))
       .concat(new DescSymbol("expl_hp.png"))
       ;
-    }
-    case "Heal": {
-      return singleton("expl_plus.png")
-      .concat(numberDescription(action.value))
-      .concat(new DescSymbol("expl_hp.png"))
-      ;
-    }
-    case "SwapHPWithExcess": {
-      return [];
     }
     case "UseCharge": {
       return singleton("expl_minus.png")
@@ -71,23 +62,23 @@ export function actionDescription(
 }
 
 export function intentDescription(
-  intent: Intent,
+  ability: Ability,
 ): DescToken[] {
-  switch (intent.tag) {
-    case "AddThreatI": {
-      return intentVarDescription(intent.value, x => intentVarNumber(x, "positive"))
-        .concat(intentVarDescription(intent.atEnemy, intentVarTarget))
+  switch (ability.tag) {
+    case "AddThreat": {
+      return intentVarDescription(ability.value, x => intentVarNumber(x, "positive"))
+        .concat(intentVarDescription(ability.atEnemy, intentVarTarget))
         .concat(new DescSymbol("expl_th.png"))
-        .concat(intentVarDescription(intent.toFriendly, intentVarTarget))
+        .concat(intentVarDescription(ability.forAlly, intentVarTarget))
         ;
     }
-    case "AddTriggerI": {
-      return intentVarDescription(intent.trigger, triggerDescription)
-        .concat(intentVarDescription(intent.target, intentVarTarget))
+    case "AddStatus": {
+      return intentVarDescription(ability.status, triggerDescription)
+        .concat(intentVarDescription(ability.target, intentVarTarget))
         ;
     }
-    case "CombinedIntent": {
-      const desc: DescToken[] = intent.intents.reduce((acc, x) => {
+    case "Combined": {
+      const desc: DescToken[] = ability.list.reduce((acc, x) => {
         if (acc.length === 0) {
           return acc.concat(intentDescription(x));
         } else {
@@ -96,67 +87,49 @@ export function intentDescription(
       }, <DescToken[]>[]);
       return desc;
     }
-    case "DamageI": {
-      return intentVarDescription(intent.value, x => intentVarNumber(x, "negative"))
+    case "Damage": {
+      return intentVarDescription(ability.value, x => intentVarNumber(x, "negative"))
         .concat(new DescSymbol("expl_hp.png"))
-        .concat(intentVarDescription(intent.target, intentVarTarget))
+        .concat(intentVarDescription(ability.target, intentVarTarget))
         ;
     }
-    case "HealI": {
-      return [];
-    }
-    case "SwapHPWithExcessI": {
-      return [];
-    }
-    case "UseChargeI": {
-      return intentVarDescription(intent.value, x => intentVarNumber(x, "negative"))
+    case "UseCharge": {
+      return intentVarDescription(ability.value, x => intentVarNumber(x, "negative"))
         .concat(new DescSymbol("expl_ch.png"))
-        .concat(intentVarDescription(intent.target, intentVarTarget))
+        .concat(intentVarDescription(ability.target, intentVarTarget))
         ;
+    }
+    default: {
+      throw "unimpl";
     }
   }
 }
 
 export function triggerDescription(
-  trigger: Trigger,
+  status: Status,
 ): DescToken[] {
-  switch (trigger.tag) {
+  switch (status.tag) {
     case "Weak": {
       return singleton("expl_plus.png")
-        .concat(numberDescription(triggerValue(trigger)))
+        .concat(numberDescription(status.value))
         .concat(new DescSymbol("icon_weak.png"))
         ;
     }
-    case "AllyWeakSelfArmor": {
-      return []
-    }
-    case "Explode": {
-      return []
-    }
     case "Fragile": {
       return singleton("expl_plus.png")
-        .concat(numberDescription(triggerValue(trigger)))
+        .concat(numberDescription(status.value))
         .concat(new DescSymbol("icon_fragile.png"))
         ;
     }
-    case "Grow": {
-      return []
-    }
     case "Strong": {
       return singleton("expl_plus.png")
-        .concat(numberDescription(triggerValue(trigger)))
+        .concat(numberDescription(status.value))
         .concat(new DescSymbol("icon_strong.png"))
         ;
     }
-    case "StrongLowHP": {
-      return []
-    }
-    case "ThreatOnAllyDamage": {
-      return []
-    }
     case "Armor": {
       return singleton("expl_plus.png")
-        .concat(numberDescription(triggerValue(trigger)))
+        .concat(numberDescription(status.value))
         .concat(new DescSymbol("icon_armor.png"))
         ;
     }
@@ -165,32 +138,17 @@ export function triggerDescription(
 
 
 export function triggerTagDescription(
-  tag: Trigger["tag"],
+  tag: StatusTag,
 ): DescToken[] {
   switch (tag) {
     case "Weak": {
       return singleton("icon_weak.png");
     }
-    case "AllyWeakSelfArmor": {
-      return []
-    }
-    case "Explode": {
-      return []
-    }
     case "Fragile": {
       return singleton("icon_fragile.png");
     }
-    case "Grow": {
-      return []
-    }
     case "Strong": {
       return singleton("icon_strong.png");
-    }
-    case "StrongLowHP": {
-      return []
-    }
-    case "ThreatOnAllyDamage": {
-      return []
     }
     case "Armor": {
       return singleton("icon_armor.png");
@@ -217,7 +175,7 @@ function intentVarNumber(
 }
 
 export function intentVarDescription<A>(
-  intentVar: IntentVar<A>,
+  intentVar: TargetVar<A> | AbilityVar<A>,
   f: (a: A) => DescToken[]
 ) {
   switch (intentVar.tag) {
@@ -229,12 +187,6 @@ export function intentVarDescription<A>(
     }
     case "AllEnemy": {
       return [new DescSymbol("expl_all_enemy.png")];
-    }
-    case "AllExceptSelf": {
-      return [];
-    }
-    case "AllyExceptSelf": {
-      return [];
     }
     case "FromInput": {
       return [new DescSymbol("expl_target.png")];
@@ -268,13 +220,12 @@ function _numberDescription(
 }
 
 export function routeDirectionDescription(
-  routeDirection: RouteDirection,
+  aiDirection: AIDirection,
 ) {
-  switch (routeDirection) {
+  switch (aiDirection) {
     case "down": return "icon_ai_down.png";
     case "left": return "icon_ai_left.png";
     case "right": return "icon_ai_right.png";
     case "up": return "icon_ai_up.png";
-    case "self": return "icon_self.png";
   }
 }

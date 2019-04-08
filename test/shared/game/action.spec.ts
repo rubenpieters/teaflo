@@ -16,11 +16,14 @@ export function tagActionArb(
   switch (tag) {
     case "Damage": {
       return fc.record({ value: fc.integer(0, 100), target: targetIdArb })
-        .map(r => new A.Damage("Action", r.value, r.target));
+        .map(r => new A.Damage("Action", "Action", r.value, r.target));
     }
     case "UseCharge": {
       return fc.record({ value: fc.integer(0, 100), target: unitIdArb })
-        .map(r => new A.UseCharge("Action", r.value, r.target));
+        .map(r => new A.UseCharge("Action", "Action", r.value, r.target));
+    }
+    default: {
+      throw "unimpl";
     }
   }
 }

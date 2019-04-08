@@ -22,8 +22,30 @@ export function moveAI(
   }
 }
 
+/**
+ * positions:
+ * 0 - 1 - 2
+ * 3 - 4 - 5
+ * 6 - 7 - 8
+ */
+
 export function aiPosToIndex(
   aiPos: AIPosition
 ): number {
   return aiPos.x + aiPos.y * 3;
+}
+
+export function indexToAiPos(
+  index: number,
+): AIPosition {
+  const x = index % 3;
+  const y =  Math.round((index / 3) - 0.5);
+  return { x, y };
+}
+
+export const aiIndices = [0,1,2,3,4,5,6,7,8];
+
+export function aiPositions(
+): AIPosition[] {
+  return aiIndices.map(indexToAiPos);
 }

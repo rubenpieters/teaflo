@@ -9,6 +9,7 @@ export type Unit = {
   charges: number,
   maxCharges: number,
   essential: boolean,
+  cardId: string,
 }
 
 export type FrAbility = {
@@ -29,7 +30,7 @@ export type EnAbility = {
 }
 
 export type EnUnit = Unit & {
-  abilities: EnAbility[],
+  abilities: { [K in number]: EnAbility },
   aiPosition: AIPosition,
 }
 

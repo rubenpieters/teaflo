@@ -2,7 +2,7 @@ import { UnitType, EntityId, HasId } from "./entityId";
 import deepEqual from "deep-equal";
 import { focus, over, modifyAndGet } from "../iassign-util";
 
-export class UnitRow<Type extends UnitType, E extends HasId> {
+export class UnitRow<Type extends UnitType, E extends HasId<Type>> {
   constructor(
     public readonly type: Type,
     public readonly units: (E | undefined)[] = [],

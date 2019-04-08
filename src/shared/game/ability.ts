@@ -32,7 +32,7 @@ export type SingleTargetAbility
 /**
  * An Ability Variable is a description of how to generate the parameters for an action.
  */
-type AbilityVar<A>
+export type AbilityVar<A>
   = Static<A>
   | FromInput
   ;
@@ -87,7 +87,7 @@ function resolveAbilityVar<A>(
  * This is separated from ability variables since these cause the ability to be decomposed
  * into multiple abilities.
  */
-type TargetVar<A>
+export type TargetVar<A>
   = AllEnemy
   | AllFriendly
   | Self
