@@ -1,4 +1,4 @@
-import { Damage, Death, Action } from "./action";
+import { Damage, Death, Action, ActionWithOrigin } from "./action";
 import * as C from "./condition";
 import * as ST from "./statusTranform";
 import { GameState } from "./state";
@@ -108,10 +108,13 @@ export function statusToCondition(
   switch (status.tag) {
     case "Fragile":
     case "Armor": {
-      return new Damage("Cond", "Cond", new C.Var("1"), C.statusOwner());
+      // Dmg (Var 1) (StatusOwner) & (Var 2)
+      return {...new Damage("Cond", "Cond", new C.Var("1"), C.statusOwner()), origin: new C.Var("2") };
     }
-    default: {
-      throw "unimpl";
+    case "Strong":
+    case "Weak": {
+      // Dmg (Var 1) (Var 2) & (StatusOwner)
+      return {...new Damage("Cond", "Cond", new C.Var("1"), new C.Var("2")), origin: C.statusOwner() };
     }
   }
 }
@@ -124,10 +127,26 @@ export function statusToTransform(
 } {
   switch (status.tag) {
     case "Armor": {
-      // we actually want to keep all properties, except the damage value
-      const transform = new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), C.statusOwner());
+      const transform: ST.StatusTransform =
+        {
+          ...new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), C.statusOwner()),
+          origin: new C.Var("3"),
+        };
       const actions: ST.StatusTransform[] = [
-        //new Death("Target", id of the armor status);
+        {
+          ...new Death("ST", C.idOfStatus()),
+          origin: new C.Static("noOrigin") as C.Static<"noOrigin">
+        }
+      ];
+      return { transform, actions };
+    }
+    case "Weak": {
+      const transform: ST.StatusTransform =
+        {
+          ...new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), new C.Var("2")),
+          origin: C.statusOwner(),
+        };
+      const actions: ST.StatusTransform[] = [
       ];
       return { transform, actions };
     }
@@ -138,10 +157,14 @@ export function statusToTransform(
 }
 
 export function applyStatuses(
-  onStackAction: Action,
+  onStackAction: ActionWithOrigin,
   state: GameState,
-) {
-  let newActions: Action[] = [];
+): {
+  transformed: ActionWithOrigin,
+  actions: ActionWithOrigin[],
+  transforms: StatusLog[],
+} {
+  let newActions: ActionWithOrigin[] = [];
   let transforms: StatusLog[] = [];
   for (const group of groupOrder) {
     for (const status of state.statusRows[group].statuses) {
@@ -162,10 +185,10 @@ export function applyStatuses(
 
 export function applyStatus(
   status: StStatus,
-  onStackAction: Action,
+  onStackAction: ActionWithOrigin,
 ): {
-  transformed: Action,
-  actions: Action[],
+  transformed: ActionWithOrigin,
+  actions: ActionWithOrigin[],
   statusLog?: StatusLog,
 } {
   const cond = statusToCondition(status);

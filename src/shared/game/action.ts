@@ -66,12 +66,15 @@ export class Invalid {
   ) {}
 }
 
+export const invalidNoOrigin: ActionWithOrigin =
+  {...new Invalid, origin: "noOrigin" };
+
 export class Death<G extends URIS> {
   public readonly tag: "Death" = "Death";
 
   constructor(
     readonly uriG: G,
-    readonly target: Type<G, UnitId>,
+    readonly target: Type<G, TargetId>,
   ) {}
 }
 
@@ -163,15 +166,17 @@ export type Action
   = ActionF<Action_URI, Action_URI>
   ;
 
-export type StActionF<F extends URIS>
+export type ActionWithOriginF<F extends URIS>
   = ActionF<F, F>
-  & { origin: Type<F, UnitId> }
+  & { origin: Type<F, UnitId | "noOrigin"> }
   ;
+
+export type ActionWithOrigin = ActionWithOriginF<"Action">;
 
 export function resolveAction(
   state: GameState,
-  action: Action,
-): { state: GameState, actions: Action[] } {
+  action: ActionWithOrigin,
+): { state: GameState, actions: ActionWithOrigin[] } {
   switch (action.tag) {
     case "Damage": {
       const result = state.overTarget(
@@ -180,9 +185,9 @@ export function resolveAction(
       );
 
       const entity = result.entity;
-      let actions: Action[] = [];
+      let actions: ActionWithOrigin[] = [];
       if (entity !== undefined && entity.hp <= 0) {
-        actions = [new Invalid()];
+        actions = [invalidNoOrigin];
       }
       return { state: result.state, actions };
     }
@@ -193,9 +198,9 @@ export function resolveAction(
       );
 
       const entity = result.entity;
-      let actions: Action[] = [];
+      let actions: ActionWithOrigin[] = [];
       if (entity !== undefined && entity.charges <= 0) {
-        actions = [new Invalid()];
+        actions = [invalidNoOrigin];
       }
       return { state: result.state, actions };
     }
@@ -231,15 +236,18 @@ export function resolveAction(
       const result = state.removeTarget(action.target);
       const entity = result.entity;
       
-      let actions: Action[] = [];
-      if (entity !== undefined && entity.essential) {
-        actions = [new Invalid()];
+      let actions: ActionWithOrigin[] = [];
+      if (entity !== undefined && entity.id.type === "friendly" && (entity as any).essential) {
+        actions = [invalidNoOrigin];
       }
 
       return { state: result.state, actions };
     }
     case "Combined": {
-     return { state, actions: action.list };
+      const actions = action.list.map(x => {
+        return {...x, origin: action.origin }
+      });
+     return { state, actions };
     }
     case "StartTurn": {
       return { state, actions: [] };
@@ -292,6 +300,16 @@ export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I e
     }
     case "StartTurn": return actionF;
   }
+}
+
+export function hoistActionWithOriginF<F extends URIS, H extends URIS>(
+  actionF: ActionWithOriginF<F>,
+  newUriF: H,
+  f: <A>(fa: Type<F, A>) => Type<H, A>,
+): ActionWithOriginF<H> {
+  const newAction = hoistActionF(actionF, newUriF, newUriF, f, f);
+  const newActionWithOrigin = {...newAction, origin: f(actionF.origin) };
+  return newActionWithOrigin;
 }
 
 export function ignoreTag(

@@ -1,17 +1,4 @@
 import { UnitId } from "./entityId";
-import { Action } from "./action";
-import { Status } from "./status";
-
-
-/**
- * Context when friendly unit has used an ability.
- */
-export class StartTurnContext {
-  public readonly tag: "StartTurnContext" = "StartTurnContext";
-
-  constructor(
-  ) {}
-}
 
 /**
  * Context when friendly unit has used an ability.
@@ -37,7 +24,6 @@ export class EnAbilityContext {
 }
 
 export type Context
-  = StartTurnContext
-  | FrAbilityContext
+  = FrAbilityContext
   | EnAbilityContext
   ;

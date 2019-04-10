@@ -32,9 +32,9 @@ export class StatusRow {
     if (index === -1) {
       return { row: this };
     }
-    const row = focus(this,
-      over(x => x.statuses[index]!, f),
-    );
+    const row = new StatusRow(focus(this.statuses,
+      over(x => x[index]!, f),
+    ));
     return { row, status: row.statuses[index]! };
   }
 
@@ -63,9 +63,9 @@ export class StatusRow {
     const newId = statusId(nextId);
     const newStatus: StStatus =
       {...status, owner: ownerId, id: newId };
-    return focus(this,
-      over(x => x.statuses, x => x.concat(newStatus)),
-    );
+    return new StatusRow(focus(this.statuses,
+      over(x => x, x => x.concat(newStatus)),
+    ));
   }
 
   statusPosition(

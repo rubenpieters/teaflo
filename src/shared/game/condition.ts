@@ -1,7 +1,7 @@
 import { GameState } from "./state";
 import { Context } from "./context";
-import { ActionF, Condition_URI, Action } from "./action";
-import { UnitId } from "./entityId";
+import { ActionF, Condition_URI, Action, ActionWithOriginF } from "./action";
+import { UnitId, StatusId } from "./entityId";
 import deepEqual from "deep-equal";
 import { StStatus } from "./statusRow";
 
@@ -66,6 +66,10 @@ export function resolveConditionVar<A>(
       const result = deepEqual(val, status.value);
       return { result };
     }
+    case "IdOfStatus": {
+      const result = deepEqual(val, status.id);
+      return { result };
+    }
   }
 }
 
@@ -78,7 +82,7 @@ declare module "fp-ts/lib/HKT" {
   }
 }
 
-export type ActionCondition = ActionF<Condition_URI, Condition_URI>;
+export type ActionCondition = ActionWithOriginF<Condition_URI>;
 
 /**
  * A Condition Variable is a description of how a parameter of an action should be compared in a condition.
@@ -88,6 +92,7 @@ export type ConditionVar<A>
   | Var
   | StatusOwner
   | StatusValue
+  | IdOfStatus
   ;
 
 export class Static<A> {
@@ -128,4 +133,16 @@ export class StatusValue {
 
 export function statusValue(): ConditionVar<number> {
   return new StatusValue();
+}
+
+export class IdOfStatus {
+  public readonly tag: "IdOfStatus" = "IdOfStatus";
+  
+  constructor(
+
+  ) {}
+}
+
+export function idOfStatus(): ConditionVar<StatusId> {
+  return new IdOfStatus();
 }

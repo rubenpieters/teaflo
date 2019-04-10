@@ -1,5 +1,5 @@
 import { ConditionVar, resolveConditionVar } from "./condition";
-import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, combinedAction, StatusTransform_URI, hoistActionF } from "./action";
+import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, combinedAction, StatusTransform_URI, hoistActionF, ActionWithOrigin, hoistActionWithOriginF, ActionWithOriginF } from "./action";
 import { GameState } from "./state";
 import { Context } from "./context";
 import { StStatus } from "./statusRow";
@@ -51,16 +51,16 @@ declare module "fp-ts/lib/HKT" {
   }
 }
 
-export type StatusTransform = ActionF<StatusTransform_URI, StatusTransform_URI>;
+export type StatusTransform = ActionWithOriginF<StatusTransform_URI>;
 
 export function resolveStatusTransform(
   statusTransform: StatusTransform,
   bindings: { [K in string]: any },
   status: StStatus,
-  onStackAction: Action,
-): Action {
+  onStackAction: ActionWithOrigin,
+): ActionWithOrigin {
   const f = <A>(v: StatusTransformVar<A>) => resolveStatusTransformVar(v, bindings, status, onStackAction);
-  const action = hoistActionF(statusTransform, "Action", "Action", f, f);
+  const action = hoistActionWithOriginF(statusTransform, "Action", f);
   return action;
 }
 
@@ -68,7 +68,7 @@ export function resolveStatusTransformVar<A>(
   statusTransformVar: StatusTransformVar<A>,
   bindings: { [K in string]: any },
   status: StStatus,
-  onStackAction: Action,
+  onStackAction: ActionWithOrigin,
 ): A {
   switch (statusTransformVar.tag) {
     case "Add": {
@@ -94,6 +94,9 @@ export function resolveStatusTransformVar<A>(
     }
     case "Var": {
       return bindings[statusTransformVar.bindingName];
+    }
+    case "IdOfStatus": {
+      return status.id as any;
     }
   }
 }

@@ -1,7 +1,6 @@
 import { Action } from "./action";
 import { GameState } from "./state";
 import { StatusTag } from "./status";
-import { Context } from "./context";
 
 export type Log = LogEntry[];
 
@@ -9,7 +8,6 @@ export type LogEntry = {
   action: Action,
   state: GameState,
   transforms: StatusLog[],
-  context: Context,
   entryIndex: number, // start turn: 0, friendly action: 1, then +1 for each enemy action
   typeIndex: number,
   actionIndex: number, // on original action: 0, then +1 for each trigger

@@ -27,9 +27,9 @@ export class UnitRow<Type extends UnitType, E extends HasId<Type>> {
     if (index === -1) {
       return { row: this };
     }
-    const row = focus(this,
-      over(x => x.units[index]!, f),
-    );
+    const row = new UnitRow(this.type, focus(this.units,
+      over(x => x[index]!, f),
+    ));
     return { row, entity: row.units[index]! };
   }
 

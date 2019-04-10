@@ -229,16 +229,10 @@ function resolveTargetVar<A>(
       return { tag: "ids", ids: state.enUnits.defined().map(r => r.e.id) };
     }
     case "Self": {
-      if (context.tag !== "EnAbilityContext" && context.tag !== "FrAbilityContext") {
-        throw "resolveTargetVar: no self in context";
-      }
       const self = context.self;
       return { tag: "ids", ids: [self] };
     }
     case "HighestThreat": {
-      if (context.tag !== "EnAbilityContext" && context.tag !== "FrAbilityContext") {
-        throw "resolveTargetVar: no self in context";
-      }
       const self = context.self;
       return { tag: "ids", ids: [getHighestThreat(state, self)] };
     }
