@@ -2,7 +2,7 @@ import { GameRefs } from "../../states/game";
 import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt, levelData, selectedSchem, SolutionData } from "../act/data";
 import { emptyTree, Location } from "../../../shared/tree";
 import { updateSolutionRep } from "../exec/events";
-import { GameState } from "../../../shared/game/state";
+import { GameState, mkGameState } from "../../../shared/game/state";
 import { endStates } from "../../../shared/game/solution";
 import { transitionScreen, ScreenSchem } from "../transition";
 import { FrUnitId } from "../../../shared/data/frUnitMap";
@@ -138,7 +138,7 @@ export function levelStats(
 
   const frUnits = createDeployArray(sol.supply);
   const enUnits = levelData[levelId].enemyIds;
-  const initState = GameState.make(frUnits, enUnits);
+  const initState = mkGameState(frUnits, enUnits);
   const finalStates = endStates(sol.solInfo.solution.tree, initState);
   const findWin = finalStates.find(x => x.type === "win");
   if (findWin !== undefined) {

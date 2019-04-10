@@ -1,7 +1,7 @@
 import { focus, over, set } from "../iassign-util";
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
 import { UnitId, TargetId, EnemyId, FriendlyId } from "./entityId";
-import { GameState } from "./state";
+import { GameState, overTarget, removeTarget } from "./state";
 import { damageEntity } from "./entity";
 import { useChargeUnit, moveAIUnit } from "./unit";
 import { AIDirection } from "./ai";
@@ -179,7 +179,7 @@ export function resolveAction(
 ): { state: GameState, actions: ActionWithOrigin[] } {
   switch (action.tag) {
     case "Damage": {
-      const result = state.overTarget(
+      const result = overTarget(state,
         action.target,
         x => damageEntity(x, action.value),
       );
@@ -192,7 +192,7 @@ export function resolveAction(
       return { state: result.state, actions };
     }
     case "UseCharge": {
-      const result = state.overTarget(
+      const result = overTarget(state,
         action.target,
         x => useChargeUnit(x, action.value),
       );
@@ -205,7 +205,7 @@ export function resolveAction(
       return { state: result.state, actions };
     }
     case "AddThreat": {
-      const result = state.overTarget(
+      const result = overTarget(state,
         action.forAlly,
         x => addThreat(x, action.atEnemy, action.value),
       );
@@ -220,7 +220,7 @@ export function resolveAction(
       return { state: result, actions: [] };
     }
     case "MoveAI": {
-      const result = state.overTarget(
+      const result = overTarget(state,
         action.target,
         x => moveAIUnit(x, action.dir),
       );
@@ -233,7 +233,7 @@ export function resolveAction(
       return { state: result, actions: [] };
     }
     case "Death": {
-      const result = state.removeTarget(action.target);
+      const result = removeTarget(state, action.target);
       const entity = result.entity;
       
       let actions: ActionWithOrigin[] = [];

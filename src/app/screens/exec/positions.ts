@@ -1,4 +1,4 @@
-import { GameState } from "../../../shared/game/state";
+import { GameState, statusPosition, position } from "../../../shared/game/state";
 import { FriendlyId, EnemyId, StatusId } from "../../../shared/game/entityId";
 import { createPosition, relativeTo, Position } from "../../../app/util/position";
 import { groupOrder } from "src/shared/game/status";
@@ -41,18 +41,18 @@ export function friendlyUnitPos(
   state: GameState,
   unitId: FriendlyId | number,
 ) {
-  let position: number;
+  let frPosition: number;
   if (typeof unitId !== "number") {
-    const result = state.position(unitId);
+    const result = position(state, unitId);
     if (result === undefined) {
       throw `friendlyUnitPos: unexpected nonexisting unit ${JSON.stringify(unitId)}`;
     }
-    position = result;
+    frPosition = result;
   } else {
-    position = unitId;
+    frPosition = unitId;
   }
   return createPosition(
-    "left", unitFrMinX + 170 * position, unitSizeX,
+    "left", unitFrMinX + 170 * frPosition, unitSizeX,
     "top", unitMinY, unitSizeY,
   );
 }
@@ -61,18 +61,18 @@ export function enemyUnitPos(
   state: GameState,
   unitId: EnemyId | number,
 ) {
-  let position: number;
+  let enPosition: number;
   if (typeof unitId !== "number") {
-    const result = state.position(unitId);
+    const result = position(state, unitId);
     if (result === undefined) {
       throw `enemyUnitPos: unexpected nonexisting unit ${JSON.stringify(unitId)}`;
     }
-    position = result;
+    enPosition = result;
   } else {
-    position = unitId;
+    enPosition = unitId;
   }
   return createPosition(
-    "left", unitEnMinX + 170 * position, unitSizeX,
+    "left", unitEnMinX + 170 * enPosition, unitSizeX,
     "top", unitMinY, unitSizeY,
   );
 }
@@ -123,7 +123,7 @@ export function statusPos(
   rowPosition?: number,
 ) {
   if (columnPosition === undefined || rowPosition === undefined) {
-    const result = state.statusPosition(statusId);
+    const result = statusPosition(state, statusId);
     if (result === undefined) {
       throw `enemyUnitPos: unexpected nonexisting unit ${JSON.stringify(statusId)}`;
     }

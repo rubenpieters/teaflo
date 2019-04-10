@@ -2,7 +2,7 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position, center } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
-import { GameState, StFrUnit, StEnUnit } from "../../../shared/game/state";
+import { GameState, StFrUnit, StEnUnit, enFiltered, frFiltered, getTarget } from "../../../shared/game/state";
 import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex, StatusLog } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
@@ -169,8 +169,8 @@ export class ExecScreen {
       this.clickState.ability.inputs[this.clickState.inputs.length];
 
     // calculate max threat value
-    const enIds = state.enFiltered().map(x => x.e.id);
-    const maxThreat = state.frFiltered()
+    const enIds = enFiltered(state).map(x => x.e.id);
+    const maxThreat = frFiltered(state)
       .map(x => Object.values(x.e.threatMap))
       .reduce((acc, curr) => Math.max(...curr.concat(acc)), 1)
       ;
@@ -507,7 +507,7 @@ export class ExecScreen {
         // compiler does not refine type of this id
         const statusId = showUnit as StatusId;
 
-        const unit: StStatus | undefined = state.getTarget(statusId);
+        const unit: StStatus | undefined = getTarget(state, statusId);
         if (unit !== undefined) {
           const pos1 = createPosition(
             "left", 650, 150,
@@ -605,10 +605,10 @@ export class ExecScreen {
     });
     
     // draw frames
-    const context = logEntry.context;
+    const origin = action.origin;
     let frameAnim: Animation[] = [];
-    if (context.tag !== "StartTurnContext") {
-      frameAnim = [this.drawFrames(state, action, context.self)];
+    if (origin !== "noOrigin") {
+      frameAnim = [this.drawFrames(state, action, origin as any)];
     }
     
     // draw difference with prev log

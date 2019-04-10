@@ -1,11 +1,11 @@
-import { Action } from "./action";
+import { Action, ActionWithOrigin } from "./action";
 import { GameState } from "./state";
 import { StatusTag } from "./status";
 
 export type Log = LogEntry[];
 
 export type LogEntry = {
-  action: Action,
+  action: ActionWithOrigin,
   state: GameState,
   transforms: StatusLog[],
   entryIndex: number, // start turn: 0, friendly action: 1, then +1 for each enemy action

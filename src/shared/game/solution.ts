@@ -2,7 +2,7 @@ import { Ability, resolveAbility } from "./ability";
 import { UnitId } from "./entityId";
 import { Tree, emptyTree, extendTree, Location, cutTree } from "../tree";
 import { focus, set } from "../iassign-util";
-import { GameState } from "./state";
+import { GameState, enIds, overTarget, enFiltered } from "./state";
 import { Log, emptyLog, LogEntry } from "./log";
 import { StartTurn, ignoreTag, Action, resolveAction, ActionWithOrigin } from "./action";
 import { Context, FrAbilityContext, EnAbilityContext } from "./context";
@@ -168,9 +168,9 @@ export function runPhases(
 
   // Action (En) Phase
   let i = 0;
-  state.enIds().forEach(t => {
+  enIds(state).forEach(t => {
     const enId = t.e;
-    const result = state.overTarget(enId, x => x);
+    const result = overTarget(state, enId, x => x);
     const entity = result.entity;
     // the entity can be undefined because an action in this loop caused a change in the state
     if (entity !== undefined) {
@@ -196,7 +196,7 @@ export function checkWin(
   state: GameState,
 ): boolean {
   // Check Win
-  const enHps = state.enFiltered()
+  const enHps = enFiltered(state)
     .map(x => x.e.hp)
     ;
   const countAllBelow0 = enHps
@@ -204,7 +204,7 @@ export function checkWin(
     .length
     ;
 
-  return countAllBelow0 === state.enFiltered().length;
+  return countAllBelow0 === enFiltered(state).length;
 }
 
 function applyAbilityToSolution(

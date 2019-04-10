@@ -6,7 +6,7 @@ import { Location } from "../../../shared/tree";
 import { firstLogIndex } from "../../../shared/game/log";
 import { runAsTween } from "../../phaser/animation";
 import { clearAnimations } from "../util";
-import { GameState } from "../../../shared/game/state";
+import { GameState, mkGameState } from "../../../shared/game/state";
 import { TargetId } from "../../../shared/game/entityId";
 import deepEqual from "deep-equal";
 
@@ -30,7 +30,7 @@ export function updateSolutionRep(
 
   const frUnits = createDeployArray(sol.supply);
   const enUnits = levelData[schem.levelId].enemyIds;
-  const initState = GameState.make(frUnits, enUnits);
+  const initState = mkGameState(frUnits, enUnits);
   const solResult = runSolution(sol.solInfo.solution, sol.solInfo.loc, initState);
 
   const prevState = gameRefs.screens.execScreen.state;

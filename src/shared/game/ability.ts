@@ -1,6 +1,6 @@
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
 import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, combinedAction, hoistActionF } from "./action";
-import { GameState, StFrUnit, StEnUnit } from "./state";
+import { GameState, StFrUnit, StEnUnit, frFiltered } from "./state";
 import { UnitRow } from "./unitRow";
 import { UnitId, TargetId, EnemyId, FriendlyId, friendlyId } from "./entityId";
 import { Context } from "./context";
@@ -246,7 +246,7 @@ export function getHighestThreat(
   state: GameState,
   self: UnitId,
 ): UnitId {
-  const threat = state.frFiltered()
+  const threat = frFiltered(state)
     .reduce((prev, curr) => {
       if (prev === undefined) {
         return curr.e;
@@ -263,7 +263,7 @@ export function getHighestThreat(
       return prev;
     }, <StFrUnit | undefined>undefined);
   if (threat === undefined) {
-    const filtered = state.frFiltered()[0];
+    const filtered = frFiltered(state)[0];
     if (filtered !== undefined) {
       return filtered.e.id;
     } else {
