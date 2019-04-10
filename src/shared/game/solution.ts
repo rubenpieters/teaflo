@@ -237,7 +237,7 @@ function applyActionsToSolution(
   let newQueue: Action[] = [];
   const addLog: LogEntry[] = [];
   for (const action of actions) {
-    const { actions, transformed, transforms } = applyStatuses(action, state, context);
+    const { actions, transformed, transforms } = applyStatuses(action, state);
     const actionResult = resolveAction(state, transformed);
     state = actionResult.state;
     newQueue = newQueue.concat(actionResult.actions).concat(actions);

@@ -2,7 +2,6 @@ import { Damage, Death, Action } from "./action";
 import * as C from "./condition";
 import * as ST from "./statusTranform";
 import { GameState } from "./state";
-import { Context } from "./context";
 import { StatusLog } from "./log";
 import { StStatus } from "./statusRow";
 
@@ -141,13 +140,12 @@ export function statusToTransform(
 export function applyStatuses(
   onStackAction: Action,
   state: GameState,
-  context: Context,
 ) {
   let newActions: Action[] = [];
   let transforms: StatusLog[] = [];
   for (const group of groupOrder) {
     for (const status of state.statusRows[group].statuses) {
-      const { transformed, actions, statusLog } = applyStatus(status, state, onStackAction, context);
+      const { transformed, actions, statusLog } = applyStatus(status, onStackAction);
       onStackAction = transformed;
       newActions = newActions.concat(actions);
       if (statusLog !== undefined) {
@@ -164,20 +162,18 @@ export function applyStatuses(
 
 export function applyStatus(
   status: StStatus,
-  state: GameState,
   onStackAction: Action,
-  context: Context,
 ): {
   transformed: Action,
   actions: Action[],
   statusLog?: StatusLog,
 } {
   const cond = statusToCondition(status);
-  const { condition, bindings } = C.resolveCondition(state, cond, onStackAction, context);
+  const { condition, bindings } = C.resolveCondition(status, cond, onStackAction);
   if (condition) {
     const st = statusToTransform(status);
-    const transformed = ST.resolveStatusTransform(state, st.transform, bindings, status, onStackAction);
-    const actions = st.actions.map(x => ST.resolveStatusTransform(state, x, bindings, status, onStackAction));
+    const transformed = ST.resolveStatusTransform(st.transform, bindings, status, onStackAction);
+    const actions = st.actions.map(x => ST.resolveStatusTransform(x, bindings, status, onStackAction));
     const statusLog = {
       tag: status.tag,
       before: onStackAction,

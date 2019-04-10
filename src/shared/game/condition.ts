@@ -3,6 +3,7 @@ import { Context } from "./context";
 import { ActionF, Condition_URI, Action } from "./action";
 import { UnitId } from "./entityId";
 import deepEqual from "deep-equal";
+import { StStatus } from "./statusRow";
 
 export class StatusCondition {
   public readonly tag: "StatusCondition" = "StatusCondition";
@@ -17,10 +18,9 @@ export type Condition
   ;
 
 export function resolveCondition(
-  state: GameState,
+  status: StStatus,
   actionCondition: ActionCondition,
   onStackAction: Action,
-  context: Context,
 ): { condition: boolean, bindings: { [K in string]: any } } {
   if (onStackAction.tag === actionCondition.tag) {
     const keys = Object.keys(actionCondition);
@@ -30,7 +30,7 @@ export function resolveCondition(
       if (key !== "tag" && key !== "uriF" && key !== "uriG") {
         const conditionVar = (actionCondition as any)[key];
         const val = (onStackAction as any)[key];
-        const resolved = resolveConditionVar(state, conditionVar, val, context);
+        const resolved = resolveConditionVar(status, conditionVar, val);
         if (resolved.binding !== undefined) {
           bindings[resolved.binding[0]] = resolved.binding[1];
         }
@@ -46,10 +46,9 @@ export function resolveCondition(
 }
 
 export function resolveConditionVar<A>(
-  state: GameState,
+  status: StStatus,
   conditionVar: ConditionVar<A>,
   val: A,
-  context: Context,
 ): { result: boolean, binding?: [string, A] } {
   switch (conditionVar.tag) {
     case "Static": {
@@ -57,23 +56,14 @@ export function resolveConditionVar<A>(
       return { result };
     }
     case "StatusOwner": {
-      if (context.tag !== "StatusContext") {
-        throw `resolveConditionVar: Invalid Context ${context.tag}, expected StatusContext`;
-      }
-      const result = deepEqual(val, context.owner);
+      const result = deepEqual(val, status.owner);
       return { result };
     }
     case "Var": {
       return { result: true, binding: [conditionVar.bindingName, val] };
     }
     case "StatusValue": {
-      if (context.tag !== "StatusContext") {
-        throw `resolveConditionVar: Invalid Context ${context.tag}, expected StatusContext`;
-      }
-      // TODO: calculate status value from hp
-      throw "TODO: calculate status value from hp";
-      const statusValue = 1;
-      const result = deepEqual(val, statusValue);
+      const result = deepEqual(val, status.value);
       return { result };
     }
   }

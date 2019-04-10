@@ -2,7 +2,7 @@ import { HKT, URIS, Type } from "fp-ts/lib/HKT";
 import { Ability_URI, ActionF, Target_URI, Damage, Action, UseCharge, Death, Combined, combinedAction, hoistActionF } from "./action";
 import { GameState, StFrUnit, StEnUnit } from "./state";
 import { UnitRow } from "./unitRow";
-import { UnitId, TargetId, EnemyId, FriendlyId } from "./entityId";
+import { UnitId, TargetId, EnemyId, FriendlyId, friendlyId } from "./entityId";
 import { Context } from "./context";
 
 /**
@@ -149,42 +149,43 @@ type StateTargetFragment = {
 
 export function resolveAbility(
   ability: Ability,
-  state: StateTargetFragment,
+  state: GameState,
   context: Context,
 ): Action[] {
-  const l = _resolveAbility(ability, state);
+  const l = _resolveAbility(ability, state, context);
   return l.map(x => resolveSingleTargetAbility(x, context));
 }
 
 function _resolveAbility(
   ability: Ability,
-  state: StateTargetFragment,
+  state: GameState,
+  context: Context,
 ): SingleTargetAbility[] {
   switch (ability.tag) {
     case "Damage": {
-      return resolveToSingleTarget(ability, "target", state);
+      return resolveToSingleTarget(ability, "target", state, context);
     }
     case "UseCharge": {
-      return resolveToSingleTarget(ability, "target", state);
+      return resolveToSingleTarget(ability, "target", state, context);
     }
     case "AddThreat": {
       // TODO: should also resolve "forAlly" to single target
-      return resolveToSingleTarget(ability, "atEnemy", state);
+      return resolveToSingleTarget(ability, "atEnemy", state, context);
     }
     case "AddStatus": {
-      return resolveToSingleTarget(ability, "target", state);
+      return resolveToSingleTarget(ability, "target", state, context);
     }
     case "MoveAI": {
-      return resolveToSingleTarget(ability, "target", state);
+      return resolveToSingleTarget(ability, "target", state, context);
     }
     case "Death": {
-      return resolveToSingleTarget(ability, "target", state);
+      return resolveToSingleTarget(ability, "target", state, context);
     }
     case "Invalid": {
       return [ability];
     }
     case "Combined": {
-      const l = ability.list.map(x => _resolveAbility(x, state));
+      const l = ability.list.map(x => _resolveAbility(x, state, context));
       return l.reduce((acc, l) => acc.concat(l), []);
     }
     case "StartTurn": {
@@ -196,10 +197,11 @@ function _resolveAbility(
 function resolveToSingleTarget<A extends Ability>(
   _ability: A,
   field: keyof A,
-  state: StateTargetFragment,
+  state: GameState,
+  context: Context,
 ): SingleTargetAbility[] {
   const ability = _ability as any;
-  const resolved = resolveTargetVar(ability[field], state);
+  const resolved = resolveTargetVar(ability[field], state, context);
   switch (resolved.tag) {
     case "ids": {
       return resolved.ids.map(id => {
@@ -216,7 +218,8 @@ function resolveToSingleTarget<A extends Ability>(
 
 function resolveTargetVar<A>(
   targetVar: TargetVar<A> | AbilityVar<A>,
-  state: StateTargetFragment,
+  state: GameState,
+  context: Context,
 ): { tag: "ids", ids: TargetId[] } | { tag: "var", var: AbilityVar<A> } {
   switch (targetVar.tag) {
     case "AllAlly": {
@@ -226,13 +229,53 @@ function resolveTargetVar<A>(
       return { tag: "ids", ids: state.enUnits.defined().map(r => r.e.id) };
     }
     case "Self": {
-      throw "TODO: get self from context";
+      if (context.tag !== "EnAbilityContext" && context.tag !== "FrAbilityContext") {
+        throw "resolveTargetVar: no self in context";
+      }
+      const self = context.self;
+      return { tag: "ids", ids: [self] };
     }
     case "HighestThreat": {
-      throw "TODO: get highest threat";
+      if (context.tag !== "EnAbilityContext" && context.tag !== "FrAbilityContext") {
+        throw "resolveTargetVar: no self in context";
+      }
+      const self = context.self;
+      return { tag: "ids", ids: [getHighestThreat(state, self)] };
     }
     default: {
       return { tag: "var", var: targetVar };
     }
+  }
+}
+
+export function getHighestThreat(
+  state: GameState,
+  self: UnitId,
+): UnitId {
+  const threat = state.frFiltered()
+    .reduce((prev, curr) => {
+      if (prev === undefined) {
+        return curr.e;
+      }
+      if (prev.threatMap[self.id] === undefined) {
+        return curr.e;
+      }
+      if (curr.e.threatMap[self.id] === undefined) {
+        return prev;
+      }
+      if (curr.e.threatMap[self.id] >= prev.threatMap[self.id]) {
+        return curr.e;
+      }
+      return prev;
+    }, <StFrUnit | undefined>undefined);
+  if (threat === undefined) {
+    const filtered = state.frFiltered()[0];
+    if (filtered !== undefined) {
+      return filtered.e.id;
+    } else {
+      throw "getHighestThreat: no friendly unit";
+    }
+  } else {
+    return threat.id;
   }
 }

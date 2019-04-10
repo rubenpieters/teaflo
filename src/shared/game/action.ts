@@ -1,11 +1,12 @@
 import { focus, over, set } from "../iassign-util";
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
 import { UnitId, TargetId, EnemyId, FriendlyId } from "./entityId";
-import { GameState, addThreat } from "./state";
+import { GameState } from "./state";
 import { damageEntity } from "./entity";
 import { useChargeUnit, moveAIUnit } from "./unit";
 import { AIDirection } from "./ai";
 import { Status, statusGroup } from "./status";
+import { addThreat } from "./threat";
 
 /**
  * HKT boilerplate

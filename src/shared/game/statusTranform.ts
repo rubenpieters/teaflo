@@ -54,19 +54,17 @@ declare module "fp-ts/lib/HKT" {
 export type StatusTransform = ActionF<StatusTransform_URI, StatusTransform_URI>;
 
 export function resolveStatusTransform(
-  state: GameState,
   statusTransform: StatusTransform,
   bindings: { [K in string]: any },
   status: StStatus,
   onStackAction: Action,
 ): Action {
-  const f = <A>(v: StatusTransformVar<A>) => resolveStatusTransformVar(state, v, bindings, status, onStackAction);
+  const f = <A>(v: StatusTransformVar<A>) => resolveStatusTransformVar(v, bindings, status, onStackAction);
   const action = hoistActionF(statusTransform, "Action", "Action", f, f);
   return action;
 }
 
 export function resolveStatusTransformVar<A>(
-  state: GameState,
   statusTransformVar: StatusTransformVar<A>,
   bindings: { [K in string]: any },
   status: StStatus,
@@ -74,14 +72,14 @@ export function resolveStatusTransformVar<A>(
 ): A {
   switch (statusTransformVar.tag) {
     case "Add": {
-      const v1 = resolveStatusTransformVar(state, statusTransformVar.v1, bindings, status, onStackAction);
-      const v2 = resolveStatusTransformVar(state, statusTransformVar.v2, bindings, status, onStackAction);
+      const v1 = resolveStatusTransformVar(statusTransformVar.v1, bindings, status, onStackAction);
+      const v2 = resolveStatusTransformVar(statusTransformVar.v2, bindings, status, onStackAction);
       const val = v1 + v2;
       return val as any;
     }
     case "Monus": {
-      const v1 = resolveStatusTransformVar(state, statusTransformVar.v1, bindings, status, onStackAction);
-      const v2 = resolveStatusTransformVar(state, statusTransformVar.v2, bindings, status, onStackAction);
+      const v1 = resolveStatusTransformVar(statusTransformVar.v1, bindings, status, onStackAction);
+      const v2 = resolveStatusTransformVar(statusTransformVar.v2, bindings, status, onStackAction);
       const val = v1 - v2;
       return Math.max(0, val) as any;
     }
