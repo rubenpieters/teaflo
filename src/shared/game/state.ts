@@ -7,6 +7,8 @@ import deepEqual from "deep-equal";
 import { frUnitMap, FrUnitId } from "../data/frUnitMap";
 import { enUnitMap, EnUnitId } from "../data/enUnitMap";
 import { StFrUnit, StEnUnit, GameState } from "../definitions/state";
+import { defined, overUnit, removeUnit } from "./unitRow";
+import { statusPosition, overStatus, removeStatus } from "./statusRow";
 
 export type IdToEntityType = {
   "friendly": StFrUnit,
@@ -51,7 +53,7 @@ export function mkGameState(
 export function frFiltered(
   state: GameState
 ): { e: StFrUnit, i: number }[] {
-  return state.frUnits.defined();
+  return defined(state.frUnits);
 }
 
 export function frIds(
@@ -65,7 +67,7 @@ export function frIds(
 export function enFiltered(
   state: GameState,
 ): { e: StEnUnit, i: number }[] {
-  return state.enUnits.defined();
+  return defined(state.enUnits);
 }
 
 export function enIds(
@@ -103,13 +105,13 @@ export function position<Type extends UnitType>(
   }
 }
 
-export function statusPosition(
+export function stStatusPosition(
   state: GameState,
   statusId: StatusId,
 ): { rowPosition: number, columnPosition: number } | undefined {
   let rowPosition = 0;
   for (const group of groupOrder) {
-    const columnPosition = state.statusRows[group].statusPosition(statusId);
+    const columnPosition = statusPosition(state.statusRows[group], statusId);
     if (columnPosition !== undefined) {
       return { rowPosition, columnPosition };
     }
@@ -131,7 +133,7 @@ export function overTarget<Type extends TargetType>(
 
       const result = modifyAndGet(state,
         x => x.frUnits, x => {
-          const result = x.overUnit(target, f);
+          const result = overUnit(x, target, f);
           return { a: result.row, b: result.entity };
         }
       );
@@ -145,7 +147,7 @@ export function overTarget<Type extends TargetType>(
 
       const result = modifyAndGet(state,
         x => x.enUnits, x => {
-          const result = x.overUnit(target, f);
+          const result = overUnit(x, target, f);
           return { a: result.row, b: result.entity };
         }
       );
@@ -160,7 +162,7 @@ export function overTarget<Type extends TargetType>(
       for (const group of groupOrder) {
         const result = modifyAndGet(state,
           x => x.statusRows[group], x => {
-            const result = x.overStatus(target, f);
+            const result = overStatus(x, target, f);
             return { a: result.row, b: result.status };
           }
         );
@@ -195,7 +197,7 @@ export function removeTarget<Type extends TargetType>(
 
       const result = modifyAndGet(state,
         x => x.frUnits, x => {
-          const result = x.removeUnit(target);
+          const result = removeUnit(x, target);
           return { a: result.row, b: result.entity };
         }
       );
@@ -208,7 +210,7 @@ export function removeTarget<Type extends TargetType>(
 
       const result = modifyAndGet(state,
         x => x.enUnits, x => {
-          const result = x.removeUnit(target);
+          const result = removeUnit(x, target);
           return { a: result.row, b: result.entity };
         }
       );
@@ -222,7 +224,7 @@ export function removeTarget<Type extends TargetType>(
       for (const group of groupOrder) {
         const result = modifyAndGet(state,
           x => x.statusRows[group], x => {
-            const result = x.removeStatus(target);
+            const result = removeStatus(x, target);
             return { a: result.row, b: result.entity };
           }
         );

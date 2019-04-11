@@ -7,6 +7,7 @@ import { Damage, Death } from "../definitions/actionf";
 import { ActionWithOrigin } from "../definitions/action";
 import { GameState } from "../definitions/state";
 import { resolveCondition } from "./condition";
+import { resolveStatusTransform } from "./statusTranform";
 
 
 export function statusGroup(
@@ -119,8 +120,8 @@ export function applyStatus(
   const { condition, bindings } = resolveCondition(status, cond, onStackAction);
   if (condition) {
     const st = statusToTransform(status);
-    const transformed = ST.resolveStatusTransform(st.transform, bindings, status, onStackAction);
-    const actions = st.actions.map(x => ST.resolveStatusTransform(x, bindings, status, onStackAction));
+    const transformed = resolveStatusTransform(st.transform, bindings, status, onStackAction);
+    const actions = st.actions.map(x => resolveStatusTransform(x, bindings, status, onStackAction));
     const statusLog = {
       tag: status.tag,
       before: onStackAction,

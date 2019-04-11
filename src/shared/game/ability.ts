@@ -6,6 +6,7 @@ import { AbilityVar, SingleTargetAbility, Ability, TargetVar } from "../definiti
 import { Action } from "../definitions/action";
 import { GameState, StFrUnit } from "../definitions/state";
 import { Static } from "../definitions/condition";
+import { defined } from "./unitRow";
 
 export function resolveSingleTargetAbility(
   ability: SingleTargetAbility,
@@ -28,7 +29,7 @@ function resolveAbilityVar<A>(
       if (context.tag !== "FrAbilityContext") {
         throw `resolveAbilityVar: Invalid Context ${context.tag}, expected FrAbilityContext`;
       }
-      if (context.input[abilityVar.input]) {
+      if (context.input[abilityVar.input] === undefined) {
         throw `resolveAbilityVar: no input at ${abilityVar.input} for FromInput Ability`;
       }
       return context.input[abilityVar.input];
@@ -53,23 +54,22 @@ function _resolveAbility(
 ): SingleTargetAbility[] {
   switch (ability.tag) {
     case "Damage": {
-      return resolveToSingleTarget(ability, "target", state, context);
+      return resolveToSingleTarget(ability, ["target"], state, context);
     }
     case "UseCharge": {
-      return resolveToSingleTarget(ability, "target", state, context);
+      return resolveToSingleTarget(ability, ["target"], state, context);
     }
     case "AddThreat": {
-      // TODO: should also resolve "forAlly" to single target
-      return resolveToSingleTarget(ability, "atEnemy", state, context);
+      return resolveToSingleTarget(ability, ["forAlly", "atEnemy"], state, context);
     }
     case "AddStatus": {
-      return resolveToSingleTarget(ability, "target", state, context);
+      return resolveToSingleTarget(ability, ["target"], state, context);
     }
     case "MoveAI": {
-      return resolveToSingleTarget(ability, "target", state, context);
+      return resolveToSingleTarget(ability, ["target"], state, context);
     }
     case "Death": {
-      return resolveToSingleTarget(ability, "target", state, context);
+      return resolveToSingleTarget(ability, ["target"], state, context);
     }
     case "Invalid": {
       return [ability];
@@ -86,24 +86,41 @@ function _resolveAbility(
 
 function resolveToSingleTarget<A extends Ability>(
   _ability: A,
-  field: keyof A,
+  fields: (keyof A)[],
   state: GameState,
   context: Context,
 ): SingleTargetAbility[] {
   const ability = _ability as any;
-  const resolved = resolveTargetVar(ability[field], state, context);
-  switch (resolved.tag) {
-    case "ids": {
-      return resolved.ids.map(id => {
-        const result: any = {...ability, uriG: "Ability" };
-        result[field] = new Static(id);
-        return result;
-      });
+  const resolvedVars = fields.map(field => {
+    return { v: resolveTargetVar(ability[field], state, context), field };
+  });
+  let l: any[] = [ability];
+  resolvedVars.forEach(r => {
+    l = replaceField(l, r.field, r.v);
+  });
+  return l;
+}
+
+function replaceField<A>(
+  abilities: Ability[],
+  field: any,
+  resolved: { tag: "ids", ids: TargetId[] } | { tag: "var", var: AbilityVar<A> },
+): Ability[] {
+  const l: Ability[][] = abilities.map(ability => {
+    switch (resolved.tag) {
+      case "ids": {
+        return resolved.ids.map(id => {
+          const result: any = {...ability, uriG: "Ability" };
+          result[field] = new Static(id);
+          return result;
+        });
+      }
+      case "var": {
+        return [{...ability, uriG: "Ability" } as any];
+      }
     }
-    case "var": {
-      return [{...ability, uriG: "Ability" } as any];
-    }
-  }
+  });
+  return l.reduce((prev, curr) => prev.concat(curr), []);
 }
 
 function resolveTargetVar<A>(
@@ -113,10 +130,10 @@ function resolveTargetVar<A>(
 ): { tag: "ids", ids: TargetId[] } | { tag: "var", var: AbilityVar<A> } {
   switch (targetVar.tag) {
     case "AllAlly": {
-      return { tag: "ids", ids: state.frUnits.defined().map(r => r.e.id) };
+      return { tag: "ids", ids: defined(state.frUnits).map(r => r.e.id) };
     }
     case "AllEnemy": {
-      return { tag: "ids", ids: state.enUnits.defined().map(r => r.e.id) };
+      return { tag: "ids", ids: defined(state.enUnits).map(r => r.e.id) };
     }
     case "Self": {
       const self = context.self;

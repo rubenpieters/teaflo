@@ -9,6 +9,7 @@ import { addThreat } from "./threat";
 import { Action, ActionWithOrigin, ActionWithOriginF } from "../definitions/action";
 import { GameState } from "../definitions/state";
 import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag } from "../definitions/actionf";
+import { addStatus } from "./statusRow";
 
 
 
@@ -17,8 +18,6 @@ export const actionTags: Action["tag"][]
       "UseCharge",
     ]
   ;
-
-
 
 export function resolveAction(
   state: GameState,
@@ -61,7 +60,7 @@ export function resolveAction(
     case "AddStatus": {
       const group = statusGroup(action.status);
       const result = focus(state,
-        over(x => x.statusRows[group], x => x.addStatus(action.status, action.target, state.nextId)),
+        over(x => x.statusRows[group], x => addStatus(x, action.status, action.target, state.nextId)),
         over(x => x.nextId, x => x + 1),
       );
       return { state: result, actions: [] };

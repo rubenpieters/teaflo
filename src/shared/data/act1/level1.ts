@@ -18,8 +18,8 @@ export const l1_en_ab2: Ability =
   ]);
 
 export const l1_en: EnUnit = {
-  hp: 5,
-  maxHp: 5,
+  hp: 24,
+  maxHp: 24,
   charges: 5,
   maxCharges: 5,
   abilities: {

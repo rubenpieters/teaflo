@@ -1,4 +1,4 @@
-import { statusPosition, position } from "../../../shared/game/state";
+import { stStatusPosition, position } from "../../../shared/game/state";
 import { FriendlyId, EnemyId, StatusId } from "../../../shared/definitions/entityId";
 import { createPosition, relativeTo, Position } from "../../../app/util/position";
 import { groupOrder } from "../../../shared/game/status";
@@ -124,7 +124,7 @@ export function statusPos(
   rowPosition?: number,
 ) {
   if (columnPosition === undefined || rowPosition === undefined) {
-    const result = statusPosition(state, statusId);
+    const result = stStatusPosition(state, statusId);
     if (result === undefined) {
       throw `enemyUnitPos: unexpected nonexisting unit ${JSON.stringify(statusId)}`;
     }

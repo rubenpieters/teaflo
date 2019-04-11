@@ -1,7 +1,5 @@
-import { focus, over, modifyAndGet } from "../iassign-util";
-import { StatusId, UnitId, HasId, statusId } from "./entityId";
+import { StatusId, UnitId } from "./entityId";
 import deepEqual from "deep-equal";
-import { damageEntity } from "../game/entity";
 import { Status } from "./status";
 
 export type StStatus = Status & {
@@ -13,68 +11,6 @@ export class StatusRow {
   constructor(
     public readonly statuses: StStatus[] = [],
   ) {}
-
-  damageStatus(
-    statusId: StatusId,
-    value: number,
-  ): StatusRow {
-    return this.overStatus(statusId, status => damageEntity(status, value)).row;
-  }
-
-  overStatus(
-    id: StatusId,
-    f: (e: StStatus) => StStatus,
-  ): { row: StatusRow, status?: StStatus } {
-    const index = this.statuses.findIndex(e => {
-      if (e === undefined) return false;
-      return deepEqual(e.id, id);
-    });
-    if (index === -1) {
-      return { row: this };
-    }
-    const row = new StatusRow(focus(this.statuses,
-      over(x => x[index]!, f),
-    ));
-    return { row, status: row.statuses[index]! };
-  }
-
-  removeStatus(
-    statusId: StatusId,
-  ): { row: StatusRow, entity?: StStatus } {
-    const index = this.statuses.findIndex(x => deepEqual(x.id, statusId));
-    if (index === -1) {
-      return { row: this };
-    }
-
-    const result = modifyAndGet(this,
-      x => x.statuses, x => {
-        const removed = x.splice(index, 1)[0];
-        return { a: x, b: removed };
-      }
-    );
-    return { row: result.s, entity: result.b };
-  }
-
-  addStatus(
-    status: Status,
-    ownerId: UnitId,
-    nextId: number,
-  ): StatusRow {
-    const newId = statusId(nextId);
-    const newStatus: StStatus =
-      {...status, owner: ownerId, id: newId };
-    return new StatusRow(focus(this.statuses,
-      over(x => x, x => x.concat(newStatus)),
-    ));
-  }
-
-  statusPosition(
-    statusId: StatusId,
-  ): number | undefined {
-    const index = this.statuses.findIndex(x => deepEqual(x.id, statusId));
-    if (index === -1) return undefined;
-    return index;
-  }
 }
 
 /**

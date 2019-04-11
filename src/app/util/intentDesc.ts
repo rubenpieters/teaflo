@@ -1,7 +1,7 @@
-import { Ability, TargetVar, AbilityVar } from "../../shared/game/ability";
-import { Status, StatusTag } from "../../shared/game/status";
-import { Action } from "../../shared/game/action";
-import { AIDirection } from "src/shared/game/ai";
+import { Ability, TargetVar, AbilityVar } from "../../shared/definitions/ability";
+import { Status, StatusTag } from "../../shared/definitions/status";
+import { Action } from "../../shared/definitions/action";
+import { AIDirection } from "../../shared/definitions/ai";
 
 export class DescSymbol {
   constructor(
@@ -19,6 +19,7 @@ export class DescSeparator {
 export type DescToken
   = DescSymbol
   | DescSeparator
+  ;
 
 function singleton(
   str: string,
