@@ -1,8 +1,8 @@
 import { focus, over, modifyAndGet } from "../iassign-util";
-import { Status } from "./status";
 import { StatusId, UnitId, HasId, statusId } from "./entityId";
 import deepEqual from "deep-equal";
-import { damageEntity } from "./entity";
+import { damageEntity } from "../game/entity";
+import { Status } from "./status";
 
 export type StStatus = Status & {
   id: StatusId,

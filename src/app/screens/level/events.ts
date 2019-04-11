@@ -1,8 +1,7 @@
 import { GameRefs } from "../../states/game";
 import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt, levelData, selectedSchem, SolutionData } from "../act/data";
 import { emptyTree, Location } from "../../../shared/tree";
-import { updateSolutionRep } from "../exec/events";
-import { GameState, mkGameState } from "../../../shared/game/state";
+import { mkGameState } from "../../../shared/game/state";
 import { endStates } from "../../../shared/game/solution";
 import { transitionScreen, ScreenSchem } from "../transition";
 import { FrUnitId } from "../../../shared/data/frUnitMap";

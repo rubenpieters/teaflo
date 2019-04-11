@@ -1,7 +1,8 @@
-import { GameState, statusPosition, position } from "../../../shared/game/state";
-import { FriendlyId, EnemyId, StatusId } from "../../../shared/game/entityId";
+import { statusPosition, position } from "../../../shared/game/state";
+import { FriendlyId, EnemyId, StatusId } from "../../../shared/definitions/entityId";
 import { createPosition, relativeTo, Position } from "../../../app/util/position";
-import { groupOrder } from "src/shared/game/status";
+import { groupOrder } from "../../../shared/game/status";
+import { GameState } from "../../../shared/definitions/state";
 
 /*
 

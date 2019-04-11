@@ -6,8 +6,8 @@ import { Location } from "../../../shared/tree";
 import { firstLogIndex } from "../../../shared/game/log";
 import { runAsTween } from "../../phaser/animation";
 import { clearAnimations } from "../util";
-import { GameState, mkGameState } from "../../../shared/game/state";
-import { TargetId } from "../../../shared/game/entityId";
+import { mkGameState } from "../../../shared/game/state";
+import { TargetId } from "../../../shared/definitions/entityId";
 import deepEqual from "deep-equal";
 
 export function drawCurrentLevel(

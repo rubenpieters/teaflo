@@ -1,4 +1,4 @@
-import { FrUnit } from "../game/unit";
+import { FrUnit } from "../definitions/unit";
 import { Equal, isTrue } from "../type-util";
 import { trinity_dmg, trinity_sup, trinity_tnk } from "./act1/frUnits";
 

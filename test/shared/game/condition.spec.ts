@@ -1,10 +1,15 @@
-import { ActionCondition, Var, statusOwner, resolveCondition } from "../../../src/shared/game/condition";
-import { Damage, Action } from "../../../src/shared/game/action";
-import { EntityId, statusId, friendlyId } from "../../../src/shared/game/entityId";
-import { Weak } from "../../../src/shared/game/status";
-import { StStatus } from "../../../src/shared/game/statusRow";
+import { resolveCondition } from "../../../src/shared/game/condition";
+import { EntityId, statusId, friendlyId } from "../../../src/shared/definitions/entityId";
+import { StStatus } from "../../../src/shared/definitions/statusRow";
+import { ActionCondition, Var, statusOwner } from "../../../src/shared/definitions/condition";
+import { Damage } from "../../../src/shared/definitions/actionf";
+import { Action } from "../../../src/shared/definitions/action";
+import { Weak } from "../../../src/shared/definitions/status";
 
-const cond1: ActionCondition = new Damage("Cond", "Cond", new Var("1"), statusOwner());
+const cond1: ActionCondition = {
+  ...new Damage("Cond", "Cond", new Var("1"), statusOwner()),
+  origin: new Var("2")
+  };
 const action1: Action = new Damage("Action", "Action", 1, new EntityId(0, "friendly"));
 const status1: StStatus = {...new Weak(1), id: statusId(1), owner: friendlyId(0) };
 

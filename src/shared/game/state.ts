@@ -1,37 +1,17 @@
-import { FrUnit, EnUnit } from "./unit";
-import { HasId, TargetId, TargetType, EntityId, FriendlyId, EnemyId, StatusId, UnitType, friendlyId, enemyId } from "./entityId";
-import { UnitRow } from "./unitRow";
-import { StatusRow, StStatus } from "./statusRow";
+import { TargetType, EntityId, FriendlyId, EnemyId, StatusId, UnitType, friendlyId, enemyId } from "../definitions/entityId";
+import { UnitRow } from "../definitions/unitRow";
+import { StatusRow, StStatus } from "../definitions/statusRow";
 import { focus, over, modifyAndGet } from "../iassign-util";
-import { StatusGroup, groupOrder } from "./status";
+import { groupOrder } from "./status";
 import deepEqual from "deep-equal";
 import { frUnitMap, FrUnitId } from "../data/frUnitMap";
 import { enUnitMap, EnUnitId } from "../data/enUnitMap";
-import { ThreatMap } from "./threat";
-
-export type StFrUnit = FrUnit & HasId<"friendly"> & { threatMap: ThreatMap };
-export type StEnUnit = EnUnit & HasId<"enemy">;
+import { StFrUnit, StEnUnit, GameState } from "../definitions/state";
 
 export type IdToEntityType = {
   "friendly": StFrUnit,
   "enemy": StEnUnit,
   "status": StStatus,
-}
-
-export type StateType
-  = "invalid"
-  | "win"
-  | "default"
-  ;
-
-export class GameState {
-  constructor(
-    public readonly frUnits: UnitRow<"friendly", StFrUnit>,
-    public readonly enUnits: UnitRow<"enemy", StEnUnit>,
-    public readonly nextId: number = 0,
-    public readonly statusRows: { [K in StatusGroup]: StatusRow },
-    public readonly type: StateType = "default",
-  ) {}
 }
 
 export function mkGameState(

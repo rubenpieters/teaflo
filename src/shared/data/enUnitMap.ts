@@ -1,4 +1,4 @@
-import { FrUnit, EnUnit } from "../game/unit";
+import { FrUnit, EnUnit } from "../definitions/unit";
 import { Equal, isTrue } from "../type-util";
 import { l1_en } from "./act1/level1";
 

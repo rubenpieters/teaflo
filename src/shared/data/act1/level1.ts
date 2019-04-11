@@ -1,9 +1,9 @@
-import { Ability } from "../../game/ability";
-import * as Ab from "../../game/ability";
-import * as A from "../../game/action";
-import * as S from "../../game/status";
-import { AIDirection } from "../../game/ai";
-import { EnUnit } from "../../game/unit";
+import { Ability } from "../../definitions/ability";
+import * as Ab from "../../definitions/ability";
+import * as A from "../../definitions/actionf";
+import * as S from "../../definitions/status";
+import { AIDirection } from "../../definitions/ai";
+import { EnUnit } from "../../definitions/unit";
 
 export const l1_en_ab1: Ability =
   A.combinedAbility([

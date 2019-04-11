@@ -1,9 +1,9 @@
-import { FrUnit } from "../../game/unit";
-import { TargetInput } from "../../game/input";
-import { Ability } from "../../game/ability";
-import * as Ab from "../../game/ability";
-import * as A from "../../game/action";
-import * as S from "../../game/status";
+import * as A from "../../definitions/actionf";
+import * as S from "../../definitions/status";
+import { Ability } from "../../definitions/ability";
+import * as Ab from "../../definitions/ability";
+import { FrUnit } from "../../definitions/unit";
+import { TargetInput } from "../../definitions/input";
 
 /**
  * Trinity Dmg Unit

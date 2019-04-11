@@ -1,11 +1,7 @@
-import { EnemyId } from "./entityId";
+import { EnemyId } from "../definitions/entityId";
 import { over, focus } from "../iassign-util";
+import { HasThreatMap } from "../definitions/threat";
 
-export type HasThreatMap = {
-  threatMap: ThreatMap,
-}
-
-export type ThreatMap = { [globalId: number]: number };
 
 export function addThreat<U extends HasThreatMap>(
   u: U,

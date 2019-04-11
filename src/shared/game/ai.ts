@@ -1,14 +1,4 @@
-export type AIPosition = {
-  x: number,
-  y: number,
-}
-
-export type AIDirection
-  = "up"
-  | "down"
-  | "left"
-  | "right"
-  ;
+import { AIPosition, AIDirection } from "../definitions/ai";
 
 export function moveAI(
   aiPos: AIPosition,

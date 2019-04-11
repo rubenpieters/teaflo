@@ -1,14 +1,17 @@
-import { Ability, resolveAbility } from "./ability";
-import { UnitId } from "./entityId";
+import { resolveAbility } from "./ability";
+import { UnitId } from "../definitions/entityId";
 import { Tree, emptyTree, extendTree, Location, cutTree } from "../tree";
 import { focus, set } from "../iassign-util";
-import { GameState, enIds, overTarget, enFiltered } from "./state";
+import { enIds, overTarget, enFiltered } from "./state";
 import { Log, emptyLog, LogEntry } from "./log";
-import { StartTurn, ignoreTag, Action, resolveAction, ActionWithOrigin } from "./action";
-import { Context, FrAbilityContext, EnAbilityContext } from "./context";
+import { ignoreTag, resolveAction } from "./action";
+import { Context, FrAbilityContext, EnAbilityContext } from "../definitions/context";
 import { applyStatuses } from "./status";
 import { aiPosToIndex } from "./ai";
-import { EnAbility } from "./unit";
+import { Ability } from "../definitions/ability";
+import { GameState } from "../definitions/state";
+import { StartTurn } from "../definitions/actionf";
+import { ActionWithOrigin } from "../definitions/action";
 
 export type SolutionData = {
   ability: Ability,

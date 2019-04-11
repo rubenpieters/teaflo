@@ -2,14 +2,12 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position, center } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
-import { GameState, StFrUnit, StEnUnit, enFiltered, frFiltered, getTarget } from "../../../shared/game/state";
+import { enFiltered, frFiltered, getTarget } from "../../../shared/game/state";
 import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex, StatusLog } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
-import { EntityId, UnitId, friendlyId, TargetId, EnemyId, FriendlyId, StatusId } from "../../../shared/game/entityId";
+import { EntityId, UnitId, friendlyId, TargetId, EnemyId, FriendlyId, StatusId } from "../../../shared/definitions/entityId";
 import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution, cutLevelSolution } from "./events";
-import { Ability } from "../../../shared/game/ability";
-import { Action } from "../../../shared/game/action";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation, runAsTween } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution, SolutionData } from "../../../shared/game/solution";
@@ -18,12 +16,17 @@ import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
 import { clearAnimations } from "../util";
 import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions } from "./positions";
-import { FrAbility, EnAbility } from "../../../shared/game/unit";
 import deepEqual from "deep-equal";
-import { groupOrder, StatusTag } from "../../../shared/game/status";
-import { StStatus } from "../../../shared/game/statusRow";
-import { UserInput, matchUserInput } from "../../../shared/game/input";
+import { groupOrder } from "../../../shared/game/status";
+import { StStatus } from "../../../shared/definitions/statusRow";
+import { matchUserInput } from "../../../shared/game/input";
 import { aiIndices, indexToAiPos, aiPosToIndex } from "../../../shared/game/ai";
+import { GameState } from "../../../shared/definitions/state";
+import { FrAbility, EnAbility } from "../../../shared/definitions/unit";
+import { Action } from "../../../shared/definitions/action";
+import { UserInput } from "../../../shared/definitions/input";
+import { Ability } from "../../../shared/definitions/ability";
+import { StatusTag } from "../../../shared/definitions/status";
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">

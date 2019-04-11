@@ -4,7 +4,7 @@ import { enUnitMap, EnUnitId } from "../../../shared/data/enUnitMap";
 import { frUnitMap, FrUnitId } from "../../../shared/data/frUnitMap";
 import { createPosition } from "../../util/position";
 import { Ability } from "../../../shared/game/ability";
-import { EntityId } from "../../../shared/game/entityId";
+import { EntityId } from "../../../shared/definitions/entityId";
 import { Pool } from "../../phaser/pool";
 import { Unit } from "../../../shared/game/unit";
 import { intentDescription } from "../../util/intentDesc";

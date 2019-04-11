@@ -1,71 +1,13 @@
-import { Damage, Death, Action, ActionWithOrigin } from "./action";
-import * as C from "./condition";
-import * as ST from "./statusTranform";
-import { GameState } from "./state";
+import * as C from "../definitions/condition";
+import * as ST from "../definitions/statusTransform";
 import { StatusLog } from "./log";
-import { StStatus } from "./statusRow";
+import { StStatus } from "../definitions/statusRow";
+import { Status, StatusGroup, StatusTag } from "../definitions/status";
+import { Damage, Death } from "../definitions/actionf";
+import { ActionWithOrigin } from "../definitions/action";
+import { GameState } from "../definitions/state";
+import { resolveCondition } from "./condition";
 
-/**
- * A status is a lingering effect on the gamestate.
- */
-export type Status
-  = Weak
-  | Strong
-  | Armor
-  | Fragile
-  ;
-
-export class Weak {
-  public readonly tag: "Weak" = "Weak";
-  public readonly hp: number;
-  public readonly maxHp: number;
-
-  constructor(
-    public readonly value: number,
-  ) {
-    this.maxHp = statusModifier(this.tag) * value;
-    this.hp = this.maxHp;
-  }
-}
-
-export class Strong {
-  public readonly tag: "Strong" = "Strong";
-  public readonly hp: number;
-  public readonly maxHp: number;
-
-  constructor(
-    public readonly value: number,
-  ) {
-    this.maxHp = statusModifier(this.tag) * value;
-    this.hp = this.maxHp;
-  }
-}
-
-export class Armor {
-  public readonly tag: "Armor" = "Armor";
-  public readonly hp: number;
-  public readonly maxHp: number;
-
-  constructor(
-    public readonly value: number,
-  ) {
-    this.maxHp = statusModifier(this.tag) * value;
-    this.hp = this.maxHp;
-  }
-}
-
-export class Fragile {
-  public readonly tag: "Fragile" = "Fragile";
-  public readonly hp: number;
-  public readonly maxHp: number;
-
-  constructor(
-    public readonly value: number,
-  ) {
-    this.maxHp = statusModifier(this.tag) * value;
-    this.hp = this.maxHp;
-  }
-}
 
 export function statusGroup(
   status: Status,
@@ -78,26 +20,8 @@ export function statusGroup(
   }
 }
 
-export type StatusGroup
-  = "atk_mod"
-  | "def_mod"
-  ;
-
 export const groupOrder: StatusGroup[]
   = ["atk_mod", "def_mod"];
-
-export function statusModifier(
-  statusTag: StatusTag,
-): number {
-  switch (statusTag) {
-    case "Armor": return 1;
-    case "Fragile": return 1;
-    case "Strong": return 7;
-    case "Weak": return 7;
-  }
-}
-
-export type StatusTag = Status["tag"];
 
 export const statusTags: StatusTag[]
   = ["Weak", "Strong", "Armor", "Fragile"];
@@ -192,7 +116,7 @@ export function applyStatus(
   statusLog?: StatusLog,
 } {
   const cond = statusToCondition(status);
-  const { condition, bindings } = C.resolveCondition(status, cond, onStackAction);
+  const { condition, bindings } = resolveCondition(status, cond, onStackAction);
   if (condition) {
     const st = statusToTransform(status);
     const transformed = ST.resolveStatusTransform(st.transform, bindings, status, onStackAction);

@@ -1,157 +1,16 @@
 import { focus, over, set } from "../iassign-util";
 import { HKT, URIS, Type } from "fp-ts/lib/HKT";
-import { UnitId, TargetId, EnemyId, FriendlyId } from "./entityId";
-import { GameState, overTarget, removeTarget } from "./state";
+import { UnitId, TargetId, EnemyId, FriendlyId } from "../definitions/entityId";
+import { overTarget, removeTarget } from "./state";
 import { damageEntity } from "./entity";
 import { useChargeUnit, moveAIUnit } from "./unit";
-import { AIDirection } from "./ai";
-import { Status, statusGroup } from "./status";
+import { statusGroup } from "./status";
 import { addThreat } from "./threat";
+import { Action, ActionWithOrigin, ActionWithOriginF } from "../definitions/action";
+import { GameState } from "../definitions/state";
+import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag } from "../definitions/actionf";
 
-/**
- * HKT boilerplate
- */
-declare module "fp-ts/lib/HKT" {
-  interface URI2HKT<A> {
-    Action: A,
-  }
-}
 
-export type ACTION_URIS = Ability_URI | Action_URI | Target_URI;
-
-export const Ability_URI: "Ability" = "Ability";
-export type Ability_URI = typeof Ability_URI;
-
-export const Action_URI: "Action" = "Action";
-export type Action_URI = typeof Action_URI;
-
-export const Target_URI: "Target" = "Target";
-export type Target_URI = typeof Target_URI;
-
-export const Condition_URI: "Cond" = "Cond";
-export type Condition_URI = typeof Condition_URI;
-
-export const StatusTransform_URI: "ST" = "ST";
-export type StatusTransform_URI = typeof StatusTransform_URI;
-
-/**
- * A generic shape of actions.
- */
-export class Damage<F extends URIS, G extends URIS> {
-  public readonly tag: "Damage" = "Damage";
-
-  constructor(
-    readonly uriF: F,
-    readonly uriG: G,
-    readonly value: Type<F, number>,
-    readonly target: Type<G, TargetId>,
-  ) {}
-}
-
-export class UseCharge<F extends URIS, G extends URIS> {
-  public readonly tag: "UseCharge" = "UseCharge";
-
-  constructor(
-    readonly uriF: F,
-    readonly uriG: G,
-    readonly value: Type<F, number>,
-    readonly target: Type<G, UnitId>,
-  ) {}
-}
-
-export class Invalid {
-  public readonly tag: "Invalid" = "Invalid";
-
-  constructor(
-  ) {}
-}
-
-export const invalidNoOrigin: ActionWithOrigin =
-  {...new Invalid, origin: "noOrigin" };
-
-export class Death<G extends URIS> {
-  public readonly tag: "Death" = "Death";
-
-  constructor(
-    readonly uriG: G,
-    readonly target: Type<G, TargetId>,
-  ) {}
-}
-
-export class Combined<F extends URIS, G extends URIS> {
-  public readonly tag: "Combined" = "Combined";
-
-  constructor(
-    public readonly list: ActionF<F, G>[],
-  ) {}
-}
-
-export function combinedAction(
-  list: ActionF<"Action", "Action">[],
-): Combined<"Action", "Action"> {
-  return new Combined(list);
-}
-
-export function combinedAbility(
-  list: ActionF<"Ability", "Target">[],
-): Combined<"Ability", "Target"> {
-  return new Combined(list);
-}
-
-export class MoveAI<F extends URIS, G extends URIS> {
-  public readonly tag: "MoveAI" = "MoveAI";
-
-  constructor(
-    readonly uriF: F,
-    readonly uriG: G,
-    public readonly dir: Type<F, AIDirection>,
-    public readonly target: Type<G, EnemyId>,
-  ) {}
-}
-
-export class AddThreat<F extends URIS, G extends URIS> {
-  public readonly tag: "AddThreat" = "AddThreat";
-
-  constructor(
-    readonly uriF: F,
-    readonly uriG: G,
-    public readonly value: Type<F, number>,
-    public readonly forAlly: Type<G, FriendlyId>,
-    public readonly atEnemy: Type<G, EnemyId>,
-  ) {}
-}
-
-export class AddStatus<F extends URIS, G extends URIS> {
-  public readonly tag: "AddStatus" = "AddStatus";
-
-  constructor(
-    readonly uriF: F,
-    readonly uriG: G,
-    public readonly status: Type<F, Status>,
-    public readonly target: Type<G, UnitId>,
-  ) {}
-}
-
-export class StartTurn {
-  public readonly tag: "StartTurn" = "StartTurn";
-
-  constructor(
-  ) {}
-}
-
-export type ActionF<F extends URIS, G extends URIS>
-  = Damage<F, G>
-  | UseCharge<F, G>
-  | Invalid
-  | Death<G>
-  | Combined<F, G>
-  | MoveAI<F, G>
-  | AddThreat<F, G>
-  | AddStatus<F, G>
-  | StartTurn
-  ;
-
-export type ActionTag = ActionF<any, any>["tag"];
 
 export const actionTags: Action["tag"][]
   = [ "Damage",
@@ -159,19 +18,7 @@ export const actionTags: Action["tag"][]
     ]
   ;
 
-/**
- * An Action describes a single step in gamestate transitions.
- */
-export type Action
-  = ActionF<Action_URI, Action_URI>
-  ;
 
-export type ActionWithOriginF<F extends URIS>
-  = ActionF<F, F>
-  & { origin: Type<F, UnitId | "noOrigin"> }
-  ;
-
-export type ActionWithOrigin = ActionWithOriginF<"Action">;
 
 export function resolveAction(
   state: GameState,

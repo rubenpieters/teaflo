@@ -1,6 +1,6 @@
-import { Action, ActionWithOrigin } from "./action";
-import { GameState } from "./state";
-import { StatusTag } from "./status";
+import { ActionWithOrigin, Action } from "../definitions/action";
+import { GameState } from "../definitions/state";
+import { StatusTag } from "../definitions/status";
 
 export type Log = LogEntry[];
 

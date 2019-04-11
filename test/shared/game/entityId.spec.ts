@@ -1,5 +1,5 @@
 import * as fc from "fast-check";
-import { UnitType, unitTypes, UnitId, EntityId, TargetId, targetTypes, TargetType, StatusId } from "../../../src/shared/game/entityId";
+import { UnitType, unitTypes, UnitId, EntityId, TargetId, targetTypes, TargetType, StatusId } from "../../../src/shared/definitions/entityId";
 import { equalitySanityCheck } from "../../util/fast-check";
 
 

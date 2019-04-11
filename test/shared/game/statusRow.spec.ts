@@ -3,7 +3,7 @@ import { equalitySanityCheck, concatArbitrary } from "../../util/fast-check";
 import { unitIdArb, statusIdArb } from "./entityId.spec";
 import deepEqual from "deep-equal";
 import { tagStatusArb, fragmentsArb, statusArb } from "./status.spec";
-import { StatusRow, StStatus, statusRowInvariant } from "../../../src/shared/game/statusRow";
+import { StatusRow, StStatus, statusRowInvariant } from "../../../src/shared/definitions/statusRow";
 
 const statusRowArb: fc.Arbitrary<StatusRow> = fc.set(statusIdArb, (a, b) => deepEqual(a, b))
   .chain(statusIdList => {
