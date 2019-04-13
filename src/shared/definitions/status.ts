@@ -17,53 +17,73 @@ export type Status
 
 export class Weak {
   public readonly tag: "Weak" = "Weak";
-  public readonly hp: number;
   public readonly maxHp: number;
+  public readonly hp: number;
 
   constructor(
     public readonly value: number,
+    hp?: number,
   ) {
     this.maxHp = statusModifier(this.tag) * value;
-    this.hp = this.maxHp;
+    if (hp !== undefined) {
+      this.hp = hp;
+    } else {
+      this.hp = this.maxHp;
+    }
   }
 }
 
 export class Strong {
   public readonly tag: "Strong" = "Strong";
-  public readonly hp: number;
   public readonly maxHp: number;
+  public readonly hp: number;
 
   constructor(
     public readonly value: number,
+    hp?: number,
   ) {
     this.maxHp = statusModifier(this.tag) * value;
-    this.hp = this.maxHp;
+    if (hp !== undefined) {
+      this.hp = hp;
+    } else {
+      this.hp = this.maxHp;
+    }
   }
 }
 
 export class Armor {
   public readonly tag: "Armor" = "Armor";
-  public readonly hp: number;
   public readonly maxHp: number;
+  public readonly hp: number;
 
   constructor(
     public readonly value: number,
+    hp?: number,
   ) {
     this.maxHp = statusModifier(this.tag) * value;
-    this.hp = this.maxHp;
+    if (hp !== undefined) {
+      this.hp = hp;
+    } else {
+      this.hp = this.maxHp;
+    }
   }
 }
 
 export class Fragile {
   public readonly tag: "Fragile" = "Fragile";
-  public readonly hp: number;
   public readonly maxHp: number;
+  public readonly hp: number;
 
   constructor(
     public readonly value: number,
+    hp?: number,
   ) {
     this.maxHp = statusModifier(this.tag) * value;
-    this.hp = this.maxHp;
+    if (hp !== undefined) {
+      this.hp = hp;
+    } else {
+      this.hp = this.maxHp;
+    }
   }
 }
 

@@ -19,3 +19,18 @@ export function concatArbitrary<A>(
 export function equalitySanityCheck<A>(arb: fc.Arbitrary<A>) {
   fc.assert(fc.property(arb, (a) => deepEqual(a, a)));
 }
+
+/**
+ * Sample an arbitrary and show samples with given show function.
+ */
+export function sampleShow<A, B>(
+  arb: fc.Arbitrary<A>,
+  showF: (a: A) => B,
+) {
+  fc.sample(arb)
+    .map(x => showF(x))
+    .forEach(x => {
+      console.log(JSON.stringify(x));
+    });
+}
+

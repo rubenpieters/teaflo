@@ -38,11 +38,11 @@ export function actionDescription(
         ;
     }
     case "AddStatus": {
-      return triggerDescription(action.status)
+      return statusDescription(action.status)
         ;
     }
     case "Combined": {
-      throw "should not happen";
+      throw "actionDescription: encountered a Combined action";
     }
     case "Damage": {
       return singleton("expl_minus.png")
@@ -74,7 +74,7 @@ export function intentDescription(
         ;
     }
     case "AddStatus": {
-      return intentVarDescription(ability.status, triggerDescription)
+      return intentVarDescription(ability.status, statusDescription)
         .concat(intentVarDescription(ability.target, intentVarTarget))
         ;
     }
@@ -106,7 +106,7 @@ export function intentDescription(
   }
 }
 
-export function triggerDescription(
+export function statusDescription(
   status: Status,
 ): DescToken[] {
   switch (status.tag) {

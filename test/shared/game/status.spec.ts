@@ -1,8 +1,10 @@
 import * as fc from "fast-check";
-import { StatusTag, Status } from "../../../src/shared/game/status";
-import * as S from "../../../src/shared/game/status";
+import { StatusTag, Status } from "../../../src/shared/definitions/status";
+import * as S from "../../../src/shared/definitions/status";
+import { statusTags, showStatus, statusDescription } from "../../../src/shared/game/status";
+import { sampleShow } from "../../util/fast-check";
 
-export const statusTagArb: fc.Arbitrary<StatusTag> = fc.constantFrom(...S.statusTags);
+export const statusTagArb: fc.Arbitrary<StatusTag> = fc.constantFrom(...statusTags);
 
 export const fragmentsArb: fc.Arbitrary<number> = fc.integer(0, 100000);
 
@@ -20,3 +22,5 @@ export function tagStatusArb(
     case "Fragile": return fragmentsArb.map(x => new S.Fragile(x));
   }
 }
+
+sampleShow(statusArb, statusDescription);

@@ -8,7 +8,9 @@ import { ActionWithOrigin } from "../definitions/action";
 import { GameState } from "../definitions/state";
 import { resolveCondition } from "./condition";
 import { resolveStatusTransform } from "./statusTranform";
-
+import { showEntityId } from "./entityId";
+import { descSingleton, numberDescription } from "./description";
+import { DescSymbol } from "../definitions/description";
 
 export function statusGroup(
   status: Status,
@@ -52,11 +54,10 @@ export function statusToTransform(
 } {
   switch (status.tag) {
     case "Armor": {
-      const transform: ST.StatusTransform =
-        {
-          ...new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), C.statusOwner()),
-          origin: new C.Var("3"),
-        };
+      const transform: ST.StatusTransform = {
+        ...new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), C.statusOwner()),
+        origin: new C.Var("3"),
+      };
       const actions: ST.StatusTransform[] = [
         {
           ...new Death("ST", C.idOfStatus()),
@@ -66,13 +67,11 @@ export function statusToTransform(
       return { transform, actions };
     }
     case "Weak": {
-      const transform: ST.StatusTransform =
-        {
-          ...new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), new C.Var("2")),
-          origin: C.statusOwner(),
-        };
-      const actions: ST.StatusTransform[] = [
-      ];
+      const transform: ST.StatusTransform = {
+        ...new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), new C.Var("2")),
+        origin: C.statusOwner(),
+      };
+      const actions: ST.StatusTransform[] = [];
       return { transform, actions };
     }
     default: {
@@ -129,6 +128,52 @@ export function applyStatus(
     };
     return { transformed, actions, statusLog };
   } else {
-    return { transformed: onStackAction, actions: [] }
+    return { transformed: onStackAction, actions: [] };
+  }
+}
+
+export function showStatus(
+  status: Status,
+): string {
+  switch (status.tag) {
+    case "Strong": // fallthrough
+    case "Weak": // fallthrough
+    case "Fragile": // fallthrough
+    case "Armor": {
+      return `${status.tag}: ${status.value} (${status.hp})`;
+    }
+  }
+}
+
+export function showStStatus(
+  status: StStatus,
+): string {
+  return `ID: ${showEntityId(status.id)} -- ONR: ${showEntityId(status.owner)} -- ${status}`;
+}
+
+export function statusDescription(
+  status: Status,
+) {
+  switch (status.tag) {
+    case "Weak": {
+      return numberDescription(status.value)
+        .concat(new DescSymbol("icon_weak"))
+        ;
+    }
+    case "Fragile": {
+      return numberDescription(status.value)
+        .concat(new DescSymbol("icon_fragile"))
+        ;
+    }
+    case "Strong": {
+      return numberDescription(status.value)
+        .concat(new DescSymbol("icon_strong"))
+        ;
+    }
+    case "Armor": {
+      return numberDescription(status.value)
+        .concat(new DescSymbol("icon_armor"))
+        ;
+    }
   }
 }

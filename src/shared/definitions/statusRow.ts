@@ -14,10 +14,9 @@ export class StatusRow {
 }
 
 /**
- * An invariant which should hold for all StatusRows.
+ * The invariant which should hold for all StatusRows.
  * 
- * For the "on_owner_id" merge type:
- *   - Only one status with the same id and owner id exists
+ * A status id should be unique.
  */
 export function statusRowInvariant(
   row: StatusRow,

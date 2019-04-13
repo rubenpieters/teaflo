@@ -1,15 +1,16 @@
 import { focus, over, set } from "../iassign-util";
-import { HKT, URIS, Type } from "fp-ts/lib/HKT";
-import { UnitId, TargetId, EnemyId, FriendlyId } from "../definitions/entityId";
+import { URIS, Type } from "fp-ts/lib/HKT";
 import { overTarget, removeTarget } from "./state";
 import { damageEntity } from "./entity";
 import { useChargeUnit, moveAIUnit } from "./unit";
-import { statusGroup } from "./status";
+import { statusGroup, statusDescription } from "./status";
 import { addThreat } from "./threat";
 import { Action, ActionWithOrigin, ActionWithOriginF } from "../definitions/action";
 import { GameState } from "../definitions/state";
 import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag } from "../definitions/actionf";
 import { addStatus } from "./statusRow";
+import { descSingleton, numberDescription } from "./description";
+import { DescToken, DescSymbol } from "../definitions/description";
 
 
 
@@ -162,4 +163,43 @@ export function ignoreTag(
   actionTag: ActionTag,
 ) {
   return actionTag === "Combined";
+}
+
+/**
+ * Description shown when an action is performed on the state.
+ */
+export function actionDescription(
+  action: Action,
+): DescToken[] {
+  switch (action.tag) {
+    case "AddThreat": {
+      return descSingleton("expl_plus.png")
+        .concat(numberDescription(action.value))
+        .concat(new DescSymbol("expl_th.png"))
+        ;
+    }
+    case "AddStatus": {
+      return descSingleton("expl_plus.png")
+        .concat(statusDescription(action.status))
+        ;
+    }
+    case "Combined": {
+      throw "actionDescription: encountered a Combined action";
+    }
+    case "Damage": {
+      return descSingleton("expl_minus.png")
+      .concat(numberDescription(action.value))
+      .concat(new DescSymbol("expl_hp.png"))
+      ;
+    }
+    case "UseCharge": {
+      return descSingleton("expl_minus.png")
+      .concat(numberDescription(action.value))
+      .concat(new DescSymbol("expl_ch.png"))
+      ;
+    }
+    default: {
+      return [];
+    }
+  }
 }

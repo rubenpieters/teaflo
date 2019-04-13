@@ -2,8 +2,9 @@ import * as fc from "fast-check";
 import { equalitySanityCheck, concatArbitrary } from "../../util/fast-check";
 import { unitIdArb, statusIdArb } from "./entityId.spec";
 import deepEqual from "deep-equal";
-import { tagStatusArb, fragmentsArb, statusArb } from "./status.spec";
+import { fragmentsArb, statusArb } from "./status.spec";
 import { StatusRow, StStatus, statusRowInvariant } from "../../../src/shared/definitions/statusRow";
+import { damageStatus, addStatus, removeStatus } from "../../../src/shared/game/statusRow";
 
 const statusRowArb: fc.Arbitrary<StatusRow> = fc.set(statusIdArb, (a, b) => deepEqual(a, b))
   .chain(statusIdList => {
@@ -22,7 +23,7 @@ equalitySanityCheck(statusRowArb);
 fc.assert(fc.property(statusRowArb, (row) => statusRowInvariant(row)));
 fc.assert(fc.property(statusRowArb, statusIdArb, fragmentsArb,
   (row, statusId, value) => {
-    const newRow = row.damageStatus(statusId, value);
+    const newRow = damageStatus(row, statusId, value);
     return statusRowInvariant(newRow) &&
       // other elements are unchanged
       deepEqual(newRow.statuses.filter(x =>
@@ -32,7 +33,7 @@ fc.assert(fc.property(statusRowArb, statusIdArb, fragmentsArb,
 fc.assert(fc.property(statusRowArb, statusArb, unitIdArb,
   (row, status, ownerId) => {
     const nextId = row.statuses.map(x => x.id.id).reduce((a,b) => a + b, 1);
-    const newRow = row.addStatus(status, ownerId, nextId);
+    const newRow = addStatus(row, status, ownerId, nextId);
     return statusRowInvariant(newRow) &&
       // the new status was added
       newRow.statuses.filter(x => x.id.id === nextId).length ===
@@ -41,7 +42,7 @@ fc.assert(fc.property(statusRowArb, statusArb, unitIdArb,
   }));
 fc.assert(fc.property(statusRowArb, statusIdArb,
   (row, statusId) => {
-    const result = row.removeStatus(statusId);
+    const result = removeStatus(row, statusId);
     const newRow = result.row;
 
     const occurrences = row.statuses.filter(x => deepEqual(x.id, statusId));
