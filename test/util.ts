@@ -1,7 +1,8 @@
-import { GameState, possibleActions, showStateCompact } from "../src/shared/game/state";
+import { possibleActions, showStateCompact } from "../src/shared/game/state";
 import { extendSolution, Solution, runPhases, SolutionData, showSolDataCompact } from "../src/shared/game/solution";
 import { Location, getLocation } from "../src/shared/tree";
 import { fnv1a } from "../src/shared/fnv1a";
+import { GameState } from "src/shared/definitions/state";
 
 export function trySolutions(
   state: GameState,

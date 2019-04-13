@@ -1,4 +1,4 @@
-import { TargetType, EntityId, FriendlyId, EnemyId, StatusId, UnitType, friendlyId, enemyId } from "../definitions/entityId";
+import { TargetType, EntityId, FriendlyId, EnemyId, StatusId, UnitType, friendlyId, enemyId, TargetId } from "../definitions/entityId";
 import { UnitRow } from "../definitions/unitRow";
 import { StatusRow, StStatus } from "../definitions/statusRow";
 import { focus, over, modifyAndGet } from "../iassign-util";
@@ -9,6 +9,8 @@ import { enUnitMap, EnUnitId } from "../data/enUnitMap";
 import { StFrUnit, StEnUnit, GameState } from "../definitions/state";
 import { defined, overUnit, removeUnit } from "./unitRow";
 import { statusPosition, overStatus, removeStatus } from "./statusRow";
+import { UserInput, UnitInput, StatusInput, FriendlyInput, EnemyInput } from "../definitions/input";
+import { SolutionData } from "./solution";
 
 export type IdToEntityType = {
   "friendly": StFrUnit,
@@ -237,6 +239,92 @@ export function removeTarget<Type extends TargetType>(
     }
     default: {
       throw "GameState.overTarget: impossible case";
+    }
+  }
+}
+
+export function possibleActions(
+  state: GameState,
+): SolutionData[] {
+  const actions: SolutionData[] = [];
+  state.frUnits.units.forEach(frUnit => {
+    if (frUnit !== undefined) {
+      frUnit.abilities.forEach(ability => {
+        if (ability.inputs.length === 0) {
+          actions.push({
+            ability: ability.ability,
+            origin: frUnit.id,
+            inputs: [],
+          });
+        } else {
+          const inputPossibilities = ability.inputs.map(input => {
+            return possibleTargets(state, input);
+          });
+          const inputCartesian = cartesian(inputPossibilities);
+          inputCartesian.forEach(inputPossibility => {
+            actions.push({
+              ability: ability.ability,
+              origin: frUnit.id,
+              inputs: inputPossibility,
+            });
+          });
+        }
+      });
+    }
+  });
+
+  return actions;
+}
+
+function cartesian<A>(arg: A[][]): A[][] {
+  if (arg.length === 0) {
+    return [];
+  };
+  const r: A[][] = [];
+  const max = arg.length - 1;
+  function helper(arr: A[], i: number) {
+      for (let j = 0, l = arg[i].length; j < l; j++) {
+          const a: A[] = arr.slice(0); // clone arr
+          a.push(arg[i][j]);
+          if (i == max)
+              r.push(a);
+          else
+              helper(a, i+1);
+      }
+  }
+  helper([], 0);
+  return r;
+}
+
+export function possibleTargets(
+  state: GameState,
+  userInput: UserInput,
+): TargetId[] {
+  switch (userInput.tag) {
+    case "TargetInput": {
+      return possibleTargets(state, new UnitInput)
+        .concat(possibleTargets(state, new StatusInput));
+    }
+    case "UnitInput": {
+      return possibleTargets(state, new FriendlyInput)
+        .concat(possibleTargets(state, new EnemyInput));
+    }
+    case "StatusInput": {
+      const statusIds: TargetId[] = [];
+      groupOrder.forEach(tag => {
+        state.statusRows[tag].statuses.forEach(status => {
+          statusIds.push(status.id);
+        });
+      });
+      return statusIds;
+    }
+    case "FriendlyInput": {
+      const frIds: TargetId[] = frFiltered(state).map(x => x.e.id);
+      return frIds;
+    }
+    case "EnemyInput": {
+      const enIds: TargetId[] = enFiltered(state).map(x => x.e.id);
+      return enIds;
     }
   }
 }
