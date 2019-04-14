@@ -1,5 +1,5 @@
-import { possibleActions, showStateCompact } from "../src/shared/game/state";
-import { extendSolution, Solution, runPhases, SolutionData, showSolDataCompact } from "../src/shared/game/solution";
+import { possibleActions, showGamestate } from "../src/shared/game/state";
+import { extendSolution, Solution, runPhases, SolutionData, showSolData } from "../src/shared/game/solution";
 import { Location, getLocation } from "../src/shared/tree";
 import { fnv1a } from "../src/shared/fnv1a";
 import { GameState } from "src/shared/definitions/state";
@@ -19,7 +19,7 @@ function isInCache(
   state: GameState,
   cache: StateCache,
 ): boolean {
-  const stateString = showStateCompact(state);
+  const stateString = showGamestate(state);
   const hash = fnv1a(stateString);
   if (cache[hash] === undefined) {
     cache[hash] = [stateString];
@@ -61,10 +61,10 @@ export function _trySolutions(
       _trySolutions(next.state, depth - 1, newAcc, cache);
     } else if (next.win) {
       const show = newAcc
-        .map((x, i) => `${showSolDataCompact(x)}`)
+        .map((x, i) => `${showSolData(x)}`)
         .join("\n")
         ;
-      console.log(showStateCompact(next.state));
+      console.log(showGamestate(next.state));
       console.log(`Win reached (${newAcc.length}):\n${show}\n----`);
     }
   });

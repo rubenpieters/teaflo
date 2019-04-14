@@ -33,7 +33,7 @@ export function resolveAction(
 
       const entity = result.entity;
       let actions: ActionWithOrigin[] = [];
-      if (entity !== undefined && entity.hp <= 0) {
+      if (entity !== undefined && entity.hp <= 0 && (entity as any).essential) {
         actions = [invalidNoOrigin];
       }
       return { state: result.state, actions };

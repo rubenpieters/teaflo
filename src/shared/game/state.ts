@@ -2,7 +2,7 @@ import { TargetType, EntityId, FriendlyId, EnemyId, StatusId, UnitType, friendly
 import { UnitRow } from "../definitions/unitRow";
 import { StatusRow, StStatus } from "../definitions/statusRow";
 import { focus, over, modifyAndGet } from "../iassign-util";
-import { groupOrder } from "./status";
+import { groupOrder, showStatus } from "./status";
 import deepEqual from "deep-equal";
 import { frUnitMap, FrUnitId } from "../data/frUnitMap";
 import { enUnitMap, EnUnitId } from "../data/enUnitMap";
@@ -11,6 +11,7 @@ import { defined, overUnit, removeUnit } from "./unitRow";
 import { statusPosition, overStatus, removeStatus } from "./statusRow";
 import { UserInput, UnitInput, StatusInput, FriendlyInput, EnemyInput } from "../definitions/input";
 import { SolutionData } from "./solution";
+import { showUnit } from "./unit";
 
 export type IdToEntityType = {
   "friendly": StFrUnit,
@@ -327,4 +328,62 @@ export function possibleTargets(
       return enIds;
     }
   }
+}
+
+export function showGamestate(
+  state: GameState,
+): string {
+  const fr = frFiltered(state).map(x => showUnit(x.e, x.i)).join(" | ");
+  const en = enFiltered(state).map(x => showUnit(x.e, x.i)).join(" | ");
+  const tr = triggerById(state);
+  const frTr = tr.fr.map((l, i) => {
+    return `${i}: ${l.map(x => showStatus(x)).join(" | ")}`;
+  }).join("\n");
+  const enTr = tr.en.map((l, i) => {
+    return `${i}: ${l.map(x => showStatus(x)).join(" | ")}`;
+  }).join("\n");
+
+  return `state:${state.type}\n${fr}\n${en}\n${frTr}\n${enTr}`;
+}
+
+export function triggerById(
+  state: GameState,
+): {
+  fr: StStatus[][],
+  en: StStatus[][],
+} {
+  const fr: StStatus[][] = [];
+  const en: StStatus[][] = [];
+  groupOrder.forEach(tag => {
+    state.statusRows[tag].statuses.forEach(status => {
+      try {
+        const position = statusPosition(state.statusRows[tag], status.id);
+        if (position === undefined) {
+          throw `triggerById: should not happen, id ${JSON.stringify(status.id)} does not exist`;
+        }
+        const ownerType = status.owner.type;
+        switch (ownerType) {
+          case "friendly": {
+            if (fr[position] === undefined) {
+              fr[position] = [status];
+            } else {
+              fr[position].push(status);
+            }
+            break;
+          }
+          case "enemy": {
+            if (en[position] === undefined) {
+              en[position] = [status];
+            } else {
+              en[position].push(status);
+            }
+            break;
+          }
+        }
+      } catch (e) {
+        
+      }
+    });
+  });
+  return { fr, en };
 }
