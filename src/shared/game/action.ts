@@ -6,11 +6,12 @@ import { useChargeUnit, moveAIUnit } from "./unit";
 import { statusGroup, statusDescription } from "./status";
 import { addThreat } from "./threat";
 import { Action, ActionWithOrigin, ActionWithOriginF } from "../definitions/action";
-import { GameState } from "../definitions/state";
+import { GameState, StFrUnit } from "../definitions/state";
 import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag } from "../definitions/actionf";
 import { addStatus } from "./statusRow";
 import { descSingleton, numberDescription } from "./description";
 import { DescToken, DescSymbol } from "../definitions/description";
+import { HasId } from "../definitions/entityId";
 
 
 
@@ -33,7 +34,12 @@ export function resolveAction(
 
       const entity = result.entity;
       let actions: ActionWithOrigin[] = [];
-      if (entity !== undefined && entity.hp <= 0 && (entity as any).essential) {
+      if (
+        entity !== undefined &&
+        entity.hp <= 0 &&
+        (entity as HasId<"friendly">).id.type === "friendly" &&
+        (entity as StFrUnit).essential
+      ) {
         actions = [invalidNoOrigin];
       }
       return { state: result.state, actions };

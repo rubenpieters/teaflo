@@ -198,7 +198,6 @@ export function runPhases(
   });
 
   const win = checkWin(state);
-  console.log(`WIN: ${win}`);
   if (win) {
     state = focus(state, set(x => x.type, "win"));
   }
@@ -212,13 +211,10 @@ export function checkWin(
   const enHps = enFiltered(state)
     .map(x => x.e.hp)
     ;
-  console.log(JSON.stringify(enHps));
   const countAllBelow0 = enHps
     .filter(x => x <= 0)
     .length
     ;
-  console.log(countAllBelow0);
-  console.log(enFiltered(state).length);
 
   return countAllBelow0 === enFiltered(state).length;
 }
