@@ -10,7 +10,7 @@ import { resolveCondition } from "./condition";
 import { resolveStatusTransform } from "./statusTranform";
 import { showEntityId } from "./entityId";
 import { descSingleton, numberDescription } from "./description";
-import { DescSymbol } from "../definitions/description";
+import { DescSymbol, DescToken } from "../definitions/description";
 
 export function statusGroup(
   status: Status,
@@ -153,7 +153,7 @@ export function showStStatus(
 
 export function statusDescription(
   status: Status,
-) {
+): DescToken[] {
   switch (status.tag) {
     case "Weak": {
       return numberDescription(status.value)
@@ -174,6 +174,25 @@ export function statusDescription(
       return numberDescription(status.value)
         .concat(new DescSymbol("icon_armor"))
         ;
+    }
+  }
+}
+
+export function statusTagDescription(
+  tag: StatusTag,
+): DescToken[] {
+  switch (tag) {
+    case "Weak": {
+      return descSingleton("icon_weak");
+    }
+    case "Fragile": {
+      return descSingleton("icon_fragile");
+    }
+    case "Strong": {
+      return descSingleton("icon_strong");
+    }
+    case "Armor": {
+      return descSingleton("icon_armor");
     }
   }
 }

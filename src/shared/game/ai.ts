@@ -39,3 +39,14 @@ export function aiPositions(
 ): AIPosition[] {
   return aiIndices.map(indexToAiPos);
 }
+
+export function routeDirectionDescription(
+  aiDirection: AIDirection,
+) {
+  switch (aiDirection) {
+    case "down": return "icon_ai_down";
+    case "left": return "icon_ai_left";
+    case "right": return "icon_ai_right";
+    case "up": return "icon_ai_up";
+  }
+}

@@ -177,7 +177,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   public clear() {
     this.groups.forEach(x => {
       if (x !== undefined) {
-        x.destroy
+        x.destroy();
       }
     });
     // kill all sprites

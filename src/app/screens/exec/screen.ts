@@ -11,13 +11,12 @@ import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, 
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation, runAsTween } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution, SolutionData } from "../../../shared/game/solution";
-import { intentDescription, actionDescription, triggerTagDescription, DescToken } from "../../util/intentDesc";
 import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
 import { clearAnimations } from "../util";
 import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions } from "./positions";
 import deepEqual from "deep-equal";
-import { groupOrder } from "../../../shared/game/status";
+import { groupOrder, statusTagDescription } from "../../../shared/game/status";
 import { StStatus } from "../../../shared/definitions/statusRow";
 import { matchUserInput } from "../../../shared/game/input";
 import { aiIndices, indexToAiPos, aiPosToIndex } from "../../../shared/game/ai";
@@ -27,6 +26,9 @@ import { Action } from "../../../shared/definitions/action";
 import { UserInput } from "../../../shared/definitions/input";
 import { Ability } from "../../../shared/definitions/ability";
 import { StatusTag } from "../../../shared/definitions/status";
+import { groupFromDesc } from "../../util/description";
+import { actionDescription } from "../../../shared/game/action";
+import { abilityDescription } from "../../../shared/game/ability";
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
@@ -672,31 +674,11 @@ export class ExecScreen {
     parentY: number,
     action: Action,
   ): Phaser.Sprite {
-    const desc = actionDescription(action);
-    let y = 0;
-    let xOffset = 0;
-    const dataList: {
-      x: number,
-      y: number,
-      frameType: {},
-      data: LogTextSpriteData,
-    }[] = [];
-    desc.forEach((descSym, descIndex) => {
-      switch (descSym.tag) {
-        case "DescSeparator": {
-          y += 1;
-          xOffset = descIndex + 1;
-          break;
-        }
-        case "DescSymbol": {
-          const xPos = 80 * (descIndex - xOffset);
-          const yPos = - y * 80;
-          dataList.push({ x: xPos, y: yPos, frameType: {}, data: { sprite: descSym.sym } });
-          break;
-        }
-      }
-    });
-    return this.logTextSpritePool.newGroup(parentX, parentY, dataList);
+    return groupFromDesc(
+      actionDescription(action),
+      40, { x: parentX, y: parentY }, () => { return {} }, sprite => { return { sprite }},
+      this.logTextSpritePool,
+    );
   }
 
   createTriggerEntryAnim(
@@ -1052,34 +1034,19 @@ function mkAbilityPool(
         },
         hoverOver: (self) => {
           if (self.data.tag === "FrAbilityData" || self.data.tag === "EnAbilityData") {
-            let intent: Ability;
+            let ability: Ability;
             if (self.data.tag === "FrAbilityData") {
-              intent = self.data.ability.ability;
+              ability = self.data.ability.ability;
             } else {
-              intent = self.data.ai.ability;
+              ability = self.data.ai.ability;
             }
-            const desc = intentDescription(intent);
-            let y = 0;
-            let xOffset = 0;
-            desc.forEach((descSym, descIndex) => {
-              const explPos = createPosition(
-                "left", 750 + 80 * (descIndex - xOffset), 80,
-                "bot", 225 - y * 80, 80,
-              );
-              switch (descSym.tag) {
-                case "DescSeparator": {
-                  y += 1;
-                  xOffset = descIndex + 1;
-                  break;
-                }
-                case "DescSymbol": {
-                  gameRefs.screens.execScreen.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
-                  break;
-                }
-              }
-            });
 
-            y += 1;
+            
+            return groupFromDesc(
+              abilityDescription(ability),
+              40, { x: 750, y: 225 }, () => { return {} }, sprite => { return { sprite }},
+              gameRefs.screens.execScreen.detailExplPool,
+            );
           }
         },
         hoverOut: (self) => {
@@ -1184,13 +1151,24 @@ function mkLogActionPool(
           gameRefs.screens.execScreen.drawStats(self.data.state);
 
           // change hover info
-          //drawDescriptionToHoverInfo(gameRefs, actionDescription(self.data.action), 50, 0);
           self.data.transforms.forEach((transform, transformIndex) => {
-            drawDescriptionToHoverInfo(gameRefs, actionDescription(transform.before), 50, 50 * transformIndex);
+            groupFromDesc(
+              actionDescription(transform.before),
+              40, { x: 50, y: 50 * transformIndex}, () => { return {} }, sprite => { return { sprite }},
+              gameRefs.screens.execScreen.detailExplPool,
+            );
             if (transformIndex === self.data.transforms.length - 1) {
-              drawDescriptionToHoverInfo(gameRefs, actionDescription(transform.after), 50, 50 * (transformIndex + 1));
+              groupFromDesc(
+                actionDescription(transform.after),
+                40, { x: 50, y: 50 * (transformIndex + 1)}, () => { return {} }, sprite => { return { sprite }},
+                gameRefs.screens.execScreen.detailExplPool,
+              );
             }
-            drawDescriptionToHoverInfo(gameRefs, triggerTagDescription(transform.tag), 0, 50 * (transformIndex + 1));
+            groupFromDesc(
+              statusTagDescription(transform.tag),
+              40, { x: 0, y: 50 * (transformIndex + 1)}, () => { return {} }, sprite => { return { sprite }},
+              gameRefs.screens.execScreen.detailExplPool,
+            );
           });
         },
         hoverOut: (self) => {
@@ -1199,33 +1177,6 @@ function mkLogActionPool(
       },
     },
   );
-}
-
-function drawDescriptionToHoverInfo(
-  gameRefs: GameRefs,
-  desc: DescToken[],
-  startX: number = 0,
-  startY: number = 0,
-) {
-  let y = 0;
-  let xOffset = 0;
-  desc.forEach((descSym, descIndex) => {
-    const explPos = createPosition(
-      "left", 750 + startX + 80 * (descIndex - xOffset), 80,
-      "bot", 225 - startY - y * 80, 80,
-    );
-    switch (descSym.tag) {
-      case "DescSeparator": {
-        y += 1;
-        xOffset = descIndex + 1;
-        break;
-      }
-      case "DescSymbol": {
-        gameRefs.screens.execScreen.detailExplPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
-        break;
-      }
-    }
-  });
 }
 
 type LogTriggerData = {

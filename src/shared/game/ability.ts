@@ -7,6 +7,9 @@ import { Action } from "../definitions/action";
 import { GameState, StFrUnit } from "../definitions/state";
 import { Static } from "../definitions/condition";
 import { defined } from "./unitRow";
+import { DescToken, DescSymbol, DescSeparator } from "../definitions/description";
+import { descSingleton, numberDescription } from "./description";
+import { statusDescription } from "./status";
 
 export function resolveSingleTargetAbility(
   ability: SingleTargetAbility,
@@ -179,4 +182,95 @@ export function getHighestThreat(
   } else {
     return threat.id;
   }
+}
+
+export function abilityDescription(
+  ability: Ability,
+): DescToken[] {
+  switch (ability.tag) {
+    case "AddThreat": {
+      return abilityVarDescription(ability.value, x => abilityVarNumber(x, "positive"))
+        .concat(abilityVarDescription(ability.atEnemy, intentVarTarget))
+        .concat(new DescSymbol("icon_th"))
+        .concat(abilityVarDescription(ability.forAlly, intentVarTarget))
+        ;
+    }
+    case "AddStatus": {
+      return abilityVarDescription(ability.status, statusDescription)
+        .concat(abilityVarDescription(ability.target, intentVarTarget))
+        ;
+    }
+    case "Combined": {
+      const desc: DescToken[] = ability.list.reduce((acc, x) => {
+        if (acc.length === 0) {
+          return acc.concat(abilityDescription(x));
+        } else {
+          return acc.concat(new DescSeparator()).concat(abilityDescription(x));
+        }
+      }, <DescToken[]>[]);
+      return desc;
+    }
+    case "Damage": {
+      return abilityVarDescription(ability.value, x => abilityVarNumber(x, "negative"))
+        .concat(new DescSymbol("icon_hp"))
+        .concat(abilityVarDescription(ability.target, intentVarTarget))
+        ;
+    }
+    case "UseCharge": {
+      return abilityVarDescription(ability.value, x => abilityVarNumber(x, "negative"))
+        .concat(new DescSymbol("icon_ch"))
+        .concat(abilityVarDescription(ability.target, intentVarTarget))
+        ;
+    }
+    case "MoveAI": {
+      return descSingleton("icon_ai");
+    }
+    default: {
+      throw `unimpl: ${JSON.stringify(ability)}`;
+    }
+  }
+}
+
+export function abilityVarDescription<A>(
+  abilityVar: TargetVar<A> | AbilityVar<A>,
+  f: (a: A) => DescToken[]
+): DescToken[] {
+  switch (abilityVar.tag) {
+    case "Static": {
+      return f(abilityVar.a);
+    }
+    case "AllAlly": {
+      return [new DescSymbol("expl_all_friendly")];
+    }
+    case "AllEnemy": {
+      return [new DescSymbol("expl_all_enemy")];
+    }
+    case "FromInput": {
+      return [new DescSymbol("expl_target")];
+    }
+    case "HighestThreat": {
+      return [new DescSymbol("expl_target_status")];
+    }
+    case "Self": {
+      return [new DescSymbol("expl_self")];
+    }
+  }
+}
+
+function abilityVarNumber(
+  x: number,
+  sign: "positive" | "negative",
+): DescToken[] {
+  if (sign === "positive") {
+    return descSingleton("expl_plus").concat(numberDescription(x));
+  } else {
+    return descSingleton("expl_minus").concat(numberDescription(x));
+  }
+}
+
+function intentVarTarget(
+  x: any
+): DescToken[] {
+  // TODO: implement
+  return [];
 }

@@ -13,9 +13,9 @@ function _numberDescription(
   const digit = x % 10;
   const next = Math.round((x / 10) - 0.5);
   if (next >= 1) {
-    return _numberDescription(next, acc).concat([new DescSymbol(`expl_${digit}.png`)]);
+    return _numberDescription(next, acc).concat([new DescSymbol(`expl_${digit}`)]);
   } else {
-    return acc.concat([new DescSymbol(`expl_${digit}.png`)]);
+    return acc.concat([new DescSymbol(`expl_${digit}`)]);
   }
 }
 

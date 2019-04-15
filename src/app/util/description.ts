@@ -1,4 +1,4 @@
-import { DescToken } from "src/shared/definitions/description";
+import { DescToken } from "../../shared/definitions/description";
 import { Pool } from "../phaser/pool";
 
 export function groupFromDesc<Data, FrameType>(
