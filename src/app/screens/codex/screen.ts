@@ -5,8 +5,10 @@ import { frUnitMap, FrUnitId } from "../../../shared/data/frUnitMap";
 import { createPosition } from "../../util/position";
 import { Ability } from "../../../shared/definitions/ability";
 import { Pool } from "../../phaser/pool";
-import { intentDescription } from "../../util/intentDesc";
 import { aiIndices } from "../../../shared/game/ai";
+import { groupFromDesc } from "../../util/description";
+import { abilityDescription } from "../../../shared/game/ability";
+import { settings } from "../../data/settings";
 
 export type CodexTypes
   = { tag: "FrCardId", cardId: FrUnitId }
@@ -137,26 +139,11 @@ export class CodexScreen {
         
         unit.abilities.forEach((ability, abilityIndex) => {
           if (this.showAbilityIndex !== undefined && this.showAbilityIndex === abilityIndex) {
-            let y = 0;
-            let xOffset = 0;
-            const desc = intentDescription(ability.ability);
-            desc.forEach((descSym, descIndex) => {
-              const explPos = createPosition(
-                "left", 150 + 80 * (descIndex - xOffset), 80,
-                "bot", 250 - y * 80, 80,
-              );
-              switch (descSym.tag) {
-                case "DescSeparator": {
-                  y += 1;
-                  xOffset = descIndex + 1;
-                  break;
-                }
-                case "DescSymbol": {
-                  this.abilityDescPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
-                  break;
-                }
-              }
-            });
+            groupFromDesc(
+              abilityDescription(ability.ability),
+              40, { x: 150, y: (settings.gameHeight - 220) }, () => { return {} }, sprite => { return { sprite }},
+              this.abilityDescPool,
+            );
           }
         });
       } else if (this.page.tag === "EnCardId") {
@@ -166,26 +153,11 @@ export class CodexScreen {
           const ability = unit.abilities[aiIndex];
           if (ability !== undefined) {
             if (this.showAbilityIndex !== undefined && this.showAbilityIndex === aiIndex) {
-              let y = 0;
-              let xOffset = 0;
-              const desc = intentDescription(ability.ability);
-              desc.forEach((descSym, descIndex) => {
-                const explPos = createPosition(
-                  "left", 150 + 80 * (descIndex - xOffset), 80,
-                  "bot", 250 - y * 80, 80,
-                );
-                switch (descSym.tag) {
-                  case "DescSeparator": {
-                    y += 1;
-                    xOffset = descIndex + 1;
-                    break;
-                  }
-                  case "DescSymbol": {
-                    this.abilityDescPool.newSprite(explPos.xMin, explPos.yMin, {}, { sprite: descSym.sym });
-                    break;
-                  }
-                }
-              });
+              groupFromDesc(
+                abilityDescription(ability.ability),
+                40, { x: 150, y: (settings.gameHeight - 220) }, () => { return {} }, sprite => { return { sprite }},
+                this.abilityDescPool,
+              );
             }
           }
         });

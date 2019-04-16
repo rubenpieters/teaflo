@@ -29,6 +29,7 @@ import { StatusTag } from "../../../shared/definitions/status";
 import { groupFromDesc } from "../../util/description";
 import { actionDescription } from "../../../shared/game/action";
 import { abilityDescription } from "../../../shared/game/ability";
+import { settings } from "../../data/settings";
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
@@ -1040,11 +1041,10 @@ function mkAbilityPool(
             } else {
               ability = self.data.ai.ability;
             }
-
             
             return groupFromDesc(
               abilityDescription(ability),
-              40, { x: 750, y: 225 }, () => { return {} }, sprite => { return { sprite }},
+              40, { x: 750, y: (settings.gameHeight - 225) }, () => { return {} }, sprite => { return { sprite }},
               gameRefs.screens.execScreen.detailExplPool,
             );
           }
