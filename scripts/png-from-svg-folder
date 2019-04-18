@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# example usage: png-from-svg-folder test1 test2 20 20
+
+FOLDER=$1
+DEST=$2
+WIDTH=$3
+HEIGHT=$4
+
+for filename in ${FOLDER}/*; do
+    base=$(basename -- "$filename")
+    extension="${base##*.}"
+    base="${base%.*}"
+    exportname=${DEST}/${base}_${WIDTH}_${HEIGHT}
+    # echo ${filename}
+    # echo ${exportname}
+    npx --no-install svgexport $filename textures/$EXPORTNAME.png $WIDTH:$HEIGHT pad
+done
