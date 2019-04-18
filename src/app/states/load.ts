@@ -33,12 +33,12 @@ export default class Load extends Phaser.State {
 
   public preload(): void {
     // load sprites
-    this.game.load.image("bg0", "textures/paper_bg2.jpg");
-    this.game.load.image("bg1", "textures/paper_bg3.jpg");
-    this.game.load.image("bg2", "textures/paper_bg4.jpg");
-    this.game.load.image("bg3", "textures/paper_bg5.jpg");
-    this.game.load.image("bg4", "textures/paper_bg1.jpg");
-    this.game.load.atlasJSONHash('atlas1', 'assets/atlas1.png', 'assets/atlas1.json');
+    this.game.load.image("bg0", "assets/textures/paper_bg2.jpg");
+    this.game.load.image("bg1", "assets/textures/paper_bg3.jpg");
+    this.game.load.image("bg2", "assets/textures/paper_bg4.jpg");
+    this.game.load.image("bg3", "assets/textures/paper_bg5.jpg");
+    this.game.load.image("bg4", "assets/textures/paper_bg1.jpg");
+    this.game.load.atlasJSONHash('atlas1', 'assets/atlas/atlas1.png', 'assets/atlas/atlas1.json');
 
     // indicate loading is done
     loadingText.setText("Click anywhere to continue...");

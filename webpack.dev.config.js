@@ -27,7 +27,7 @@ module.exports = {
       path.join(__dirname, "dist")
     ]),
     new CopyWebpackPlugin([
-      { from: "textures/", to: "textures/" },
+      { from: "assets/", to: "assets/" },
     ]),
     new HtmlWebpackPlugin({
       title: "TeaFlo",
