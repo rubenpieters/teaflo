@@ -21,10 +21,10 @@ export type ActionCondition = ActionWithOriginF<Condition_URI>;
  */
 export type ConditionVar<A>
   = Static<A>
-  | Var
   | StatusOwner
   | StatusValue
   | IdOfStatus
+  | Trivial
   ;
 
 export class Static<A> {
@@ -35,19 +35,10 @@ export class Static<A> {
   ) {}
 }
 
-export class Var {
-  public readonly tag: "Var" = "Var";
-
-  constructor(
-    public readonly bindingName: string,
-  ) {}
-}
-
 export class StatusOwner {
   public readonly tag: "StatusOwner" = "StatusOwner";
   
   constructor(
-
   ) {}
 }
 
@@ -59,7 +50,6 @@ export class StatusValue {
   public readonly tag: "StatusValue" = "StatusValue";
   
   constructor(
-
   ) {}
 }
 
@@ -71,10 +61,16 @@ export class IdOfStatus {
   public readonly tag: "IdOfStatus" = "IdOfStatus";
   
   constructor(
-
   ) {}
 }
 
 export function idOfStatus(): ConditionVar<StatusId> {
   return new IdOfStatus();
+}
+
+export class Trivial {
+  public readonly tag: "Trivial" = "Trivial";
+  
+  constructor(
+  ) {}
 }

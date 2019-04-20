@@ -1,9 +1,9 @@
 import { resolveStatusTransform } from "../../../src/shared/game/statusTranform";
 import { Damage } from "../../../src/shared/definitions/actionf";
-import { Var, statusOwner } from "../../../src/shared/definitions/condition";
+import { statusOwner } from "../../../src/shared/definitions/condition";
 import { EntityId, friendlyId, enemyId, statusId } from "../../../src/shared/definitions/entityId";
 import { Weak } from "../../../src/shared/definitions/status";
-import { StatusTransform } from "../../../src/shared/definitions/statusTransform";
+import { StatusTransform, Var } from "../../../src/shared/definitions/statusTransform";
 
 const trans1: StatusTransform = {
   ...new Damage("ST", "ST", new Var("1"), statusOwner()),

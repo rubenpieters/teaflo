@@ -35,13 +35,15 @@ export function statusToCondition(
   switch (status.tag) {
     case "Fragile":
     case "Armor": {
+      // Dmg Value Target & Origin
       // Dmg (Var 1) (StatusOwner) & (Var 2)
-      return {...new Damage("Cond", "Cond", new C.Var("1"), C.statusOwner()), origin: new C.Var("2") };
+      return {...new Damage("Cond", "Cond", new C.Trivial, C.statusOwner()), origin: new C.Trivial };
     }
     case "Strong":
     case "Weak": {
+      // Dmg Value Target & Origin
       // Dmg (Var 1) (Var 2) & (StatusOwner)
-      return {...new Damage("Cond", "Cond", new C.Var("1"), new C.Var("2")), origin: C.statusOwner() };
+      return {...new Damage("Cond", "Cond", new C.Trivial, new C.Trivial), origin: C.statusOwner() };
     }
   }
 }
@@ -55,8 +57,8 @@ export function statusToTransform(
   switch (status.tag) {
     case "Armor": {
       const transform: ST.StatusTransform = {
-        ...new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), C.statusOwner()),
-        origin: new C.Var("3"),
+        ...new Damage("ST", "ST", ST.monus(new ST.Var("value"), C.statusValue()), new ST.Var("target")),
+        origin: new ST.Var("origin"),
       };
       const actions: ST.StatusTransform[] = [
         {
@@ -68,8 +70,8 @@ export function statusToTransform(
     }
     case "Weak": {
       const transform: ST.StatusTransform = {
-        ...new Damage("ST", "ST", ST.monus(new C.Var("1"), C.statusValue()), new C.Var("2")),
-        origin: C.statusOwner(),
+        ...new Damage("ST", "ST", ST.monus(new ST.Var("value"), C.statusValue()), new ST.Var("target")),
+        origin: new ST.Var("origin"),
       };
       const actions: ST.StatusTransform[] = [];
       return { transform, actions };

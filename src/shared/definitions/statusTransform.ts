@@ -34,10 +34,19 @@ export function add(
   return new Add(v1, v2);
 }
 
+export class Var {
+  public readonly tag: "Var" = "Var";
+
+  constructor(
+    public readonly bindingName: string,
+  ) {}
+}
+
 export type StatusTransformVar<A>
   = ConditionVar<A>
   | Monus
   | Add
+  | Var
   ;
 
 export type StatusTransform = ActionWithOriginF<StatusTransform_URI>;

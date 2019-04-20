@@ -17,11 +17,9 @@ export function resolveCondition(
       if (key !== "tag" && key !== "uriF" && key !== "uriG") {
         const conditionVar = (actionCondition as any)[key];
         const val = (onStackAction as any)[key];
-        const resolved = resolveConditionVar(status, conditionVar, val);
-        if (resolved.binding !== undefined) {
-          bindings[resolved.binding[0]] = resolved.binding[1];
-        }
-        if (! resolved.result) {
+        const result = resolveConditionVar(status, conditionVar, val);
+        bindings[key] = val;
+        if (! result) {
           condition = false;
         }
       }
@@ -36,26 +34,26 @@ export function resolveConditionVar<A>(
   status: StStatus,
   conditionVar: ConditionVar<A>,
   val: A,
-): { result: boolean, binding?: [string, A] } {
+): boolean {
   switch (conditionVar.tag) {
     case "Static": {
       const result = deepEqual(val, conditionVar.a);
-      return { result };
+      return result;
     }
     case "StatusOwner": {
       const result = deepEqual(val, status.owner);
-      return { result };
-    }
-    case "Var": {
-      return { result: true, binding: [conditionVar.bindingName, val] };
+      return result;
     }
     case "StatusValue": {
       const result = deepEqual(val, status.value);
-      return { result };
+      return result;
     }
     case "IdOfStatus": {
       const result = deepEqual(val, status.id);
-      return { result };
+      return result;
+    }
+    case "Trivial": {
+      return true;
     }
   }
 }
