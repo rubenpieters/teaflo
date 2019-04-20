@@ -12,6 +12,7 @@ import { addStatus } from "./statusRow";
 import { descSingleton, numberDescription } from "./description";
 import { DescToken, DescSymbol } from "../definitions/description";
 import { HasId } from "../definitions/entityId";
+import { routeDirectionDescription } from "./ai";
 
 
 
@@ -204,8 +205,21 @@ export function actionDescription(
       .concat(new DescSymbol("icon_ch"))
       ;
     }
-    default: {
-      return [];
+    case "MoveAI": {
+      return routeDirectionDescription(action.dir)
+        ;
+    }
+    case "Death": {
+      return descSingleton("icon_death")
+        ;
+    }
+    case "StartTurn": {
+      return descSingleton("icon_start_turn")
+        ;
+    }
+    case "Invalid": {
+      return descSingleton("icon_invalid")
+        ;
     }
   }
 }

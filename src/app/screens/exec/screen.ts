@@ -1071,10 +1071,10 @@ function mkTriggerPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         switch (self.data.status.tag) {
-          case "Armor": return "icon_armor.png";
-          case "Weak": return "icon_weak.png";
-          case "Strong": return "icon_strong.png";
-          case "Fragile": return "icon_fragile.png";
+          case "Armor": return "icon_armor_40_40.png";
+          case "Weak": return "icon_weak_40_40.png";
+          case "Strong": return "icon_strong_40_40.png";
+          case "Fragile": return "icon_fragile_40_40.png";
           default: return "icon_a.png";
         }
       },
@@ -1121,13 +1121,14 @@ function mkLogActionPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         switch (self.data.action.tag) {
-          case "Damage": return "icon_hp_minus.png";
-          case "UseCharge": return "icon_ch_minus.png";
-          case "AddThreat": return "icon_th_plus.png";
+          case "Damage": return "icon_damage_40_40.png";
+          case "UseCharge": return "icon_usecharge_40_40.png";
+          case "AddThreat": return "icon_addthreat_40_40.png";
           case "MoveAI": return "icon_ai.png";
-          case "StartTurn": return "icon_start_turn.png";
-          case "AddStatus": return "icon_add_status.png";
-          case "Death": return "icon_death.png";
+          case "StartTurn": return "icon_start_turn_40_40.png";
+          case "AddStatus": return "icon_addstatus_40_40.png";
+          case "Death": return "icon_death_40_40.png";
+          case "Invalid": return "icon_invalid_40_40.png"
           default: return "icon_b.png";
         }
       },

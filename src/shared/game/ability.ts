@@ -190,14 +190,14 @@ export function abilityDescription(
 ): DescToken[] {
   switch (ability.tag) {
     case "AddThreat": {
-      return abilityVarDescription(ability.value, x => abilityVarNumber(x, "positive"))
-      .concat(abilityVarDescription(ability.forAlly, intentVarTarget))
-        .concat(new DescSymbol("icon_th"))
+      return descSingleton("icon_addthreat")
+        .concat(abilityVarDescription(ability.value, x => numberDescription(x)))
+        .concat(abilityVarDescription(ability.forAlly, intentVarTarget))
         .concat(abilityVarDescription(ability.atEnemy, intentVarTarget))
         ;
     }
     case "AddStatus": {
-      return descSingleton("icon_plus")
+      return descSingleton("icon_addstatus")
         .concat(abilityVarDescription(ability.status, statusDescription))
         .concat(abilityVarDescription(ability.target, intentVarTarget))
         ;
@@ -213,14 +213,15 @@ export function abilityDescription(
       return desc;
     }
     case "Damage": {
-      return abilityVarDescription(ability.value, x => abilityVarNumber(x, "negative"))
+      return descSingleton("icon_addthreat")
+        .concat(abilityVarDescription(ability.value, x => numberDescription(x)))
         .concat(new DescSymbol("icon_hp"))
         .concat(abilityVarDescription(ability.target, intentVarTarget))
         ;
     }
     case "UseCharge": {
-      return abilityVarDescription(ability.value, x => abilityVarNumber(x, "negative"))
-        .concat(new DescSymbol("icon_ch"))
+      return descSingleton("icon_usecharge")
+        .concat(abilityVarDescription(ability.value, x => numberDescription(x)))
         .concat(abilityVarDescription(ability.target, intentVarTarget))
         ;
     }
@@ -228,8 +229,17 @@ export function abilityDescription(
       return abilityVarDescription(ability.dir, x => routeDirectionDescription(x))
         ;
     }
-    default: {
-      throw `unimpl: ${JSON.stringify(ability)}`;
+    case "Death": {
+      return descSingleton("icon_death")
+        ;
+    }
+    case "StartTurn": {
+      return descSingleton("icon_start_turn")
+        ;
+    }
+    case "Invalid": {
+      return descSingleton("icon_invalid")
+        ;
     }
   }
 }
