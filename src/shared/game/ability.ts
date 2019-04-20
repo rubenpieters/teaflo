@@ -205,9 +205,9 @@ export function abilityDescription(
     case "Combined": {
       const desc: DescToken[] = ability.list.reduce((acc, x) => {
         if (acc.length === 0) {
-          return acc.concat(abilityDescription(x));
+          return abilityDescription(x).concat(acc);
         } else {
-          return acc.concat(new DescSeparator()).concat(abilityDescription(x));
+          return abilityDescription(x).concat(new DescSeparator()).concat(acc);
         }
       }, <DescToken[]>[]);
       return desc;
