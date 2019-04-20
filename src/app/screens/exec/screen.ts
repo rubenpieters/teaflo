@@ -1048,6 +1048,7 @@ function mkAbilityPool(
               gameRefs.screens.execScreen.detailExplPool,
             );
           }
+          return undefined as any;
         },
         hoverOut: (self) => {
           gameRefs.screens.execScreen.detailExplPool.clear();
