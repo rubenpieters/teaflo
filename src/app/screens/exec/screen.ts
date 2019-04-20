@@ -677,7 +677,7 @@ export class ExecScreen {
   ): Phaser.Sprite {
     return groupFromDesc(
       actionDescription(action),
-      40, { x: parentX, y: parentY }, () => { return {} }, sprite => { return { sprite }},
+      80, { x: parentX, y: parentY }, () => { return {} }, sprite => { return { sprite }},
       this.logTextSpritePool,
     );
   }
@@ -1044,7 +1044,7 @@ function mkAbilityPool(
             
             return groupFromDesc(
               abilityDescription(ability),
-              40, { x: 750, y: (settings.gameHeight - 225) }, () => { return {} }, sprite => { return { sprite }},
+              80, { x: 750, y: (settings.gameHeight - 225) }, () => { return {} }, sprite => { return { sprite }},
               gameRefs.screens.execScreen.detailExplPool,
             );
           }
@@ -1155,19 +1155,19 @@ function mkLogActionPool(
           self.data.transforms.forEach((transform, transformIndex) => {
             groupFromDesc(
               actionDescription(transform.before),
-              40, { x: 50, y: 50 * transformIndex}, () => { return {} }, sprite => { return { sprite }},
+              80, { x: 50, y: 50 * transformIndex}, () => { return {} }, sprite => { return { sprite }},
               gameRefs.screens.execScreen.detailExplPool,
             );
             if (transformIndex === self.data.transforms.length - 1) {
               groupFromDesc(
                 actionDescription(transform.after),
-                40, { x: 50, y: 50 * (transformIndex + 1)}, () => { return {} }, sprite => { return { sprite }},
+                80, { x: 50, y: 50 * (transformIndex + 1)}, () => { return {} }, sprite => { return { sprite }},
                 gameRefs.screens.execScreen.detailExplPool,
               );
             }
             groupFromDesc(
               statusTagDescription(transform.tag),
-              40, { x: 0, y: 50 * (transformIndex + 1)}, () => { return {} }, sprite => { return { sprite }},
+              80, { x: 0, y: 50 * (transformIndex + 1)}, () => { return {} }, sprite => { return { sprite }},
               gameRefs.screens.execScreen.detailExplPool,
             );
           });

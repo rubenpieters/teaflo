@@ -48,5 +48,8 @@ export function resolveStatusTransformVar<A>(
     case "IdOfStatus": {
       return status.id as any;
     }
+    case "Trivial": {
+      throw "resolveStatusTransformVar: unexpected statusTransform 'Trivial'";
+    }
   }
 }

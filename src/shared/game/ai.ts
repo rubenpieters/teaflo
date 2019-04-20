@@ -1,4 +1,6 @@
 import { AIPosition, AIDirection } from "../definitions/ai";
+import { descSingleton } from "./description";
+import { DescToken } from "../definitions/description";
 
 export function moveAI(
   aiPos: AIPosition,
@@ -42,11 +44,11 @@ export function aiPositions(
 
 export function routeDirectionDescription(
   aiDirection: AIDirection,
-) {
+): DescToken[] {
   switch (aiDirection) {
-    case "down": return "icon_ai_down";
-    case "left": return "icon_ai_left";
-    case "right": return "icon_ai_right";
-    case "up": return "icon_ai_up";
+    case "down": return descSingleton("icon_ai_down");
+    case "left": return descSingleton("icon_ai_left");
+    case "right": return descSingleton("icon_ai_right");
+    case "up": return descSingleton("icon_ai_up");
   }
 }

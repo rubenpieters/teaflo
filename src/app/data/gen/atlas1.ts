@@ -289,525 +289,909 @@ export type Atlas1 = {
         "width": 40,
         "height": 40
     },
-    "select2.png": {
+    "icon_0_40_40.png": {
         "x": 2042,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_armor_40_40.png": {
+        "x": 2082,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_1_40_40.png": {
+        "x": 2122,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ch_40_40.png": {
+        "x": 2162,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_2_40_40.png": {
+        "x": 2202,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_death_40_40.png": {
+        "x": 2242,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_3_40_40.png": {
+        "x": 2282,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_fragile_40_40.png": {
+        "x": 2322,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_4_40_40.png": {
+        "x": 2362,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_highest_threat_40_40.png": {
+        "x": 2402,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_5_40_40.png": {
+        "x": 2442,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_hp_40_40.png": {
+        "x": 2482,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_6_40_40.png": {
+        "x": 2522,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_input_40_40.png": {
+        "x": 2562,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_7_40_40.png": {
+        "x": 2602,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_invalid_40_40.png": {
+        "x": 2642,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_8_40_40.png": {
+        "x": 2682,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_minus_40_40.png": {
+        "x": 2722,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_9_40_40.png": {
+        "x": 2762,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_plus_40_40.png": {
+        "x": 2802,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ai_down_40_40.png": {
+        "x": 2842,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_self_40_40.png": {
+        "x": 2882,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ai_left_40_40.png": {
+        "x": 2922,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_start_turn_40_40.png": {
+        "x": 2962,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ai_right_40_40.png": {
+        "x": 3002,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_strong_40_40.png": {
+        "x": 3042,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ai_up_40_40.png": {
+        "x": 3082,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_th_40_40.png": {
+        "x": 3122,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_all_enemy_40_40.png": {
+        "x": 3162,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_weak_40_40.png": {
+        "x": 3202,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_all_friendly_40_40.png": {
+        "x": 3242,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_win_40_40.png": {
+        "x": 3282,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "select2.png": {
+        "x": 3322,
         "y": 0,
         "width": 150,
         "height": 47
     },
     "select1.png": {
-        "x": 2192,
+        "x": 3472,
         "y": 0,
         "width": 150,
         "height": 48
     },
     "codex2.png": {
-        "x": 2342,
+        "x": 3622,
         "y": 0,
         "width": 150,
         "height": 48
     },
     "schem2.png": {
-        "x": 2492,
+        "x": 3772,
         "y": 0,
         "width": 150,
         "height": 48
     },
     "codex1.png": {
-        "x": 2642,
-        "y": 0,
-        "width": 150,
-        "height": 49
-    },
-    "schem1.png": {
-        "x": 2792,
+        "x": 3922,
         "y": 0,
         "width": 150,
         "height": 49
     },
     "icon_add_status.png": {
-        "x": 2942,
-        "y": 0,
+        "x": 0,
+        "y": 20,
         "width": 50,
         "height": 50
     },
+    "schem1.png": {
+        "x": 50,
+        "y": 24,
+        "width": 150,
+        "height": 49
+    },
     "icon_a.png": {
-        "x": 3352,
-        "y": 0,
+        "x": 560,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_b.png": {
-        "x": 3412,
-        "y": 0,
+        "x": 620,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_c.png": {
-        "x": 3472,
-        "y": 0,
+        "x": 680,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_d.png": {
-        "x": 3532,
-        "y": 0,
+        "x": 740,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_e.png": {
-        "x": 3592,
-        "y": 0,
+        "x": 800,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_f.png": {
-        "x": 3652,
-        "y": 0,
+        "x": 860,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "menu_btn1.png": {
-        "x": 3712,
-        "y": 0,
+        "x": 920,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "ab1.png": {
-        "x": 3782,
-        "y": 0,
+        "x": 990,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "ab2.png": {
-        "x": 3852,
-        "y": 0,
+        "x": 1060,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "ab3.png": {
-        "x": 3922,
-        "y": 0,
+        "x": 1130,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "ab4.png": {
-        "x": 3992,
-        "y": 0,
+        "x": 1200,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "expl_0.png": {
-        "x": 0,
-        "y": 24,
+        "x": 1270,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_1.png": {
-        "x": 80,
-        "y": 24,
+        "x": 1350,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_2.png": {
-        "x": 160,
-        "y": 25,
+        "x": 1430,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_3.png": {
-        "x": 240,
-        "y": 25,
+        "x": 1510,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_4.png": {
-        "x": 320,
-        "y": 30,
+        "x": 1590,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_5.png": {
-        "x": 400,
-        "y": 30,
+        "x": 1670,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_6.png": {
-        "x": 480,
+        "x": 1750,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_7.png": {
-        "x": 560,
+        "x": 1830,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_8.png": {
-        "x": 640,
+        "x": 1910,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_9.png": {
-        "x": 720,
+        "x": 1990,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_all_enemy.png": {
-        "x": 800,
+        "x": 2070,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_all_friendly.png": {
-        "x": 880,
+        "x": 2150,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_armor.png": {
-        "x": 960,
+        "x": 2230,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_ch.png": {
-        "x": 1040,
+        "x": 2310,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_hp.png": {
-        "x": 1120,
+        "x": 2390,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_minus.png": {
-        "x": 1200,
+        "x": 2470,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_plus.png": {
-        "x": 1280,
+        "x": 2550,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_self.png": {
-        "x": 1360,
+        "x": 2630,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_target.png": {
-        "x": 1440,
+        "x": 2710,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_target_status.png": {
-        "x": 1520,
+        "x": 2790,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_target_unit.png": {
-        "x": 1600,
+        "x": 2870,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_th.png": {
-        "x": 1680,
+        "x": 2950,
         "y": 40,
         "width": 80,
         "height": 80
     },
-    "fr_unit_a1_l1_01_ab1.png": {
-        "x": 1760,
+    "icon_0_80_80.png": {
+        "x": 3030,
         "y": 40,
-        "width": 100,
-        "height": 100
+        "width": 80,
+        "height": 80
     },
-    "fr_unit_a1_l1_01_ab2.png": {
-        "x": 1860,
+    "icon_armor_80_80.png": {
+        "x": 3110,
         "y": 40,
-        "width": 100,
-        "height": 100
+        "width": 80,
+        "height": 80
     },
-    "fr_unit_a1_l2_01_ab1.png": {
-        "x": 1960,
+    "icon_1_80_80.png": {
+        "x": 3190,
+        "y": 40,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ch_80_80.png": {
+        "x": 3270,
         "y": 47,
-        "width": 100,
-        "height": 100
+        "width": 80,
+        "height": 80
+    },
+    "icon_2_80_80.png": {
+        "x": 3350,
+        "y": 47,
+        "width": 80,
+        "height": 80
+    },
+    "icon_death_80_80.png": {
+        "x": 3430,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_3_80_80.png": {
+        "x": 3510,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_fragile_80_80.png": {
+        "x": 3590,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_4_80_80.png": {
+        "x": 3670,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_highest_threat_80_80.png": {
+        "x": 3750,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_5_80_80.png": {
+        "x": 3830,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_hp_80_80.png": {
+        "x": 3910,
+        "y": 49,
+        "width": 80,
+        "height": 80
+    },
+    "icon_6_80_80.png": {
+        "x": 3990,
+        "y": 49,
+        "width": 80,
+        "height": 80
     },
     "bar_hp.png": {
-        "x": 4062,
-        "y": 0,
-        "width": 10,
-        "height": 150
-    },
-    "bar_ch.png": {
         "x": 4072,
         "y": 0,
         "width": 10,
         "height": 150
     },
+    "bar_ch.png": {
+        "x": 4082,
+        "y": 0,
+        "width": 10,
+        "height": 150
+    },
+    "icon_input_80_80.png": {
+        "x": 0,
+        "y": 73,
+        "width": 80,
+        "height": 80
+    },
+    "icon_7_80_80.png": {
+        "x": 80,
+        "y": 73,
+        "width": 80,
+        "height": 80
+    },
+    "icon_invalid_80_80.png": {
+        "x": 160,
+        "y": 85,
+        "width": 80,
+        "height": 80
+    },
+    "icon_8_80_80.png": {
+        "x": 240,
+        "y": 85,
+        "width": 80,
+        "height": 80
+    },
+    "icon_minus_80_80.png": {
+        "x": 320,
+        "y": 90,
+        "width": 80,
+        "height": 80
+    },
+    "icon_9_80_80.png": {
+        "x": 400,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_plus_80_80.png": {
+        "x": 480,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ai_down_80_80.png": {
+        "x": 560,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_self_80_80.png": {
+        "x": 640,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ai_left_80_80.png": {
+        "x": 720,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_start_turn_80_80.png": {
+        "x": 800,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ai_right_80_80.png": {
+        "x": 880,
+        "y": 110,
+        "width": 80,
+        "height": 80
+    },
+    "icon_strong_80_80.png": {
+        "x": 960,
+        "y": 110,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ai_up_80_80.png": {
+        "x": 1040,
+        "y": 110,
+        "width": 80,
+        "height": 80
+    },
+    "icon_th_80_80.png": {
+        "x": 1120,
+        "y": 110,
+        "width": 80,
+        "height": 80
+    },
+    "icon_all_enemy_80_80.png": {
+        "x": 1200,
+        "y": 120,
+        "width": 80,
+        "height": 80
+    },
+    "icon_weak_80_80.png": {
+        "x": 1280,
+        "y": 120,
+        "width": 80,
+        "height": 80
+    },
+    "icon_all_friendly_80_80.png": {
+        "x": 1360,
+        "y": 120,
+        "width": 80,
+        "height": 80
+    },
+    "icon_win_80_80.png": {
+        "x": 1440,
+        "y": 120,
+        "width": 80,
+        "height": 80
+    },
+    "fr_unit_a1_l1_01_ab1.png": {
+        "x": 1520,
+        "y": 120,
+        "width": 100,
+        "height": 100
+    },
+    "fr_unit_a1_l1_01_ab2.png": {
+        "x": 1620,
+        "y": 120,
+        "width": 100,
+        "height": 100
+    },
+    "fr_unit_a1_l2_01_ab1.png": {
+        "x": 1720,
+        "y": 120,
+        "width": 100,
+        "height": 100
+    },
     "menu_btn2.png": {
-        "x": 2060,
-        "y": 48,
+        "x": 1820,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "unit1.png": {
-        "x": 2210,
-        "y": 48,
+        "x": 1970,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "unit2.png": {
-        "x": 2360,
-        "y": 48,
+        "x": 2120,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "unit3.png": {
-        "x": 2510,
-        "y": 49,
+        "x": 2270,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "unit4.png": {
-        "x": 2660,
-        "y": 49,
+        "x": 2420,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "bar_hover.png": {
-        "x": 2810,
-        "y": 50,
+        "x": 2570,
+        "y": 120,
         "width": 160,
         "height": 160
     },
     "frame_in.png": {
-        "x": 2970,
-        "y": 60,
+        "x": 2730,
+        "y": 120,
         "width": 160,
         "height": 160
     },
     "frame_out.png": {
-        "x": 3130,
-        "y": 60,
+        "x": 2890,
+        "y": 120,
         "width": 160,
         "height": 160
     },
     "btn_level_neutral.png": {
-        "x": 3290,
-        "y": 60,
+        "x": 3050,
+        "y": 128,
+        "width": 400,
+        "height": 200
+    },
+    "btn_level_click.png": {
+        "x": 3450,
+        "y": 128,
         "width": 400,
         "height": 200
     },
     "menu_btn3.png": {
-        "x": 3690,
-        "y": 70,
+        "x": 3850,
+        "y": 129,
         "width": 220,
         "height": 220
     },
-    "btn_level_click.png": {
-        "x": 0,
-        "y": 110,
-        "width": 400,
-        "height": 200
-    },
     "btn_level_hover.png": {
-        "x": 400,
-        "y": 120,
+        "x": 0,
+        "y": 170,
         "width": 400,
         "height": 200
     },
     "menu_btn_half1.png": {
-        "x": 3910,
-        "y": 70,
+        "x": 400,
+        "y": 180,
         "width": 125,
         "height": 250
     },
     "menu_btn_half2.png": {
-        "x": 800,
-        "y": 120,
+        "x": 525,
+        "y": 180,
         "width": 125,
         "height": 250
     },
     "menu_btn_joined.png": {
-        "x": 925,
-        "y": 120,
+        "x": 650,
+        "y": 190,
         "width": 250,
         "height": 250
     },
     "menu_btn_joined1.png": {
-        "x": 1175,
-        "y": 120,
+        "x": 900,
+        "y": 190,
         "width": 300,
         "height": 250
     },
     "side_btn.png": {
-        "x": 1475,
-        "y": 120,
+        "x": 1200,
+        "y": 200,
         "width": 240,
         "height": 250
     },
-    "en_unit_a1_l1_01.png": {
-        "x": 1715,
-        "y": 140,
-        "width": 150,
-        "height": 300
-    },
-    "hp.png": {
-        "x": 1865,
-        "y": 140,
-        "width": 75,
-        "height": 300
-    },
-    "ch.png": {
-        "x": 1940,
-        "y": 147,
-        "width": 75,
-        "height": 300
-    },
     "menu_btn_joined2.png": {
-        "x": 2015,
-        "y": 198,
+        "x": 1440,
+        "y": 220,
         "width": 350,
         "height": 250
     },
     "menu_btn_joined3.png": {
-        "x": 2365,
-        "y": 199,
+        "x": 1790,
+        "y": 270,
         "width": 400,
         "height": 250
     },
     "menu_btn_joined4.png": {
-        "x": 2765,
-        "y": 220,
+        "x": 2190,
+        "y": 280,
         "width": 450,
         "height": 250
     },
-    "res_anim.png": {
-        "x": 3215,
-        "y": 220,
-        "width": 75,
-        "height": 300
-    },
-    "fr_unit_a1_l1_01.png": {
-        "x": 3290,
-        "y": 260,
+    "en_unit_a1_l1_01.png": {
+        "x": 2640,
+        "y": 280,
         "width": 150,
         "height": 300
     },
+    "fr_unit_a1_l1_01.png": {
+        "x": 2790,
+        "y": 280,
+        "width": 150,
+        "height": 300
+    },
+    "hp.png": {
+        "x": 2940,
+        "y": 280,
+        "width": 75,
+        "height": 300
+    },
     "fr_unit_a1_l2_01.png": {
-        "x": 3440,
-        "y": 260,
+        "x": 3015,
+        "y": 328,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_02.png": {
-        "x": 3590,
-        "y": 290,
+        "x": 3165,
+        "y": 328,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_03.png": {
-        "x": 3740,
-        "y": 290,
+        "x": 3315,
+        "y": 328,
         "width": 150,
         "height": 300
     },
+    "ch.png": {
+        "x": 3465,
+        "y": 328,
+        "width": 75,
+        "height": 300
+    },
+    "res_anim.png": {
+        "x": 3540,
+        "y": 328,
+        "width": 75,
+        "height": 300
+    },
     "bmark_neutral.png": {
-        "x": 0,
-        "y": 310,
+        "x": 3615,
+        "y": 328,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
-        "x": 200,
-        "y": 310,
+        "x": 3815,
+        "y": 349,
         "width": 200,
         "height": 400
     },
     "bmark_hover.png": {
-        "x": 400,
-        "y": 320,
+        "x": 0,
+        "y": 370,
         "width": 200,
         "height": 400
     },
     "bt_bmark_neutral.png": {
-        "x": 600,
-        "y": 320,
+        "x": 200,
+        "y": 370,
         "width": 200,
         "height": 400
     },
     "bt_bmark_click.png": {
-        "x": 3890,
-        "y": 320,
+        "x": 400,
+        "y": 430,
         "width": 200,
         "height": 400
     },
     "bt_bmark_hover.png": {
-        "x": 800,
-        "y": 370,
+        "x": 600,
+        "y": 440,
         "width": 200,
         "height": 400
     },
-    "box.png": {
-        "x": 1000,
-        "y": 370,
-        "width": 640,
-        "height": 1080
-    },
     "menu_bar.png": {
-        "x": 1640,
+        "x": 800,
         "y": 440,
         "width": 150,
         "height": 1080
     },
+    "box.png": {
+        "x": 950,
+        "y": 470,
+        "width": 640,
+        "height": 1080
+    },
     "select3.png": {
-        "x": 1790,
-        "y": 449,
+        "x": 1590,
+        "y": 530,
         "width": 720,
         "height": 1080
     },
     "select3_f.png": {
-        "x": 2510,
-        "y": 590,
+        "x": 2310,
+        "y": 628,
         "width": 1221,
         "height": 1080
     },
     "sel_act1.png": {
         "x": 0,
-        "y": 1529,
+        "y": 1610,
         "width": 1920,
         "height": 1080
     },
     "sel_level1.png": {
         "x": 1920,
-        "y": 1670,
+        "y": 1708,
         "width": 1920,
         "height": 1080
     },
     "sel_level2.png": {
         "x": 0,
-        "y": 2609,
+        "y": 2690,
         "width": 1920,
         "height": 1080
     },
     "sel_level3.png": {
         "x": 1920,
-        "y": 2750,
+        "y": 2788,
         "width": 1920,
         "height": 1080
     }
@@ -1102,525 +1486,909 @@ export const atlas1: Atlas1 = {
         "width": 40,
         "height": 40
     },
-    "select2.png": {
+    "icon_0_40_40.png": {
         "x": 2042,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_armor_40_40.png": {
+        "x": 2082,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_1_40_40.png": {
+        "x": 2122,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ch_40_40.png": {
+        "x": 2162,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_2_40_40.png": {
+        "x": 2202,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_death_40_40.png": {
+        "x": 2242,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_3_40_40.png": {
+        "x": 2282,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_fragile_40_40.png": {
+        "x": 2322,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_4_40_40.png": {
+        "x": 2362,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_highest_threat_40_40.png": {
+        "x": 2402,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_5_40_40.png": {
+        "x": 2442,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_hp_40_40.png": {
+        "x": 2482,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_6_40_40.png": {
+        "x": 2522,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_input_40_40.png": {
+        "x": 2562,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_7_40_40.png": {
+        "x": 2602,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_invalid_40_40.png": {
+        "x": 2642,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_8_40_40.png": {
+        "x": 2682,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_minus_40_40.png": {
+        "x": 2722,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_9_40_40.png": {
+        "x": 2762,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_plus_40_40.png": {
+        "x": 2802,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ai_down_40_40.png": {
+        "x": 2842,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_self_40_40.png": {
+        "x": 2882,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ai_left_40_40.png": {
+        "x": 2922,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_start_turn_40_40.png": {
+        "x": 2962,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ai_right_40_40.png": {
+        "x": 3002,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_strong_40_40.png": {
+        "x": 3042,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_ai_up_40_40.png": {
+        "x": 3082,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_th_40_40.png": {
+        "x": 3122,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_all_enemy_40_40.png": {
+        "x": 3162,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_weak_40_40.png": {
+        "x": 3202,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_all_friendly_40_40.png": {
+        "x": 3242,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "icon_win_40_40.png": {
+        "x": 3282,
+        "y": 0,
+        "width": 40,
+        "height": 40
+    },
+    "select2.png": {
+        "x": 3322,
         "y": 0,
         "width": 150,
         "height": 47
     },
     "select1.png": {
-        "x": 2192,
+        "x": 3472,
         "y": 0,
         "width": 150,
         "height": 48
     },
     "codex2.png": {
-        "x": 2342,
+        "x": 3622,
         "y": 0,
         "width": 150,
         "height": 48
     },
     "schem2.png": {
-        "x": 2492,
+        "x": 3772,
         "y": 0,
         "width": 150,
         "height": 48
     },
     "codex1.png": {
-        "x": 2642,
-        "y": 0,
-        "width": 150,
-        "height": 49
-    },
-    "schem1.png": {
-        "x": 2792,
+        "x": 3922,
         "y": 0,
         "width": 150,
         "height": 49
     },
     "icon_add_status.png": {
-        "x": 2942,
-        "y": 0,
+        "x": 0,
+        "y": 20,
         "width": 50,
         "height": 50
     },
+    "schem1.png": {
+        "x": 50,
+        "y": 24,
+        "width": 150,
+        "height": 49
+    },
     "icon_a.png": {
-        "x": 3352,
-        "y": 0,
+        "x": 560,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_b.png": {
-        "x": 3412,
-        "y": 0,
+        "x": 620,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_c.png": {
-        "x": 3472,
-        "y": 0,
+        "x": 680,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_d.png": {
-        "x": 3532,
-        "y": 0,
+        "x": 740,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_e.png": {
-        "x": 3592,
-        "y": 0,
+        "x": 800,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "icon_f.png": {
-        "x": 3652,
-        "y": 0,
+        "x": 860,
+        "y": 40,
         "width": 60,
         "height": 60
     },
     "menu_btn1.png": {
-        "x": 3712,
-        "y": 0,
+        "x": 920,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "ab1.png": {
-        "x": 3782,
-        "y": 0,
+        "x": 990,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "ab2.png": {
-        "x": 3852,
-        "y": 0,
+        "x": 1060,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "ab3.png": {
-        "x": 3922,
-        "y": 0,
+        "x": 1130,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "ab4.png": {
-        "x": 3992,
-        "y": 0,
+        "x": 1200,
+        "y": 40,
         "width": 70,
         "height": 70
     },
     "expl_0.png": {
-        "x": 0,
-        "y": 24,
+        "x": 1270,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_1.png": {
-        "x": 80,
-        "y": 24,
+        "x": 1350,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_2.png": {
-        "x": 160,
-        "y": 25,
+        "x": 1430,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_3.png": {
-        "x": 240,
-        "y": 25,
+        "x": 1510,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_4.png": {
-        "x": 320,
-        "y": 30,
+        "x": 1590,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_5.png": {
-        "x": 400,
-        "y": 30,
+        "x": 1670,
+        "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_6.png": {
-        "x": 480,
+        "x": 1750,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_7.png": {
-        "x": 560,
+        "x": 1830,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_8.png": {
-        "x": 640,
+        "x": 1910,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_9.png": {
-        "x": 720,
+        "x": 1990,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_all_enemy.png": {
-        "x": 800,
+        "x": 2070,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_all_friendly.png": {
-        "x": 880,
+        "x": 2150,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_armor.png": {
-        "x": 960,
+        "x": 2230,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_ch.png": {
-        "x": 1040,
+        "x": 2310,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_hp.png": {
-        "x": 1120,
+        "x": 2390,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_minus.png": {
-        "x": 1200,
+        "x": 2470,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_plus.png": {
-        "x": 1280,
+        "x": 2550,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_self.png": {
-        "x": 1360,
+        "x": 2630,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_target.png": {
-        "x": 1440,
+        "x": 2710,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_target_status.png": {
-        "x": 1520,
+        "x": 2790,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_target_unit.png": {
-        "x": 1600,
+        "x": 2870,
         "y": 40,
         "width": 80,
         "height": 80
     },
     "expl_th.png": {
-        "x": 1680,
+        "x": 2950,
         "y": 40,
         "width": 80,
         "height": 80
     },
-    "fr_unit_a1_l1_01_ab1.png": {
-        "x": 1760,
+    "icon_0_80_80.png": {
+        "x": 3030,
         "y": 40,
-        "width": 100,
-        "height": 100
+        "width": 80,
+        "height": 80
     },
-    "fr_unit_a1_l1_01_ab2.png": {
-        "x": 1860,
+    "icon_armor_80_80.png": {
+        "x": 3110,
         "y": 40,
-        "width": 100,
-        "height": 100
+        "width": 80,
+        "height": 80
     },
-    "fr_unit_a1_l2_01_ab1.png": {
-        "x": 1960,
+    "icon_1_80_80.png": {
+        "x": 3190,
+        "y": 40,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ch_80_80.png": {
+        "x": 3270,
         "y": 47,
-        "width": 100,
-        "height": 100
+        "width": 80,
+        "height": 80
+    },
+    "icon_2_80_80.png": {
+        "x": 3350,
+        "y": 47,
+        "width": 80,
+        "height": 80
+    },
+    "icon_death_80_80.png": {
+        "x": 3430,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_3_80_80.png": {
+        "x": 3510,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_fragile_80_80.png": {
+        "x": 3590,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_4_80_80.png": {
+        "x": 3670,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_highest_threat_80_80.png": {
+        "x": 3750,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_5_80_80.png": {
+        "x": 3830,
+        "y": 48,
+        "width": 80,
+        "height": 80
+    },
+    "icon_hp_80_80.png": {
+        "x": 3910,
+        "y": 49,
+        "width": 80,
+        "height": 80
+    },
+    "icon_6_80_80.png": {
+        "x": 3990,
+        "y": 49,
+        "width": 80,
+        "height": 80
     },
     "bar_hp.png": {
-        "x": 4062,
-        "y": 0,
-        "width": 10,
-        "height": 150
-    },
-    "bar_ch.png": {
         "x": 4072,
         "y": 0,
         "width": 10,
         "height": 150
     },
+    "bar_ch.png": {
+        "x": 4082,
+        "y": 0,
+        "width": 10,
+        "height": 150
+    },
+    "icon_input_80_80.png": {
+        "x": 0,
+        "y": 73,
+        "width": 80,
+        "height": 80
+    },
+    "icon_7_80_80.png": {
+        "x": 80,
+        "y": 73,
+        "width": 80,
+        "height": 80
+    },
+    "icon_invalid_80_80.png": {
+        "x": 160,
+        "y": 85,
+        "width": 80,
+        "height": 80
+    },
+    "icon_8_80_80.png": {
+        "x": 240,
+        "y": 85,
+        "width": 80,
+        "height": 80
+    },
+    "icon_minus_80_80.png": {
+        "x": 320,
+        "y": 90,
+        "width": 80,
+        "height": 80
+    },
+    "icon_9_80_80.png": {
+        "x": 400,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_plus_80_80.png": {
+        "x": 480,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ai_down_80_80.png": {
+        "x": 560,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_self_80_80.png": {
+        "x": 640,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ai_left_80_80.png": {
+        "x": 720,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_start_turn_80_80.png": {
+        "x": 800,
+        "y": 100,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ai_right_80_80.png": {
+        "x": 880,
+        "y": 110,
+        "width": 80,
+        "height": 80
+    },
+    "icon_strong_80_80.png": {
+        "x": 960,
+        "y": 110,
+        "width": 80,
+        "height": 80
+    },
+    "icon_ai_up_80_80.png": {
+        "x": 1040,
+        "y": 110,
+        "width": 80,
+        "height": 80
+    },
+    "icon_th_80_80.png": {
+        "x": 1120,
+        "y": 110,
+        "width": 80,
+        "height": 80
+    },
+    "icon_all_enemy_80_80.png": {
+        "x": 1200,
+        "y": 120,
+        "width": 80,
+        "height": 80
+    },
+    "icon_weak_80_80.png": {
+        "x": 1280,
+        "y": 120,
+        "width": 80,
+        "height": 80
+    },
+    "icon_all_friendly_80_80.png": {
+        "x": 1360,
+        "y": 120,
+        "width": 80,
+        "height": 80
+    },
+    "icon_win_80_80.png": {
+        "x": 1440,
+        "y": 120,
+        "width": 80,
+        "height": 80
+    },
+    "fr_unit_a1_l1_01_ab1.png": {
+        "x": 1520,
+        "y": 120,
+        "width": 100,
+        "height": 100
+    },
+    "fr_unit_a1_l1_01_ab2.png": {
+        "x": 1620,
+        "y": 120,
+        "width": 100,
+        "height": 100
+    },
+    "fr_unit_a1_l2_01_ab1.png": {
+        "x": 1720,
+        "y": 120,
+        "width": 100,
+        "height": 100
+    },
     "menu_btn2.png": {
-        "x": 2060,
-        "y": 48,
+        "x": 1820,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "unit1.png": {
-        "x": 2210,
-        "y": 48,
+        "x": 1970,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "unit2.png": {
-        "x": 2360,
-        "y": 48,
+        "x": 2120,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "unit3.png": {
-        "x": 2510,
-        "y": 49,
+        "x": 2270,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "unit4.png": {
-        "x": 2660,
-        "y": 49,
+        "x": 2420,
+        "y": 120,
         "width": 150,
         "height": 150
     },
     "bar_hover.png": {
-        "x": 2810,
-        "y": 50,
+        "x": 2570,
+        "y": 120,
         "width": 160,
         "height": 160
     },
     "frame_in.png": {
-        "x": 2970,
-        "y": 60,
+        "x": 2730,
+        "y": 120,
         "width": 160,
         "height": 160
     },
     "frame_out.png": {
-        "x": 3130,
-        "y": 60,
+        "x": 2890,
+        "y": 120,
         "width": 160,
         "height": 160
     },
     "btn_level_neutral.png": {
-        "x": 3290,
-        "y": 60,
+        "x": 3050,
+        "y": 128,
+        "width": 400,
+        "height": 200
+    },
+    "btn_level_click.png": {
+        "x": 3450,
+        "y": 128,
         "width": 400,
         "height": 200
     },
     "menu_btn3.png": {
-        "x": 3690,
-        "y": 70,
+        "x": 3850,
+        "y": 129,
         "width": 220,
         "height": 220
     },
-    "btn_level_click.png": {
-        "x": 0,
-        "y": 110,
-        "width": 400,
-        "height": 200
-    },
     "btn_level_hover.png": {
-        "x": 400,
-        "y": 120,
+        "x": 0,
+        "y": 170,
         "width": 400,
         "height": 200
     },
     "menu_btn_half1.png": {
-        "x": 3910,
-        "y": 70,
+        "x": 400,
+        "y": 180,
         "width": 125,
         "height": 250
     },
     "menu_btn_half2.png": {
-        "x": 800,
-        "y": 120,
+        "x": 525,
+        "y": 180,
         "width": 125,
         "height": 250
     },
     "menu_btn_joined.png": {
-        "x": 925,
-        "y": 120,
+        "x": 650,
+        "y": 190,
         "width": 250,
         "height": 250
     },
     "menu_btn_joined1.png": {
-        "x": 1175,
-        "y": 120,
+        "x": 900,
+        "y": 190,
         "width": 300,
         "height": 250
     },
     "side_btn.png": {
-        "x": 1475,
-        "y": 120,
+        "x": 1200,
+        "y": 200,
         "width": 240,
         "height": 250
     },
-    "en_unit_a1_l1_01.png": {
-        "x": 1715,
-        "y": 140,
-        "width": 150,
-        "height": 300
-    },
-    "hp.png": {
-        "x": 1865,
-        "y": 140,
-        "width": 75,
-        "height": 300
-    },
-    "ch.png": {
-        "x": 1940,
-        "y": 147,
-        "width": 75,
-        "height": 300
-    },
     "menu_btn_joined2.png": {
-        "x": 2015,
-        "y": 198,
+        "x": 1440,
+        "y": 220,
         "width": 350,
         "height": 250
     },
     "menu_btn_joined3.png": {
-        "x": 2365,
-        "y": 199,
+        "x": 1790,
+        "y": 270,
         "width": 400,
         "height": 250
     },
     "menu_btn_joined4.png": {
-        "x": 2765,
-        "y": 220,
+        "x": 2190,
+        "y": 280,
         "width": 450,
         "height": 250
     },
-    "res_anim.png": {
-        "x": 3215,
-        "y": 220,
-        "width": 75,
-        "height": 300
-    },
-    "fr_unit_a1_l1_01.png": {
-        "x": 3290,
-        "y": 260,
+    "en_unit_a1_l1_01.png": {
+        "x": 2640,
+        "y": 280,
         "width": 150,
         "height": 300
     },
+    "fr_unit_a1_l1_01.png": {
+        "x": 2790,
+        "y": 280,
+        "width": 150,
+        "height": 300
+    },
+    "hp.png": {
+        "x": 2940,
+        "y": 280,
+        "width": 75,
+        "height": 300
+    },
     "fr_unit_a1_l2_01.png": {
-        "x": 3440,
-        "y": 260,
+        "x": 3015,
+        "y": 328,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_02.png": {
-        "x": 3590,
-        "y": 290,
+        "x": 3165,
+        "y": 328,
         "width": 150,
         "height": 300
     },
     "fr_unit_a1_l2_03.png": {
-        "x": 3740,
-        "y": 290,
+        "x": 3315,
+        "y": 328,
         "width": 150,
         "height": 300
     },
+    "ch.png": {
+        "x": 3465,
+        "y": 328,
+        "width": 75,
+        "height": 300
+    },
+    "res_anim.png": {
+        "x": 3540,
+        "y": 328,
+        "width": 75,
+        "height": 300
+    },
     "bmark_neutral.png": {
-        "x": 0,
-        "y": 310,
+        "x": 3615,
+        "y": 328,
         "width": 200,
         "height": 400
     },
     "bmark_click.png": {
-        "x": 200,
-        "y": 310,
+        "x": 3815,
+        "y": 349,
         "width": 200,
         "height": 400
     },
     "bmark_hover.png": {
-        "x": 400,
-        "y": 320,
+        "x": 0,
+        "y": 370,
         "width": 200,
         "height": 400
     },
     "bt_bmark_neutral.png": {
-        "x": 600,
-        "y": 320,
+        "x": 200,
+        "y": 370,
         "width": 200,
         "height": 400
     },
     "bt_bmark_click.png": {
-        "x": 3890,
-        "y": 320,
+        "x": 400,
+        "y": 430,
         "width": 200,
         "height": 400
     },
     "bt_bmark_hover.png": {
-        "x": 800,
-        "y": 370,
+        "x": 600,
+        "y": 440,
         "width": 200,
         "height": 400
     },
-    "box.png": {
-        "x": 1000,
-        "y": 370,
-        "width": 640,
-        "height": 1080
-    },
     "menu_bar.png": {
-        "x": 1640,
+        "x": 800,
         "y": 440,
         "width": 150,
         "height": 1080
     },
+    "box.png": {
+        "x": 950,
+        "y": 470,
+        "width": 640,
+        "height": 1080
+    },
     "select3.png": {
-        "x": 1790,
-        "y": 449,
+        "x": 1590,
+        "y": 530,
         "width": 720,
         "height": 1080
     },
     "select3_f.png": {
-        "x": 2510,
-        "y": 590,
+        "x": 2310,
+        "y": 628,
         "width": 1221,
         "height": 1080
     },
     "sel_act1.png": {
         "x": 0,
-        "y": 1529,
+        "y": 1610,
         "width": 1920,
         "height": 1080
     },
     "sel_level1.png": {
         "x": 1920,
-        "y": 1670,
+        "y": 1708,
         "width": 1920,
         "height": 1080
     },
     "sel_level2.png": {
         "x": 0,
-        "y": 2609,
+        "y": 2690,
         "width": 1920,
         "height": 1080
     },
     "sel_level3.png": {
         "x": 1920,
-        "y": 2750,
+        "y": 2788,
         "width": 1920,
         "height": 1080
     }

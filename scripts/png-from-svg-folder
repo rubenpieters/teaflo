@@ -14,5 +14,5 @@ for filename in ${FOLDER}/*; do
     exportname=${DEST}/${base}_${WIDTH}_${HEIGHT}
     # echo ${filename}
     # echo ${exportname}
-    npx --no-install svgexport $filename textures/$EXPORTNAME.png $WIDTH:$HEIGHT pad
+    npx --no-install svgexport $filename $exportname.png $WIDTH:$HEIGHT pad
 done

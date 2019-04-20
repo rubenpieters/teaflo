@@ -179,13 +179,13 @@ export function actionDescription(
 ): DescToken[] {
   switch (action.tag) {
     case "AddThreat": {
-      return descSingleton("expl_plus")
+      return descSingleton("icon_plus")
         .concat(numberDescription(action.value))
         .concat(new DescSymbol("icon_th"))
         ;
     }
     case "AddStatus": {
-      return descSingleton("expl_plus")
+      return descSingleton("icon_plus")
         .concat(statusDescription(action.status))
         ;
     }
@@ -193,13 +193,13 @@ export function actionDescription(
       throw "actionDescription: encountered a Combined action";
     }
     case "Damage": {
-      return descSingleton("expl_minus")
+      return descSingleton("icon_minus")
       .concat(numberDescription(action.value))
       .concat(new DescSymbol("icon_hp"))
       ;
     }
     case "UseCharge": {
-      return descSingleton("expl_minus")
+      return descSingleton("icon_minus")
       .concat(numberDescription(action.value))
       .concat(new DescSymbol("icon_ch"))
       ;

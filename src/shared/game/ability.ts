@@ -10,6 +10,7 @@ import { defined } from "./unitRow";
 import { DescToken, DescSymbol, DescSeparator } from "../definitions/description";
 import { descSingleton, numberDescription } from "./description";
 import { statusDescription } from "./status";
+import { routeDirectionDescription } from "./ai";
 
 export function resolveSingleTargetAbility(
   ability: SingleTargetAbility,
@@ -190,13 +191,14 @@ export function abilityDescription(
   switch (ability.tag) {
     case "AddThreat": {
       return abilityVarDescription(ability.value, x => abilityVarNumber(x, "positive"))
-        .concat(abilityVarDescription(ability.atEnemy, intentVarTarget))
+      .concat(abilityVarDescription(ability.forAlly, intentVarTarget))
         .concat(new DescSymbol("icon_th"))
-        .concat(abilityVarDescription(ability.forAlly, intentVarTarget))
+        .concat(abilityVarDescription(ability.atEnemy, intentVarTarget))
         ;
     }
     case "AddStatus": {
-      return abilityVarDescription(ability.status, statusDescription)
+      return descSingleton("icon_plus")
+        .concat(abilityVarDescription(ability.status, statusDescription))
         .concat(abilityVarDescription(ability.target, intentVarTarget))
         ;
     }
@@ -223,7 +225,8 @@ export function abilityDescription(
         ;
     }
     case "MoveAI": {
-      return descSingleton("icon_ai");
+      return abilityVarDescription(ability.dir, x => routeDirectionDescription(x))
+        ;
     }
     default: {
       throw `unimpl: ${JSON.stringify(ability)}`;
@@ -240,19 +243,19 @@ export function abilityVarDescription<A>(
       return f(abilityVar.a);
     }
     case "AllAlly": {
-      return [new DescSymbol("expl_all_friendly")];
+      return [new DescSymbol("icon_all_friendly")];
     }
     case "AllEnemy": {
-      return [new DescSymbol("expl_all_enemy")];
+      return [new DescSymbol("icon_all_enemy")];
     }
     case "FromInput": {
-      return [new DescSymbol("expl_target")];
+      return [new DescSymbol("icon_input")];
     }
     case "HighestThreat": {
-      return [new DescSymbol("expl_target_status")];
+      return [new DescSymbol("icon_highest_threat")];
     }
     case "Self": {
-      return [new DescSymbol("expl_self")];
+      return [new DescSymbol("icon_self")];
     }
   }
 }
@@ -262,9 +265,9 @@ function abilityVarNumber(
   sign: "positive" | "negative",
 ): DescToken[] {
   if (sign === "positive") {
-    return descSingleton("expl_plus").concat(numberDescription(x));
+    return descSingleton("icon_plus").concat(numberDescription(x));
   } else {
-    return descSingleton("expl_minus").concat(numberDescription(x));
+    return descSingleton("icon_minus").concat(numberDescription(x));
   }
 }
 

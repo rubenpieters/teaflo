@@ -1,14 +1,14 @@
 import { resolveCondition } from "../../../src/shared/game/condition";
 import { EntityId, statusId, friendlyId } from "../../../src/shared/definitions/entityId";
 import { StStatus } from "../../../src/shared/definitions/statusRow";
-import { ActionCondition, Var, statusOwner } from "../../../src/shared/definitions/condition";
+import { ActionCondition, statusOwner, Trivial } from "../../../src/shared/definitions/condition";
 import { Damage } from "../../../src/shared/definitions/actionf";
 import { Action } from "../../../src/shared/definitions/action";
 import { Weak } from "../../../src/shared/definitions/status";
 
 const cond1: ActionCondition = {
-  ...new Damage("Cond", "Cond", new Var("1"), statusOwner()),
-  origin: new Var("2")
+  ...new Damage("Cond", "Cond", new Trivial, statusOwner()),
+  origin: new Trivial
   };
 const action1: Action = new Damage("Action", "Action", 1, new EntityId(0, "friendly"));
 const status1: StStatus = {...new Weak(1), id: statusId(1), owner: friendlyId(0) };
