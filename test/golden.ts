@@ -6,7 +6,7 @@ type TestResult = {
   testSucceeded: boolean,
 }
 
-function goldenTest(
+export function goldenTest(
   goldenFile: string,
   testResult: () => string,
   options?: {
