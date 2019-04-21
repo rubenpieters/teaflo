@@ -23,6 +23,9 @@ export type GameRefs = {
   saveData: {
     act: ActSaveData,
   },
+  filters: {
+    [K in string]: Phaser.Filter
+  }
 }
 
 let gameRefs: GameRefs;
@@ -39,6 +42,11 @@ export default class Game extends Phaser.State {
   public create(): void {
     this.stage.backgroundColor = 0xDCDCDC;
 
+    // create filters
+    const blueGlow = new Phaser.Filter(this.game, {},
+      this.game.cache.getShader("blue-glow")
+    );
+
     // TODO: should screens be part of gameRefs?
     gameRefs = {
       game: this.game,
@@ -53,7 +61,10 @@ export default class Game extends Phaser.State {
       },
       saveData: {
         act: mkActSaveData(),
-      }
+      },
+      filters: {
+        "blue-glow": blueGlow,
+      },
     }
 
     const bgScreen = new BgScreen(gameRefs);
@@ -74,6 +85,12 @@ export default class Game extends Phaser.State {
     bgScreen.initialize();
     actScreen.drawActBtn();
     menuScreen.drawMenuBtn();
+  }
+
+  public update(): void {
+    for (let key in gameRefs.filters) {
+      gameRefs.filters[key].update();
+    }
   }
 
   public render(): void {

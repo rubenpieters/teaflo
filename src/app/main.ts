@@ -15,7 +15,7 @@ function main(): void {
   const gameConfig: Phaser.IGameConfig = {
     width: settings.gameWidth,
     height: settings.gameHeight,
-    renderer: Phaser.AUTO,
+    renderer: Phaser.WEBGL,
     parent: "",
     resolution: 1,
     scaleMode: Phaser.ScaleManager.SHOW_ALL,

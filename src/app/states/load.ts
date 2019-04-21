@@ -40,6 +40,9 @@ export default class Load extends Phaser.State {
     this.game.load.image("bg4", "assets/textures/paper_bg1.jpg");
     this.game.load.atlasJSONHash('atlas1', 'assets/atlas/atlas1.png', 'assets/atlas/atlas1.json');
 
+    // load shaders
+    this.game.load.shader("blue-glow", "assets/shaders/blue-glow.frag");
+
     // indicate loading is done
     loadingText.setText("Click anywhere to continue...");
     ready = true;

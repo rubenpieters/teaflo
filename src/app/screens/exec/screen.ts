@@ -1,7 +1,7 @@
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position, center } from "../../util/position";
-import { addText, DataSprite } from "../../phaser/datasprite";
+import { addText, DataSprite, addShader, clearShader } from "../../phaser/datasprite";
 import { enFiltered, frFiltered, getTarget } from "../../../shared/game/state";
 import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex, StatusLog } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
@@ -1034,6 +1034,7 @@ function mkAbilityPool(
           }
         },
         hoverOver: (self) => {
+          addShader(gameRefs, self, "blue-glow");
           if (self.data.tag === "FrAbilityData" || self.data.tag === "EnAbilityData") {
             let ability: Ability;
             if (self.data.tag === "FrAbilityData") {
@@ -1051,6 +1052,7 @@ function mkAbilityPool(
           return undefined as any;
         },
         hoverOut: (self) => {
+          clearShader(self);
           gameRefs.screens.execScreen.detailExplPool.clear();
         },
       },

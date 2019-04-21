@@ -44,3 +44,24 @@ export function addText<Data>(
     btnText.destroy();
   });
 }
+
+export function addShader<Data>(
+  gameRefs: GameRefs,
+  sprite: DataSprite<Data>,
+  shader: string,
+) {
+  sprite.filters = [ gameRefs.filters[shader] ];
+
+  sprite.events.onKilled.add(() => {
+    clearShader(sprite);
+  });
+  sprite.events.onDestroy.add(() => {
+    clearShader(sprite);
+  });
+}
+
+export function clearShader<Data>(
+  sprite: DataSprite<Data>,
+) {
+  sprite.filters = null as any;
+}
