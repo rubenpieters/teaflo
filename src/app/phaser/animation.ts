@@ -12,7 +12,7 @@ export class Create {
 
 export class BaseAnimation {
   constructor(
-    public readonly length: number,
+    public readonly duration: number,
     public readonly self: any,
     public readonly f: (tween: Phaser.Tween) => void,
     public readonly tag: "BaseAnimation" = "BaseAnimation",
@@ -133,7 +133,7 @@ function animTime(
 ): number {
   switch (animation.tag) {
     case "Create": return animTime(animation.k(undefined));
-    case "BaseAnimation": return animation.length;
+    case "BaseAnimation": return animation.duration;
     case "SeqAnimation": return animation.list.reduce((acc, prev) => animTime(prev) + acc, 0);
     case "ParAnimation": return maxAnimTime(animation.list);
   }

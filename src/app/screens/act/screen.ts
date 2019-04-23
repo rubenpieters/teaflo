@@ -5,7 +5,7 @@ import { createPosition, Position } from "../../util/position";
 import { createTween, chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween, ParAnimation, Create } from "../../phaser/animation";
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
-import { addText, DataSprite } from "../../phaser/datasprite";
+import { addText, DataSprite, clearShader, addShader } from "../../phaser/datasprite";
 import { loadLevel, levelStats } from "../level/events";
 import { ScreenAct, transitionScreen } from "../transition";
 
@@ -62,14 +62,14 @@ export class ActScreen {
         // this is the currently selected act
         pos = createPosition(
           "left", 100 + 210 * i, 200,
-          "top", -100, 400,
+          "top", 0, 400,
         );
         frame = "down";
       } else {
         // this is not the currently selected act
         pos = createPosition(
           "left", 100 + 210 * i, 400,
-          "top", -200, 200,
+          "top", 0, 200,
         );
         frame = "neutral";
       }
@@ -239,9 +239,9 @@ function mkActBtnPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         switch (frameType) {
-          case "down": return <any>"bmark_click.png";
-          case "hover": return <any>"bmark_hover.png";
-          case "neutral": return <any>"bmark_neutral.png";
+          case "down": return "test2_200_200.png";
+          case "hover": return "test2_200_200.png";
+          case "neutral": return "test2_200_200.png";
         }
       },
       introAnim: [
@@ -254,12 +254,14 @@ function mkActBtnPool(
           transitionScreen(gameRefs, new ScreenAct(new SelectedActMenu(self.data.actId)));
         },
         hoverOver: (self) => {
-          const tween = createTween(gameRefs.game, self, x => x.to({ y: -100 }, 75, Phaser.Easing.Linear.None, false, 0));
-          tween.start();
+          addShader(gameRefs, self, "blue-glow");
+          //const tween = createTween(gameRefs.game, self, x => x.to({ y: -100 }, 75, Phaser.Easing.Linear.None, false, 0));
+          //tween.start();
         },
         hoverOut: (self) => {
-          const tween = createTween(gameRefs.game, self, x => x.to({ y: -200 }, 75, Phaser.Easing.Linear.None, false, 0));
-          tween.start();
+          clearShader(self);
+          //const tween = createTween(gameRefs.game, self, x => x.to({ y: -200 }, 75, Phaser.Easing.Linear.None, false, 0));
+          //tween.start();
         },
       },
     },

@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 
-# example usage: png-from-svg test 20 20
+# example usage: png-from-svg test 20 20 true
 
 SVG=$1
 WIDTH=$2
 HEIGHT=$3
+TOATLAS=$4
 
 EXPORTNAME=${SVG}_${WIDTH}_${HEIGHT}
+EXPORTFILE=textures/$EXPORTNAME.png
 
-npx --no-install svgexport scans/$SVG.svg textures/$EXPORTNAME.png $WIDTH:$HEIGHT pad
+echo "$EXPORTFILE"
+
+npx --no-install svgexport scans/$SVG.svg $EXPORTFILE $WIDTH:$HEIGHT pad
+
+if [ "$TOATLAS" = true ] ; then
+  grep -qxF "$EXPORTFILE" assets/atlas/atlas1.txt || echo "$EXPORTFILE" >> assets/atlas/atlas1.txt
+fi
