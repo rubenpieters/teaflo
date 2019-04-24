@@ -1,6 +1,7 @@
 import { FrUnit } from "../definitions/unit";
 import { Equal, isTrue } from "../type-util";
-import { trinity_dmg, trinity_sup, trinity_tnk } from "./act1/frUnits";
+import { trinity_dmg, trinity_sup, trinity_tnk } from "./act2/frUnits";
+import { a1l1_fr } from "./act1/level1";
 
 // check that values of frUnitMap are all `FrUnit`
 type FrUnitMapValues = (typeof frUnitMap)[keyof (typeof frUnitMap)];
@@ -8,6 +9,7 @@ isTrue<Equal<FrUnitMapValues, FrUnit>>(true);
 export type FrUnitId = keyof (typeof frUnitMap);
 
 export const frUnitMap = {
+  "a1l1_fr": a1l1_fr,
   "trinity_dmg": trinity_dmg,
   "trinity_sup": trinity_sup,
   "trinity_tnk": trinity_tnk,

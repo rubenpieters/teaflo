@@ -37,11 +37,19 @@ export function resolveAction(
       let actions: ActionWithOrigin[] = [];
       if (
         entity !== undefined &&
-        entity.hp <= 0 &&
-        (entity as HasId<"friendly">).id.type === "friendly" &&
-        (entity as StFrUnit).essential
+        entity.hp <= 0
       ) {
-        actions = [invalidNoOrigin];
+        if (
+          (entity as HasId<"friendly">).id.type === "friendly" &&
+          (entity as StFrUnit).essential
+        ) {
+          actions = [invalidNoOrigin];
+        } else {
+          actions = [{
+            ...new Death("Action", entity.id),
+            origin: "noOrigin",
+          }];
+        }
       }
       return { state: result.state, actions };
     }

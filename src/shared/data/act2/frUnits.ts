@@ -12,6 +12,7 @@ export const trinity_dmg_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(1), new Ab.Self()),
     new A.Damage("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0)),
+    new A.AddThreat("Ability", "Target", new Ab.Static(10), Ab.self(), new Ab.FromInput(0)),
   ]);
 
 export const trinity_dmg: FrUnit = {

@@ -1,6 +1,6 @@
 import { mkGameState, showGamestate } from "../../src/shared/game/state";
 import { extendSolution, emptySolution, runSolution } from "../../src/shared/game/solution";
-import { trinity_sup_ab1, trinity_tnk_ab1, trinity_dmg_ab1 } from "../../src/shared/data/act1/frUnits";
+import { trinity_sup_ab1, trinity_tnk_ab1, trinity_dmg_ab1 } from "../../src/shared/data/act2/frUnits";
 import { friendlyId, enemyId } from "../../src/shared/definitions/entityId";
 
 export function run(
@@ -9,7 +9,7 @@ export function run(
 
   const initState = mkGameState(
     ["trinity_dmg", "trinity_tnk", "trinity_sup"],
-    ["l1_en"],
+    ["a2l1_en"],
   );
   
   result += "-------------------------------------------\n";
@@ -84,4 +84,4 @@ export function run(
   return result;
 }
 
-console.log(run());
+//console.log(run());

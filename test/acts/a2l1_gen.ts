@@ -3,7 +3,7 @@ import { trySolutions } from "../util";
 
 const initState = mkGameState(
   ["trinity_dmg", "trinity_tnk", "trinity_sup"],
-  ["l1_en"],
+  ["a2l1_en"],
 );
 
 console.log(showGamestate(initState));
