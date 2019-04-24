@@ -184,8 +184,12 @@ export function runPhases(
     const enId = t.e;
     const result = overTarget(state, enId, x => x);
     const entity = result.entity;
-    // the entity can be undefined because an action in this loop caused a change in the state
-    if (entity !== undefined) {
+    if (
+      // the entity can be undefined because an action in this loop caused a change in the state
+      entity !== undefined &&
+      // an enemy only acts when its hp is higher than 0
+      entity.hp > 0
+    ) {
       const enAbility: Ability = entity.abilities[aiPosToIndex(entity.aiPosition)].ability;
       const enContext = new EnAbilityContext(enId);
       const enActionResult = applyAbilityToSolution(enAbility, enContext, state, i + 2);

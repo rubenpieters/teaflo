@@ -213,9 +213,8 @@ export function abilityDescription(
       return desc;
     }
     case "Damage": {
-      return descSingleton("icon_addthreat")
+      return descSingleton("icon_damage")
         .concat(abilityVarDescription(ability.value, x => numberDescription(x)))
-        .concat(new DescSymbol("icon_hp"))
         .concat(abilityVarDescription(ability.target, intentVarTarget))
         ;
     }

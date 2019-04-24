@@ -84,4 +84,4 @@ export function run(
   return result;
 }
 
-// console.log(run());
+console.log(run());
