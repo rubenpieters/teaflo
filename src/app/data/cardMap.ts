@@ -4,6 +4,8 @@ export const cardMap: {
   // act 1 level 1
   "a1l1_fr": "unit3.png",
   "a1l1_en": "unit4.png",
+  "a1l2_fr": "unit3.png",
+  "a1l2_en": "unit4.png",
   // act 2
   "trinity_dmg": "unit3.png",
   "trinity_tnk": "unit2.png",

@@ -36,9 +36,8 @@ export const a1l1_fr: FrUnit = {
  * En Unit
  */
 export const a1l1_en_ab: Ability =
-  A.combinedAbility([
-    new A.Damage("Ability", "Target", new Ab.Static(5), Ab.highestThreat()),
-  ]);
+  new A.Damage("Ability", "Target", new Ab.Static(5), Ab.highestThreat())
+  ;
 
 export const a1l1_en: EnUnit = {
   hp: 20,

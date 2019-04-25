@@ -38,10 +38,10 @@ export const trinity_dmg: FrUnit = {
  * Trinity Tank Unit
  */
 export const trinity_tnk_ab1: Ability =
-A.combinedAbility([
-  new A.UseCharge("Ability", "Target", new Ab.Static(1), new Ab.Self()),
-  new A.AddThreat("Ability", "Target", new Ab.Static(13), Ab.self(), Ab.allEnemy()),
-]);
+  A.combinedAbility([
+    new A.UseCharge("Ability", "Target", new Ab.Static(1), new Ab.Self()),
+    new A.AddThreat("Ability", "Target", new Ab.Static(13), Ab.self(), Ab.allEnemy()),
+  ]);
 
 export const trinity_tnk: FrUnit = {
   hp: 11,
@@ -65,10 +65,10 @@ export const trinity_tnk: FrUnit = {
  * Trinity Support Unit
  */
 export const trinity_sup_ab1: Ability =
-A.combinedAbility([
-  new A.UseCharge("Ability", "Target", new Ab.Static(1), new Ab.Self()),
-  new A.AddStatus("Ability", "Target", new Ab.Static(new S.Armor(10)), new Ab.FromInput(0)),
-]);
+  A.combinedAbility([
+    new A.UseCharge("Ability", "Target", new Ab.Static(1), new Ab.Self()),
+    new A.AddStatus("Ability", "Target", new Ab.Static(new S.Armor(10)), new Ab.FromInput(0)),
+  ]);
 
 export const trinity_sup: FrUnit = {
   hp: 5,
