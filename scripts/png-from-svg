@@ -7,13 +7,18 @@ WIDTH=$2
 HEIGHT=$3
 TOATLAS=$4
 
-EXPORTNAME=${SVG}_${WIDTH}_${HEIGHT}
-EXPORTFILE=textures/$EXPORTNAME.png
+EXPORTNAME=${SVG}_${WIDTH}_${HEIGHT}.png
+
+base=$(basename -- "$EXPORTNAME")
+extension="${base##*.}"
+base="${base%.*}"
+
+EXPORTFILE=textures/$base.png
 
 echo "$EXPORTFILE"
 
 npx --no-install svgexport scans/$SVG.svg $EXPORTFILE $WIDTH:$HEIGHT pad
 
 if [ "$TOATLAS" = true ] ; then
-  grep -qxF "$EXPORTFILE" assets/atlas/atlas1.txt || echo "$EXPORTFILE" >> assets/atlas/atlas1.txt
+  grep -qxF "$EXPORTFILE" scripts/atlas1.txt || echo "$EXPORTFILE" >> scripts/atlas1.txt
 fi

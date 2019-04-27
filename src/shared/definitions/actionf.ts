@@ -29,6 +29,17 @@ export class UseCharge<F extends URIS, G extends URIS> {
   ) {}
 }
 
+export class RestoreCharge<F extends URIS, G extends URIS> {
+  public readonly tag: "RestoreCharge" = "RestoreCharge";
+
+  constructor(
+    readonly uriF: F,
+    readonly uriG: G,
+    readonly value: Type<F, number>,
+    readonly target: Type<G, UnitId>,
+  ) {}
+}
+
 export class Invalid {
   public readonly tag: "Invalid" = "Invalid";
 
@@ -112,6 +123,7 @@ export class StartTurn {
 export type ActionF<F extends URIS, G extends URIS>
   = Damage<F, G>
   | UseCharge<F, G>
+  | RestoreCharge<F, G>
   | Invalid
   | Death<G>
   | Combined<F, G>

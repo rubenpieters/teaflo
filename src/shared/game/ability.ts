@@ -63,6 +63,9 @@ function _resolveAbility(
     case "UseCharge": {
       return resolveToSingleTarget(ability, ["target"], state, context);
     }
+    case "RestoreCharge": {
+      return resolveToSingleTarget(ability, ["target"], state, context);
+    }
     case "AddThreat": {
       return resolveToSingleTarget(ability, ["forAlly", "atEnemy"], state, context);
     }
@@ -220,6 +223,12 @@ export function abilityDescription(
     }
     case "UseCharge": {
       return descSingleton("icon_usecharge")
+        .concat(abilityVarDescription(ability.value, x => numberDescription(x)))
+        .concat(abilityVarDescription(ability.target, intentVarTarget))
+        ;
+    }
+    case "RestoreCharge": {
+      return descSingleton("icon_restorecharge")
         .concat(abilityVarDescription(ability.value, x => numberDescription(x)))
         .concat(abilityVarDescription(ability.target, intentVarTarget))
         ;

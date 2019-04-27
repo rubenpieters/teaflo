@@ -697,17 +697,23 @@ export type Atlas1 = {
         "width": 40,
         "height": 40
     },
-    "options1.png": {
+    "icon_restorecharge_40_40.png": {
         "x": 1140,
         "y": 2290,
-        "width": 150,
-        "height": 25
+        "width": 40,
+        "height": 40
     },
     "expl_6.png": {
         "x": 1180,
         "y": 2210,
         "width": 80,
         "height": 80
+    },
+    "options1.png": {
+        "x": 1180,
+        "y": 2290,
+        "width": 150,
+        "height": 25
     },
     "expl_7.png": {
         "x": 1260,
@@ -1201,33 +1207,39 @@ export type Atlas1 = {
         "width": 80,
         "height": 80
     },
-    "menu_btn1.png": {
+    "icon_restorecharge_80_80.png": {
         "x": 2260,
         "y": 3930,
+        "width": 80,
+        "height": 80
+    },
+    "menu_btn1.png": {
+        "x": 2260,
+        "y": 4010,
         "width": 70,
         "height": 70
     },
     "ab1.png": {
-        "x": 2260,
-        "y": 4000,
+        "x": 2330,
+        "y": 4010,
         "width": 70,
         "height": 70
     },
     "ab2.png": {
-        "x": 2330,
-        "y": 3930,
-        "width": 70,
-        "height": 70
-    },
-    "ab3.png": {
         "x": 2340,
         "y": 3850,
         "width": 70,
         "height": 70
     },
+    "ab3.png": {
+        "x": 2340,
+        "y": 3920,
+        "width": 70,
+        "height": 70
+    },
     "ab4.png": {
-        "x": 2330,
-        "y": 4000,
+        "x": 2400,
+        "y": 3990,
         "width": 70,
         "height": 70
     },
@@ -1972,17 +1984,23 @@ export const atlas1: Atlas1 = {
         "width": 40,
         "height": 40
     },
-    "options1.png": {
+    "icon_restorecharge_40_40.png": {
         "x": 1140,
         "y": 2290,
-        "width": 150,
-        "height": 25
+        "width": 40,
+        "height": 40
     },
     "expl_6.png": {
         "x": 1180,
         "y": 2210,
         "width": 80,
         "height": 80
+    },
+    "options1.png": {
+        "x": 1180,
+        "y": 2290,
+        "width": 150,
+        "height": 25
     },
     "expl_7.png": {
         "x": 1260,
@@ -2476,33 +2494,39 @@ export const atlas1: Atlas1 = {
         "width": 80,
         "height": 80
     },
-    "menu_btn1.png": {
+    "icon_restorecharge_80_80.png": {
         "x": 2260,
         "y": 3930,
+        "width": 80,
+        "height": 80
+    },
+    "menu_btn1.png": {
+        "x": 2260,
+        "y": 4010,
         "width": 70,
         "height": 70
     },
     "ab1.png": {
-        "x": 2260,
-        "y": 4000,
+        "x": 2330,
+        "y": 4010,
         "width": 70,
         "height": 70
     },
     "ab2.png": {
-        "x": 2330,
-        "y": 3930,
-        "width": 70,
-        "height": 70
-    },
-    "ab3.png": {
         "x": 2340,
         "y": 3850,
         "width": 70,
         "height": 70
     },
+    "ab3.png": {
+        "x": 2340,
+        "y": 3920,
+        "width": 70,
+        "height": 70
+    },
     "ab4.png": {
-        "x": 2330,
-        "y": 4000,
+        "x": 2400,
+        "y": 3990,
         "width": 70,
         "height": 70
     },

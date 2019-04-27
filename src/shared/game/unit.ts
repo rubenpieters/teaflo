@@ -14,6 +14,15 @@ export function useChargeUnit<E extends Unit>(
   );
 }
 
+export function restoreChargeUnit<E extends Unit>(
+  e: E,
+  value: number,
+): E {
+  return focus(e,
+    over(x => x.charges, x => x + value),
+  );
+}
+
 export function moveAIUnit<E extends EnUnit>(
   e: E,
   dir: AIDirection,

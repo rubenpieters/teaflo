@@ -2,12 +2,12 @@ import { focus, over, set } from "../iassign-util";
 import { URIS, Type } from "fp-ts/lib/HKT";
 import { overTarget, removeTarget } from "./state";
 import { damageEntity } from "./entity";
-import { useChargeUnit, moveAIUnit } from "./unit";
+import { useChargeUnit, moveAIUnit, restoreChargeUnit } from "./unit";
 import { statusGroup, statusDescription } from "./status";
 import { addThreat } from "./threat";
 import { Action, ActionWithOrigin, ActionWithOriginF } from "../definitions/action";
 import { GameState, StFrUnit } from "../definitions/state";
-import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag } from "../definitions/actionf";
+import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag, RestoreCharge } from "../definitions/actionf";
 import { addStatus } from "./statusRow";
 import { descSingleton, numberDescription } from "./description";
 import { DescToken, DescSymbol } from "../definitions/description";
@@ -64,6 +64,16 @@ export function resolveAction(
       if (entity !== undefined && entity.charges < 0) {
         actions = [invalidNoOrigin];
       }
+      return { state: result.state, actions };
+    }
+    case "RestoreCharge": {
+      const result = overTarget(state,
+        action.target,
+        x => restoreChargeUnit(x, action.value),
+      );
+
+      const actions: ActionWithOrigin[] = [];
+
       return { state: result.state, actions };
     }
     case "AddThreat": {
@@ -134,6 +144,11 @@ export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I e
       const newValue = f(actionF.value);
       const newTarget = g(actionF.target);
       return new UseCharge(newUriF, newUriG, newValue, newTarget);
+    }
+    case "RestoreCharge": {
+      const newValue = f(actionF.value);
+      const newTarget = g(actionF.target);
+      return new RestoreCharge(newUriF, newUriG, newValue, newTarget);
     }
     case "AddThreat": {
       const newValue = f(actionF.value);
@@ -209,6 +224,12 @@ export function actionDescription(
     }
     case "UseCharge": {
       return descSingleton("icon_minus")
+      .concat(numberDescription(action.value))
+      .concat(new DescSymbol("icon_ch"))
+      ;
+    }
+    case "RestoreCharge": {
+      return descSingleton("icon_plus")
       .concat(numberDescription(action.value))
       .concat(new DescSymbol("icon_ch"))
       ;

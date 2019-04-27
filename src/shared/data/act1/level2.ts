@@ -51,7 +51,7 @@ export const a1l2_fr: FrUnit = {
  */
 export const a1l2_en_ab1: Ability =
   A.combinedAbility([
-    new A.UseCharge("Ability", "Target", new Ab.Static(-1), Ab.highestThreat()),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(1), Ab.highestThreat()),
     new A.MoveAI("Ability", "Target", new Ab.Static("right" as AIDirection), Ab.self()),
   ]);
 

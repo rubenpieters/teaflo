@@ -216,3 +216,5 @@ textures/menu_schem_100_100.png
 textures/menu_codex_100_100.png
 textures/menu_options_100_100.png
 textures/menu_select_100_100.png
+textures/icon_restorecharge_80_80.png
+textures/icon_restorecharge_40_40.png
