@@ -1,5 +1,5 @@
 import { GameRefs } from "../../states/game";
-import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt, levelData, selectedSchem, SolutionData } from "../act/data";
+import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt, levelData, selectedSchem, SolutionData, LevelDataKeys } from "../act/data";
 import { emptyTree, Location } from "../../../shared/tree";
 import { mkGameState } from "../../../shared/game/state";
 import { endStates } from "../../../shared/game/solution";
@@ -8,7 +8,7 @@ import { FrUnitId } from "../../../shared/data/frUnitMap";
 
 export function loadLevel(
   gameRefs: GameRefs,
-  levelId: string,
+  levelId: LevelDataKeys,
   solId: number,
 ) {
   const sol = schemScholAt(gameRefs, levelId, solId);
@@ -21,7 +21,7 @@ export function loadLevel(
 
 export function newExecLevel(
   gameRefs: GameRefs,
-  levelId: string,
+  levelId: LevelDataKeys,
   solId: number,
 ) {
   const sol = currentSchemSol(gameRefs);
@@ -123,12 +123,12 @@ export function createDeployArray(
 
 export function levelStats(
   gameRefs: GameRefs,
-  levelId: string,
+  levelId: LevelDataKeys,
   solIndex: number,
 ): {
   win: boolean,
 } {
-  const sol: SolutionData = gameRefs.saveData.act.levels[levelId][solIndex];
+  const sol: SolutionData = gameRefs.saveData.act.levels[levelId]![solIndex];
   if (sol === undefined || sol.solInfo === undefined) {
     return {
       win: false,

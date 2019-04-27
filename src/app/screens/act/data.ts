@@ -5,6 +5,7 @@ import { SpeedType } from "../../../app/phaser/animation";
 import { ScreenActive, ScreenAct, ScreenSchem, ScreenCodex, ScreenSettings } from "../transition";
 import { FrUnitId } from "../../../shared/data/frUnitMap";
 import { EnUnitId } from "../../../shared/data/enUnitMap";
+import { isTrue, Equal } from "../../../shared/type-util";
 
 export type ActData = {
   shortName: string,
@@ -15,7 +16,7 @@ export type ActData = {
 
 export type LevelData = {
   name: string,
-  id: string,
+  id: LevelDataKeys,
   cardIds: FrUnitId[],
   enemyIds: EnUnitId[],
   slots: number,
@@ -46,6 +47,17 @@ const a1l2: LevelData = {
   supplyLocations: [{ x: 518, y: 27 }],
 };
 
+const a1l3: LevelData = {
+  name: "A1 level3",
+  id: "a1l3",
+  cardIds: ["a1l3_fr1", "a1l3_fr2"],
+  enemyIds: ["a1l3_en1", "a1l3_en2"],
+  slots: 2,
+  selectLocation: { x: 200, y: 200 },
+  boxSprite: "select3_f.png",
+  supplyLocations: [{ x: 518, y: 27 }, { x: 70, y: 680 }],
+};
+
 const a2l1: LevelData = {
   name: "A2 level1",
   id: "a2l1",
@@ -74,7 +86,7 @@ export const actData: {
   0: {
     shortName: "1",
     longName: "Act 1",
-    levels: [a1l1, a1l2],
+    levels: [a1l1, a1l2, a1l3],
     bgSprite: "sel_act1.png",
   },
   1: {
@@ -91,11 +103,17 @@ export const actData: {
   },
 }
 
-export const levelData: {
-  [key: string]: LevelData
-} = {
+
+
+// check that values of levelData are all `LevelData`
+type LevelDataValues = (typeof levelData)[keyof (typeof levelData)];
+isTrue<Equal<LevelDataValues, LevelData>>(true);
+export type LevelDataKeys = keyof (typeof levelData);
+
+export const levelData = {
   "a1l1": a1l1,
   "a1l2": a1l2,
+  "a1l3": a1l3,
   "a2l1": a2l1,
   "a3l1": a3l1,
 }
@@ -109,7 +127,7 @@ export class SelectedActMenu {
 
 export class SelectedLevelMenu {
   constructor (
-    public readonly levelId: string,
+    public readonly levelId: LevelDataKeys,
     public readonly tag: "SelectedLevelMenu" = "SelectedLevelMenu",
   ) {}
 }
@@ -118,7 +136,7 @@ export type ActSaveData = {
   currentMenu: SelectedActMenu | SelectedLevelMenu | undefined,
   currentSchem: SelectedBuildSchem | SelectedExecSchem | undefined,
   activeScreen: "menu" | "schem" | "codex" | "settings",
-  levels: { [key in string]: SolutionData[] },
+  levels: { [key in LevelDataKeys]?: SolutionData[] },
   animationSpeeds: {
     log: SpeedType,
   },
@@ -145,7 +163,7 @@ export type SolutionData = {
 }
 
 export function mkSolutionData(
-  levelId: string,
+  levelId: LevelDataKeys,
 ): SolutionData {
   const supply = levelData[levelId].cardIds.map(cardId => { return { cardId, deployPos: undefined }});
   return {
@@ -215,7 +233,7 @@ export function selectedLevelId(
 
 export class SelectedBuildSchem {
   constructor (
-    public readonly levelId: string,
+    public readonly levelId: LevelDataKeys,
     public readonly solId: number,
     public readonly tag: "SelectedBuildSchem" = "SelectedBuildSchem",
   ) {}
@@ -223,7 +241,7 @@ export class SelectedBuildSchem {
 
 export class SelectedExecSchem {
   constructor (
-    public readonly levelId: string,
+    public readonly levelId: LevelDataKeys,
     public readonly solId: number,
     public readonly tag: "SelectedExecSchem" = "SelectedExecSchem",
   ) {}
@@ -239,23 +257,23 @@ export function currentSchemSol(
   gameRefs: GameRefs,
 ): SolutionData | undefined {
   const schem = selectedSchem(gameRefs);
-  return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId][schem.solId];
+  return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId]![schem.solId];
 }
 
 export function schemScholAt(
   gameRefs: GameRefs,
-  levelId: string,
+  levelId: LevelDataKeys,
   solId: number,
 ): SolutionData | undefined {
   const schem = selectedSchem(gameRefs);
-  return schem === undefined ? undefined : gameRefs.saveData.act.levels[levelId][solId];
+  return schem === undefined ? undefined : gameRefs.saveData.act.levels[levelId]![solId];
 }
 
 export function currentSolution(
   gameRefs: GameRefs,
 ) {
   const schem = selectedSchem(gameRefs);
-  return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo;
+  return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId]![schem.solId].solInfo;
 }
 
 export function setSolution(
@@ -264,7 +282,7 @@ export function setSolution(
 ) {
   const schem = selectedSchem(gameRefs);
   if (schem !== undefined) {
-    gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo = solInfo;
+    gameRefs.saveData.act.levels[schem.levelId]![schem.solId].solInfo = solInfo;
   }
 }
 
@@ -274,7 +292,7 @@ export function setLocation(
 ) {
   const schem = selectedSchem(gameRefs);
   if (schem !== undefined) {
-    const solInfo = gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo;
+    const solInfo = gameRefs.saveData.act.levels[schem.levelId]![schem.solId].solInfo;
     if (solInfo !== undefined) {
       solInfo.loc = loc;
     }

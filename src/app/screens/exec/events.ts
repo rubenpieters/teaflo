@@ -132,10 +132,10 @@ export function clearSolution(
 ) {
   const schem = selectedSchem(gameRefs);
   if (schem !== undefined) {
-    gameRefs.saveData.act.levels[schem.levelId][schem.solId].supply.forEach(x => {
+    gameRefs.saveData.act.levels[schem.levelId]![schem.solId].supply.forEach(x => {
       x.deployPos = undefined;
     });
-    gameRefs.saveData.act.levels[schem.levelId][schem.solId].solInfo = undefined;
+    gameRefs.saveData.act.levels[schem.levelId]![schem.solId].solInfo = undefined;
   }
   drawCurrentLevel(gameRefs);
 }

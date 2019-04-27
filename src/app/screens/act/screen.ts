@@ -1,4 +1,4 @@
-import { actData, selectedActId, selectedMenu, SelectedActMenu, SelectedLevelMenu, LevelData } from "../../screens/act/data";
+import { actData, selectedActId, selectedMenu, SelectedActMenu, SelectedLevelMenu, LevelData, LevelDataKeys } from "../../screens/act/data";
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
 import { createPosition, Position } from "../../util/position";
@@ -136,21 +136,21 @@ export class ActScreen {
   }
 
   redrawSolBtn(
-    levelId: string,
+    levelId: LevelDataKeys,
   ) {
     this.solBtnPool.killAll();
     this._drawSolBtn(levelId, false);
   }
 
   drawSolBtn(
-    levelId: string,
+    levelId: LevelDataKeys,
   ) {
     this.solBtnPool.killAll();
     this._drawSolBtn(levelId, true);
   }
 
   private _drawSolBtn(
-    levelId: string,
+    levelId: LevelDataKeys,
     animation: boolean,
   ) {
     const levels = this.gameRefs.saveData.act.levels[levelId];
@@ -270,7 +270,7 @@ function mkActBtnPool(
 }
 
 type LevelBtnData = {
-  levelId: string,
+  levelId: LevelDataKeys,
   levelIndex: number,
 }
 
@@ -305,13 +305,13 @@ function mkLevelBtnPool(
 
 type SolBtnDataSelect = {
   tag: "SolBtnDataSelect",
-  levelId: string,
+  levelId: LevelDataKeys,
   solIndex: number,
 }
 
 type SolBtnDataAdd = {
   tag: "SolBtnDataAdd",
-  levelId: string,
+  levelId: LevelDataKeys,
 }
 
 type SolBtnData = SolBtnDataSelect | SolBtnDataAdd;

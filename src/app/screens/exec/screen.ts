@@ -30,6 +30,8 @@ import { groupFromDesc } from "../../util/description";
 import { actionDescription } from "../../../shared/game/action";
 import { abilityDescription } from "../../../shared/game/ability";
 import { settings } from "../../data/settings";
+import { FrUnitId } from "../../../shared/data/frUnitMap";
+import { EnUnitId } from "../../../shared/data/enUnitMap";
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
@@ -878,7 +880,8 @@ function mkUnitPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return cardMap[self.data.cardId];
+        // TODO: fix the cast
+        return cardMap[self.data.cardId as any as FrUnitId | EnUnitId];
       },
       introAnim: [
         (self, tween) => {

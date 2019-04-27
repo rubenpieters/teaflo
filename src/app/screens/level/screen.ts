@@ -8,6 +8,8 @@ import { cardMap } from "../../data/cardMap";
 import { loadLevel, newExecLevel, levelStats, toggleDeploy } from "../level/events";
 import { filterUndefined } from "../../util/util";
 import { settings } from "../../data/settings";
+import { FrUnitId } from "../../../shared/data/frUnitMap";
+import { EnUnitId } from "../../../shared/data/enUnitMap";
 
 const colors =
   [
@@ -193,7 +195,8 @@ function mkBuildCardPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return cardMap[self.data.cardId];
+        // TODO: fix cast
+        return cardMap[self.data.cardId as any as FrUnitId | EnUnitId];
       },
       introAnim: [
         (self, tween) => {
