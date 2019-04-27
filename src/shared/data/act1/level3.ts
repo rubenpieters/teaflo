@@ -16,8 +16,8 @@ export const a1l3_fr1_ab1: Ability =
   ]);
 
 export const a1l3_fr1: FrUnit = {
-  hp: 20,
-  maxHp: 20,
+  hp: 5,
+  maxHp: 5,
   charges: 5,
   maxCharges: 5,
   abilities: [
@@ -39,8 +39,8 @@ export const a1l3_fr2_ab1: Ability =
   ;
 
 export const a1l3_fr2: FrUnit = {
-  hp: 30,
-  maxHp: 30,
+  hp: 50,
+  maxHp: 50,
   charges: 5,
   maxCharges: 5,
   abilities: [
