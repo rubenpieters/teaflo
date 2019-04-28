@@ -10,6 +10,7 @@ import { filterUndefined } from "../../util/util";
 import { settings } from "../../data/settings";
 import { FrUnitId } from "../../../shared/data/frUnitMap";
 import { EnUnitId } from "../../../shared/data/enUnitMap";
+import { CardId } from "src/shared/data/cardId";
 
 const colors =
   [
@@ -182,7 +183,7 @@ function mkBoxPool(
 
 type BuildCardData = {
   tag: "card",
-  cardId: string,
+  cardId: CardId,
   deployPos: number | undefined,
   index: number,
 }
@@ -195,8 +196,7 @@ function mkBuildCardPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        // TODO: fix cast
-        return cardMap[self.data.cardId as any as FrUnitId | EnUnitId];
+        return cardMap[self.data.cardId];
       },
       introAnim: [
         (self, tween) => {

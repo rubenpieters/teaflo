@@ -1,8 +1,7 @@
-import { EnUnitId } from "src/shared/data/enUnitMap";
-import { FrUnitId } from "src/shared/data/frUnitMap";
+import { CardId } from "src/shared/data/cardId";
 
 export const cardMap: {
-  [K in FrUnitId | EnUnitId]: string
+  [K in CardId]: string
 } = {
   // act 1 level 1
   "a1l1_fr": "unit3.png",

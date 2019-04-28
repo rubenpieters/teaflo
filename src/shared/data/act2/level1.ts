@@ -36,5 +36,5 @@ export const a2l1_en: EnUnit = {
   },
   essential: true,
   aiPosition: { x: 0, y: 0 },
-  cardId: "l1_en",
+  cardId: "a2l1_en",
 }

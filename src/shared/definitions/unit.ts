@@ -1,6 +1,7 @@
 import { Ability } from "./ability";
 import { UserInput } from "./input";
 import { AIPosition } from "./ai";
+import { CardId } from "../data/cardId";
 
 
 export type Unit = {
@@ -9,7 +10,7 @@ export type Unit = {
   charges: number,
   maxCharges: number,
   essential: boolean,
-  cardId: string,
+  cardId: CardId,
 }
 
 export type FrAbility = {
