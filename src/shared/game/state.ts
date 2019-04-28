@@ -335,7 +335,7 @@ export function showGamestate(
 ): string {
   const fr = frFiltered(state).map(x => showUnit(x.e, x.i)).join(" | ");
   const en = enFiltered(state).map(x => showUnit(x.e, x.i)).join(" | ");
-  const tr = triggerById(state);
+  const tr = statusById(state);
   const frTr = tr.fr.map((l, i) => {
     return `${i}: ${l.map(x => showStatus(x)).join(" | ")}`;
   }).join("\n");
@@ -346,7 +346,7 @@ export function showGamestate(
   return `state:${state.type}\n${fr}\n${en}\n${frTr}\n${enTr}`;
 }
 
-export function triggerById(
+export function statusById(
   state: GameState,
 ): {
   fr: StStatus[][],
@@ -364,18 +364,18 @@ export function triggerById(
         const ownerType = status.owner.type;
         switch (ownerType) {
           case "friendly": {
-            if (fr[position] === undefined) {
-              fr[position] = [status];
+            if (fr[status.owner.id] === undefined) {
+              fr[status.owner.id] = [status];
             } else {
-              fr[position].push(status);
+              fr[status.owner.id].push(status);
             }
             break;
           }
           case "enemy": {
-            if (en[position] === undefined) {
-              en[position] = [status];
+            if (en[status.owner.id] === undefined) {
+              en[status.owner.id] = [status];
             } else {
-              en[position].push(status);
+              en[status.owner.id].push(status);
             }
             break;
           }

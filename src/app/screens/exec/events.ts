@@ -43,6 +43,7 @@ export function updateSolutionRep(
   if (prevState === undefined) {
     gameRefs.screens.execScreen.drawAnimControlBtns();
     gameRefs.screens.execScreen.drawTreeControlBtns();
+    gameRefs.screens.execScreen.drawSwitchOrderBtns();
     gameRefs.screens.execScreen.drawClearBtn();
   }
   const logIndex = firstLogIndex();

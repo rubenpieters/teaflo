@@ -2,7 +2,7 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position, center } from "../../util/position";
 import { addText, DataSprite, addShader, clearShader } from "../../phaser/datasprite";
-import { enFiltered, frFiltered, getTarget } from "../../../shared/game/state";
+import { enFiltered, frFiltered, getTarget, statusById } from "../../../shared/game/state";
 import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex, StatusLog } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
@@ -55,12 +55,15 @@ export class ExecScreen {
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
   treeControlBtnPool: Pool<TreeControlBtn, {}>
+  switchStatusOrderBtnPool: Pool<SwitchStatusOrderBtnData, {}>
 
   state: GameState | undefined
+  statusesById: { fr: StStatus[][], en: StStatus[][], } | undefined
   log: Log | undefined
   hoveredUnit: TargetId | undefined
   clickState: { ability: FrAbility, inputs: any[], origin: UnitId, index: number } | undefined
   intermediate: LogIndex | undefined
+  statusOrder: "byOrder" | "byId" = "byId"
 
   treeCtrl: "remove" | undefined
 
@@ -88,6 +91,7 @@ export class ExecScreen {
     this.hoverSpritePool = mkHoverSpritePool(gameRefs);
     this.hoverGraphicsPool = gameRefs.game.add.graphics();
     this.stateIconPool = mkStateIconPool(gameRefs);
+    this.switchStatusOrderBtnPool = mkSwitchStatusOrderBtnPool(gameRefs);
   }
 
   reset() {
@@ -97,6 +101,7 @@ export class ExecScreen {
     this.clickState = undefined;
     this.intermediate = undefined;
     this.treeCtrl = undefined;
+    this.statusOrder = "byOrder";
   }
 
   solDataFromClickState(): SolutionData {
@@ -167,6 +172,9 @@ export class ExecScreen {
     this.stateTextPool.clear();
     this.abilityPool.clear();
     this.stateIconPool.clear();
+
+    // calculate statuses by id
+    this.statusesById = statusById(state);
 
     // the input type of the click state
     // undefined if the clickstate is undefined
@@ -384,7 +392,7 @@ export class ExecScreen {
     // AETHER
     groupOrder.forEach((tag, tagIndex) => {
       state.statusRows[tag].statuses.forEach((status, statusIndex) => {
-        const triggerPos = statusPos(state, status.id, statusIndex, tagIndex);
+        const triggerPos = statusPos(state, this.statusesById!, this.statusOrder, status.id, statusIndex, tagIndex);
         const trSprite = this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { status });
         if (currentInputType !== undefined && ! matchUserInput(currentInputType, status.id)) {
           trSprite.alpha = 0.3;
@@ -437,6 +445,15 @@ export class ExecScreen {
     });
   }
 
+  drawSwitchOrderBtns() {
+    this.switchStatusOrderBtnPool.clear();
+    const pos = createPosition(
+      "left", 200, 60,
+      "top", 1000, 60,
+    );
+    this.switchStatusOrderBtnPool.newSprite(pos.xMin, pos.yMin, {}, {});
+  }
+
   drawStats(
     state: GameState,
   ) {
@@ -481,7 +498,7 @@ export class ExecScreen {
     });
     groupOrder.forEach((tag, tagIndex) => {
       state.statusRows[tag].statuses.forEach((status, statusIndex) => {
-        const triggerPos = statusPos(state, status.id, statusIndex, tagIndex);
+        const triggerPos = statusPos(state, this.statusesById!, this.statusOrder, status.id, statusIndex, tagIndex);
         // hover graphics
         if (
           this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, status.id)
@@ -648,7 +665,7 @@ export class ExecScreen {
       case "status": {
         const id = _id as StatusId;
 
-        return statusPos(state, id);
+        return statusPos(state, this.statusesById!, this.statusOrder, id);
       }
       case "enemy": {
         const id = _id as EnemyId;
@@ -1457,6 +1474,44 @@ function mkTreeControlBtnPool(
             }
             case "remove": {
               gameRefs.screens.execScreen.setTreeControl(undefined);
+              break;
+            }
+          }
+        },
+      },
+    },
+  );
+}
+
+type SwitchStatusOrderBtnData = {
+};
+
+function mkSwitchStatusOrderBtnPool(
+  gameRefs: GameRefs,
+): Pool<SwitchStatusOrderBtnData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return "icon_anim_pause.png";
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+          switch (gameRefs.screens.execScreen.statusOrder) {
+            case "byId": {
+              gameRefs.screens.execScreen.statusOrder = "byOrder";
+              gameRefs.screens.execScreen.drawCurrentState();
+              break;
+            }
+            case "byOrder": {
+              gameRefs.screens.execScreen.statusOrder = "byId";
+              gameRefs.screens.execScreen.drawCurrentState();
               break;
             }
           }

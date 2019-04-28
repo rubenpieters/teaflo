@@ -3,6 +3,8 @@ import { FriendlyId, EnemyId, StatusId } from "../../../shared/definitions/entit
 import { createPosition, relativeTo, Position } from "../../../app/util/position";
 import { groupOrder } from "../../../shared/game/status";
 import { GameState } from "../../../shared/definitions/state";
+import { StStatus } from "src/shared/definitions/statusRow";
+import deepEqual = require("deep-equal");
 
 /*
 
@@ -117,22 +119,68 @@ export function unitUtilityPositions(
 
 export function statusPos(
   state: GameState,
+  statusesById: { fr: StStatus[][], en: StStatus[][], },
+  statusOrder: "byOrder" | "byId",
   statusId: StatusId,
   // x index, the index within its status row
   columnPosition?: number,
   // y index, to which status row it belongs
   rowPosition?: number,
-) {
-  if (columnPosition === undefined || rowPosition === undefined) {
-    const result = stStatusPosition(state, statusId);
-    if (result === undefined) {
-      throw `enemyUnitPos: unexpected nonexisting unit ${JSON.stringify(statusId)}`;
+): Position {
+  if (statusOrder === "byOrder") {
+    if (columnPosition === undefined || rowPosition === undefined) {
+      const result = stStatusPosition(state, statusId);
+      if (result === undefined) {
+        throw `enemyUnitPos: unexpected nonexisting unit ${JSON.stringify(statusId)}`;
+      }
+      columnPosition = result.columnPosition;
+      rowPosition = result.rowPosition;
     }
-    columnPosition = result.columnPosition;
-    rowPosition = result.rowPosition;
+    return createPosition(
+      "left", 240 + 50 * columnPosition, 40,
+      "top", 50 + 50 * rowPosition, 40,
+    );
+  } else if (statusOrder === "byId") {
+    let statusInfo = findStatus(statusesById.fr, statusId);
+    let basePos: Position = undefined as any;
+    if (statusInfo === undefined) {
+      statusInfo = findStatus(statusesById.en, statusId);
+    } else {
+      basePos = friendlyUnitPos(state, statusInfo.unitId);
+      return relativeTo(basePos,
+        [{ type: "above", amt: 100 }, { type: "right", amt: 40 * statusInfo.stId }],
+        40, 40,
+      );
+    }
+    if (statusInfo === undefined) {
+      throw `can not find ${JSON.stringify(statusId)}`;
+    } else {
+      basePos = enemyUnitPos(state, statusInfo.unitId);
+    }
+
+    return relativeTo(basePos,
+      [{ type: "above", amt: 100 }, { type: "right", amt: 40 * statusInfo.stId }],
+      40, 40,
+    );
+  } else {
+    throw "statusPos: should not happen";
   }
-  return createPosition(
-    "left", 240 + 50 * columnPosition, 40,
-    "top", 50 + 50 * rowPosition, 40,
-  );
+}
+
+function findStatus(
+  rows: StStatus[][],
+  statusId: StatusId,
+) {
+  let unitId = 0;
+  for (const row of rows) {
+    let stId = 0;
+    for (const st of row) {
+      if (deepEqual(statusId, st.id)) {
+        return { unitId, stId };
+      }
+      stId += 1;
+    }
+    unitId += 1;
+  }
+  return undefined;
 }
