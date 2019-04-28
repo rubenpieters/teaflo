@@ -45,7 +45,7 @@ export function removeUnit<Type extends UnitType, E extends HasId<Type>>(
 
   const result = modifyAndGet(row,
     x => x.units, x => {
-      const removed = x.splice(index, 1)[0];
+      const removed = x.splice(index, 1, undefined)[0];
       return { a: x, b: removed };
     }
   );
