@@ -7,7 +7,7 @@ import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logInd
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { EntityId, UnitId, friendlyId, TargetId, EnemyId, FriendlyId, StatusId } from "../../../shared/definitions/entityId";
-import { hoverUnit, clearHover, clickUnit, extendLevelSolution, changeLevelLoc, clearSolution, cutLevelSolution } from "./events";
+import { hoverUnit, clearHover, extendLevelSolution, changeLevelLoc, clearSolution, cutLevelSolution } from "./events";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation, runAsTween } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution, SolutionData } from "../../../shared/game/solution";
@@ -59,7 +59,6 @@ export class ExecScreen {
   state: GameState | undefined
   log: Log | undefined
   hoveredUnit: TargetId | undefined
-  selectedUnit: TargetId | undefined
   clickState: { ability: FrAbility, inputs: any[], origin: UnitId, index: number } | undefined
   intermediate: LogIndex | undefined
 
@@ -95,7 +94,6 @@ export class ExecScreen {
     this.state = undefined;
     this.log = undefined;
     this.hoveredUnit = undefined;
-    this.selectedUnit = undefined;
     this.clickState = undefined;
     this.intermediate = undefined;
     this.treeCtrl = undefined;
@@ -206,8 +204,7 @@ export class ExecScreen {
 
         // hover bar
         if (
-          (this.selectedUnit !== undefined && deepEqual(this.selectedUnit, unit.id)) ||
-          (this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id))
+          this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id)
         ) {
           const hoverBarPos = relativeTo(unitPos,
             [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
@@ -319,8 +316,7 @@ export class ExecScreen {
 
         // hover bar
         if (
-          (this.selectedUnit !== undefined && deepEqual(this.selectedUnit, unit.id)) ||
-          (this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id))
+          this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id)
         ) {
           const hoverBarPos = relativeTo(unitPos,
             [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
@@ -398,8 +394,7 @@ export class ExecScreen {
 
         // hover graphics
         if (
-          (this.selectedUnit !== undefined && deepEqual(this.selectedUnit, status.id)) ||
-          (this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, status.id))
+          this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, status.id)
         ) {
           this.hoverGraphicsPool.beginFill();
           this.hoverGraphicsPool.lineStyle(4);
@@ -456,8 +451,7 @@ export class ExecScreen {
       if (unit !== undefined) {
         // hover bar
         if (
-          (this.selectedUnit !== undefined && deepEqual(this.selectedUnit, unit.id)) ||
-          (this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id))
+          this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id)
         ) {
           const unitPos = friendlyUnitPos(state, unitIndex);
           const hoverBarPos = relativeTo(unitPos,
@@ -473,8 +467,7 @@ export class ExecScreen {
       if (unit !== undefined) {
         // hover bar
         if (
-          (this.selectedUnit !== undefined && deepEqual(this.selectedUnit, unit.id)) ||
-          (this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id))
+          this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id)
         ) {
           const unitPos = enemyUnitPos(state, unitIndex);
           const hoverBarPos = relativeTo(unitPos,
@@ -491,8 +484,7 @@ export class ExecScreen {
         const triggerPos = statusPos(state, status.id, statusIndex, tagIndex);
         // hover graphics
         if (
-          (this.selectedUnit !== undefined && deepEqual(this.selectedUnit, status.id)) ||
-          (this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, status.id))
+          this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, status.id)
         ) {
           this.hoverGraphicsPool.beginFill();
           this.hoverGraphicsPool.lineStyle(4);
@@ -508,7 +500,7 @@ export class ExecScreen {
     });
 
     // DETAIL
-    const showUnit = this.hoveredUnit !== undefined ? this.hoveredUnit : this.selectedUnit;
+    const showUnit = this.hoveredUnit;
     if (showUnit !== undefined) {
       if (showUnit.type === "status") {
         // compiler does not refine type of this id
@@ -889,9 +881,7 @@ function mkUnitPool(
       callbacks: {
         click: (self) => {
           const clickState = gameRefs.screens.execScreen.clickState;
-          if (clickState === undefined) {
-            clickUnit(gameRefs, self.data.globalId);
-          } else {
+          if (clickState !== undefined) {
             const inputType: UserInput = clickState.ability.inputs[clickState.inputs.length];
             if (matchUserInput(inputType, self.data.globalId)) {
               clickState.inputs.push(self.data.globalId);
@@ -939,9 +929,7 @@ function mkUnitResPool(
       callbacks: {
         click: (self) => {
           const clickState = gameRefs.screens.execScreen.clickState;
-          if (clickState === undefined) {
-            clickUnit(gameRefs, self.data.globalId);
-          } else {
+          if (clickState !== undefined) {
             const inputType: UserInput = clickState.ability.inputs[clickState.inputs.length];
             if (matchUserInput(inputType, self.data.globalId)) {
               clickState.inputs.push(self.data.globalId);
@@ -1090,9 +1078,7 @@ function mkTriggerPool(
         click: (self) => {
           const globalId = self.data.status.id;
           const clickState = gameRefs.screens.execScreen.clickState;
-          if (clickState === undefined) {
-            clickUnit(gameRefs, globalId);
-          } else {
+          if (clickState !== undefined) {
             const inputType: UserInput = clickState.ability.inputs[clickState.inputs.length];
             if (matchUserInput(inputType, globalId)) {
               clickState.inputs.push(globalId);

@@ -70,19 +70,6 @@ export function clearHover(
   gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
 }
 
-export function clickUnit(
-  gameRefs: GameRefs,
-  globalId: TargetId,
-) {
-  const selected = gameRefs.screens.execScreen.selectedUnit;
-  if (selected !== undefined && deepEqual(globalId, selected)) {
-    gameRefs.screens.execScreen.selectedUnit = undefined;
-  } else {
-    gameRefs.screens.execScreen.selectedUnit = globalId;
-  }
-  gameRefs.screens.execScreen.drawStats(gameRefs.screens.execScreen.currentState());
-}
-
 export function extendLevelSolution(
   gameRefs: GameRefs,
   solData: SolutionData,
