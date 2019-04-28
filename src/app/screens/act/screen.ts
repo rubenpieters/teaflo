@@ -120,7 +120,7 @@ export class ActScreen {
     const levelId = levelData.id;
     const pos = createPosition(
       "left", 250, 400,
-      "top", 300 + (250 * levelIndex), 200,
+      "top", 300 + (150 * levelIndex), 200,
     );
     const sprite = this.levelBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { levelId, levelIndex });
     addText(this.gameRefs, sprite, pos, levelData.name, "#000000", 40);

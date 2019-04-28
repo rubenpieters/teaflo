@@ -80,6 +80,7 @@ export const a1l3_en1: EnUnit = {
   aiPosition: { x: 0, y: 0 },
   cardId: "a1l3_en1",
 }
+
 export const a1l3_en2_ab1: Ability =
   new A.Damage("Ability", "Target", new Ab.Static(7), Ab.highestThreat())
   ;

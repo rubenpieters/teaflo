@@ -1128,6 +1128,7 @@ function mkLogActionPool(
         switch (self.data.action.tag) {
           case "Damage": return "icon_damage_40_40.png";
           case "UseCharge": return "icon_usecharge_40_40.png";
+          case "RestoreCharge": return "icon_restorecharge_40_40.png";
           case "AddThreat": return "icon_addthreat_40_40.png";
           case "MoveAI": return "icon_ai.png";
           case "StartTurn": return "icon_start_turn_40_40.png";
