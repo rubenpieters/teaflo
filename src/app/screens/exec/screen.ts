@@ -14,7 +14,7 @@ import { Solution, SolutionData } from "../../../shared/game/solution";
 import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
 import { clearAnimations } from "../util";
-import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions, explX, explY, explArrowEnd } from "./positions";
+import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions, explX, explY, explArrowEnd, unitEnMinX, unitFrMinY } from "./positions";
 import deepEqual from "deep-equal";
 import { groupOrder, statusTagDescription } from "../../../shared/game/status";
 import { StStatus } from "../../../shared/definitions/statusRow";
@@ -34,7 +34,7 @@ import { CardId } from "../../../shared/data/cardId";
 import { drawLine } from "../../phaser/line";
 
 export class ExecScreen {
-  clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
+  clearBtnPool: Pool<{}, {}>
   unitPool: Pool<UnitData, {}>
   unitResPool: Pool<UnitResData, {}>
   abilityPool: Pool<AbilityData, {}>
@@ -153,8 +153,8 @@ export class ExecScreen {
     this.clearBtnPool.clear();
 
     const pos = createPosition(
-      "right", 100, 400,
-      "bot", 500, 200,
+      "right", 650, 100,
+      "bot", 20, 100,
     );
     const sprite = this.clearBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", {});
     addText(this.gameRefs, sprite, pos, "Clear", "#000000", 40);
@@ -428,7 +428,7 @@ export class ExecScreen {
     types.map((type, typeIndex) => {
       const pos = createPosition(
         "left", 20 + 61 * typeIndex, 60,
-        "top", 50, 60,
+        "top", 900, 60,
       );
       this.animControlBtnPool.newSprite(pos.xMin, pos.yMin, {}, { type });
     });
@@ -453,8 +453,8 @@ export class ExecScreen {
   drawSwitchOrderBtns() {
     this.switchStatusOrderBtnPool.clear();
     const pos = createPosition(
-      "left", 200, 60,
-      "top", 1000, 60,
+      "left", unitEnMinX - 250, 60,
+      "top", unitFrMinY - 50, 60,
     );
     this.switchStatusOrderBtnPool.newSprite(pos.xMin, pos.yMin, {}, {});
   }
@@ -857,30 +857,28 @@ export class ExecScreen {
 
 function mkClearBtnPool(
   gameRefs: GameRefs,
-): Pool<{}, "neutral" | "hover" | "down"> {
-  return mkButtonPool(
+): Pool<{}, {}> {
+  return new Pool(
     gameRefs.game,
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        switch (frameType) {
-          case "down": return "btn_level_click.png";
-          case "hover": return "btn_level_hover.png";
-          case "neutral": return "btn_level_neutral.png";
-        }
+        return "icon_clear_100_100.png";
       },
       introAnim: [
-        (self, tween) => {
-          tween.from({ y: self.y - 50 }, 50, Phaser.Easing.Linear.None, false, 0);
-        }
       ],
       callbacks: {
         click: (self) => {
           clearSolution(gameRefs);
         },
+        hoverOver: (self) => {
+          addShader(gameRefs, self, "blue-glow");
+        },
+        hoverOut: (self) => {
+          clearShader(self);
+        },
       },
     },
-    self => { return false; }
   );
 }
 
@@ -1464,7 +1462,7 @@ function mkTreeControlBtnPool(
           return "icon_add_status.png";
         } else {
           switch (self.data.type) {
-            case "remove": return "icon_anim_pause.png";
+            case "remove": return "icon_deletetree_40_40.png";
           }
           throw "mkTreeControlBtnPool: impossible";
         }
@@ -1503,12 +1501,9 @@ function mkSwitchStatusOrderBtnPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return "icon_anim_pause.png";
+        return "icon_swapstatusmode_40_40.png";
       },
       introAnim: [
-        (self, tween) => {
-          tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
-        },
       ],
       callbacks: {
         click: (self) => {

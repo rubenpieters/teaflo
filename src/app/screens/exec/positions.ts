@@ -32,12 +32,12 @@ const unitSizeY = 150;
 const unitSpacing = 30;
 const unitSpaceNeeded = unitSizeX * 4 + unitSpacing * 3;
 
-const unitFrMinY = 450;
+export const unitFrMinY = 450;
 const unitFrMinX = 250;
 const unitFrMaxX = unitFrMinX + unitSpaceNeeded;
 
 const unitEnMinY = 100;
-const unitEnMinX = unitFrMaxX + 100;
+export const unitEnMinX = unitFrMaxX + 100;
 const unitEnMaxX = unitEnMinX + unitSpaceNeeded;
 
 export const explX = unitEnMinX;
