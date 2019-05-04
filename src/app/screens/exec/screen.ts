@@ -301,6 +301,7 @@ export class ExecScreen {
       }
     });
 
+    // draw enemy units
     state.enUnits.units.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
         const unitPos = enemyUnitPos(state, unitIndex);
@@ -371,9 +372,11 @@ export class ExecScreen {
           const ability = unit.abilities[index];
           if (ability !== undefined) {
             const aiPos = indexToAiPos(index);
-            const abPos = createPosition(
-              "left", 970 + 170 * unitIndex + 70 * aiPos.x, 70,
-              "top", 760 + 70 * aiPos.y, 70,
+            const abPos = relativeTo(unitPos,
+              [ { type: "below", amt: 95 + 70 * aiPos.y },
+                { type: "left", amt: -45 - 70 * aiPos.x }
+              ],
+              70, 70,
             );
             this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
               { tag: "EnAbilityData", ai: ability, aiIndex: index }

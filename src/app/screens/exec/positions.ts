@@ -32,11 +32,11 @@ const unitSizeY = 150;
 const unitSpacing = 30;
 const unitSpaceNeeded = unitSizeX * 4 + unitSpacing * 3;
 
-const unitMinY = 450;
-
+const unitFrMinY = 450;
 const unitFrMinX = 250;
 const unitFrMaxX = unitFrMinX + unitSpaceNeeded;
 
+const unitEnMinY = 100;
 const unitEnMinX = unitFrMaxX + 100;
 const unitEnMaxX = unitEnMinX + unitSpaceNeeded;
 
@@ -56,7 +56,7 @@ export function friendlyUnitPos(
   }
   return createPosition(
     "left", unitFrMinX + 170 * frPosition, unitSizeX,
-    "top", unitMinY, unitSizeY,
+    "top", unitFrMinY, unitSizeY,
   );
 }
 
@@ -75,8 +75,8 @@ export function enemyUnitPos(
     enPosition = unitId;
   }
   return createPosition(
-    "left", unitEnMinX + 170 * enPosition, unitSizeX,
-    "top", unitMinY, unitSizeY,
+    "left", unitEnMinX + 210 * enPosition, unitSizeX,
+    "top", unitEnMinY, unitSizeY,
   );
 }
 
