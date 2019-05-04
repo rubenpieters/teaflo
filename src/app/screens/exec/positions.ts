@@ -40,6 +40,10 @@ const unitEnMinY = 100;
 const unitEnMinX = unitFrMaxX + 100;
 const unitEnMaxX = unitEnMinX + unitSpaceNeeded;
 
+export const explX = unitEnMinX;
+export const explY = unitEnMinY + 650;
+export const explArrowEnd = { x: explX - 30, y: explY + 40 };
+
 export function friendlyUnitPos(
   state: GameState,
   unitId: FriendlyId | number,

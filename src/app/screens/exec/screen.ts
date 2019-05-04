@@ -14,7 +14,7 @@ import { Solution, SolutionData } from "../../../shared/game/solution";
 import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
 import { clearAnimations } from "../util";
-import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions } from "./positions";
+import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions, explX, explY, explArrowEnd } from "./positions";
 import deepEqual from "deep-equal";
 import { groupOrder, statusTagDescription } from "../../../shared/game/status";
 import { StStatus } from "../../../shared/definitions/statusRow";
@@ -31,6 +31,7 @@ import { actionDescription } from "../../../shared/game/action";
 import { abilityDescription } from "../../../shared/game/ability";
 import { settings } from "../../data/settings";
 import { CardId } from "../../../shared/data/cardId";
+import { drawLine } from "../../phaser/line";
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, "neutral" | "hover" | "down">
@@ -52,6 +53,7 @@ export class ExecScreen {
   hoverSpritePool: Pool<HoverSpriteData, {}>
   hoverGraphicsPool: Phaser.Graphics
   stateIconPool: Pool<StateIconData, {}>
+  logGraphicsPool: Phaser.Graphics
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
   treeControlBtnPool: Pool<TreeControlBtn, {}>
@@ -92,6 +94,7 @@ export class ExecScreen {
     this.hoverGraphicsPool = gameRefs.game.add.graphics();
     this.stateIconPool = mkStateIconPool(gameRefs);
     this.switchStatusOrderBtnPool = mkSwitchStatusOrderBtnPool(gameRefs);
+    this.logGraphicsPool = gameRefs.game.add.graphics();
   }
 
   reset() {
@@ -407,15 +410,14 @@ export class ExecScreen {
         if (
           this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, status.id)
         ) {
-          this.hoverGraphicsPool.beginFill();
-          this.hoverGraphicsPool.lineStyle(4);
-          const centerTriggerPos = center(triggerPos);
-          this.hoverGraphicsPool.moveTo(centerTriggerPos.x, centerTriggerPos.y);
+          const start = center(triggerPos);
+          let end: { x: number, y: number } = undefined as any;
           if (status.owner.type === "friendly") {
-            const ownerPosCenter = center(friendlyUnitPos(state, new EntityId(status.owner.id, "friendly")));
-            this.hoverGraphicsPool.lineTo(ownerPosCenter.x, ownerPosCenter.y); 
+            end = center(friendlyUnitPos(state, status.owner as EntityId<"friendly">));
+          } else if (status.owner.type === "enemy") {
+            end = center(enemyUnitPos(state, status.owner as EntityId<"enemy">));
           }
-          this.hoverGraphicsPool.endFill();
+          drawLine(this.hoverGraphicsPool, start, end);
         }
       });
     });
@@ -613,49 +615,53 @@ export class ExecScreen {
 
     // draw action popup text
     const action = logEntry.action;
-    const actionAnimPos = this.logLocation(action, state);
     const actionAnim = new Create(() => {
-      return this.createLogTextSprite(actionAnimPos.xMin, actionAnimPos.yMin, action);
+      // draw connection line
+      this.logGraphicsPool.clear();
+      const logLoc = this.logLocation(action, state);
+      if (logLoc !== undefined) {
+        drawLine(this.logGraphicsPool, logLoc, explArrowEnd);
+      }
+      // return sprite
+      return this.createLogTextSprite(explX, explY, action);
     }, self => {
       return new BaseAnimation(1000, self, t => {
-        t.to({ y: actionAnimPos.yMin - 100 }, 1000);
-        t.onComplete.add(() => self.destroy());
+        t.from({ alpha: 0.3 }, 1000);
+        t.onComplete.add(() => {
+          self.destroy();
+          this.logGraphicsPool.clear();
+        });
       });
     });
-    
-    // draw frames
-    const origin = action.origin;
-    let frameAnim: Animation[] = [];
-    if (origin !== "noOrigin") {
-      frameAnim = [this.drawFrames(state, action, origin as any)];
-    }
     
     // draw difference with prev log
     if (prevLog !== undefined) {
       // console.log(`PREV: ${JSON.stringify(prevLog.action)}`)
     }
 
-    return new ParAnimation(anims.concat(frameAnim).concat(actionAnim));
+    return new ParAnimation(anims.concat(actionAnim));
   }
 
   logLocation(
     action: Action,
     state: GameState,
-  ): Position {
+  ): { x: number, y: number } | undefined {
     switch (action.tag) {
       case "AddStatus": // fallthrough
       case "UseCharge": // fallthrough
+      case "RestoreCharge": // fallthrough
+      case "MoveAI": // fallthrough
       case "Damage": {
-        return this.onTargetPos(state, action.target);
+        return center(this.onTargetPos(state, action.target));
       }
       case "AddThreat": {
-        return this.onTargetPos(state, action.forAlly);
+        return center(this.onTargetPos(state, action.forAlly));
       }
-      default: {
-        return createPosition(
-          "left", 380, 100,
-          "top", 200, 100,
-        );
+      case "Death": // fallthrough TODO: this should point to the location of where the status was?
+      case "Combined": // fallthrough
+      case "Invalid": // fallthrough
+      case "StartTurn": {
+        return undefined;
       }
     }
   }
@@ -1054,7 +1060,7 @@ function mkAbilityPool(
             
             return groupFromDesc(
               abilityDescription(ability),
-              80, { x: 750, y: (settings.gameHeight - 225) }, () => { return {} }, sprite => { return { sprite }},
+              80, { x: explX, y: explY }, () => { return {} }, sprite => { return { sprite }},
               gameRefs.screens.execScreen.detailExplPool,
             );
           }
