@@ -613,9 +613,39 @@ export class ExecScreen {
       }
     });
 
-    // draw action popup text
-    const action = logEntry.action;
-    const actionAnim = new Create(() => {
+    const effectAnim = this.createEffectAnimation(state, logEntry.action, logEntry.transforms);
+    
+    // draw difference with prev log
+    if (prevLog !== undefined) {
+      // console.log(`PREV: ${JSON.stringify(prevLog.action)}`)
+    }
+
+    return new ParAnimation(anims.concat(effectAnim));
+  }
+
+  createEffectAnimation(
+    state: GameState,
+    lastAction: Action,
+    transforms: StatusLog[],
+  ): Animation {
+    return this._createEffectAnimation(state, lastAction, transforms, 0, []);
+  }
+
+  _createEffectAnimation(
+    state: GameState,
+    lastAction: Action,
+    transforms: StatusLog[],
+    index: number,
+    sprites: Phaser.Sprite[],
+  ): Animation {
+    let action: Action = undefined as any;
+    if (index < transforms.length) {
+      action = transforms[index].before;
+    } else {
+      action = lastAction;
+    }
+    
+    return new Create(() => {
       // draw connection line
       this.logGraphicsPool.clear();
       const logLoc = this.logLocation(action, state);
@@ -623,23 +653,26 @@ export class ExecScreen {
         drawLine(this.logGraphicsPool, logLoc, explArrowEnd);
       }
       // return sprite
-      return this.createLogTextSprite(explX, explY, action);
+      return this.createLogTextSprite(explX, explY - 160 + (80 * index), action);
     }, self => {
-      return new BaseAnimation(1000, self, t => {
-        t.from({ alpha: 0.3 }, 1000);
-        t.onComplete.add(() => {
-          self.destroy();
-          this.logGraphicsPool.clear();
+      if (index < transforms.length) {
+        return new SeqAnimation([
+          new BaseAnimation(1000, self, t => {
+            t.from({ alpha: 0.3 }, 1000);
+          }),
+          this._createEffectAnimation(state, lastAction, transforms, index + 1, sprites.concat(self)),
+        ]);
+      } else {
+        return new BaseAnimation(1000, self, t => {
+          t.from({ alpha: 0.3 }, 1000);
+          t.onComplete.add(() => {
+            self.destroy();
+            sprites.forEach(x => x.destroy())
+            this.logGraphicsPool.clear();
+          });
         });
-      });
+      }
     });
-    
-    // draw difference with prev log
-    if (prevLog !== undefined) {
-      // console.log(`PREV: ${JSON.stringify(prevLog.action)}`)
-    }
-
-    return new ParAnimation(anims.concat(actionAnim));
   }
 
   logLocation(
