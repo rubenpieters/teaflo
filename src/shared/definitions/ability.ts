@@ -47,6 +47,7 @@ export class FromInput {
  */
 export type TargetVar<A>
   = AllEnemy
+  | AllEnemyExceptSelf
   | AllFriendly
   | Self
   | HighestThreat
@@ -62,6 +63,18 @@ export class AllEnemy {
 
 export function allEnemy(): TargetVar<EnemyId> {
   return new AllEnemy();
+}
+
+export class AllEnemyExceptSelf {
+  public readonly tag: "AllEnemyExceptSelf" = "AllEnemyExceptSelf";
+
+  constructor(
+
+  ) {}
+}
+
+export function allEnemyExceptSelf(): TargetVar<EnemyId> {
+  return new AllEnemyExceptSelf();
 }
 
 export class AllFriendly {

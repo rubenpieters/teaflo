@@ -1,4 +1,4 @@
-import { AbilityVar, TargetVar } from "./ability";
+import { AbilityVar, TargetVar, Static } from "./ability";
 import { ConditionVar } from "./condition";
 import { StatusTransformVar } from "./statusTransform";
 
@@ -12,10 +12,18 @@ declare module "fp-ts/lib/HKT" {
     Target: AbilityVar<A> | TargetVar<A>,
     Cond: ConditionVar<A>,
     ST: StatusTransformVar<A>,
+    SATarget: StatusTransformVar<A> | TargetVar<A>,
   }
 }
 
-export type ACTION_URIS = Ability_URI | Action_URI | Target_URI;
+export type ACTION_URIS
+  = Ability_URI
+  | Action_URI
+  | Target_URI
+  | Condition_URI
+  | StatusTransform_URI
+  | SATarget_URI
+  ;
 
 export const Ability_URI: "Ability" = "Ability";
 export type Ability_URI = typeof Ability_URI;
@@ -31,3 +39,6 @@ export type Condition_URI = typeof Condition_URI;
 
 export const StatusTransform_URI: "ST" = "ST";
 export type StatusTransform_URI = typeof StatusTransform_URI;
+
+export const SATarget_URI: "SATarget" = "SATarget";
+export type SATarget_URI = typeof SATarget_URI;

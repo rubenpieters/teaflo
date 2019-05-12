@@ -11,6 +11,7 @@ import { DescToken, DescSymbol, DescSeparator } from "../definitions/description
 import { descSingleton, numberDescription } from "./description";
 import { statusDescription } from "./status";
 import { routeDirectionDescription } from "./ai";
+import deepEqual from "deep-equal";
 
 export function resolveSingleTargetAbility(
   ability: SingleTargetAbility,
@@ -130,30 +131,43 @@ function replaceField<A>(
   return l.reduce((prev, curr) => prev.concat(curr), []);
 }
 
-function resolveTargetVar<A>(
-  targetVar: TargetVar<A> | AbilityVar<A>,
+function resolveTargetVar<A, B>(
+  targetVar: TargetVar<A> | B,
   state: GameState,
   context: Context,
-): { tag: "ids", ids: TargetId[] } | { tag: "var", var: AbilityVar<A> } {
-  switch (targetVar.tag) {
-    case "AllAlly": {
-      return { tag: "ids", ids: defined(state.frUnits).map(r => r.e.id) };
+): { tag: "ids", ids: TargetId[] } | { tag: "var", var: B } {
+  if (isTargetVar(targetVar)) {
+    switch (targetVar.tag) {
+      case "AllAlly": {
+        return { tag: "ids", ids: defined(state.frUnits).map(r => r.e.id) };
+      }
+      case "AllEnemy": {
+        return { tag: "ids", ids: defined(state.enUnits).map(r => r.e.id) };
+      }
+      case "AllEnemyExceptSelf": {
+        const ids = defined(state.enUnits).map(r => r.e.id)
+          .filter(x => ! deepEqual(x, context.self));
+        return { tag: "ids", ids };
+      }
+      case "Self": {
+        const self = context.self;
+        return { tag: "ids", ids: [self] };
+      }
+      case "HighestThreat": {
+        const self = context.self;
+        return { tag: "ids", ids: [getHighestThreat(state, self)] };
+      }
+      default: {
+        return { tag: "var", var: targetVar };
+      }
     }
-    case "AllEnemy": {
-      return { tag: "ids", ids: defined(state.enUnits).map(r => r.e.id) };
-    }
-    case "Self": {
-      const self = context.self;
-      return { tag: "ids", ids: [self] };
-    }
-    case "HighestThreat": {
-      const self = context.self;
-      return { tag: "ids", ids: [getHighestThreat(state, self)] };
-    }
-    default: {
-      return { tag: "var", var: targetVar };
-    }
+  } else {
+    return { tag: "var", var: targetVar };
   }
+}
+
+function isTargetVar <A>(a: any): a is TargetVar<A> {
+  return a.tag !== undefined;
 }
 
 export function getHighestThreat(
@@ -264,6 +278,9 @@ export function abilityVarDescription<A>(
       return [new DescSymbol("icon_all_friendly")];
     }
     case "AllEnemy": {
+      return [new DescSymbol("icon_all_enemy")];
+    }
+    case "AllEnemyExceptSelf": {
       return [new DescSymbol("icon_all_enemy")];
     }
     case "FromInput": {

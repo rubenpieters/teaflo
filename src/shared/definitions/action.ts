@@ -10,6 +10,11 @@ export type Action
   = ActionF<Action_URI, Action_URI>
   ;
 
+export type ActionWithOriginFG<F extends URIS, G extends URIS>
+  = ActionF<F, G>
+  & { origin: Type<F, UnitId | "noOrigin"> }
+  ;
+
 export type ActionWithOriginF<F extends URIS>
   = ActionF<F, F>
   & { origin: Type<F, UnitId | "noOrigin"> }

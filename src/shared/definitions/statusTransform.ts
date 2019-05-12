@@ -1,6 +1,7 @@
 import { ConditionVar } from "./condition";
-import { ActionWithOriginF } from "./action";
-import { StatusTransform_URI } from "./hkt";
+import { ActionWithOriginF, ActionWithOriginFG } from "./action";
+import { StatusTransform_URI, SATarget_URI } from "./hkt";
+import { ActionF } from "./actionf";
 
 export class Monus {
   public readonly tag: "Monus" = "Monus";
@@ -50,3 +51,7 @@ export type StatusTransformVar<A>
   ;
 
 export type StatusTransform = ActionWithOriginF<StatusTransform_URI>;
+
+export type StatusAbilityWithOrigin = ActionWithOriginFG<StatusTransform_URI, SATarget_URI>;
+
+export type StatusAbility = ActionF<StatusTransform_URI, SATarget_URI>;
