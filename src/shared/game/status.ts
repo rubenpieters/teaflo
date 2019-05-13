@@ -11,7 +11,7 @@ import { resolveStatusTransform } from "./statusTranform";
 import { showEntityId } from "./entityId";
 import { descSingleton, numberDescription } from "./description";
 import { DescSymbol, DescToken } from "../definitions/description";
-import { TargetId } from "../definitions/entityId";
+import { TargetId, UnitId } from "../definitions/entityId";
 import { TargetVar } from "../definitions/ability";
 import { defined } from "./unitRow";
 import { getHighestThreat } from "./ability";
@@ -261,6 +261,11 @@ function resolveTargetVar<A, B>(
         const ids = defined(state.enUnits).map(r => r.e.id)
           .filter(x => ! deepEqual(x, status.owner));
         return { tag: "ids", ids };
+      }
+      case "AllUnits": {
+       const ids: UnitId[] = defined(state.frUnits).map(r => r.e.id as UnitId)
+         .concat(defined(state.enUnits).map(r => r.e.id));
+       return { tag: "ids", ids };
       }
       case "Self": {
         const self = status.id;

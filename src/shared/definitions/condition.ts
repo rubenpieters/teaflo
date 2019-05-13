@@ -20,6 +20,8 @@ export type ActionCondition = ActionWithOriginF<Condition_URI>;
  * A Condition Variable is a description of how a parameter of an action should be compared in a condition.
  */
 export type ConditionVar<A>
+  // Static is an exact condition match as ConditionVar
+  // but a Static variable when used as TransformVar
   = Static<A>
   | StatusOwner
   | StatusValue

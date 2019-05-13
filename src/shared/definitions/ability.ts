@@ -1,6 +1,6 @@
 import { ActionF } from "./actionf";
 import { Ability_URI, Target_URI } from "./hkt";
-import { EnemyId, FriendlyId, TargetId } from "./entityId";
+import { EnemyId, FriendlyId, TargetId, UnitId } from "./entityId";
 
 /**
  * An Ability is an action with ability variables which still need to be resolved.
@@ -49,6 +49,7 @@ export type TargetVar<A>
   = AllEnemy
   | AllEnemyExceptSelf
   | AllFriendly
+  | AllUnits
   | Self
   | HighestThreat
   ;
@@ -87,6 +88,18 @@ export class AllFriendly {
 
 export function allFriendly(): TargetVar<FriendlyId> {
   return new AllFriendly();
+}
+
+export class AllUnits {
+  public readonly tag: "AllUnits" = "AllUnits";
+
+  constructor(
+
+  ) {}
+}
+
+export function allUnits(): TargetVar<UnitId> {
+  return new AllUnits();
 }
 
 export class Self {

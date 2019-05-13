@@ -1123,6 +1123,7 @@ function mkTriggerPool(
           case "Weak": return "icon_weak_40_40.png";
           case "Strong": return "icon_strong_40_40.png";
           case "Fragile": return "icon_fragile_40_40.png";
+          case "OnDeath": return "icon_death_40_40.png";
           default: return "icon_a.png";
         }
       },

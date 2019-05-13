@@ -149,6 +149,11 @@ function resolveTargetVar<A, B>(
           .filter(x => ! deepEqual(x, context.self));
         return { tag: "ids", ids };
       }
+      case "AllUnits": {
+        const ids: UnitId[] = defined(state.frUnits).map(r => r.e.id as UnitId)
+          .concat(defined(state.enUnits).map(r => r.e.id));
+        return { tag: "ids", ids };
+      }
       case "Self": {
         const self = context.self;
         return { tag: "ids", ids: [self] };
@@ -282,6 +287,9 @@ export function abilityVarDescription<A>(
     }
     case "AllEnemyExceptSelf": {
       return [new DescSymbol("icon_all_enemy")];
+    }
+    case "AllUnits": {
+      return [new DescSymbol("icon_all_enemy")]
     }
     case "FromInput": {
       return [new DescSymbol("icon_input")];

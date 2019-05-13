@@ -72,12 +72,12 @@ const a1l4: LevelData = {
 const a1l5: LevelData = {
   name: "A1 level5",
   id: "a1l5",
-  cardIds: ["a1l5_fr1", "a1l5_fr2"],
+  cardIds: ["a1l5_fr1", "a1l5_fr2", "a1l5_fr3"],
   enemyIds: ["a1l5_en1", "a1l5_en2"],
-  slots: 2,
+  slots: 3,
   selectLocation: { x: 200, y: 200 },
   boxSprite: "select3_f.png",
-  supplyLocations: [{ x: 518, y: 27 }, { x: 70, y: 680 }],
+  supplyLocations: [{ x: 518, y: 27 }, { x: 70, y: 680 }, { x: 915, y: 715 }],
 };
 
 const a2l1: LevelData = {

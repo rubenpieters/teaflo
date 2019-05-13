@@ -20,6 +20,7 @@ export function tagStatusArb(
     case "Weak": return fragmentsArb.map(x => new S.Weak(x));
     case "Armor": return fragmentsArb.map(x => new S.Armor(x));
     case "Fragile": return fragmentsArb.map(x => new S.Fragile(x));
+    case "OnDeath": throw "to impl";
   }
 }
 
