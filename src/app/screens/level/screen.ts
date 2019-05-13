@@ -64,6 +64,7 @@ export class LevelScreen {
     const schem = selectedSchem(this.gameRefs);
     const levelId = schem!.levelId;
     const solData = currentSchemSol(this.gameRefs);
+    const slots = levelData[levelId].slots;
 
     let spriteFs: {
       create: () => DataSprite<any>,
@@ -85,7 +86,7 @@ export class LevelScreen {
     };
 
     const supplyF = solData === undefined ? [] : solData.supply.map(({ cardId, deployPos }, cardIndex) => {
-      let data: BuildCardData = { tag: "card", cardId, deployPos, index: cardIndex };
+      let data: BuildCardData = { tag: "card", cardId, deployPos, index: cardIndex, slots };
       return {
         create: () => {
           const loc = levelData[schem!.levelId].supplyLocations[cardIndex];
@@ -186,6 +187,7 @@ type BuildCardData = {
   cardId: CardId,
   deployPos: number | undefined,
   index: number,
+  slots: number,
 }
 
 function mkBuildCardPool(
@@ -205,7 +207,7 @@ function mkBuildCardPool(
       ],
       callbacks: {
         click: (self) => {
-          toggleDeploy(gameRefs, self.data.index);
+          toggleDeploy(gameRefs, self.data.index, self.data.slots);
         },
       },
     },

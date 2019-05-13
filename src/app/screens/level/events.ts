@@ -71,10 +71,15 @@ export function moveCard(
 export function toggleDeploy(
   gameRefs: GameRefs,
   supplyIndex: number,
+  slots: number,
 ) {
   const sol = currentSchemSol(gameRefs);
   if (sol !== undefined) {
-    if (sol.supply[supplyIndex].deployPos === undefined) {
+    const limitReached = sol.supply.filter(x => x.deployPos !== undefined).length === slots;
+
+    console.log(`slots: ${slots}`);
+    console.log(`curr: ${sol.supply.length}`);
+    if (sol.supply[supplyIndex].deployPos === undefined && ! limitReached) {
       // deploy this card
 
       // increase the deployPos for each card
