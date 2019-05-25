@@ -19,6 +19,9 @@ export const cardMap: {
   "a1l5_fr1": "unit3.png",
   "a1l5_fr2": "unit2.png",
   "a1l5_fr3": "unit1.png",
+  "a1l6_fr1": "unit3.png",
+  "a1l6_fr2": "unit2.png",
+  "a1l6_fr3": "unit1.png",
   "a1l5_en1": "unit4.png",
   "a1l5_en2": "unit4.png",
   // act 2
