@@ -12,6 +12,8 @@ import { statusPosition, overStatus, removeStatus } from "./statusRow";
 import { UserInput, UnitInput, StatusInput, FriendlyInput, EnemyInput } from "../definitions/input";
 import { SolutionData } from "./solution";
 import { showUnit } from "./unit";
+import { FrUnit, EnUnit } from "../definitions/unit";
+import { CardId } from "../data/cardId";
 
 export type IdToEntityType = {
   "friendly": StFrUnit,
@@ -23,11 +25,34 @@ export function mkGameState(
   frUnits: (FrUnitId | undefined)[],
   enUnits: (EnUnitId | undefined)[],
 ): GameState {
+  const frUnitsWithId: (FrUnit & { cardId: CardId } | undefined)[] = frUnits.map(x => {
+    if (x !== undefined) {
+      return {...frUnitMap[x], cardId: x};
+    } else {
+      return undefined;
+    }
+  }) 
+
+  const enUnitsWithId: (EnUnit | undefined)[] = enUnits.map(x => {
+    if (x !== undefined) {
+      return enUnitMap[x]; 
+    } else {
+      return undefined;
+    }
+  });
+
+  return mkGameStateWithUnit(frUnitsWithId, enUnitsWithId);
+}
+
+export function mkGameStateWithUnit(
+  frUnits: (FrUnit & { cardId: CardId } | undefined)[],
+  enUnits: (EnUnit | undefined)[],
+): GameState {
   let frLastId = 0;
   const frUnitsWithId: (StFrUnit | undefined)[] = frUnits.map((x, i) => {
     if (x !== undefined) {
       frLastId += 1;
-      return {...frUnitMap[x], id: friendlyId(i), cardId: x, threatMap: {}, };
+      return {...x, id: friendlyId(i), threatMap: {}, };
     } else {
       return undefined;
     }
@@ -36,7 +61,7 @@ export function mkGameState(
   const enUnitsWithId: (StEnUnit | undefined)[] = enUnits.map((x, i) => {
     if (x !== undefined) {
       enLastId += 1;
-      return {...enUnitMap[x], id: enemyId(i + frLastId), };
+      return {...x, id: enemyId(i + frLastId), };
     } else {
       return undefined;
     }
