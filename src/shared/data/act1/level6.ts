@@ -40,7 +40,7 @@ export const a1l6_fr1: FrUnit = {
     {
       ability: a1l6_fr1_ab2,
       inputs: [
-        new FriendlyInput(),
+        new TargetInput(),
       ],
       spriteId: "ab3",
       name: "a1l6_fr1_ab2",
@@ -58,8 +58,8 @@ export const a1l6_fr2_ab1: Ability =
   ]);
 
 export const a1l6_fr2: FrUnit = {
-  hp: 51,
-  maxHp: 51,
+  hp: 41,
+  maxHp: 41,
   charges: 0,
   maxCharges: 6,
   abilities: [
