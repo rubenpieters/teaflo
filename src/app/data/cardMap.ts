@@ -36,4 +36,12 @@ export const cardMap: {
   "trinity_sup": "unit1.png",
   // act 2 level 1
   "a2l1_en": "unit4.png",
+  // act 3
+  "d_i": "unit1.png",
+  "d_ii": "unit1.png",
+  "d_iii": "unit1.png",
+  "d_iv": "unit1.png",
+  "c_i": "unit2.png",
+  "c_ii": "unit2.png",
+  "c_iii": "unit2.png",
 }

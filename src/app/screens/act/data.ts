@@ -117,12 +117,12 @@ const a2l1: LevelData = {
 const a3l1: LevelData = {
   name: "A3 level1",
   id: "a3l1",
-  cardIds: [],
-  enemyIds: [],
-  slots: 1,
+  cardIds: ["d_i", "d_ii", "d_iii", "d_iv", "c_i", "c_ii", "c_iii"],
+  enemyIds: ["a1l7_en1"],
+  slots: 2,
   selectLocation: { x: 200, y: 200 },
   boxSprite: "select3.png",
-  supplyLocations: [{ x: 300, y: 100 }, { x: 150, y: 500 }, { x: 450, y: 500 }],
+  supplyLocations: [{ x: 100, y: 100 }, { x: 200, y: 100 }, { x: 300, y: 100 }, { x: 400, y: 100 }, { x: 100, y: 200 }, { x: 200, y: 200 }, { x: 300, y: 200 }],
 };
 
 export const actData: {
