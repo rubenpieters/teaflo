@@ -44,4 +44,6 @@ export const cardMap: {
   "c_i": "unit2.png",
   "c_ii": "unit2.png",
   "c_iii": "unit2.png",
+  "a3l1_en1": "unit4.png",
+  "a3l2_en1": "unit4.png",
 }

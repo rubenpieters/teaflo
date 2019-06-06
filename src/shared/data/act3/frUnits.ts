@@ -82,8 +82,8 @@ export const d_iii: FrUnit = {
 }
 
 export const d_iv: FrUnit = {
-  hp: 30,
-  maxHp: 30,
+  hp: 60,
+  maxHp: 60,
   charges: 0,
   maxCharges: 6,
   abilities: [
@@ -103,7 +103,7 @@ export const d_iv: FrUnit = {
 export const c_i_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(1), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(2), new Ab.FromInput(0)),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(1), new Ab.FromInput(0)),
   ]);
 
 export const c_i: FrUnit = {
@@ -128,7 +128,7 @@ export const c_i: FrUnit = {
 export const c_ii_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(1), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(3), new Ab.FromInput(0)),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(2), new Ab.FromInput(0)),
     new A.Damage("Ability", "Target", new Ab.Static(5), new Ab.FromInput(0)),
   ]);
 
@@ -154,7 +154,7 @@ export const c_ii: FrUnit = {
 export const c_iii_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(1), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(3), new Ab.FromInput(0)),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(2), new Ab.FromInput(0)),
     new A.AddThreat("Ability", "Target", new Ab.Static(20), Ab.self(), Ab.allEnemy()),
   ]);
 
