@@ -865,11 +865,23 @@ export type Atlas1 = {
         "width": 40,
         "height": 40
     },
+    "icon_heal_40_40.png": {
+        "x": 1320,
+        "y": 2290,
+        "width": 40,
+        "height": 40
+    },
     "expl_hp.png": {
         "x": 1360,
         "y": 2210,
         "width": 80,
         "height": 80
+    },
+    "icon_removethreat_40_40.png": {
+        "x": 1360,
+        "y": 2290,
+        "width": 40,
+        "height": 40
     },
     "expl_minus.png": {
         "x": 1440,
@@ -1231,69 +1243,81 @@ export type Atlas1 = {
         "width": 80,
         "height": 80
     },
-    "menu_btn1.png": {
+    "icon_heal_80_80.png": {
         "x": 2375,
         "y": 3410,
-        "width": 70,
-        "height": 70
+        "width": 80,
+        "height": 80
     },
-    "ab1.png": {
+    "icon_removethreat_80_80.png": {
         "x": 2375,
-        "y": 3480,
-        "width": 70,
-        "height": 70
+        "y": 3490,
+        "width": 80,
+        "height": 80
     },
-    "icon_a.png": {
-        "x": 2340,
-        "y": 3980,
-        "width": 60,
-        "height": 60
-    },
-    "ab2.png": {
+    "menu_btn1.png": {
         "x": 2340,
         "y": 3850,
         "width": 70,
         "height": 70
     },
-    "ab3.png": {
+    "ab1.png": {
         "x": 2390,
         "y": 3690,
         "width": 70,
         "height": 70
     },
-    "ab4.png": {
-        "x": 2400,
-        "y": 3610,
+    "ab2.png": {
+        "x": 2390,
+        "y": 3760,
         "width": 70,
         "height": 70
     },
-    "icon_b.png": {
+    "ab3.png": {
         "x": 2400,
-        "y": 3920,
+        "y": 3570,
+        "width": 70,
+        "height": 70
+    },
+    "ab4.png": {
+        "x": 2455,
+        "y": 3410,
+        "width": 70,
+        "height": 70
+    },
+    "icon_a.png": {
+        "x": 2460,
+        "y": 3640,
+        "width": 60,
+        "height": 60
+    },
+    "icon_b.png": {
+        "x": 2470,
+        "y": 3540,
         "width": 60,
         "height": 60
     },
     "icon_c.png": {
-        "x": 2410,
-        "y": 3820,
+        "x": 2515,
+        "y": 3480,
         "width": 60,
         "height": 60
     },
     "icon_d.png": {
-        "x": 2450,
-        "y": 3760,
+        "x": 2525,
+        "y": 3410,
         "width": 60,
         "height": 60
     },
     "icon_e.png": {
         "x": 2460,
-        "y": 3680,
+        "y": 3700,
         "width": 60,
         "height": 60
     },
     "icon_f.png": {
-        "x": 2470,
-        "y": 3610,
+        "x": 2460,
+        "y": 3760,
         "width": 60,
         "height": 60
     },
@@ -2170,11 +2194,23 @@ export const atlas1: Atlas1 = {
         "width": 40,
         "height": 40
     },
+    "icon_heal_40_40.png": {
+        "x": 1320,
+        "y": 2290,
+        "width": 40,
+        "height": 40
+    },
     "expl_hp.png": {
         "x": 1360,
         "y": 2210,
         "width": 80,
         "height": 80
+    },
+    "icon_removethreat_40_40.png": {
+        "x": 1360,
+        "y": 2290,
+        "width": 40,
+        "height": 40
     },
     "expl_minus.png": {
         "x": 1440,
@@ -2536,69 +2572,81 @@ export const atlas1: Atlas1 = {
         "width": 80,
         "height": 80
     },
-    "menu_btn1.png": {
+    "icon_heal_80_80.png": {
         "x": 2375,
         "y": 3410,
-        "width": 70,
-        "height": 70
+        "width": 80,
+        "height": 80
     },
-    "ab1.png": {
+    "icon_removethreat_80_80.png": {
         "x": 2375,
-        "y": 3480,
-        "width": 70,
-        "height": 70
+        "y": 3490,
+        "width": 80,
+        "height": 80
     },
-    "icon_a.png": {
-        "x": 2340,
-        "y": 3980,
-        "width": 60,
-        "height": 60
-    },
-    "ab2.png": {
+    "menu_btn1.png": {
         "x": 2340,
         "y": 3850,
         "width": 70,
         "height": 70
     },
-    "ab3.png": {
+    "ab1.png": {
         "x": 2390,
         "y": 3690,
         "width": 70,
         "height": 70
     },
-    "ab4.png": {
-        "x": 2400,
-        "y": 3610,
+    "ab2.png": {
+        "x": 2390,
+        "y": 3760,
         "width": 70,
         "height": 70
     },
-    "icon_b.png": {
+    "ab3.png": {
         "x": 2400,
-        "y": 3920,
+        "y": 3570,
+        "width": 70,
+        "height": 70
+    },
+    "ab4.png": {
+        "x": 2455,
+        "y": 3410,
+        "width": 70,
+        "height": 70
+    },
+    "icon_a.png": {
+        "x": 2460,
+        "y": 3640,
+        "width": 60,
+        "height": 60
+    },
+    "icon_b.png": {
+        "x": 2470,
+        "y": 3540,
         "width": 60,
         "height": 60
     },
     "icon_c.png": {
-        "x": 2410,
-        "y": 3820,
+        "x": 2515,
+        "y": 3480,
         "width": 60,
         "height": 60
     },
     "icon_d.png": {
-        "x": 2450,
-        "y": 3760,
+        "x": 2525,
+        "y": 3410,
         "width": 60,
         "height": 60
     },
     "icon_e.png": {
         "x": 2460,
-        "y": 3680,
+        "y": 3700,
         "width": 60,
         "height": 60
     },
     "icon_f.png": {
-        "x": 2470,
-        "y": 3610,
+        "x": 2460,
+        "y": 3760,
         "width": 60,
         "height": 60
     },

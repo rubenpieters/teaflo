@@ -1,13 +1,13 @@
 import { focus, over, set } from "../iassign-util";
 import { URIS, Type } from "fp-ts/lib/HKT";
 import { overTarget, removeTarget } from "./state";
-import { damageEntity } from "./entity";
+import { damageEntity, healEntity } from "./entity";
 import { useChargeUnit, moveAIUnit, restoreChargeUnit } from "./unit";
 import { statusGroup, statusDescription } from "./status";
-import { addThreat } from "./threat";
+import { addThreat, removeThreat } from "./threat";
 import { Action, ActionWithOrigin, ActionWithOriginF } from "../definitions/action";
 import { GameState, StFrUnit } from "../definitions/state";
-import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag, RestoreCharge } from "../definitions/actionf";
+import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag, RestoreCharge, Heal, RemoveThreat } from "../definitions/actionf";
 import { addStatus } from "./statusRow";
 import { descSingleton, numberDescription } from "./description";
 import { DescToken, DescSymbol } from "../definitions/description";
@@ -53,6 +53,16 @@ export function resolveAction(
       }
       return { state: result.state, actions };
     }
+    case "Heal": {
+      const result = overTarget(state,
+        action.target,
+        x => healEntity(x, action.value),
+      );
+
+      const actions: ActionWithOrigin[] = [];
+
+      return { state: result.state, actions };
+    }
     case "UseCharge": {
       const result = overTarget(state,
         action.target,
@@ -80,6 +90,13 @@ export function resolveAction(
       const result = overTarget(state,
         action.forAlly,
         x => addThreat(x, action.atEnemy, action.value),
+      );
+      return { state: result.state, actions: [] };
+    }
+    case "RemoveThreat": {
+      const result = overTarget(state,
+        action.forAlly,
+        x => removeThreat(x, action.atEnemy, action.value),
       );
       return { state: result.state, actions: [] };
     }
@@ -140,6 +157,11 @@ export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I e
       const newTarget = g(actionF.target);
       return new Damage(newUriF, newUriG, newValue, newTarget);
     }
+    case "Heal": {
+      const newValue = f(actionF.value);
+      const newTarget = g(actionF.target);
+      return new Heal(newUriF, newUriG, newValue, newTarget);
+    }
     case "UseCharge": {
       const newValue = f(actionF.value);
       const newTarget = g(actionF.target);
@@ -155,6 +177,12 @@ export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I e
       const newForAlly = g(actionF.forAlly);
       const newAtEnemy = g(actionF.atEnemy);
       return new AddThreat(newUriF, newUriG, newValue, newForAlly, newAtEnemy);
+    }
+    case "RemoveThreat": {
+      const newValue = f(actionF.value);
+      const newForAlly = g(actionF.forAlly);
+      const newAtEnemy = g(actionF.atEnemy);
+      return new RemoveThreat(newUriF, newUriG, newValue, newForAlly, newAtEnemy);
     }
     case "AddStatus": {
       const newValue = f(actionF.status);
@@ -208,6 +236,12 @@ export function actionDescription(
         .concat(new DescSymbol("icon_th"))
         ;
     }
+    case "RemoveThreat": {
+      return descSingleton("icon_minus")
+        .concat(numberDescription(action.value))
+        .concat(new DescSymbol("icon_th"))
+        ;
+    }
     case "AddStatus": {
       return descSingleton("icon_plus")
         .concat(statusDescription(action.status))
@@ -218,6 +252,12 @@ export function actionDescription(
     }
     case "Damage": {
       return descSingleton("icon_minus")
+      .concat(numberDescription(action.value))
+      .concat(new DescSymbol("icon_hp"))
+      ;
+    }
+    case "Heal": {
+      return descSingleton("icon_plus")
       .concat(numberDescription(action.value))
       .concat(new DescSymbol("icon_hp"))
       ;

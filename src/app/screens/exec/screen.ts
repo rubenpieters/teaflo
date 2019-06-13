@@ -684,9 +684,11 @@ export class ExecScreen {
       case "UseCharge": // fallthrough
       case "RestoreCharge": // fallthrough
       case "MoveAI": // fallthrough
+      case "Heal": // fallthrough
       case "Damage": {
         return center(this.onTargetPos(state, action.target));
       }
+      case "RemoveThreat": // fallthrough
       case "AddThreat": {
         return center(this.onTargetPos(state, action.forAlly));
       }
@@ -1169,15 +1171,17 @@ function mkLogActionPool(
       toFrame: (self, frameType) => {
         switch (self.data.action.tag) {
           case "Damage": return "icon_damage_40_40.png";
+          case "Heal": return "icon_heal_40_40.png";
           case "UseCharge": return "icon_usecharge_40_40.png";
           case "RestoreCharge": return "icon_restorecharge_40_40.png";
           case "AddThreat": return "icon_addthreat_40_40.png";
+          case "RemoveThreat": return "icon_removethreat_40_40.png";
           case "MoveAI": return "icon_ai.png";
           case "StartTurn": return "icon_start_turn_40_40.png";
           case "AddStatus": return "icon_addstatus_40_40.png";
           case "Death": return "icon_death_40_40.png";
-          case "Invalid": return "icon_invalid_40_40.png"
-          default: return "icon_b.png";
+          case "Invalid": return "icon_invalid_40_40.png";
+          case "Combined": return "icon_b.png";
         }
       },
       introAnim: [

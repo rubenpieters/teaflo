@@ -247,7 +247,7 @@ export const c_iv: FrUnit = {
 export const c_v_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(1), Ab.self()),
-    new A.AddThreat("Ability", "Target", new Ab.Static(-50), Ab.self(), Ab.allEnemy()),
+    new A.RemoveThreat("Ability", "Target", new Ab.Static(50), Ab.self(), Ab.allEnemy()),
   ]);
 
 export const c_v: FrUnit = {

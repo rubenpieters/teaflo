@@ -172,6 +172,9 @@ function _resolveStatusAbilityWithOrigin(
     case "Damage": {
       return resolveToSingleTarget(ability, ["target"], state, status);
     }
+    case "Heal": {
+      return resolveToSingleTarget(ability, ["target"], state, status);
+    }
     case "UseCharge": {
       return resolveToSingleTarget(ability, ["target"], state, status);
     }
@@ -179,6 +182,9 @@ function _resolveStatusAbilityWithOrigin(
       return resolveToSingleTarget(ability, ["target"], state, status);
     }
     case "AddThreat": {
+      return resolveToSingleTarget(ability, ["forAlly", "atEnemy"], state, status);
+    }
+    case "RemoveThreat": {
       return resolveToSingleTarget(ability, ["forAlly", "atEnemy"], state, status);
     }
     case "AddStatus": {

@@ -19,7 +19,7 @@ export function restoreChargeUnit<E extends Unit>(
   value: number,
 ): E {
   return focus(e,
-    over(x => x.charges, x => x + value),
+    over(x => x.charges, x => Math.min(e.maxCharges, x + value)),
   );
 }
 

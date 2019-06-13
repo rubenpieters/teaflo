@@ -18,6 +18,17 @@ export class Damage<F extends URIS, G extends URIS> {
   ) {}
 }
 
+export class Heal<F extends URIS, G extends URIS> {
+  public readonly tag: "Heal" = "Heal";
+
+  constructor(
+    readonly uriF: F,
+    readonly uriG: G,
+    readonly value: Type<F, number>,
+    readonly target: Type<G, TargetId>,
+  ) {}
+}
+
 export class UseCharge<F extends URIS, G extends URIS> {
   public readonly tag: "UseCharge" = "UseCharge";
 
@@ -102,6 +113,18 @@ export class AddThreat<F extends URIS, G extends URIS> {
   ) {}
 }
 
+export class RemoveThreat<F extends URIS, G extends URIS> {
+  public readonly tag: "RemoveThreat" = "RemoveThreat";
+
+  constructor(
+    readonly uriF: F,
+    readonly uriG: G,
+    public readonly value: Type<F, number>,
+    public readonly forAlly: Type<G, FriendlyId>,
+    public readonly atEnemy: Type<G, EnemyId>,
+  ) {}
+}
+
 export class AddStatus<F extends URIS, G extends URIS> {
   public readonly tag: "AddStatus" = "AddStatus";
 
@@ -122,6 +145,7 @@ export class StartTurn {
 
 export type ActionF<F extends URIS, G extends URIS>
   = Damage<F, G>
+  | Heal<F, G>
   | UseCharge<F, G>
   | RestoreCharge<F, G>
   | Invalid
@@ -129,6 +153,7 @@ export type ActionF<F extends URIS, G extends URIS>
   | Combined<F, G>
   | MoveAI<F, G>
   | AddThreat<F, G>
+  | RemoveThreat<F, G>
   | AddStatus<F, G>
   | StartTurn
   ;

@@ -61,6 +61,9 @@ function _resolveAbility(
     case "Damage": {
       return resolveToSingleTarget(ability, ["target"], state, context);
     }
+    case "Heal": {
+      return resolveToSingleTarget(ability, ["target"], state, context);
+    }
     case "UseCharge": {
       return resolveToSingleTarget(ability, ["target"], state, context);
     }
@@ -68,6 +71,9 @@ function _resolveAbility(
       return resolveToSingleTarget(ability, ["target"], state, context);
     }
     case "AddThreat": {
+      return resolveToSingleTarget(ability, ["forAlly", "atEnemy"], state, context);
+    }
+    case "RemoveThreat": {
       return resolveToSingleTarget(ability, ["forAlly", "atEnemy"], state, context);
     }
     case "AddStatus": {
@@ -218,6 +224,13 @@ export function abilityDescription(
         .concat(abilityVarDescription(ability.atEnemy, intentVarTarget))
         ;
     }
+    case "RemoveThreat": {
+      return descSingleton("icon_removethreat")
+        .concat(abilityVarDescription(ability.value, x => numberDescription(x)))
+        .concat(abilityVarDescription(ability.forAlly, intentVarTarget))
+        .concat(abilityVarDescription(ability.atEnemy, intentVarTarget))
+        ;
+    }
     case "AddStatus": {
       return descSingleton("icon_addstatus")
         .concat(abilityVarDescription(ability.status, statusDescription))
@@ -236,6 +249,12 @@ export function abilityDescription(
     }
     case "Damage": {
       return descSingleton("icon_damage")
+        .concat(abilityVarDescription(ability.value, x => numberDescription(x)))
+        .concat(abilityVarDescription(ability.target, intentVarTarget))
+        ;
+    }
+    case "Heal": {
+      return descSingleton("icon_heal")
         .concat(abilityVarDescription(ability.value, x => numberDescription(x)))
         .concat(abilityVarDescription(ability.target, intentVarTarget))
         ;
