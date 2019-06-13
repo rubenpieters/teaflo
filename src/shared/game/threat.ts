@@ -21,7 +21,7 @@ export function removeThreat<U extends HasThreatMap>(
 ): U {
   return focus(u,
     over(x => x.threatMap[atEnemy.id],
-      x => x === undefined ? value : Math.max(0, x - value)
+      x => x === undefined ? 0 : Math.max(0, x - value)
     ),
   );
 }
