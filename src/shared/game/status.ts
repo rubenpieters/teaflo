@@ -257,8 +257,13 @@ function resolveTargetVar<A, B>(
 ): { tag: "ids", ids: TargetId[] } | { tag: "var", var: B } {
   if (isTargetVar(targetVar)) {
     switch (targetVar.tag) {
-      case "AllAlly": {
+      case "AllFriendly": {
         return { tag: "ids", ids: defined(state.frUnits).map(r => r.e.id) };
+      }
+      case "AllFriendlyExceptSelf": {
+        const ids = defined(state.frUnits).map(r => r.e.id)
+          .filter(x => ! deepEqual(x, status.owner));
+        return { tag: "ids", ids };
       }
       case "AllEnemy": {
         return { tag: "ids", ids: defined(state.enUnits).map(r => r.e.id) };

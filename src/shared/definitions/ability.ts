@@ -49,6 +49,7 @@ export type TargetVar<A>
   = AllEnemy
   | AllEnemyExceptSelf
   | AllFriendly
+  | AllFriendlyExceptSelf
   | AllUnits
   | Self
   | HighestThreat
@@ -79,7 +80,7 @@ export function allEnemyExceptSelf(): TargetVar<EnemyId> {
 }
 
 export class AllFriendly {
-  public readonly tag: "AllAlly" = "AllAlly";
+  public readonly tag: "AllFriendly" = "AllFriendly";
 
   constructor(
 
@@ -89,6 +90,19 @@ export class AllFriendly {
 export function allFriendly(): TargetVar<FriendlyId> {
   return new AllFriendly();
 }
+
+export class AllFriendlyExceptSelf {
+  public readonly tag: "AllFriendlyExceptSelf" = "AllFriendlyExceptSelf";
+
+  constructor(
+
+  ) {}
+}
+
+export function allFriendlyExceptSelf(): TargetVar<FriendlyId> {
+  return new AllFriendlyExceptSelf();
+}
+
 
 export class AllUnits {
   public readonly tag: "AllUnits" = "AllUnits";
