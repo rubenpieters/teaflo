@@ -7,8 +7,9 @@ import { GameState } from "src/shared/definitions/state";
 export function trySolutions(
   state: GameState,
   depth: number,
+  print: boolean = true,
 ) {
-  return _trySolutions(state, depth, [], {});
+  return _trySolutions(state, depth, [], {}, print);
 }
 
 type StateCache = {
@@ -42,14 +43,18 @@ export function _trySolutions(
   depth: number,
   acc: SolutionData[],
   cache: StateCache,
-) {
+  print: boolean,
+): number {
   if (depth <= 0) {
     //console.log("reached max depth");
-    return;
+    return 0;
   }
   const nextStates = tryNextActions(state);
   const wins = nextStates.filter(x => x.win).length;
   //console.log(`${wins} win(s)`);
+
+  let recWins = 0;
+
   nextStates.forEach((next, branchIndex) => {
     const newAcc = acc.concat(next.action);
     if (isInCache(next.state, cache)) {
@@ -58,16 +63,19 @@ export function _trySolutions(
       //console.log("invalid state");
     } else if (! next.win) {
       //console.log(`Trying branch ${branchIndex}`);
-      _trySolutions(next.state, depth - 1, newAcc, cache);
+      recWins = recWins +_trySolutions(next.state, depth - 1, newAcc, cache, print);
     } else if (next.win) {
       const show = newAcc
         .map((x, i) => `${showSolData(x)}`)
         .join("\n")
         ;
-      console.log(showGamestate(next.state));
-      console.log(`Win reached (${newAcc.length}):\n${show}\n----`);
+      if (print) {
+        console.log(showGamestate(next.state));
+        console.log(`Win reached (${newAcc.length}):\n${show}\n----`);
+      }
     }
   });
+  return wins + recWins;
 }
 
 export function tryNextActions(

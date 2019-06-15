@@ -196,7 +196,7 @@ export const c_iii: FrUnit = {
 export const u_i_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
-    new A.RemoveThreat("Ability", "Target", new Ab.Static(50), Ab.self(), Ab.allEnemy()),
+    new A.RemoveThreat("Ability", "Target", new Ab.Static(50), new Ab.FromInput(0), Ab.allEnemy()),
   ]);
 
 export const u_i: FrUnit = {
@@ -208,7 +208,7 @@ export const u_i: FrUnit = {
     {
       ability: u_i_ab1,
       inputs: [
-        new TargetInput(),
+        new FriendlyInput(),
       ],
       spriteId: "ab3",
       name: "u_i_ab1",

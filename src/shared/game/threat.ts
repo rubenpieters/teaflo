@@ -20,8 +20,11 @@ export function removeThreat<U extends HasThreatMap>(
   value: number,
 ): U {
   return focus(u,
-    over(x => x.threatMap[atEnemy.id],
-      x => x === undefined ? 0 : Math.max(0, x - value)
+    over(x => x.threatMap[atEnemy.id] as number | undefined,
+      x => {
+        const newX = x === undefined ? 0 : x - value;
+        return newX <= 0 ? undefined : newX;
+      }
     ),
   );
 }

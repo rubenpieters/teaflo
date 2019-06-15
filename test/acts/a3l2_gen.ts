@@ -1,6 +1,5 @@
 import { mkGameState, showGamestate } from "../../src/shared/game/state";
 import { trySolutions } from "../util";
-import { pre } from "fast-check";
 
 possibilities(
   ["u_i", "u_ii", "u_iii"],
@@ -15,7 +14,8 @@ possibilities(
     ["a3l2_en1"],
   );
 
-  trySolutions(initState, 10);
+  const wins = trySolutions(initState, 10, false);
+  console.log(`WINS: ${wins}`);
   console.log("-----------------------------------------------------");
 });
 
