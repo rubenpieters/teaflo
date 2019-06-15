@@ -190,32 +190,29 @@ export function getHighestThreat(
   state: GameState,
   self: UnitId,
 ): UnitId {
-  const threat = frFiltered(state)
+  const filtered = frFiltered(state);
+  if (filtered.length === 0) {
+    throw "getHighestThreat: no friendly unit";
+  }
+  const firstFr = filtered[filtered.length - 1];
+  const threat = filtered.slice(0, filtered.length - 1)
     .reduce((prev, curr) => {
-      if (prev === undefined) {
-        return curr.e;
-      }
-      if (prev.threatMap[self.id] === undefined) {
-        return curr.e;
-      }
       if (curr.e.threatMap[self.id] === undefined) {
         return prev;
       }
-      if (curr.e.threatMap[self.id] >= prev.threatMap[self.id]) {
+      if (prev.threatMap[self.id] === undefined) {
+        if (curr.e.threatMap[self.id] === 0) {
+          return prev;
+        } else {
+          return curr.e
+        }
+      }
+      if (curr.e.threatMap[self.id] > prev.threatMap[self.id]) {
         return curr.e;
       }
       return prev;
-    }, <StFrUnit | undefined>undefined);
-  if (threat === undefined) {
-    const filtered = frFiltered(state)[0];
-    if (filtered !== undefined) {
-      return filtered.e.id;
-    } else {
-      throw "getHighestThreat: no friendly unit";
-    }
-  } else {
-    return threat.id;
-  }
+    }, firstFr.e);
+  return threat.id;
 }
 
 export function abilityDescription(
