@@ -225,3 +225,5 @@ textures/icon_heal_40_40.png
 textures/icon_heal_80_80.png
 textures/icon_removethreat_80_80.png
 textures/icon_removethreat_40_40.png
+textures/icon_lowesthp_40_40.png
+textures/icon_lowesthp_80_80.png

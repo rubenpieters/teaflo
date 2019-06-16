@@ -119,7 +119,7 @@ export const d_iv: FrUnit = {
 export const c_i_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0)),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(11), new Ab.FromInput(0)),
   ]);
 
 export const c_i: FrUnit = {
@@ -144,7 +144,7 @@ export const c_i: FrUnit = {
 export const c_ii_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(20), new Ab.FromInput(0)),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(17), new Ab.FromInput(0)),
     new A.Damage("Ability", "Target", new Ab.Static(5), new Ab.FromInput(0)),
   ]);
 
@@ -170,7 +170,7 @@ export const c_ii: FrUnit = {
 export const c_iii_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(20), new Ab.FromInput(0)),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(17), new Ab.FromInput(0)),
     new A.AddThreat("Ability", "Target", new Ab.Static(12), Ab.self(), Ab.allEnemy()),
   ]);
 
@@ -223,7 +223,7 @@ export const u_ii_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
     new A.RestoreCharge("Ability", "Target", new Ab.Static(4), Ab.allFriendlyExceptSelf()),
-    new A.Heal("Ability", "Target", new Ab.Static(6), Ab.allFriendly()),
+    new A.Heal("Ability", "Target", new Ab.Static(3), Ab.allFriendly()),
   ]);
 
 export const u_ii: FrUnit = {

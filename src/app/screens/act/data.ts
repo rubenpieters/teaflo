@@ -94,12 +94,12 @@ const a1l6: LevelData = {
 const a1l7: LevelData = {
   name: "A1 level7",
   id: "a1l7",
-  cardIds: ["a1l7_fr1", "a1l7_fr2", "a1l7_fr3", "a1l7_fr4"],
+  cardIds: ["a1l7_fr1", "a1l7_fr2", "a1l7_fr3"],
   enemyIds: ["a1l7_en1"],
-  slots: 2,
+  slots: 3,
   selectLocation: { x: 200, y: 200 },
   boxSprite: "select3.png",
-  supplyLocations: [{ x: 518, y: 27 }, { x: 70, y: 680 }, { x: 915, y: 715 }, { x: 500, y: 500 }],
+  supplyLocations: [{ x: 518, y: 27 }, { x: 70, y: 680 }, { x: 915, y: 715 }],
 };
 
 
@@ -159,6 +159,21 @@ const a3l3: LevelData = {
   ],
 };
 
+const a3l4: LevelData = {
+  name: "A3 level4",
+  id: "a3l4",
+  cardIds: ["d_i", "d_ii", "d_iii", "d_iv", "c_i", "c_ii", "c_iii", "u_i", "u_ii", "u_iii"],
+  enemyIds: ["a3l4_en1"],
+  slots: 3,
+  selectLocation: { x: 200, y: 200 },
+  boxSprite: "select3.png",
+  supplyLocations: [
+    { x: 100, y: 100 }, { x: 200, y: 100 }, { x: 300, y: 100 }, { x: 400, y: 100 },
+    { x: 100, y: 200 }, { x: 200, y: 200 }, { x: 300, y: 200 },
+    { x: 100, y: 300 }, { x: 200, y: 300 }, { x: 300, y: 300 }
+  ],
+};
+
 export const actData: {
   [key: number]: ActData
 } = {
@@ -177,7 +192,7 @@ export const actData: {
   2: {
     shortName: "3",
     longName: "Act 3",
-    levels: [a3l1, a3l2, a3l3],
+    levels: [a3l1, a3l2, a3l3, a3l4],
     bgSprite: "sel_act1.png",
   },
 }
@@ -201,6 +216,7 @@ export const levelData = {
   "a3l1": a3l1,
   "a3l2": a3l2,
   "a3l3": a3l3,
+  "a3l4": a3l4,
 }
 
 export class SelectedActMenu {

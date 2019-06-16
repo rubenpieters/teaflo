@@ -1,6 +1,17 @@
 import { mkGameState, showGamestate } from "../../src/shared/game/state";
 import { trySolutions } from "../util";
 
+/*
+const initState = mkGameState(
+  ["u_iii", "c_iii", "d_ii"],
+  ["a3l2_en1"],
+);
+
+console.log(showGamestate(initState));
+
+trySolutions(initState, 10);
+*/
+
 possibilities(
   ["u_i", "u_ii", "u_iii"],
   ["c_i", "c_ii", "c_iii"],

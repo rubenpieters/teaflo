@@ -173,6 +173,9 @@ function resolveTargetVar<A, B>(
         const self = context.self;
         return { tag: "ids", ids: [getHighestThreat(state, self)] };
       }
+      case "LowestHp": {
+        return { tag: "ids", ids: [getLowestFriendlyHp(state)] };
+      }
       default: {
         return { tag: "var", var: targetVar };
       }
@@ -196,6 +199,7 @@ export function getHighestThreat(
   }
   const firstFr = filtered[filtered.length - 1];
   const threat = filtered.slice(0, filtered.length - 1)
+    .reverse()
     .reduce((prev, curr) => {
       if (curr.e.threatMap[self.id] === undefined) {
         return prev;
@@ -213,6 +217,26 @@ export function getHighestThreat(
       return prev;
     }, firstFr.e);
   return threat.id;
+}
+
+export function getLowestFriendlyHp(
+  state: GameState,
+): UnitId {
+  const filtered = frFiltered(state);
+  if (filtered.length === 0) {
+    throw "getLowestFriendlyHp: no friendly unit";
+  }
+  const firstFr = filtered[filtered.length - 1];
+  const target = filtered.slice(0, filtered.length - 1)
+    .reverse()
+    .reduce((prev, curr) => {
+      if (curr.e.hp < prev.hp) {
+        return curr.e;
+      } else {
+        return prev;
+      }
+  }, firstFr.e);
+  return target.id;
 }
 
 export function abilityDescription(
@@ -320,6 +344,9 @@ export function abilityVarDescription<A>(
     }
     case "HighestThreat": {
       return [new DescSymbol("icon_highest_threat")];
+    }
+    case "LowestHp": {
+      return [new DescSymbol("icon_lowesthp")];
     }
     case "Self": {
       return [new DescSymbol("icon_self")];

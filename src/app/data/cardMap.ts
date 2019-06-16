@@ -28,7 +28,6 @@ export const cardMap: {
   "a1l7_fr1": "unit3.png",
   "a1l7_fr2": "unit3.png",
   "a1l7_fr3": "unit3.png",
-  "a1l7_fr4": "unit3.png",
   "a1l7_en1": "unit4.png",
   // act 2
   "trinity_dmg": "unit3.png",
@@ -51,4 +50,5 @@ export const cardMap: {
   "a3l2_en1": "unit4.png",
   "a3l3_en1": "unit4.png",
   "a3l3_en2": "unit4.png",
+  "a3l4_en1": "unit4.png",
 }

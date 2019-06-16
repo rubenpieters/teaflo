@@ -11,6 +11,7 @@ import { a1l7_en1 } from "./act1/level7";
 import { a3l1_en1 } from "./act3/level1";
 import { a3l2_en1 } from "./act3/level2";
 import { a3l3_en1, a3l3_en2 } from "./act3/level3";
+import { a3l4_en1 } from "./act3/level4";
 
 // check that values of frUnitMap are all `FrUnit`
 type EnUnitMapValues = (typeof enUnitMap)[keyof (typeof enUnitMap)];
@@ -33,4 +34,5 @@ export const enUnitMap = {
   "a3l2_en1": a3l2_en1,
   "a3l3_en1": a3l3_en1,
   "a3l3_en2": a3l3_en2,
+  "a3l4_en1": a3l4_en1,
 }

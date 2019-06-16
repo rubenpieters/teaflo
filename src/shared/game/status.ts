@@ -14,7 +14,7 @@ import { DescSymbol, DescToken } from "../definitions/description";
 import { TargetId, UnitId } from "../definitions/entityId";
 import { TargetVar } from "../definitions/ability";
 import { defined } from "./unitRow";
-import { getHighestThreat } from "./ability";
+import { getHighestThreat, getLowestFriendlyHp } from "./ability";
 import deepEqual from "deep-equal";
 
 export function statusGroup(
@@ -285,6 +285,9 @@ function resolveTargetVar<A, B>(
       case "HighestThreat": {
         const self = status.owner;
         return { tag: "ids", ids: [getHighestThreat(state, self)] };
+      }
+      case "LowestHp": {
+        return { tag: "ids", ids: [getLowestFriendlyHp(state)] };
       }
       default: {
         return { tag: "var", var: targetVar };

@@ -53,6 +53,7 @@ export type TargetVar<A>
   | AllUnits
   | Self
   | HighestThreat
+  | LowestHp
   ;
 
 export class AllEnemy {
@@ -138,4 +139,16 @@ export class HighestThreat {
 
 export function highestThreat(): TargetVar<FriendlyId> {
   return new HighestThreat();
+}
+
+export class LowestHp {
+  public readonly tag: "LowestHp" = "LowestHp";
+
+  constructor(
+
+  ) {}
+}
+
+export function lowestHp(): TargetVar<FriendlyId> {
+  return new LowestHp();
 }
