@@ -12,7 +12,7 @@ import { TargetInput, EnemyInput, FriendlyInput } from "../../definitions/input"
 export const a1l4_fr1_ab1: Ability =
   A.combinedAbility([
     new A.Damage("Ability", "Target", new Ab.Static(4), Ab.allEnemy()),
-    new A.AddThreat("Ability", "Target", new Ab.Static(4), Ab.self(),  Ab.allEnemy()),
+    new A.AddThreat("Ability", "Target", new Ab.Static(4), Ab.self(), Ab.allEnemy()),
   ]);
 
 export const a1l4_fr1: FrUnit = {
