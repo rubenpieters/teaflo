@@ -12,7 +12,7 @@ import * as C from "../../definitions/condition";
  */
 export const a3l3_en1_ab1: Ability =
   A.combinedAbility([
-    new A.Damage("Ability", "Target", new Ab.Static(2), Ab.highestThreat()),
+    new A.Damage("Ability", "Target", new Ab.Static(3), Ab.highestThreat()),
   ]);
 
 export const a3l3_en1: EnUnit = {

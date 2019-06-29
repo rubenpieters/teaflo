@@ -121,7 +121,7 @@ const a3l1: LevelData = {
   enemyIds: ["a3l1_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
-  boxSprite: "select3.png",
+  boxSprite: "select3_f.png",
   supplyLocations: [
     { x: 100, y: 100 }, { x: 200, y: 100 }, { x: 300, y: 100 }, { x: 400, y: 100 },
     { x: 100, y: 200 }, { x: 200, y: 200 }, { x: 300, y: 200 },
@@ -136,7 +136,7 @@ const a3l2: LevelData = {
   enemyIds: ["a3l2_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
-  boxSprite: "select3.png",
+  boxSprite: "select3_f.png",
   supplyLocations: [
     { x: 100, y: 100 }, { x: 200, y: 100 }, { x: 300, y: 100 }, { x: 400, y: 100 },
     { x: 100, y: 200 }, { x: 200, y: 200 }, { x: 300, y: 200 },
@@ -151,7 +151,7 @@ const a3l3: LevelData = {
   enemyIds: ["a3l3_en1", "a3l3_en2"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
-  boxSprite: "select3.png",
+  boxSprite: "select3_f.png",
   supplyLocations: [
     { x: 100, y: 100 }, { x: 200, y: 100 }, { x: 300, y: 100 }, { x: 400, y: 100 },
     { x: 100, y: 200 }, { x: 200, y: 200 }, { x: 300, y: 200 },
@@ -166,7 +166,7 @@ const a3l4: LevelData = {
   enemyIds: ["a3l4_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
-  boxSprite: "select3.png",
+  boxSprite: "select3_f.png",
   supplyLocations: [
     { x: 100, y: 100 }, { x: 200, y: 100 }, { x: 300, y: 100 }, { x: 400, y: 100 },
     { x: 100, y: 200 }, { x: 200, y: 200 }, { x: 300, y: 200 },
@@ -181,7 +181,7 @@ const a3l5: LevelData = {
   enemyIds: ["a3l5_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
-  boxSprite: "select3.png",
+  boxSprite: "select3_f.png",
   supplyLocations: [
     { x: 100, y: 100 }, { x: 200, y: 100 }, { x: 300, y: 100 }, { x: 400, y: 100 },
     { x: 100, y: 200 }, { x: 200, y: 200 }, { x: 300, y: 200 },
