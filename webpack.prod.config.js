@@ -3,8 +3,6 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
-const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
-const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
 
 module.exports = {
   entry: path.join(__dirname, "src/app/main.ts"),
