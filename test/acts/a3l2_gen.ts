@@ -1,7 +1,8 @@
 import { mkGameState, showGamestate } from "../../src/shared/game/state";
 import { trySolutions } from "../util";
 
-
+/*
+// Sol 1
 const initState = mkGameState(
   ["u_i", "c_iii", "d_iv"],
   ["a3l2_en1"],
@@ -10,7 +11,17 @@ const initState = mkGameState(
 console.log(showGamestate(initState));
 
 trySolutions(initState, 10);
+*/
 
+// Sol 1
+const initState = mkGameState(
+  ["u_ii", "c_ii", "d_i"],
+  ["a3l2_en1"],
+);
+
+console.log(showGamestate(initState));
+
+trySolutions(initState, 15);
 
 /*
 possibilities(

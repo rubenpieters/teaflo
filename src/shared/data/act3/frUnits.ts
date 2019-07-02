@@ -12,14 +12,14 @@ import * as C from "../../definitions/condition";
  */
 export const d_i_ab1: Ability =
   A.combinedAbility([
-    new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
-    new A.Damage("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0)),
-    new A.AddThreat("Ability", "Target", new Ab.Static(10), Ab.self(), new Ab.FromInput(0)),
+    new A.UseCharge("Ability", "Target", new Ab.Static(9), Ab.self()),
+    new A.Damage("Ability", "Target", new Ab.Static(9), new Ab.FromInput(0)),
+    new A.AddThreat("Ability", "Target", new Ab.Static(9), Ab.self(), new Ab.FromInput(0)),
   ]);
 
 export const d_i: FrUnit = {
-  hp: 35,
-  maxHp: 35,
+  hp: 40,
+  maxHp: 40,
   charges: 0,
   maxCharges: 50,
   abilities: [
@@ -144,15 +144,15 @@ export const c_i: FrUnit = {
 export const c_ii_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(17), new Ab.FromInput(0)),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(20), new Ab.FromInput(0)),
     new A.Damage("Ability", "Target", new Ab.Static(5), new Ab.FromInput(0)),
   ]);
 
 export const c_ii: FrUnit = {
-  hp: 20,
-  maxHp: 20,
-  charges: 30,
-  maxCharges: 30,
+  hp: 15,
+  maxHp: 15,
+  charges: 40,
+  maxCharges: 40,
   abilities: [
     {
       ability: c_ii_ab1,
@@ -221,20 +221,20 @@ export const u_i: FrUnit = {
 
 export const u_ii_ab1: Ability =
   A.combinedAbility([
-    new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(4), Ab.allFriendlyExceptSelf()),
-    new A.Heal("Ability", "Target", new Ab.Static(3), Ab.allFriendly()),
+    new A.UseCharge("Ability", "Target", new Ab.Static(20), Ab.self()),
+    new A.Heal("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0)),
   ]);
 
 export const u_ii: FrUnit = {
-  hp: 20,
-  maxHp: 20,
-  charges: 30,
-  maxCharges: 30,
+  hp: 10,
+  maxHp: 10,
+  charges: 0,
+  maxCharges: 20,
   abilities: [
     {
       ability: u_ii_ab1,
       inputs: [
+        new TargetInput(),
       ],
       spriteId: "ab3",
       name: "c_ii_ab1",
