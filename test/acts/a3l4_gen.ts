@@ -1,36 +1,48 @@
 import { mkGameState, showGamestate } from "../../src/shared/game/state";
 import { trySolutions } from "../util";
 
-
+/*
 // Sol 1
 const initState = mkGameState(
-  //["u_i", "c_iii", "d_iv"],
-  ["u_i", "c_ii", "d_iii"],
-  ["a3l2_en1"],
+  ["u_i", "c_iii", "d_iv"],
+  ["a3l4_en1",],
 );
 
 console.log(showGamestate(initState));
 
 trySolutions(initState, 10);
-
+*/
 
 /*
-// Sol 1
+// Sol 2
 const initState = mkGameState(
   ["u_ii", "c_ii", "d_i"],
-  ["a3l2_en1"],
+  ["a3l4_en1"],
 );
 
 console.log(showGamestate(initState));
 
-trySolutions(initState, 15);
+trySolutions(initState, 13);
 */
 
 /*
+// Sol 3
+const initState = mkGameState(
+  ["u_iii", "c_i", "d_iii"],
+  ["a3l4_en1"],
+);
+
+console.log(showGamestate(initState));
+
+trySolutions(initState, 13);
+*/
+
+
 possibilities(
   ["u_i", "u_ii", "u_iii"],
   ["c_i", "c_ii", "c_iii"],
-  ["d_i", "d_ii", "d_iii", "d_iv"]
+//  ["d_i", "d_ii", "d_iii", "d_iv"]
+  ["d_i", "d_iii", "d_iv"]
 ).forEach(l => {
   console.log("-----------------------------------------------------");
   console.log(`PARAMS -- ${l}`)
@@ -44,7 +56,7 @@ possibilities(
   console.log(`WINS: ${wins}`);
   console.log("-----------------------------------------------------");
 });
-*/
+
 
 function possibilities<A>(...lists: A[][]): A[][] {
   return _possibilities(lists);

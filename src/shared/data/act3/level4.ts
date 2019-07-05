@@ -12,12 +12,12 @@ import * as C from "../../definitions/condition";
  */
 export const a3l4_en1_ab1: Ability =
   A.combinedAbility([
-    new A.Damage("Ability", "Target", new Ab.Static(2), Ab.lowestHp()),
+    new A.Damage("Ability", "Target", new Ab.Static(4), Ab.lowestHp()),
   ]);
 
 export const a3l4_en1: EnUnit = {
-  hp: 20,
-  maxHp: 20,
+  hp: 32,
+  maxHp: 32,
   charges: 5,
   maxCharges: 5,
   abilities: {
