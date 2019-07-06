@@ -36,6 +36,7 @@ import { drawLine } from "../../phaser/line";
 export class ExecScreen {
   clearBtnPool: Pool<{}, {}>
   unitPool: Pool<UnitData, {}>
+  emptySlotPool: Pool<EmptySlotData, {}>
   unitResPool: Pool<UnitResData, {}>
   abilityPool: Pool<AbilityData, {}>
   unitTextPool: TextPool
@@ -74,6 +75,7 @@ export class ExecScreen {
   ) {
     this.clearBtnPool = mkClearBtnPool(gameRefs);
     this.unitPool = mkUnitPool(gameRefs);
+    this.emptySlotPool = mkEmptySlotPool(gameRefs);
     this.unitResPool = mkUnitResPool(gameRefs);
     this.unitTextPool = new TextPool(gameRefs.game);
     this.statsTextPool = new TextPool(gameRefs.game);
@@ -166,6 +168,7 @@ export class ExecScreen {
     state: GameState,
     prevState?: GameState,
   ) {
+    this.emptySlotPool.clear();
     this.unitPool.clear();
     this.unitResPool.clear();
     this.triggerPool.clear();
@@ -193,7 +196,10 @@ export class ExecScreen {
 
     // draw friendly units
     state.frUnits.units.forEach((unit, unitIndex) => {
-      if (unit !== undefined) {
+      if (unit === undefined) {
+        const unitPos = friendlyUnitPos(state, unitIndex);
+        this.emptySlotPool.newSprite(unitPos.xMin, unitPos.yMin, {}, {});
+      } else if (unit !== undefined) {
         const unitPos = friendlyUnitPos(state, unitIndex);
         const utilityPos = unitUtilityPositions(unitPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
@@ -955,6 +961,33 @@ function mkUnitPool(
         },
         hoverOut: (self) => {
           clearHover(gameRefs);
+        },
+      },
+    },
+  );
+}
+
+type EmptySlotData = {
+};
+
+function mkEmptySlotPool(
+  gameRefs: GameRefs,
+): Pool<EmptySlotData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return "empty_slot_150_150.png";
+      },
+      introAnim: [
+        (self, tween) => {
+          tween.from({ y: self.y - 50 }, 20, Phaser.Easing.Linear.None, false, 5);
+        },
+      ],
+      callbacks: {
+        click: (self) => {
+          console.log("test");
         },
       },
     },

@@ -1,6 +1,6 @@
 import { GameRefs } from "../../states/game";
 import { mkSolutionData, SelectedActMenu, SelectedLevelMenu, LevelDataKeys } from "./data";
-import { transitionScreen, ScreenAct } from "../transition";
+import { transitionScreen, ScreenAct, ScreenSchem } from "../transition";
 
 export function loadActMenu(
   gameRefs: GameRefs,
@@ -39,11 +39,14 @@ export function changeLevel(
   gameRefs: GameRefs,
   levelId: LevelDataKeys,
 ) {
-  gameRefs.saveData.act.currentMenu = new SelectedLevelMenu(levelId);
+  transitionScreen(gameRefs, new ScreenSchem(levelId));
+
+  /*gameRefs.saveData.act.currentMenu = new SelectedLevelMenu(levelId);
   
   gameRefs.screens.actScreen.levelSelectMode();
   gameRefs.screens.actScreen.redrawActBtn();
   gameRefs.screens.actScreen.drawSolBtn(levelId);
+  */
 }
 
 export function addNewSolution(
@@ -52,7 +55,7 @@ export function addNewSolution(
 ) {
   const solutions = gameRefs.saveData.act.levels[levelId];
   if (solutions === undefined) {
-    gameRefs.saveData.act.levels[levelId] = [mkSolutionData(levelId)];
+    gameRefs.saveData.act.levels[levelId] = {};
   } else {
     solutions.push(mkSolutionData(levelId));
   }

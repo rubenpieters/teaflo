@@ -1,5 +1,5 @@
 import { GameRefs } from "../../states/game";
-import { SelectedBuildSchem, currentSchemSol, SelectedExecSchem, schemScholAt, levelData, selectedSchem, SolutionData, LevelDataKeys } from "../act/data";
+import { currentSolMap, levelData, SolutionData, LevelDataKeys } from "../act/data";
 import { emptyTree, Location } from "../../../shared/tree";
 import { mkGameState } from "../../../shared/game/state";
 import { endStates } from "../../../shared/game/solution";
@@ -9,22 +9,15 @@ import { FrUnitId } from "../../../shared/data/frUnitMap";
 export function loadLevel(
   gameRefs: GameRefs,
   levelId: LevelDataKeys,
-  solId: number,
 ) {
-  const sol = schemScholAt(gameRefs, levelId, solId);
-  if (sol === undefined || sol.solInfo === undefined) {
-    transitionScreen(gameRefs, new ScreenSchem(new SelectedBuildSchem(levelId, solId)));
-  } else {
-    transitionScreen(gameRefs, new ScreenSchem(new SelectedExecSchem(levelId, solId)));
-  }
+  transitionScreen(gameRefs, new ScreenSchem(levelId));
 }
 
 export function newExecLevel(
   gameRefs: GameRefs,
   levelId: LevelDataKeys,
-  solId: number,
 ) {
-  const sol = currentSchemSol(gameRefs);
+  const sol = currentSolMap(gameRefs);
   if (sol !== undefined) {
     sol.solInfo = {
       solution: {
@@ -33,7 +26,7 @@ export function newExecLevel(
       },
       loc: [],
     };
-    loadLevel(gameRefs, levelId, solId);
+    loadLevel(gameRefs, levelId);
   }
 }
 
@@ -73,7 +66,7 @@ export function toggleDeploy(
   supplyIndex: number,
   slots: number,
 ) {
-  const sol = currentSchemSol(gameRefs);
+  const sol = currentSolMap(gameRefs);
   if (sol !== undefined) {
     const limitReached = sol.supply.filter(x => x.deployPos !== undefined).length === slots;
 

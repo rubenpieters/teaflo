@@ -1,4 +1,4 @@
-import { SelectedBuildSchem, SelectedExecSchem, SelectedActMenu, SelectedLevelMenu, currentScreen } from "./act/data";
+import { SelectedActMenu, SelectedLevelMenu, currentScreen, LevelDataKeys, emptyComposition } from "./act/data";
 import { GameRefs } from "../states/game";
 import { clearPools, clearAnimations } from "./util";
 import { updateSolutionRep } from "./exec/events";
@@ -13,7 +13,7 @@ export class ScreenAct {
 
 export class ScreenSchem {
   constructor(
-    public readonly selected: SelectedBuildSchem | SelectedExecSchem | undefined,
+    public readonly levelId: LevelDataKeys | undefined,
     public readonly tag: "ScreenSchem" = "ScreenSchem",
   ) {}
 }
@@ -105,25 +105,12 @@ export function transitionScreen(
         }
         case "ScreenSchem": {
           gameRefs.saveData.act.activeScreen = "schem";
-          if (newScreen.selected !== undefined) {
-            switch (newScreen.selected.tag) {
-              case "SelectedBuildSchem": {
-                const levelId = newScreen.selected.levelId;
-                const solId = newScreen.selected.solId;
-                gameRefs.saveData.act.currentSchem = new SelectedBuildSchem(levelId, solId);
-                gameRefs.screens.levelScreen.drawBox();
-                break;
-              }
-              case "SelectedExecSchem": {
-                const levelId = newScreen.selected.levelId;
-                const solId = newScreen.selected.solId;
-                gameRefs.saveData.act.currentSchem = new SelectedExecSchem(levelId, solId);
-                gameRefs.screens.execScreen.reset();
-                updateSolutionRep(gameRefs);
-                break;
-              }
-            }
-          }
+          const levelId = newScreen.levelId;
+          gameRefs.saveData.act.currentLevelId = levelId;
+          // TODO: keep track of composition per level
+          gameRefs.saveData.act.currentComposition = levelId === undefined ? [] : emptyComposition(levelId);
+          gameRefs.screens.execScreen.reset();
+          updateSolutionRep(gameRefs);
           break;
         }
         case "ScreenCodex": {

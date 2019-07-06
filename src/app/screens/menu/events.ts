@@ -1,5 +1,5 @@
 import { GameRefs } from "../../states/game";
-import { selectedSchem, currentSchemSol } from "../act/data";
+import { currentSolMap } from "../act/data";
 import { updateSolutionRep } from "../exec/events";
 
 export function loadActScreen(

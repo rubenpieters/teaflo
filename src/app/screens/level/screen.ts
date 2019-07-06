@@ -3,7 +3,7 @@ import { GameRefs } from "../../states/game";
 import { createPosition } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
 import { chainSpriteCreation, createTween } from "../../phaser/animation";
-import { currentSchemSol, selectedSchem, levelData } from "../act/data";
+import { currentSolMap, selectedSchem, levelData } from "../act/data";
 import { cardMap } from "../../data/cardMap";
 import { loadLevel, newExecLevel, levelStats, toggleDeploy } from "../level/events";
 import { filterUndefined } from "../../util/util";
@@ -63,7 +63,7 @@ export class LevelScreen {
   ) {
     const schem = selectedSchem(this.gameRefs);
     const levelId = schem!.levelId;
-    const solData = currentSchemSol(this.gameRefs);
+    const solData = currentSolMap(this.gameRefs);
     const slots = levelData[levelId].slots;
 
     let spriteFs: {

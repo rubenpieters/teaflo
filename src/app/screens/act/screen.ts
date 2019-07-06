@@ -1,13 +1,13 @@
-import { actData, selectedActId, selectedMenu, SelectedActMenu, SelectedLevelMenu, LevelData, LevelDataKeys } from "../../screens/act/data";
+import { actData, selectedActId, selectedMenu, SelectedActMenu, LevelDataKeys } from "../../screens/act/data";
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
 import { createPosition, Position } from "../../util/position";
-import { createTween, chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween, ParAnimation, Create } from "../../phaser/animation";
+import { chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween, ParAnimation, Create } from "../../phaser/animation";
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
 import { addText, DataSprite, clearShader, addShader } from "../../phaser/datasprite";
 import { loadLevel, levelStats } from "../level/events";
-import { ScreenAct, transitionScreen } from "../transition";
+import { ScreenAct, transitionScreen, ScreenSchem } from "../transition";
 
 export class ActScreen {
   actBtnPool: Pool<ActBtnData, "neutral" | "hover" | "down">
@@ -295,7 +295,7 @@ function mkLevelBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          transitionScreen(gameRefs, new ScreenAct(new SelectedLevelMenu(self.data.levelId)))
+          transitionScreen(gameRefs, new ScreenSchem(self.data.levelId));
         },
       },
     },

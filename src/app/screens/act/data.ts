@@ -1,6 +1,6 @@
 import { GameRefs } from "../../states/game";
-import { Solution } from "../../../shared/game/solution";
-import { Location } from "../../../shared/tree";
+import { Solution, emptySolution } from "../../../shared/game/solution";
+import { Location, emptyTree } from "../../../shared/tree";
 import { SpeedType } from "../../../app/phaser/animation";
 import { ScreenActive, ScreenAct, ScreenSchem, ScreenCodex, ScreenSettings } from "../transition";
 import { FrUnitId } from "../../../shared/data/frUnitMap";
@@ -212,8 +212,6 @@ export const actData: {
   },
 }
 
-
-
 // check that values of levelData are all `LevelData`
 type LevelDataValues = (typeof levelData)[keyof (typeof levelData)];
 isTrue<Equal<LevelDataValues, LevelData>>(true);
@@ -251,17 +249,20 @@ export class SelectedLevelMenu {
 
 export type ActSaveData = {
   currentMenu: SelectedActMenu | SelectedLevelMenu | undefined,
-  currentSchem: SelectedBuildSchem | SelectedExecSchem | undefined,
+  currentLevelId: LevelDataKeys | undefined,
+  currentComposition: Composition | undefined,
   activeScreen: "menu" | "schem" | "codex" | "settings",
-  levels: { [key in LevelDataKeys]?: SolutionData[] },
+  levels: { [key in LevelDataKeys]?: SolutionDataMap },
   animationSpeeds: {
     log: SpeedType,
   },
-}
+};
+
 export function mkActSaveData(): ActSaveData {
   return {
     currentMenu: undefined,
-    currentSchem: undefined,
+    currentLevelId: undefined,
+    currentComposition: undefined,
     activeScreen: "menu",
     levels: {},
     animationSpeeds: {
@@ -270,24 +271,49 @@ export function mkActSaveData(): ActSaveData {
   };
 }
 
+export type SolutionDataMap = {
+  [key in string]?: SolutionData
+};
+
+export type Composition = (FrUnitId | undefined)[];
+
+export function compositionToKey(
+  composition: Composition
+): string {
+  return composition.map(x => {
+    if (x !== undefined) {
+      return x;
+    } else {
+      return "";
+    }
+  }).join(",");
+}
+
 export type SolutionData = {
-  name: string,
-  supply: { cardId: FrUnitId, deployPos: number | undefined }[],
+  composition: Composition,
   solInfo: {
     solution: Solution,
     loc: Location
-  } | undefined,
-}
+  },
+};
 
 export function mkSolutionData(
   levelId: LevelDataKeys,
 ): SolutionData {
-  const supply = levelData[levelId].cardIds.map(cardId => { return { cardId, deployPos: undefined }});
   return {
-    name: "New_Sol",
-    supply,
-    solInfo: undefined,
+    composition: emptyComposition(levelId),
+    solInfo: {
+      solution: emptySolution,
+      loc: [],
+    },
   };
+}
+
+export function emptyComposition(
+  levelId: LevelDataKeys,
+): Composition {
+  const slots = levelData[levelId].slots;
+  return repeat(slots, undefined);
 }
 
 function repeat<A>(
@@ -309,7 +335,7 @@ export function currentScreen(
       return new ScreenAct(gameRefs.saveData.act.currentMenu);
     }
     case "schem": {
-      return new ScreenSchem(gameRefs.saveData.act.currentSchem);
+      return new ScreenSchem(gameRefs.saveData.act.currentLevelId);
     }
     case "codex": {
       return new ScreenCodex();
@@ -339,7 +365,7 @@ export function selectedActId(
 
 export function selectedLevelId(
   gameRefs: GameRefs
-): string | undefined {
+): LevelDataKeys | undefined {
   const menu = selectedMenu(gameRefs);
   if (menu === undefined) return undefined;
   switch (menu.tag) {
@@ -348,58 +374,62 @@ export function selectedLevelId(
   } 
 }
 
-export class SelectedBuildSchem {
-  constructor (
-    public readonly levelId: LevelDataKeys,
-    public readonly solId: number,
-    public readonly tag: "SelectedBuildSchem" = "SelectedBuildSchem",
-  ) {}
-}
-
-export class SelectedExecSchem {
-  constructor (
-    public readonly levelId: LevelDataKeys,
-    public readonly solId: number,
-    public readonly tag: "SelectedExecSchem" = "SelectedExecSchem",
-  ) {}
-}
-
-export function selectedSchem(
+export function selectedSchemLevelId(
   gameRefs: GameRefs,
-): SelectedBuildSchem | SelectedExecSchem | undefined {
-  return gameRefs.saveData.act.currentSchem;
+): LevelDataKeys | undefined {
+  return gameRefs.saveData.act.currentLevelId;
 }
 
-export function currentSchemSol(
+export function selectedSchemComposition(
   gameRefs: GameRefs,
-): SolutionData | undefined {
-  const schem = selectedSchem(gameRefs);
-  return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId]![schem.solId];
+): Composition | undefined {
+  return gameRefs.saveData.act.currentComposition;
+}
+
+export function currentSolMap(
+  gameRefs: GameRefs,
+): SolutionDataMap | undefined {
+  const levelId = selectedLevelId(gameRefs);
+  return levelId == undefined ? undefined : gameRefs.saveData.act.levels[levelId];
+}
+
+export function initSolMap(
+  gameRefs: GameRefs,
+  levelId: LevelDataKeys,
+): SolutionDataMap {
+  const newSolMap = {}
+  gameRefs.saveData.act.levels[levelId] = newSolMap;
+  return newSolMap;
 }
 
 export function schemScholAt(
   gameRefs: GameRefs,
   levelId: LevelDataKeys,
-  solId: number,
+  composition: Composition,
 ): SolutionData | undefined {
-  const schem = selectedSchem(gameRefs);
-  return schem === undefined ? undefined : gameRefs.saveData.act.levels[levelId]![solId];
+  return gameRefs.saveData.act.levels[levelId]![compositionToKey(composition)];
 }
 
 export function currentSolution(
   gameRefs: GameRefs,
 ) {
-  const schem = selectedSchem(gameRefs);
-  return schem === undefined ? undefined : gameRefs.saveData.act.levels[schem.levelId]![schem.solId].solInfo;
+  const levelId = selectedLevelId(gameRefs);
+  const composition = selectedSchemComposition(gameRefs);
+  if (levelId !== undefined && composition !== undefined) {
+    return gameRefs.saveData.act.levels[levelId]![compositionToKey(composition)]!.solInfo;
+  } else {
+    return undefined;
+  }
 }
 
 export function setSolution(
   gameRefs: GameRefs,
   solInfo: { solution: Solution, loc: Location },
 ) {
-  const schem = selectedSchem(gameRefs);
-  if (schem !== undefined) {
-    gameRefs.saveData.act.levels[schem.levelId]![schem.solId].solInfo = solInfo;
+  const levelId = selectedLevelId(gameRefs);
+  const composition = selectedSchemComposition(gameRefs);
+  if (levelId !== undefined && composition !== undefined) {
+    gameRefs.saveData.act.levels[levelId]![compositionToKey(composition)]!.solInfo = solInfo;
   }
 }
 
@@ -407,11 +437,20 @@ export function setLocation(
   gameRefs: GameRefs,
   loc: Location,
 ) {
-  const schem = selectedSchem(gameRefs);
-  if (schem !== undefined) {
-    const solInfo = gameRefs.saveData.act.levels[schem.levelId]![schem.solId].solInfo;
+  const levelId = selectedLevelId(gameRefs);
+  const composition = selectedSchemComposition(gameRefs);
+  if (levelId !== undefined && composition !== undefined) {
+    const solInfo = gameRefs.saveData.act.levels[levelId]![compositionToKey(composition)]!.solInfo;
     if (solInfo !== undefined) {
       solInfo.loc = loc;
     }
   }
+}
+
+export function validComposition(
+  composition: Composition,
+  levelId: LevelDataKeys,
+) {
+  const slots = levelData[levelId].slots;
+  return composition.length === slots && composition.findIndex(x => x === undefined) === -1;
 }
