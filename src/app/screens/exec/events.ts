@@ -1,7 +1,6 @@
 import { GameRefs } from "../../../app/states/game";
-import { currentSolution, currentSolMap, levelData, setSolution, setLocation, selectedLevelId, initSolMap, emptyComposition, validComposition, selectedSchemLevelId } from "../act/data";
+import { currentSolution, currentSolMap, levelData, setSolution, setLocation, selectedLevelId, initSol, emptyComposition, validComposition, selectedSchemLevelId, currentSol, compositionToKey, selectedSchemComposition } from "../act/data";
 import { runSolution, extendSolution, SolutionData, cutSolution } from "../../../shared/game/solution";
-import { loadLevel, createDeployArray } from "../level/events";
 import { Location } from "../../../shared/tree";
 import { firstLogIndex } from "../../../shared/game/log";
 import { runAsTween } from "../../phaser/animation";
@@ -9,37 +8,42 @@ import { clearAnimations } from "../util";
 import { mkGameState } from "../../../shared/game/state";
 import { TargetId } from "../../../shared/definitions/entityId";
 import deepEqual from "deep-equal";
+import { CardId } from "src/shared/data/cardId";
+import { FrUnitId } from "src/shared/data/frUnitMap";
 
 export function drawCurrentLevel(
   gameRefs: GameRefs,
 ) {
   const levelId = selectedLevelId(gameRefs);
   if (levelId !== undefined) {
-    loadLevel(gameRefs, levelId);
+    // loadLevel(gameRefs, levelId);
   }
 }
 
 export function updateSolutionRep(
   gameRefs: GameRefs,
 ) {
-  let solMap = currentSolMap(gameRefs);
+  let sol = currentSol(gameRefs);
   const levelId = selectedSchemLevelId(gameRefs);
   if (levelId === undefined) {
     return;
   }
 
-  if (solMap === undefined) {
-    solMap = initSolMap(gameRefs, levelId);
+  if (sol === undefined) {
+    sol = initSol(gameRefs, levelId);
   }
   
-  const sol = solMap[levelId];
-  const composition = sol === undefined ? emptyComposition(levelId) : sol.composition;
+  const composition = sol.currentComposition;
+  const solMap = sol.solMap;
+  const solData = solMap[compositionToKey(composition)];
 
   const frUnits = composition;
   const enUnits = levelData[levelId].enemyIds;
   const initState = mkGameState(frUnits, enUnits);
 
-  if (sol === undefined || ! validComposition(composition, levelId)) {
+  if (solData === undefined || ! validComposition(composition, levelId)) {
+    gameRefs.screens.execScreen.state = initState;
+
     gameRefs.screens.execScreen.drawState(initState);
     gameRefs.screens.execScreen.drawStats(initState);
     gameRefs.screens.execScreen.drawAnimControlBtns();
@@ -47,7 +51,7 @@ export function updateSolutionRep(
     gameRefs.screens.execScreen.drawSwitchOrderBtns();
     gameRefs.screens.execScreen.drawClearBtn();
   } else {
-    const solResult = runSolution(sol.solInfo.solution, sol.solInfo.loc, initState);
+    const solResult = runSolution(solData.solInfo.solution, solData.solInfo.loc, initState);
 
     const prevState = gameRefs.screens.execScreen.state;
     gameRefs.screens.execScreen.state = solResult.state;
@@ -55,7 +59,7 @@ export function updateSolutionRep(
     // update tree rep
     clearAnimations(gameRefs.game, gameRefs.screens.execScreen);
     gameRefs.screens.execScreen.clearAnimPools();
-    gameRefs.screens.execScreen.drawTree(sol.solInfo!);
+    gameRefs.screens.execScreen.drawTree(solData.solInfo!);
     if (prevState === undefined) {
       gameRefs.screens.execScreen.drawAnimControlBtns();
       gameRefs.screens.execScreen.drawTreeControlBtns();
@@ -132,6 +136,7 @@ export function cutLevelSolution(
   }
 }
 
+/*
 export function clearSolution(
   gameRefs: GameRefs,
 ) {
@@ -144,6 +149,7 @@ export function clearSolution(
   }
   drawCurrentLevel(gameRefs);
 }
+*/
 
 export function showChangeUnitScreen(
   gameRefs: GameRefs,
@@ -158,4 +164,15 @@ export function hideChangeUnitScreen(
 ) {
   gameRefs.screens.execScreen.selecting = undefined;
   gameRefs.screens.execScreen.drawUnitSelect();
+}
+
+export function deployUnit(
+  gameRefs: GameRefs,
+  cardId: FrUnitId,
+  position: number,
+) {
+  const levelId = selectedSchemLevelId(gameRefs);
+  gameRefs.saveData.act.levels[levelId!]!.currentComposition[position] = cardId;
+  updateSolutionRep(gameRefs);
+  hideChangeUnitScreen(gameRefs);
 }

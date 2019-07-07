@@ -2,12 +2,12 @@ import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position, center } from "../../util/position";
 import { addText, DataSprite, addShader, clearShader } from "../../phaser/datasprite";
-import { enFiltered, frFiltered, getTarget, statusById } from "../../../shared/game/state";
+import { enFiltered, frFiltered, getTarget, statusById, position } from "../../../shared/game/state";
 import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex, StatusLog } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { EntityId, UnitId, friendlyId, TargetId, EnemyId, FriendlyId, StatusId } from "../../../shared/definitions/entityId";
-import { hoverUnit, clearHover, extendLevelSolution, changeLevelLoc, clearSolution, cutLevelSolution, showChangeUnitScreen, hideChangeUnitScreen } from "./events";
+import { hoverUnit, clearHover, extendLevelSolution, changeLevelLoc, cutLevelSolution, showChangeUnitScreen, hideChangeUnitScreen, deployUnit } from "./events";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation, runAsTween } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution, SolutionData } from "../../../shared/game/solution";
@@ -32,6 +32,8 @@ import { abilityDescription } from "../../../shared/game/ability";
 import { settings } from "../../data/settings";
 import { CardId } from "../../../shared/data/cardId";
 import { drawLine } from "../../phaser/line";
+import { levelData, selectedSchemLevelId, LevelDataKeys } from "../act/data";
+import { FrUnitId } from "src/shared/data/frUnitMap";
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, {}>
@@ -55,8 +57,8 @@ export class ExecScreen {
   hoverGraphicsPool: Phaser.Graphics
   stateIconPool: Pool<StateIconData, {}>
   logGraphicsPool: Phaser.Graphics
-  unitSelectPool: Pool<UnitSelectData, {}>
   unitSelectBgPool: Pool<UnitSelectBgData, {}>
+  unitSelectPool: Pool<UnitSelectData, {}>
   
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
@@ -101,8 +103,8 @@ export class ExecScreen {
     this.stateIconPool = mkStateIconPool(gameRefs);
     this.switchStatusOrderBtnPool = mkSwitchStatusOrderBtnPool(gameRefs);
     this.logGraphicsPool = gameRefs.game.add.graphics();
-    this.unitSelectPool = mkUnitSelectPool(gameRefs);
     this.unitSelectBgPool = mkUnitSelectBgPool(gameRefs);
+    this.unitSelectPool = mkUnitSelectPool(gameRefs);
   }
 
   reset() {
@@ -153,20 +155,20 @@ export class ExecScreen {
 
   drawClearBtn(
   ) {
-    this.redrawClearBtn();
-    this.clearBtnPool.playIntroAnimations();
+    //this.redrawClearBtn();
+    //this.clearBtnPool.playIntroAnimations();
   }
 
   redrawClearBtn(
   ) {
-    this.clearBtnPool.clear();
+    /*this.clearBtnPool.clear();
 
     const pos = createPosition(
       "right", 650, 100,
       "bot", 20, 100,
     );
     const sprite = this.clearBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", {});
-    addText(this.gameRefs, sprite, pos, "Clear", "#000000", 40);
+    addText(this.gameRefs, sprite, pos, "Clear", "#000000", 40);*/
   }
 
   // DRAW STATE
@@ -644,10 +646,17 @@ export class ExecScreen {
     this.unitSelectBgPool.clear();
 
     if (this.selecting !== undefined) {
-      const unitSelectPos = relativeTo(friendlyUnitPos(this.currentState(), this.selecting),
+      const bgPos = relativeTo(friendlyUnitPos(this.currentState(), this.selecting),
         [{type: "above", amt: 10}], 550, 190
       );
-      this.unitSelectBgPool.newSprite(unitSelectPos.xMin, unitSelectPos.yMin, {}, {});
+      this.unitSelectBgPool.newSprite(bgPos.xMin, bgPos.yMin, {}, {});
+
+      const levelId = selectedSchemLevelId(this.gameRefs);
+      const slots = levelData[levelId!].slots;
+      const cardIds = levelData[levelId!].cardIds[(slots - 1) - this.selecting];
+      cardIds.forEach((cardId, cardIdIndex) => {
+        this.unitSelectPool.newSprite(bgPos.xMin + 20 + 170 * cardIdIndex, bgPos.yMin + 20, {}, { cardId });
+      });
     }
   }
 
@@ -932,7 +941,7 @@ function mkClearBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          clearSolution(gameRefs);
+          // clearSolution(gameRefs);
         },
         hoverOver: (self) => {
           addShader(gameRefs, self, "blue-glow");
@@ -1011,7 +1020,10 @@ function mkEmptySlotPool(
       ],
       callbacks: {
         click: (self) => {
-          if (gameRefs.screens.execScreen.selecting === undefined) {
+          if (
+            gameRefs.screens.execScreen.selecting === undefined ||
+            gameRefs.screens.execScreen.selecting !== self.data.position
+          ) {
             showChangeUnitScreen(gameRefs, self.data.position);
           } else {
             hideChangeUnitScreen(gameRefs);
@@ -1625,7 +1637,7 @@ function mkSwitchStatusOrderBtnPool(
 }
 
 type UnitSelectData = {
-  cardId: CardId,
+  cardId: FrUnitId,
 };
 
 function mkUnitSelectPool(
@@ -1642,7 +1654,7 @@ function mkUnitSelectPool(
       ],
       callbacks: {
         click: (self) => {
-
+          deployUnit(gameRefs, self.data.cardId, gameRefs.screens.execScreen.selecting!);
         },
       },
     },

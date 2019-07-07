@@ -1,7 +1,6 @@
 import { ActScreen } from "../screens/act/screen";
 import { ActSaveData, mkActSaveData } from "../screens/act/data";
 import { BgScreen } from "../screens/bg/screen";
-import { LevelScreen } from "../screens/level/screen";
 import { MenuScreen } from "../screens/menu/screen";
 import { settings } from "../data/settings";
 import { createPosition } from "../util/position";
@@ -14,7 +13,6 @@ export type GameRefs = {
   screens: {
     bgScreen: BgScreen,
     actScreen: ActScreen,
-    levelScreen: LevelScreen,
     execScreen: ExecScreen,
     menuScreen: MenuScreen,
     codexScreen: CodexScreen,
@@ -53,7 +51,6 @@ export default class Game extends Phaser.State {
       screens: {
         bgScreen: <any>undefined,
         actScreen: <any>undefined,
-        levelScreen: <any>undefined,
         menuScreen: <any>undefined,
         execScreen: <any>undefined,
         codexScreen: <any>undefined,
@@ -71,8 +68,6 @@ export default class Game extends Phaser.State {
     gameRefs.screens.bgScreen = bgScreen;
     const actScreen = new ActScreen(gameRefs);
     gameRefs.screens.actScreen = actScreen;
-    const levelScreen = new LevelScreen(gameRefs);
-    gameRefs.screens.levelScreen = levelScreen;
     const execScreen = new ExecScreen(gameRefs);
     gameRefs.screens.execScreen = execScreen;
     const menuScreen = new MenuScreen(gameRefs);

@@ -54,9 +54,7 @@ export function transitionScreen(
       break;
     }
     case "ScreenSchem": {
-      clearAnimations(gameRefs.game, gameRefs.screens.levelScreen);
       clearAnimations(gameRefs.game, gameRefs.screens.execScreen);
-      clearPools(gameRefs.screens.levelScreen);
       clearPools(gameRefs.screens.execScreen);
       break;
     }
@@ -107,8 +105,6 @@ export function transitionScreen(
           gameRefs.saveData.act.activeScreen = "schem";
           const levelId = newScreen.levelId;
           gameRefs.saveData.act.currentLevelId = levelId;
-          // TODO: keep track of composition per level
-          gameRefs.saveData.act.currentComposition = levelId === undefined ? [] : emptyComposition(levelId);
           gameRefs.screens.execScreen.reset();
           updateSolutionRep(gameRefs);
           break;

@@ -17,7 +17,7 @@ export type ActData = {
 export type LevelData = {
   name: string,
   id: LevelDataKeys,
-  cardIds: FrUnitId[],
+  cardIds: FrUnitId[][],
   enemyIds: EnUnitId[],
   slots: number,
   selectLocation: { x: number, y: number },
@@ -28,7 +28,7 @@ export type LevelData = {
 const a1l1: LevelData = {
   name: "A1 level1",
   id: "a1l1",
-  cardIds: ["a1l1_fr"],
+  cardIds: [["a1l1_fr"]],
   enemyIds: ["a1l1_en"],
   slots: 1,
   selectLocation: { x: 200, y: 200 },
@@ -39,7 +39,7 @@ const a1l1: LevelData = {
 const a1l2: LevelData = {
   name: "A1 level2",
   id: "a1l2",
-  cardIds: ["a1l2_fr"],
+  cardIds: [["a1l2_fr"]],
   enemyIds: ["a1l2_en"],
   slots: 1,
   selectLocation: { x: 200, y: 200 },
@@ -50,7 +50,7 @@ const a1l2: LevelData = {
 const a1l3: LevelData = {
   name: "A1 level3",
   id: "a1l3",
-  cardIds: ["a1l3_fr1", "a1l3_fr2"],
+  cardIds: [["a1l3_fr1"], ["a1l3_fr2"]],
   enemyIds: ["a1l3_en1", "a1l3_en2"],
   slots: 2,
   selectLocation: { x: 200, y: 200 },
@@ -61,7 +61,7 @@ const a1l3: LevelData = {
 const a1l4: LevelData = {
   name: "A1 level4",
   id: "a1l4",
-  cardIds: ["a1l4_fr1", "a1l4_fr2"],
+  cardIds: [["a1l4_fr1"], ["a1l4_fr2"]],
   enemyIds: ["a1l4_en1", "a1l4_en2"],
   slots: 2,
   selectLocation: { x: 200, y: 200 },
@@ -72,7 +72,7 @@ const a1l4: LevelData = {
 const a1l5: LevelData = {
   name: "A1 level5",
   id: "a1l5",
-  cardIds: ["a1l5_fr1", "a1l5_fr2", "a1l5_fr3"],
+  cardIds: [["a1l5_fr1"], ["a1l5_fr2"], ["a1l5_fr3"]],
   enemyIds: ["a1l5_en1", "a1l5_en2"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
@@ -83,7 +83,7 @@ const a1l5: LevelData = {
 const a1l6: LevelData = {
   name: "A1 level6",
   id: "a1l6",
-  cardIds: ["a1l6_fr1", "a1l6_fr2", "a1l6_fr3"],
+  cardIds: [["a1l6_fr1"], ["a1l6_fr2"], ["a1l6_fr3"]],
   enemyIds: ["a1l6_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
@@ -94,7 +94,7 @@ const a1l6: LevelData = {
 const a1l7: LevelData = {
   name: "A1 level7",
   id: "a1l7",
-  cardIds: ["a1l7_fr1", "a1l7_fr2", "a1l7_fr3"],
+  cardIds: [["a1l7_fr1"], ["a1l7_fr2"], ["a1l7_fr3"]],
   enemyIds: ["a1l7_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
@@ -106,7 +106,7 @@ const a1l7: LevelData = {
 const a2l1: LevelData = {
   name: "A2 level1",
   id: "a2l1",
-  cardIds: ["trinity_dmg", "trinity_sup", "trinity_tnk"],
+  cardIds: [["trinity_dmg"], ["trinity_sup"], ["trinity_tnk"]],
   enemyIds: ["a2l1_en"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
@@ -117,7 +117,7 @@ const a2l1: LevelData = {
 const a3l1: LevelData = {
   name: "A3 level1",
   id: "a3l1",
-  cardIds: ["d_i", "d_ii", "d_iii", "d_iv", "c_i", "c_ii", "c_iii", "u_i", "u_ii", "u_iii"],
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
   enemyIds: ["a3l1_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
@@ -132,7 +132,7 @@ const a3l1: LevelData = {
 const a3l2: LevelData = {
   name: "A3 level2",
   id: "a3l2",
-  cardIds: ["d_i", "d_ii", "d_iii", "d_iv", "c_i", "c_ii", "c_iii", "u_i", "u_ii", "u_iii"],
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
   enemyIds: ["a3l2_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
@@ -147,7 +147,7 @@ const a3l2: LevelData = {
 const a3l3: LevelData = {
   name: "A3 level3",
   id: "a3l3",
-  cardIds: ["d_i", "d_ii", "d_iii", "d_iv", "c_i", "c_ii", "c_iii", "u_i", "u_ii", "u_iii"],
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
   enemyIds: ["a3l3_en1", "a3l3_en2"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
@@ -162,7 +162,7 @@ const a3l3: LevelData = {
 const a3l4: LevelData = {
   name: "A3 level4",
   id: "a3l4",
-  cardIds: ["d_i", "d_ii", "d_iii", "d_iv", "c_i", "c_ii", "c_iii", "u_i", "u_ii", "u_iii"],
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
   enemyIds: ["a3l4_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
@@ -177,7 +177,7 @@ const a3l4: LevelData = {
 const a3l5: LevelData = {
   name: "A3 level5",
   id: "a3l5",
-  cardIds: ["d_i", "d_ii", "d_iii", "d_iv", "c_i", "c_ii", "c_iii", "u_i", "u_ii", "u_iii"],
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
   enemyIds: ["a3l5_en1"],
   slots: 3,
   selectLocation: { x: 200, y: 200 },
@@ -250,19 +250,22 @@ export class SelectedLevelMenu {
 export type ActSaveData = {
   currentMenu: SelectedActMenu | SelectedLevelMenu | undefined,
   currentLevelId: LevelDataKeys | undefined,
-  currentComposition: Composition | undefined,
   activeScreen: "menu" | "schem" | "codex" | "settings",
-  levels: { [key in LevelDataKeys]?: SolutionDataMap },
+  levels: { [key in LevelDataKeys]?: Sol }
   animationSpeeds: {
     log: SpeedType,
   },
 };
 
+export type Sol = {
+  solMap: SolutionDataMap,
+  currentComposition: Composition,
+}
+
 export function mkActSaveData(): ActSaveData {
   return {
     currentMenu: undefined,
     currentLevelId: undefined,
-    currentComposition: undefined,
     activeScreen: "menu",
     levels: {},
     animationSpeeds: {
@@ -382,24 +385,38 @@ export function selectedSchemLevelId(
 
 export function selectedSchemComposition(
   gameRefs: GameRefs,
+  levelId: LevelDataKeys,
 ): Composition | undefined {
-  return gameRefs.saveData.act.currentComposition;
+  const sol = gameRefs.saveData.act.levels[levelId];
+  return sol === undefined ? undefined : sol.currentComposition;
+}
+
+export function currentSol(
+  gameRefs: GameRefs,
+): Sol | undefined {
+  const levelId = selectedSchemLevelId(gameRefs);
+  return levelId === undefined ? undefined : gameRefs.saveData.act.levels[levelId];
 }
 
 export function currentSolMap(
   gameRefs: GameRefs,
 ): SolutionDataMap | undefined {
-  const levelId = selectedLevelId(gameRefs);
-  return levelId == undefined ? undefined : gameRefs.saveData.act.levels[levelId];
+  const levelId = selectedSchemLevelId(gameRefs);
+  if (levelId !== undefined) {
+    const sol = gameRefs.saveData.act.levels[levelId];
+    return sol === undefined ? undefined : sol.solMap;
+  } else {
+    return undefined;
+  }
 }
 
-export function initSolMap(
+export function initSol(
   gameRefs: GameRefs,
   levelId: LevelDataKeys,
-): SolutionDataMap {
-  const newSolMap = {}
-  gameRefs.saveData.act.levels[levelId] = newSolMap;
-  return newSolMap;
+): Sol {
+  const newSol = { currentComposition: emptyComposition(levelId), solMap: {} };
+  gameRefs.saveData.act.levels[levelId] = newSol;
+  return newSol;
 }
 
 export function schemScholAt(
@@ -407,16 +424,20 @@ export function schemScholAt(
   levelId: LevelDataKeys,
   composition: Composition,
 ): SolutionData | undefined {
-  return gameRefs.saveData.act.levels[levelId]![compositionToKey(composition)];
+  return gameRefs.saveData.act.levels[levelId]!.solMap[compositionToKey(composition)];
 }
 
 export function currentSolution(
   gameRefs: GameRefs,
 ) {
-  const levelId = selectedLevelId(gameRefs);
-  const composition = selectedSchemComposition(gameRefs);
-  if (levelId !== undefined && composition !== undefined) {
-    return gameRefs.saveData.act.levels[levelId]![compositionToKey(composition)]!.solInfo;
+  const levelId = selectedSchemLevelId(gameRefs);
+  if (levelId !== undefined) {
+    const composition = selectedSchemComposition(gameRefs, levelId);
+    if (composition !== undefined) {
+      return gameRefs.saveData.act.levels[levelId]!.solMap[compositionToKey(composition)]!.solInfo;
+    } else {
+      return undefined;
+    }
   } else {
     return undefined;
   }
@@ -427,9 +448,11 @@ export function setSolution(
   solInfo: { solution: Solution, loc: Location },
 ) {
   const levelId = selectedLevelId(gameRefs);
-  const composition = selectedSchemComposition(gameRefs);
-  if (levelId !== undefined && composition !== undefined) {
-    gameRefs.saveData.act.levels[levelId]![compositionToKey(composition)]!.solInfo = solInfo;
+  if (levelId !== undefined) {
+    const composition = selectedSchemComposition(gameRefs, levelId);
+    if (composition !== undefined) {
+      gameRefs.saveData.act.levels[levelId]!.solMap[compositionToKey(composition)]!.solInfo = solInfo;
+    }
   }
 }
 
@@ -437,12 +460,14 @@ export function setLocation(
   gameRefs: GameRefs,
   loc: Location,
 ) {
-  const levelId = selectedLevelId(gameRefs);
-  const composition = selectedSchemComposition(gameRefs);
-  if (levelId !== undefined && composition !== undefined) {
-    const solInfo = gameRefs.saveData.act.levels[levelId]![compositionToKey(composition)]!.solInfo;
-    if (solInfo !== undefined) {
-      solInfo.loc = loc;
+  const levelId = selectedSchemLevelId(gameRefs);
+  if (levelId !== undefined) {
+    const composition = selectedSchemComposition(gameRefs, levelId);
+    if (composition !== undefined) {
+      const solInfo = gameRefs.saveData.act.levels[levelId]!.solMap[compositionToKey(composition)]!.solInfo;
+      if (solInfo !== undefined) {
+        solInfo.loc = loc;
+      } 
     }
   }
 }

@@ -6,6 +6,7 @@ import { endStates } from "../../../shared/game/solution";
 import { transitionScreen, ScreenSchem } from "../transition";
 import { FrUnitId } from "../../../shared/data/frUnitMap";
 
+/*
 export function loadLevel(
   gameRefs: GameRefs,
   levelId: LevelDataKeys,
@@ -30,7 +31,7 @@ export function newExecLevel(
   }
 }
 
-/*export function moveCardToFirstFree(
+export function moveCardToFirstFree(
   gameRefs: GameRefs,
   from: { type: "supply" | "deploy", index: number },
   to: { type: "supply" | "deploy" },
@@ -59,7 +60,7 @@ export function moveCard(
 
     gameRefs.screens.levelScreen.redrawBox();
   }
-}*/
+}
 
 export function toggleDeploy(
   gameRefs: GameRefs,
@@ -147,3 +148,4 @@ export function levelStats(
     win: false,
   }
 }
+*/

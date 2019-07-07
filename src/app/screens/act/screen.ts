@@ -6,7 +6,6 @@ import { chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
 import { addText, DataSprite, clearShader, addShader } from "../../phaser/datasprite";
-import { loadLevel, levelStats } from "../level/events";
 import { ScreenAct, transitionScreen, ScreenSchem } from "../transition";
 
 export class ActScreen {
@@ -162,7 +161,7 @@ export class ActScreen {
     if (levels === undefined) {
       solBtns = [];
     } else {
-      solBtns = levels.map((levelData, solIndex) => {
+      /*solBtns = levels.map((levelData, solIndex) => {
         return {
           create: () => {
             const pos = createPosition(
@@ -179,7 +178,7 @@ export class ActScreen {
           },
         }
       });
-      solAddI = levels.length;
+      solAddI = levels.length;*/
     }
     const solAddBtn = {
       create: () => {
@@ -195,7 +194,7 @@ export class ActScreen {
         return this.solBtnPool.introTween(sprite);
       },
     };
-    chainSpriteCreation(solBtns.concat(solAddBtn), animation);
+    // chainSpriteCreation(solBtns.concat(solAddBtn), animation);
   }
 
   setVisibility(
@@ -344,7 +343,7 @@ function mkSolBtnPool(
               break;
             }
             case "SolBtnDataSelect": {
-              loadLevel(gameRefs, data.levelId, data.solIndex);
+              // loadLevel(gameRefs, data.levelId, data.solIndex);
               break;
             }
           }

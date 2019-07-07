@@ -98,7 +98,7 @@ function mkMenuBtnPool(
       callbacks: {
         click: (self) => {
           if (! (gameRefs.saveData.act.activeScreen === self.data.type
-            || self.data.type === "schem" && gameRefs.saveData.act.currentSchem === undefined)
+            || self.data.type === "schem" && gameRefs.saveData.act.currentLevelId === undefined)
           ) {
             switch (self.data.type) {
               case "menu": {

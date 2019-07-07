@@ -6,7 +6,6 @@ export function loadActScreen(
   gameRefs: GameRefs,
 ) {
   gameRefs.screens.actScreen.setVisibility(true);
-  gameRefs.screens.levelScreen.setVisibility(false);
   gameRefs.screens.execScreen.setVisibility(false);
   gameRefs.screens.codexScreen.setVisibility(false);
   gameRefs.screens.settingsScreen.setVisibility(false);
@@ -19,7 +18,6 @@ export function loadExecScreen(
   gameRefs: GameRefs,
 ) {
   gameRefs.screens.actScreen.setVisibility(false);
-  gameRefs.screens.levelScreen.setVisibility(false);
   gameRefs.screens.execScreen.setVisibility(true);
   gameRefs.screens.codexScreen.setVisibility(false);
   gameRefs.screens.settingsScreen.setVisibility(false);
@@ -32,7 +30,6 @@ export function loadCodexScreen(
   gameRefs: GameRefs,
 ) {
   gameRefs.screens.actScreen.setVisibility(false);
-  gameRefs.screens.levelScreen.setVisibility(false);
   gameRefs.screens.execScreen.setVisibility(false);
   gameRefs.screens.codexScreen.setVisibility(true);
   gameRefs.screens.settingsScreen.setVisibility(false);
@@ -45,7 +42,6 @@ export function loadSettingsScreen(
   gameRefs: GameRefs,
 ) {
   gameRefs.screens.actScreen.setVisibility(false);
-  gameRefs.screens.levelScreen.setVisibility(false);
   gameRefs.screens.execScreen.setVisibility(false);
   gameRefs.screens.codexScreen.setVisibility(false);
   gameRefs.screens.settingsScreen.setVisibility(true);

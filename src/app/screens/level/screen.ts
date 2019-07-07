@@ -1,9 +1,10 @@
+/*
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition } from "../../util/position";
 import { addText, DataSprite } from "../../phaser/datasprite";
 import { chainSpriteCreation, createTween } from "../../phaser/animation";
-import { currentSolMap, selectedSchem, levelData } from "../act/data";
+import { currentSolMap, levelData } from "../act/data";
 import { cardMap } from "../../data/cardMap";
 import { loadLevel, newExecLevel, levelStats, toggleDeploy } from "../level/events";
 import { filterUndefined } from "../../util/util";
@@ -279,3 +280,4 @@ function mkCircPool(
     },
   );
 }
+*/

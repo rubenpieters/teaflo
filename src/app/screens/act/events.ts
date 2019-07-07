@@ -53,12 +53,12 @@ export function addNewSolution(
   gameRefs: GameRefs,
   levelId: LevelDataKeys,
 ) {
-  const solutions = gameRefs.saveData.act.levels[levelId];
+  /*const solutions = gameRefs.saveData.act.levels[levelId];
   if (solutions === undefined) {
     gameRefs.saveData.act.levels[levelId] = {};
   } else {
     solutions.push(mkSolutionData(levelId));
   }
 
-  gameRefs.screens.actScreen.redrawSolBtn(levelId);
+  gameRefs.screens.actScreen.redrawSolBtn(levelId);*/
 }
