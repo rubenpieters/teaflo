@@ -30,7 +30,7 @@ export function statusId(
 }
 
 /**
- * A unit is belongs to the team which the player controls (friendly).
+ * A unit elongs to the team which the player controls (friendly).
  * Or to the team which the player fights (enemy).
  */
 export type UnitType

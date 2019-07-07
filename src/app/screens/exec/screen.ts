@@ -7,7 +7,7 @@ import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logInd
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { EntityId, UnitId, friendlyId, TargetId, EnemyId, FriendlyId, StatusId } from "../../../shared/definitions/entityId";
-import { hoverUnit, clearHover, extendLevelSolution, changeLevelLoc, clearSolution, cutLevelSolution } from "./events";
+import { hoverUnit, clearHover, extendLevelSolution, changeLevelLoc, clearSolution, cutLevelSolution, showChangeUnitScreen, hideChangeUnitScreen } from "./events";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation, runAsTween } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution, SolutionData } from "../../../shared/game/solution";
@@ -55,6 +55,9 @@ export class ExecScreen {
   hoverGraphicsPool: Phaser.Graphics
   stateIconPool: Pool<StateIconData, {}>
   logGraphicsPool: Phaser.Graphics
+  unitSelectPool: Pool<UnitSelectData, {}>
+  unitSelectBgPool: Pool<UnitSelectBgData, {}>
+  
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
   treeControlBtnPool: Pool<TreeControlBtn, {}>
@@ -67,6 +70,7 @@ export class ExecScreen {
   clickState: { ability: FrAbility, inputs: any[], origin: UnitId, index: number } | undefined
   intermediate: LogIndex | undefined
   statusOrder: "byOrder" | "byId" = "byId"
+  selecting: number | undefined
 
   treeCtrl: "remove" | undefined
 
@@ -97,6 +101,8 @@ export class ExecScreen {
     this.stateIconPool = mkStateIconPool(gameRefs);
     this.switchStatusOrderBtnPool = mkSwitchStatusOrderBtnPool(gameRefs);
     this.logGraphicsPool = gameRefs.game.add.graphics();
+    this.unitSelectPool = mkUnitSelectPool(gameRefs);
+    this.unitSelectBgPool = mkUnitSelectBgPool(gameRefs);
   }
 
   reset() {
@@ -107,6 +113,7 @@ export class ExecScreen {
     this.intermediate = undefined;
     this.treeCtrl = undefined;
     this.statusOrder = "byOrder";
+    this.selecting = undefined;
   }
 
   solDataFromClickState(): SolutionData {
@@ -198,13 +205,14 @@ export class ExecScreen {
     state.frUnits.units.forEach((unit, unitIndex) => {
       if (unit === undefined) {
         const unitPos = friendlyUnitPos(state, unitIndex);
-        this.emptySlotPool.newSprite(unitPos.xMin, unitPos.yMin, {}, {});
+        this.emptySlotPool.newSprite(unitPos.xMin, unitPos.yMin, {}, { position: unitIndex });
       } else if (unit !== undefined) {
         const unitPos = friendlyUnitPos(state, unitIndex);
         const utilityPos = unitUtilityPositions(unitPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: unit.id,
+            position: unitIndex,
           }
         );
         if (currentInputType !== undefined && ! matchUserInput(currentInputType, unit.id)) {
@@ -318,6 +326,7 @@ export class ExecScreen {
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: unit.id,
+            position: unitIndex,
           }
         );
         if (currentInputType !== undefined && ! matchUserInput(currentInputType, unit.id)) {
@@ -629,6 +638,19 @@ export class ExecScreen {
     return new ParAnimation(anims.concat(effectAnim));
   }
 
+  drawUnitSelect(
+  ) {
+    this.unitSelectPool.clear();
+    this.unitSelectBgPool.clear();
+
+    if (this.selecting !== undefined) {
+      const unitSelectPos = relativeTo(friendlyUnitPos(this.currentState(), this.selecting),
+        [{type: "above", amt: 10}], 550, 190
+      );
+      this.unitSelectBgPool.newSprite(unitSelectPos.xMin, unitSelectPos.yMin, {}, {});
+    }
+  }
+
   createEffectAnimation(
     state: GameState,
     lastAction: Action,
@@ -926,6 +948,7 @@ function mkClearBtnPool(
 type UnitData = {
   cardId: CardId,
   globalId: EntityId<"friendly" | "enemy">,
+  position: number,
 };
 
 function mkUnitPool(
@@ -968,6 +991,7 @@ function mkUnitPool(
 }
 
 type EmptySlotData = {
+  position: number,
 };
 
 function mkEmptySlotPool(
@@ -987,7 +1011,11 @@ function mkEmptySlotPool(
       ],
       callbacks: {
         click: (self) => {
-          console.log("test");
+          if (gameRefs.screens.execScreen.selecting === undefined) {
+            showChangeUnitScreen(gameRefs, self.data.position);
+          } else {
+            hideChangeUnitScreen(gameRefs);
+          }
         },
       },
     },
@@ -1590,6 +1618,55 @@ function mkSwitchStatusOrderBtnPool(
               break;
             }
           }
+        },
+      },
+    },
+  );
+}
+
+type UnitSelectData = {
+  cardId: CardId,
+};
+
+function mkUnitSelectPool(
+  gameRefs: GameRefs,
+): Pool<UnitSelectData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return cardMap[self.data.cardId];
+      },
+      introAnim: [
+      ],
+      callbacks: {
+        click: (self) => {
+
+        },
+      },
+    },
+  );
+}
+
+type UnitSelectBgData = {
+};
+
+function mkUnitSelectBgPool(
+  gameRefs: GameRefs,
+): Pool<UnitSelectBgData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return "unit_select_bg.png";
+      },
+      introAnim: [
+      ],
+      callbacks: {
+        click: (self) => {
+
         },
       },
     },

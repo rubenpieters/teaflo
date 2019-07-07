@@ -1,5 +1,5 @@
 import { GameRefs } from "../../../app/states/game";
-import { currentSolution, currentSolMap, levelData, setSolution, setLocation, selectedLevelId, newSolMap, initSolMap, emptyComposition, validComposition, selectedSchemLevelId } from "../act/data";
+import { currentSolution, currentSolMap, levelData, setSolution, setLocation, selectedLevelId, initSolMap, emptyComposition, validComposition, selectedSchemLevelId } from "../act/data";
 import { runSolution, extendSolution, SolutionData, cutSolution } from "../../../shared/game/solution";
 import { loadLevel, createDeployArray } from "../level/events";
 import { Location } from "../../../shared/tree";
@@ -48,7 +48,7 @@ export function updateSolutionRep(
     gameRefs.screens.execScreen.drawClearBtn();
   } else {
     const solResult = runSolution(sol.solInfo.solution, sol.solInfo.loc, initState);
-  
+
     const prevState = gameRefs.screens.execScreen.state;
     gameRefs.screens.execScreen.state = solResult.state;
     gameRefs.screens.execScreen.log = solResult.log;
@@ -143,4 +143,19 @@ export function clearSolution(
     gameRefs.saveData.act.levels[schem.levelId]![schem.solId].solInfo = undefined;
   }
   drawCurrentLevel(gameRefs);
+}
+
+export function showChangeUnitScreen(
+  gameRefs: GameRefs,
+  position: number,
+) {
+  gameRefs.screens.execScreen.selecting = position;
+  gameRefs.screens.execScreen.drawUnitSelect();
+}
+
+export function hideChangeUnitScreen(
+  gameRefs: GameRefs,
+) {
+  gameRefs.screens.execScreen.selecting = undefined;
+  gameRefs.screens.execScreen.drawUnitSelect();
 }
