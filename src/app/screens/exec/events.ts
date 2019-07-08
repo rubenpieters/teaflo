@@ -1,5 +1,5 @@
 import { GameRefs } from "../../../app/states/game";
-import { currentSolution, currentSolMap, levelData, setSolution, setLocation, selectedLevelId, initSol, emptyComposition, validComposition, selectedSchemLevelId, currentSol, compositionToKey, selectedSchemComposition } from "../act/data";
+import { currentSolution, currentSolMap, levelData, setSolution, setLocation, selectedLevelId, initSol, emptyComposition, validComposition, selectedSchemLevelId, currentSol, compositionToKey, selectedSchemComposition, initSolution } from "../act/data";
 import { runSolution, extendSolution, SolutionData, cutSolution } from "../../../shared/game/solution";
 import { Location } from "../../../shared/tree";
 import { firstLogIndex } from "../../../shared/game/log";
@@ -96,15 +96,17 @@ export function extendLevelSolution(
   gameRefs: GameRefs,
   solData: SolutionData,
 ) {
-  const solInfo = currentSolution(gameRefs);
-  if (solInfo !== undefined) {
-    const newSol = extendSolution(solData, solInfo.solution, solInfo.loc);
-    setSolution(gameRefs, newSol);
-
-    updateSolutionRep(gameRefs);
-    gameRefs.screens.execScreen.clickState = undefined;
-    gameRefs.screens.execScreen.intermediate = undefined;
+  let solInfo = currentSolution(gameRefs);
+  if (solInfo === undefined) {
+    console.log(`TEST: ${JSON.stringify(initSolution(gameRefs))}`);
+    solInfo = initSolution(gameRefs)!.solInfo;
   }
+  const newSol = extendSolution(solData, solInfo.solution, solInfo.loc);
+  setSolution(gameRefs, newSol);
+
+  updateSolutionRep(gameRefs);
+  gameRefs.screens.execScreen.clickState = undefined;
+  gameRefs.screens.execScreen.intermediate = undefined;
 }
 
 export function changeLevelLoc(

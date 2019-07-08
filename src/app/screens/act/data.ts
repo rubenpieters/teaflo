@@ -434,7 +434,8 @@ export function currentSolution(
   if (levelId !== undefined) {
     const composition = selectedSchemComposition(gameRefs, levelId);
     if (composition !== undefined) {
-      return gameRefs.saveData.act.levels[levelId]!.solMap[compositionToKey(composition)]!.solInfo;
+      const solution = gameRefs.saveData.act.levels[levelId]!.solMap[compositionToKey(composition)];
+      return solution === undefined ? undefined : solution.solInfo;
     } else {
       return undefined;
     }
@@ -447,12 +448,39 @@ export function setSolution(
   gameRefs: GameRefs,
   solInfo: { solution: Solution, loc: Location },
 ) {
-  const levelId = selectedLevelId(gameRefs);
+  const levelId = selectedSchemLevelId(gameRefs);
   if (levelId !== undefined) {
     const composition = selectedSchemComposition(gameRefs, levelId);
     if (composition !== undefined) {
-      gameRefs.saveData.act.levels[levelId]!.solMap[compositionToKey(composition)]!.solInfo = solInfo;
+      const solution = gameRefs.saveData.act.levels[levelId]!.solMap[compositionToKey(composition)];
+      if (solution !== undefined) {
+        solution.solInfo = solInfo;
+      }
     }
+  }
+}
+
+export function initSolution(
+  gameRefs: GameRefs,
+): SolutionData | undefined {
+  const levelId = selectedSchemLevelId(gameRefs);
+  if (levelId !== undefined) {
+    const composition = selectedSchemComposition(gameRefs, levelId);
+    if (composition !== undefined) {
+      const newSolution = {
+        composition,
+        solInfo: {
+          solution: emptySolution,
+          loc: [],
+        }
+      };
+      gameRefs.saveData.act.levels[levelId]!.solMap[compositionToKey(composition)] = newSolution;
+      return newSolution;
+    } else {
+      return undefined;
+    }
+  } else {
+    return undefined;
   }
 }
 

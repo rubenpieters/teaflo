@@ -986,6 +986,15 @@ function mkUnitPool(
                 extendLevelSolution(gameRefs, gameRefs.screens.execScreen.solDataFromClickState());
               }
             }
+          } else {
+            if (
+              gameRefs.screens.execScreen.selecting === undefined ||
+              gameRefs.screens.execScreen.selecting !== self.data.position
+            ) {
+              showChangeUnitScreen(gameRefs, self.data.position);
+            } else {
+              hideChangeUnitScreen(gameRefs);
+            }
           }
         },
         hoverOver: (self) => {
