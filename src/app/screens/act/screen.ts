@@ -92,109 +92,30 @@ export class ActScreen {
   ) {
     this.levelBtnPool.clear();
     this._drawLevelBtn(actId);
-    /*this.gameRefs.screens.bgScreen.bgOnIntroComplete(
-      () => {
-        this._drawLevelBtn(actId);
-        const levels = actData[actId].levels;
-        this.levelSelectionPool.newSprite(0, 0, {}, {
-          polys: levels.map(x => new Phaser.Polygon(x.spritePoints.map(({x, y}) => new Phaser.Point(x, y)))),
-          levelData: levels,
-          bgSprite: actData[actId].bgSprite,
-        });
-      },
-    );*/
   }
 
   private _drawLevelBtn(
     actId: number,
   ) {
-    this.createLevelBtn(actId, 0);
-  }
-
-  private createLevelBtn(
-    actId: number,
-    levelIndex: number,
-  ) {
-    const levelData = actData[actId].levels[levelIndex];
-    const levelId = levelData.id;
-    const pos = createPosition(
-      "left", 250, 400,
-      "top", 300 + (80 * levelIndex), 200,
-    );
-    const sprite = this.levelBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { levelId, levelIndex });
-    addText(this.gameRefs, sprite, pos, levelData.name, "#000000", 40);
-    const intro = this.levelBtnPool.introTween(sprite);
-    if (intro !== undefined) {
-      if (levelIndex + 1 < actData[actId].levels.length) {
-        intro.last.onComplete.add(() => {
-          this.createLevelBtn(actId, levelIndex + 1);
-        });
-      }
-      intro.first.start();
-    }
-  }
-
-  redrawSolBtn(
-    levelId: LevelDataKeys,
-  ) {
-    this.solBtnPool.killAll();
-    this._drawSolBtn(levelId, false);
-  }
-
-  drawSolBtn(
-    levelId: LevelDataKeys,
-  ) {
-    this.solBtnPool.killAll();
-    this._drawSolBtn(levelId, true);
-  }
-
-  private _drawSolBtn(
-    levelId: LevelDataKeys,
-    animation: boolean,
-  ) {
-    const levels = this.gameRefs.saveData.act.levels[levelId];
-    let solBtns: {
-      create: () => DataSprite<SolBtnData>,
-      introTween: (sprite: DataSprite<SolBtnData>) => { first: Phaser.Tween, last: Phaser.Tween } | undefined,
-    }[];
-    let solAddI = 0;
-    if (levels === undefined) {
-      solBtns = [];
-    } else {
-      /*solBtns = levels.map((levelData, solIndex) => {
-        return {
-          create: () => {
-            const pos = createPosition(
-              "left", 250, 400,
-              "top", 300 + (250 * solIndex), 200,
-            );
-            const sprite = this.solBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { tag: "SolBtnDataSelect", levelId, solIndex });
-            const lvlStats = levelStats(this.gameRefs, levelId, solIndex);
-            addText(this.gameRefs, sprite, pos, `${levelData.name}\nWin: ${lvlStats.win}`, "#000000", 40);
-            return sprite;
-          },
-          introTween: (sprite: DataSprite<SolBtnData>) => {
-            return this.solBtnPool.introTween(sprite);
-          },
-        }
-      });
-      solAddI = levels.length;*/
-    }
-    const solAddBtn = {
-      create: () => {
-        const pos = createPosition(
-          "left", 250, 400,
-          "top", 300 + (250 * solAddI), 200,
+    const levels = actData[actId].levels;
+    const anims = new ParAnimation(levels.map((levelData, levelIndex) => {
+      const levelId = levelData.id;
+      const pos = createPosition(
+        "left", levelData.iconLocation.x, 400,
+        "top", levelData.iconLocation.y, 200,
+      );
+      return new Create(() => {
+        return this.levelBtnPool.newSprite(pos.xMin, pos.yMin, "neutral",
+          { levelId, levelIndex, icon: levelData.icon }
         );
-        const sprite = this.solBtnPool.newSprite(pos.xMin, pos.yMin, "neutral", { tag: "SolBtnDataAdd", levelId });
-        addText(this.gameRefs, sprite, pos, "+", "#000000", 40);
-        return sprite;
-      },
-      introTween: (sprite: DataSprite<SolBtnData>) => {
-        return this.solBtnPool.introTween(sprite);
-      },
-    };
-    // chainSpriteCreation(solBtns.concat(solAddBtn), animation);
+      }, self => {
+        return new BaseAnimation(150, self, tween => {
+          tween.from({ alpha: 0 }, 300, Phaser.Easing.Linear.None, false, 50);
+        });
+      });
+    }));
+
+    runAsTween(this.gameRefs, anims);
   }
 
   setVisibility(
@@ -271,6 +192,7 @@ function mkActBtnPool(
 type LevelBtnData = {
   levelId: LevelDataKeys,
   levelIndex: number,
+  icon: string,
 }
 
 function mkLevelBtnPool(
@@ -282,9 +204,9 @@ function mkLevelBtnPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         switch (frameType) {
-          case "down": return "btn_level_click.png";
-          case "hover": return "btn_level_hover.png";
-          case "neutral": return "btn_level_neutral.png";
+          case "down": return self.data.icon;
+          case "hover": return self.data.icon;
+          case "neutral": return self.data.icon;
         }
       },
       introAnim: [
@@ -295,6 +217,12 @@ function mkLevelBtnPool(
       callbacks: {
         click: (self) => {
           transitionScreen(gameRefs, new ScreenSchem(self.data.levelId));
+        },
+        hoverOver: (self) => {
+          addShader(gameRefs, self, "blue-glow");
+        },
+        hoverOut: (self) => {
+          clearShader(self);
         },
       },
     },

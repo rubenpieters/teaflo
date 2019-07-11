@@ -91,7 +91,6 @@ export function transitionScreen(
                 gameRefs.saveData.act.currentMenu = new SelectedLevelMenu(levelId);
                 gameRefs.screens.actScreen.levelSelectMode();
                 gameRefs.screens.actScreen.drawActBtn();
-                gameRefs.screens.actScreen.drawSolBtn(levelId);
                 break;
               }
             }

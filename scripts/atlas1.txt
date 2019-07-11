@@ -229,3 +229,4 @@ textures/icon_lowesthp_40_40.png
 textures/icon_lowesthp_80_80.png
 textures/empty_slot_150_150.png
 textures/unit_select_bg.png
+textures/lvl_icon_150_150.png
