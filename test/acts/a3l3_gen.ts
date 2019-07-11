@@ -13,9 +13,20 @@ console.log(showGamestate(initState));
 trySolutions(initState, 10);
 */
 
+/*
 // Sol 2
 const initState = mkGameState(
   ["u_ii", "c_ii", "d_i"],
+  ["a3l3_en1", "a3l3_en2"],
+);
+
+console.log(showGamestate(initState));
+
+trySolutions(initState, 13);
+*/
+
+const initState = mkGameState(
+  ["u_i", "c_iii", "d_iv"],
   ["a3l3_en1", "a3l3_en2"],
 );
 
@@ -37,7 +48,7 @@ possibilities(
     ["a3l2_en1"],
   );
 
-  const wins = trySolutions(initState, 10, false);
+  const wins = trySolutions(initState, 13, false);
   console.log(`WINS: ${wins}`);
   console.log("-----------------------------------------------------");
 });
