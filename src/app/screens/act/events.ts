@@ -1,33 +1,19 @@
 import { GameRefs } from "../../states/game";
-import { mkSolutionData, SelectedActMenu, SelectedLevelMenu, LevelDataKeys } from "./data";
-import { transitionScreen, ScreenAct, ScreenSchem } from "../transition";
+import { transitionScreen, ScreenAct, ScreenExec } from "../transition";
+import { ActDataKeys } from "src/app/data/actData";
+import { LevelDataKeys } from "src/app/data/levelData";
 
 export function loadActMenu(
   gameRefs: GameRefs,
 ) {
-  const menu = gameRefs.saveData.act.currentMenu;
-  if (menu !== undefined) {
-    switch (menu.tag) {
-      case "SelectedActMenu": {
-        transitionScreen(gameRefs, new ScreenAct(menu));
-        break;
-      }
-      case "SelectedLevelMenu": {
-        transitionScreen(gameRefs, new ScreenAct(menu));
-        break;
-      }
-    }
-  } else {
-    transitionScreen(gameRefs, new ScreenAct(undefined));
-  }
+  const actId = gameRefs.saveData.currentActId;
+  transitionScreen(gameRefs, new ScreenAct(actId));
 }
 
 export function changeAct(
   gameRefs: GameRefs,
-  actId: number,
+  actId: ActDataKeys,
 ) {
-  gameRefs.saveData.act.currentMenu = new SelectedActMenu(actId);
-
   gameRefs.screens.actScreen.clearAnimations();
   gameRefs.screens.bgScreen.clearAnimations();
   gameRefs.screens.actScreen.actSelectMode();
@@ -39,7 +25,7 @@ export function changeLevel(
   gameRefs: GameRefs,
   levelId: LevelDataKeys,
 ) {
-  transitionScreen(gameRefs, new ScreenSchem(levelId));
+  transitionScreen(gameRefs, new ScreenExec(levelId));
 
   /*gameRefs.saveData.act.currentMenu = new SelectedLevelMenu(levelId);
   

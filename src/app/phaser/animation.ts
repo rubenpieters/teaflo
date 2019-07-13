@@ -169,7 +169,7 @@ export function createTypeTween(
   if (type !== undefined) {
     (<any>tween).data = { };
     (<any>tween).data[type] = true;
-    tween.timeScale = speedTypeToSpeed(gameRefs.saveData.act.animationSpeeds[type]);
+    tween.timeScale = speedTypeToSpeed(gameRefs.saveData.animationSpeeds[type]);
   }
   return tween;
 }

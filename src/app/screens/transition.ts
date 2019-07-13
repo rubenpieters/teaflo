@@ -1,20 +1,22 @@
-import { SelectedActMenu, SelectedLevelMenu, currentScreen, LevelDataKeys, emptyComposition } from "./act/data";
 import { GameRefs } from "../states/game";
 import { clearPools, clearAnimations } from "./util";
 import { updateSolutionRep } from "./exec/events";
 import { CodexTypes } from "./codex/screen";
+import { activeScreen } from "../data/saveData";
+import { ActDataKeys } from "../data/actData";
+import { LevelDataKeys } from "../data/levelData";
 
 export class ScreenAct {
   constructor(
-    public readonly selected: SelectedActMenu | SelectedLevelMenu | undefined,
+    public readonly actId: ActDataKeys,
     public readonly tag: "ScreenAct" = "ScreenAct",
   ) {}
 }
 
-export class ScreenSchem {
+export class ScreenExec {
   constructor(
     public readonly levelId: LevelDataKeys | undefined,
-    public readonly tag: "ScreenSchem" = "ScreenSchem",
+    public readonly tag: "ScreenExec" = "ScreenExec",
   ) {}
 }
 
@@ -34,7 +36,7 @@ export class ScreenSettings {
 
 export type ScreenActive
   = ScreenAct
-  | ScreenSchem
+  | ScreenExec
   | ScreenCodex
   | ScreenSettings
   ;
@@ -43,7 +45,7 @@ export function transitionScreen(
   gameRefs: GameRefs,
   newScreen: ScreenActive,
 ) {
-  const oldScreen = currentScreen(gameRefs);
+  const oldScreen = activeScreen(gameRefs);
   // clear old screen
   clearAnimations(gameRefs.game, gameRefs.screens.bgScreen);
   clearPools(gameRefs.screens.menuScreen);
@@ -53,7 +55,7 @@ export function transitionScreen(
       clearPools(gameRefs.screens.actScreen);
       break;
     }
-    case "ScreenSchem": {
+    case "ScreenExec": {
       clearAnimations(gameRefs.game, gameRefs.screens.execScreen);
       clearPools(gameRefs.screens.execScreen);
       break;
@@ -75,41 +77,24 @@ export function transitionScreen(
       gameRefs.screens.menuScreen.drawMenuBtn();
       switch (newScreen.tag) {
         case "ScreenAct": {
-          gameRefs.saveData.act.activeScreen = "menu";
-          if (newScreen.selected !== undefined) {
-            switch (newScreen.selected.tag) {
-              case "SelectedActMenu": {
-                const actId = newScreen.selected.actId;
-                gameRefs.saveData.act.currentMenu = new SelectedActMenu(actId);
-                gameRefs.screens.actScreen.actSelectMode();
-                gameRefs.screens.actScreen.drawActBtn();
-                gameRefs.screens.actScreen.drawLevelBtn(actId);
-                break;
-              }
-              case "SelectedLevelMenu": {
-                const levelId = newScreen.selected.levelId;
-                gameRefs.saveData.act.currentMenu = new SelectedLevelMenu(levelId);
-                gameRefs.screens.actScreen.levelSelectMode();
-                gameRefs.screens.actScreen.drawActBtn();
-                break;
-              }
-            }
-          } else {
-            gameRefs.saveData.act.currentMenu = undefined;
-            gameRefs.screens.actScreen.drawActBtn();
-          }
+          gameRefs.saveData.activeScreen = "menu";
+          const actId = newScreen.actId;
+          gameRefs.saveData.currentActId = actId;
+          gameRefs.screens.actScreen.actSelectMode();
+          gameRefs.screens.actScreen.drawActBtn();
+          gameRefs.screens.actScreen.drawLevelBtn(actId);
           break;
         }
-        case "ScreenSchem": {
-          gameRefs.saveData.act.activeScreen = "schem";
+        case "ScreenExec": {
+          gameRefs.saveData.activeScreen = "exec";
           const levelId = newScreen.levelId;
-          gameRefs.saveData.act.currentLevelId = levelId;
+          gameRefs.saveData.currentLevelId = levelId;
           gameRefs.screens.execScreen.reset();
           updateSolutionRep(gameRefs);
           break;
         }
         case "ScreenCodex": {
-          gameRefs.saveData.act.activeScreen = "codex";
+          gameRefs.saveData.activeScreen = "codex";
           if (newScreen.page !== undefined) {
             gameRefs.screens.codexScreen.page = newScreen.page;
           }
@@ -118,7 +103,7 @@ export function transitionScreen(
           break;
         }
         case "ScreenSettings": {
-          gameRefs.saveData.act.activeScreen = "settings";
+          gameRefs.saveData.activeScreen = "settings";
           break;
         }
       }

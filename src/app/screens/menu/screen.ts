@@ -31,7 +31,7 @@ export class MenuScreen {
     this.menuBtnPool.clear();
 
     // buttons are placed in reverse order on the screen
-    const l: ["settings", "codex", "schem", "menu"] = ["settings", "codex", "schem", "menu"];
+    const l: ["settings", "codex", "exec", "menu"] = ["settings", "codex", "exec", "menu"];
     const anims = l.map((type, i) => {
       return new Create(
         () => {
@@ -40,7 +40,7 @@ export class MenuScreen {
             "right", (120 * i), 100,
             "bot", 20, 100,
           );
-          if (this.gameRefs.saveData.act.activeScreen === type) {
+          if (this.gameRefs.saveData.activeScreen === type) {
             // this is the currently selected menu type
             sprite = this.menuBtnPool.newSprite(pos.xMin, pos.yMin, "not_selected", { type, index: i, originalX: pos.xMin });
           } else {
@@ -70,7 +70,7 @@ export class MenuScreen {
 }
 
 type MenuBtnData = {
-  type: "menu" | "schem" | "codex" | "settings",
+  type: "menu" | "exec" | "codex" | "settings",
   index: number,
   originalX: number,
 }
@@ -85,7 +85,7 @@ function mkMenuBtnPool(
       toFrame: (self, frameType) => {
         switch (self.data.type) {
           case "menu": return `menu_select_100_100.png`;
-          case "schem": return `menu_schem_100_100.png`;
+          case "exec": return `menu_schem_100_100.png`;
           case "codex": return `menu_codex_100_100.png`;
           case "settings": return `menu_options_100_100.png`;
         }
@@ -97,15 +97,15 @@ function mkMenuBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          if (! (gameRefs.saveData.act.activeScreen === self.data.type
-            || self.data.type === "schem" && gameRefs.saveData.act.currentLevelId === undefined)
+          if (! (gameRefs.saveData.activeScreen === self.data.type
+            || self.data.type === "exec" && gameRefs.saveData.currentLevelId === undefined)
           ) {
             switch (self.data.type) {
               case "menu": {
                 loadActMenu(gameRefs);
                 return;
               }
-              case "schem": {
+              case "exec": {
                 drawCurrentLevel(gameRefs);
                 return;
               }

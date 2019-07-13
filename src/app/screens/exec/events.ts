@@ -1,5 +1,4 @@
 import { GameRefs } from "../../../app/states/game";
-import { currentSolution, currentSolMap, levelData, setSolution, setLocation, selectedLevelId, initSol, emptyComposition, validComposition, selectedSchemLevelId, currentSol, compositionToKey, selectedSchemComposition, initSolution } from "../act/data";
 import { runSolution, extendSolution, SolutionData, cutSolution } from "../../../shared/game/solution";
 import { Location } from "../../../shared/tree";
 import { firstLogIndex } from "../../../shared/game/log";
@@ -7,9 +6,9 @@ import { runAsTween } from "../../phaser/animation";
 import { clearAnimations } from "../util";
 import { mkGameState } from "../../../shared/game/state";
 import { TargetId } from "../../../shared/definitions/entityId";
-import deepEqual from "deep-equal";
-import { CardId } from "src/shared/data/cardId";
-import { FrUnitId } from "src/shared/data/frUnitMap";
+import { FrUnitId } from "../../../shared/data/frUnitMap";
+import { selectedLevelId, getLevelSaveDataAndFillDefault, compositionToKey, validComposition, setLocation, currentSolution, setSolution } from "../../data/saveData";
+import { levelData } from "../../data/levelData";
 
 export function drawCurrentLevel(
   gameRefs: GameRefs,
@@ -23,18 +22,15 @@ export function drawCurrentLevel(
 export function updateSolutionRep(
   gameRefs: GameRefs,
 ) {
-  let sol = currentSol(gameRefs);
-  const levelId = selectedSchemLevelId(gameRefs);
+  const levelId = selectedLevelId(gameRefs);
   if (levelId === undefined) {
     return;
   }
 
-  if (sol === undefined) {
-    sol = initSol(gameRefs, levelId);
-  }
-  
-  const composition = sol.currentComposition;
-  const solMap = sol.solMap;
+  const saveData = getLevelSaveDataAndFillDefault(gameRefs, levelId);
+
+  const composition = saveData.currentComposition;
+  const solMap = saveData.solMap;
   const solData = solMap[compositionToKey(composition)];
 
   const frUnits = composition;
@@ -50,6 +46,7 @@ export function updateSolutionRep(
     gameRefs.screens.execScreen.drawTreeControlBtns();
     gameRefs.screens.execScreen.drawSwitchOrderBtns();
     gameRefs.screens.execScreen.drawClearBtn();
+    gameRefs.screens.execScreen.clearTree();
   } else {
     const solResult = runSolution(solData.solInfo.solution, solData.solInfo.loc, initState);
 
@@ -59,7 +56,7 @@ export function updateSolutionRep(
     // update tree rep
     clearAnimations(gameRefs.game, gameRefs.screens.execScreen);
     gameRefs.screens.execScreen.clearAnimPools();
-    gameRefs.screens.execScreen.drawTree(solData.solInfo!);
+    gameRefs.screens.execScreen.drawTree(solData.solInfo);
     if (prevState === undefined) {
       gameRefs.screens.execScreen.drawAnimControlBtns();
       gameRefs.screens.execScreen.drawTreeControlBtns();
@@ -96,11 +93,7 @@ export function extendLevelSolution(
   gameRefs: GameRefs,
   solData: SolutionData,
 ) {
-  let solInfo = currentSolution(gameRefs);
-  if (solInfo === undefined) {
-    console.log(`TEST: ${JSON.stringify(initSolution(gameRefs))}`);
-    solInfo = initSolution(gameRefs)!.solInfo;
-  }
+  const solInfo = currentSolution(gameRefs);
   const newSol = extendSolution(solData, solInfo.solution, solInfo.loc);
   setSolution(gameRefs, newSol);
 
@@ -113,14 +106,11 @@ export function changeLevelLoc(
   gameRefs: GameRefs,
   loc: Location,
 ) {
-  const solInfo = currentSolution(gameRefs);
-  if (solInfo !== undefined) {
-    setLocation(gameRefs, loc);
+  setLocation(gameRefs, loc);
 
-    updateSolutionRep(gameRefs);
-    gameRefs.screens.execScreen.clickState = undefined;
-    gameRefs.screens.execScreen.intermediate = undefined;
-  }
+  updateSolutionRep(gameRefs);
+  gameRefs.screens.execScreen.clickState = undefined;
+  gameRefs.screens.execScreen.intermediate = undefined;
 }
 
 export function cutLevelSolution(
@@ -128,14 +118,12 @@ export function cutLevelSolution(
   loc: Location,
 ) {
   const solInfo = currentSolution(gameRefs);
-  if (solInfo !== undefined) {
-    const newSolution = cutSolution(solInfo.solution, loc);
-    setSolution(gameRefs, newSolution);
+  const newSolution = cutSolution(solInfo.solution, loc);
+  setSolution(gameRefs, newSolution);
 
-    updateSolutionRep(gameRefs);
-    gameRefs.screens.execScreen.clickState = undefined;
-    gameRefs.screens.execScreen.intermediate = undefined;
-  }
+  updateSolutionRep(gameRefs);
+  gameRefs.screens.execScreen.clickState = undefined;
+  gameRefs.screens.execScreen.intermediate = undefined;
 }
 
 /*
@@ -173,8 +161,8 @@ export function deployUnit(
   cardId: FrUnitId,
   position: number,
 ) {
-  const levelId = selectedSchemLevelId(gameRefs);
-  gameRefs.saveData.act.levels[levelId!]!.currentComposition[position] = cardId;
+  const levelId = selectedLevelId(gameRefs);
+  gameRefs.saveData.levelSaves[levelId!]!.currentComposition[position] = cardId;
   updateSolutionRep(gameRefs);
   hideChangeUnitScreen(gameRefs);
 }

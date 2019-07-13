@@ -1,5 +1,4 @@
 import { GameRefs } from "../../states/game";
-import { currentSolMap } from "../act/data";
 import { updateSolutionRep } from "../exec/events";
 
 export function loadActScreen(
@@ -9,7 +8,7 @@ export function loadActScreen(
   gameRefs.screens.execScreen.setVisibility(false);
   gameRefs.screens.codexScreen.setVisibility(false);
   gameRefs.screens.settingsScreen.setVisibility(false);
-  gameRefs.saveData.act.activeScreen = "menu";
+  gameRefs.saveData.activeScreen = "menu";
   gameRefs.screens.actScreen.draw();
   gameRefs.screens.menuScreen.redrawMenuBtn();
 }
@@ -21,7 +20,7 @@ export function loadExecScreen(
   gameRefs.screens.execScreen.setVisibility(true);
   gameRefs.screens.codexScreen.setVisibility(false);
   gameRefs.screens.settingsScreen.setVisibility(false);
-  gameRefs.saveData.act.activeScreen = "schem";
+  gameRefs.saveData.activeScreen = "exec";
   updateSolutionRep(gameRefs);
   gameRefs.screens.menuScreen.redrawMenuBtn();
 }
@@ -33,7 +32,7 @@ export function loadCodexScreen(
   gameRefs.screens.execScreen.setVisibility(false);
   gameRefs.screens.codexScreen.setVisibility(true);
   gameRefs.screens.settingsScreen.setVisibility(false);
-  gameRefs.saveData.act.activeScreen = "codex";
+  gameRefs.saveData.activeScreen = "codex";
   gameRefs.screens.codexScreen.drawPage();
   gameRefs.screens.menuScreen.redrawMenuBtn();
 }
@@ -45,6 +44,6 @@ export function loadSettingsScreen(
   gameRefs.screens.execScreen.setVisibility(false);
   gameRefs.screens.codexScreen.setVisibility(false);
   gameRefs.screens.settingsScreen.setVisibility(true);
-  gameRefs.saveData.act.activeScreen = "settings";
+  gameRefs.saveData.activeScreen = "settings";
   gameRefs.screens.menuScreen.redrawMenuBtn();
 }

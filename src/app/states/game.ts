@@ -1,5 +1,4 @@
 import { ActScreen } from "../screens/act/screen";
-import { ActSaveData, mkActSaveData } from "../screens/act/data";
 import { BgScreen } from "../screens/bg/screen";
 import { MenuScreen } from "../screens/menu/screen";
 import { settings } from "../data/settings";
@@ -7,6 +6,7 @@ import { createPosition } from "../util/position";
 import { ExecScreen } from "../screens/exec/screen";
 import { CodexScreen } from "../screens/codex/screen";
 import { SettingsScreen } from "../screens/settings/screen";
+import { SaveData, emptySaveData } from "../data/saveData";
 
 export type GameRefs = {
   game: Phaser.Game,
@@ -18,9 +18,7 @@ export type GameRefs = {
     codexScreen: CodexScreen,
     settingsScreen: SettingsScreen,
   },
-  saveData: {
-    act: ActSaveData,
-  },
+  saveData: SaveData,
   filters: {
     [K in string]: Phaser.Filter
   }
@@ -56,9 +54,7 @@ export default class Game extends Phaser.State {
         codexScreen: <any>undefined,
         settingsScreen: <any>undefined,
       },
-      saveData: {
-        act: mkActSaveData(),
-      },
+      saveData: emptySaveData(),
       filters: {
         "blue-glow": blueGlow,
       },

@@ -32,8 +32,9 @@ import { abilityDescription } from "../../../shared/game/ability";
 import { settings } from "../../data/settings";
 import { CardId } from "../../../shared/data/cardId";
 import { drawLine } from "../../phaser/line";
-import { levelData, selectedSchemLevelId, LevelDataKeys } from "../act/data";
-import { FrUnitId } from "src/shared/data/frUnitMap";
+import { FrUnitId } from "../../../shared/data/frUnitMap";
+import { selectedLevelId } from "../../data/saveData";
+import { levelData } from "../../data/levelData";
 
 export class ExecScreen {
   clearBtnPool: Pool<{}, {}>
@@ -651,7 +652,7 @@ export class ExecScreen {
       );
       this.unitSelectBgPool.newSprite(bgPos.xMin, bgPos.yMin, {}, {});
 
-      const levelId = selectedSchemLevelId(this.gameRefs);
+      const levelId = selectedLevelId(this.gameRefs);
       const slots = levelData[levelId!].slots;
       const cardIds = levelData[levelId!].cardIds[(slots - 1) - this.selecting];
       cardIds.forEach((cardId, cardIdIndex) => {
@@ -886,10 +887,14 @@ export class ExecScreen {
     });
   }
 
+  clearTree() {
+    this.solTreePool.clear();
+  }
+
   setLogAnimationSpeed(
     speed: SpeedType,
   ) {
-    this.gameRefs.saveData.act.animationSpeeds.log = speed;
+    this.gameRefs.saveData.animationSpeeds.log = speed;
     const tweens = this.gameRefs.game.tweens.getAll();
     tweens.forEach(tween => {
       if ( (<any>tween).data !== undefined
@@ -1270,7 +1275,7 @@ function mkLogActionPool(
         (self, tween) => {
           tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
           (<any>tween).data = { log: true };
-          tween.timeScale = speedTypeToSpeed(gameRefs.saveData.act.animationSpeeds.log);
+          tween.timeScale = speedTypeToSpeed(gameRefs.saveData.animationSpeeds.log);
         },
       ],
       callbacks: {
@@ -1335,7 +1340,7 @@ function mkLogTriggerPool(
         (self, tween) => {
           tween.from({ y: self.y - 50 }, 1000, Phaser.Easing.Linear.None, false, 5);
           (<any>tween).data = { log: true };
-          tween.timeScale = speedTypeToSpeed(gameRefs.saveData.act.animationSpeeds.log);
+          tween.timeScale = speedTypeToSpeed(gameRefs.saveData.animationSpeeds.log);
         },
       ],
       callbacks: {

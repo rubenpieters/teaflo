@@ -1,4 +1,3 @@
-import { actData, selectedActId, selectedMenu, SelectedActMenu, LevelDataKeys } from "../../screens/act/data";
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { settings } from "../../data/settings";
 import { createPosition, Position } from "../../util/position";
@@ -6,7 +5,10 @@ import { chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
 import { addText, DataSprite, clearShader, addShader } from "../../phaser/datasprite";
-import { ScreenAct, transitionScreen, ScreenSchem } from "../transition";
+import { ScreenAct, transitionScreen, ScreenExec } from "../transition";
+import { selectedActId } from "../../data/saveData";
+import { actData, ActDataKeys } from "../../data/actData";
+import { LevelDataKeys } from "../../data/levelData";
 
 export class ActScreen {
   actBtnPool: Pool<ActBtnData, "neutral" | "hover" | "down">
@@ -22,21 +24,8 @@ export class ActScreen {
   }
 
   draw() {
-    const menu = selectedMenu(this.gameRefs);
-    if (menu === undefined) {
-      this.drawActBtn();
-      return;
-    }
-    switch (menu.tag) {                                                                                             
-      case "SelectedActMenu": {
-        changeAct(this.gameRefs, menu.actId);
-        break;
-      }
-      case "SelectedLevelMenu": {
-        changeLevel(this.gameRefs, menu.levelId);
-        break;
-      }
-    }
+    const actId = this.gameRefs.saveData.currentActId;
+    changeAct(this.gameRefs, actId);
   }
 
   drawActBtn() {
@@ -53,7 +42,7 @@ export class ActScreen {
 
     let i = 0;
     for (const actKey in actData) {
-      const actId = Number(actKey);
+      const actId = Number(actKey) as ActDataKeys;
 
       let pos: Position;
       let frame: "down" | "neutral" | "hover";
@@ -88,14 +77,14 @@ export class ActScreen {
   }
 
   drawLevelBtn(
-    actId: number,
+    actId: ActDataKeys,
   ) {
     this.levelBtnPool.clear();
     this._drawLevelBtn(actId);
   }
 
   private _drawLevelBtn(
-    actId: number,
+    actId: ActDataKeys,
   ) {
     const levels = actData[actId].levels;
     const anims = new ParAnimation(levels.map((levelData, levelIndex) => {
@@ -146,7 +135,7 @@ export class ActScreen {
 }
 
 type ActBtnData = {
-  actId: number,
+  actId: ActDataKeys,
   actIndex: number,
 }
 
@@ -171,7 +160,7 @@ function mkActBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          transitionScreen(gameRefs, new ScreenAct(new SelectedActMenu(self.data.actId)));
+          transitionScreen(gameRefs, new ScreenAct(self.data.actId));
         },
         hoverOver: (self) => {
           addShader(gameRefs, self, "blue-glow");
@@ -216,7 +205,7 @@ function mkLevelBtnPool(
       ],
       callbacks: {
         click: (self) => {
-          transitionScreen(gameRefs, new ScreenSchem(self.data.levelId));
+          transitionScreen(gameRefs, new ScreenExec(self.data.levelId));
         },
         hoverOver: (self) => {
           addShader(gameRefs, self, "blue-glow");
