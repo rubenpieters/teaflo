@@ -24,13 +24,13 @@ export const actData = {
   1: {
     shortName: "2",
     longName: "Act 2",
-    levels: [L.a2l1],
+    levels: [L.a3l2, L.a3l3, L.a3l4],
     bgSprite: "sel_act1.png",
   },
   2: {
     shortName: "3",
     longName: "Act 3",
-    levels: [L.a3l1, L.a3l2, L.a3l3, L.a3l4, L.a3l5],
+    levels: [L.a2l1],
     bgSprite: "sel_act1.png",
   },
 }

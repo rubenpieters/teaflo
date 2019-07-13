@@ -7,6 +7,7 @@ import { ExecScreen } from "../screens/exec/screen";
 import { CodexScreen } from "../screens/codex/screen";
 import { SettingsScreen } from "../screens/settings/screen";
 import { SaveData, emptySaveData } from "../data/saveData";
+import { transitionScreen, ScreenAct } from "../screens/transition";
 
 export type GameRefs = {
   game: Phaser.Game,
@@ -74,8 +75,7 @@ export default class Game extends Phaser.State {
     gameRefs.screens.settingsScreen = settingsScreen;
 
     bgScreen.initialize();
-    actScreen.drawActBtn();
-    menuScreen.drawMenuBtn();
+    transitionScreen(gameRefs, new ScreenAct(0));
   }
 
   public update(): void {
