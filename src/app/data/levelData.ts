@@ -10,6 +10,7 @@ export type LevelData = {
   cardIds: FrUnitId[][],
   enemyIds: EnUnitId[],
   slots: number,
+  dev?: boolean,
 }
 
 export const a1l1: LevelData = {
@@ -80,6 +81,7 @@ export const a1l7: LevelData = {
   cardIds: [["a1l7_fr1"], ["a1l7_fr2"], ["a1l7_fr3"]],
   enemyIds: ["a1l7_en1"],
   slots: 3,
+  dev: true,
 };
 
 

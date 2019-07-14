@@ -92,15 +92,21 @@ export class ActScreen {
         "left", levelData.iconLocation.x, 400,
         "top", levelData.iconLocation.y, 200,
       );
-      return new Create(() => {
-        return this.levelBtnPool.newSprite(pos.xMin, pos.yMin, "neutral",
-          { levelId, levelIndex, icon: levelData.icon }
-        );
-      }, self => {
-        return new BaseAnimation(150, self, tween => {
-          tween.from({ alpha: 0 }, 300, Phaser.Easing.Linear.None, false, 50);
+      if (levelData.dev !== undefined && levelData.dev && ! this.gameRefs.settings.devMode) {
+        return new BaseAnimation(1, self, tween => {
+          
         });
-      });
+      } else {
+        return new Create(() => {
+          return this.levelBtnPool.newSprite(pos.xMin, pos.yMin, "neutral",
+            { levelId, levelIndex, icon: levelData.icon }
+          );
+        }, self => {
+          return new BaseAnimation(150, self, tween => {
+            tween.from({ alpha: 0 }, 300, Phaser.Easing.Linear.None, false, 50);
+          });
+        });
+      }
     }));
 
     runAsTween(this.gameRefs, anims);
