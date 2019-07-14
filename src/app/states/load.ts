@@ -42,6 +42,7 @@ export default class Load extends Phaser.State {
 
     // load shaders
     this.game.load.shader("blue-glow", "assets/shaders/blue-glow.frag");
+    this.game.load.shader("blue-flame", "assets/shaders/blue-flame.frag");
 
     // indicate loading is done
     loadingText.setText("Click anywhere to continue...");

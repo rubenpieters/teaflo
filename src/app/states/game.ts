@@ -43,6 +43,9 @@ export default class Game extends Phaser.State {
     const blueGlow = new Phaser.Filter(this.game, {},
       this.game.cache.getShader("blue-glow")
     );
+    const blueFlame = new Phaser.Filter(this.game, {},
+      this.game.cache.getShader("blue-flame")
+    );
 
     // TODO: should screens be part of gameRefs?
     gameRefs = {
@@ -58,6 +61,7 @@ export default class Game extends Phaser.State {
       saveData: emptySaveData(),
       filters: {
         "blue-glow": blueGlow,
+        "blue-flame": blueFlame,
       },
     }
 
