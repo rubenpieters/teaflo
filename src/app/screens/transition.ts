@@ -104,6 +104,7 @@ export function transitionScreen(
         }
         case "ScreenSettings": {
           gameRefs.saveData.activeScreen = "settings";
+          gameRefs.screens.settingsScreen.drawBtn();
           break;
         }
       }

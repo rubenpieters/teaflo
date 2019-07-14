@@ -29,7 +29,6 @@ import { StatusTag } from "../../../shared/definitions/status";
 import { groupFromDesc } from "../../util/description";
 import { actionDescription } from "../../../shared/game/action";
 import { abilityDescription } from "../../../shared/game/ability";
-import { settings } from "../../data/settings";
 import { CardId } from "../../../shared/data/cardId";
 import { drawLine } from "../../phaser/line";
 import { FrUnitId } from "../../../shared/data/frUnitMap";
@@ -207,10 +206,10 @@ export class ExecScreen {
     // draw friendly units
     state.frUnits.units.forEach((unit, unitIndex) => {
       if (unit === undefined) {
-        const unitPos = friendlyUnitPos(state, unitIndex);
+        const unitPos = friendlyUnitPos(this.gameRefs.settings, state, unitIndex);
         this.emptySlotPool.newSprite(unitPos.xMin, unitPos.yMin, {}, { position: unitIndex });
       } else if (unit !== undefined) {
-        const unitPos = friendlyUnitPos(state, unitIndex);
+        const unitPos = friendlyUnitPos(this.gameRefs.settings, state, unitIndex);
         const utilityPos = unitUtilityPositions(unitPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
@@ -276,7 +275,7 @@ export class ExecScreen {
 
         // TH
         enIds.forEach((enId, enIndex) => {
-          const unitThPos = createPosition(
+          const unitThPos = createPosition(this.gameRefs.settings,
             "left", 245 + 170 * unitIndex + 30 * enIndex, 25,
             "top", 740, 50,
           );
@@ -289,7 +288,7 @@ export class ExecScreen {
           const threat = unit.threatMap[enId.id] === undefined ? 0 : unit.threatMap[enId.id];
           unitThSprite.width = 25;
           unitThSprite.height = threat / maxThreat * 50;
-          const thTextPos = createPosition(
+          const thTextPos = createPosition(this.gameRefs.settings,
             "left", 245 + 170 * unitIndex + 30 * enIndex, 25,
             "top", 800, 20,
           );
@@ -301,7 +300,7 @@ export class ExecScreen {
           if (abilityIndex >= 4) { throw "ability index should be below 4" };
           const flagTop = abilityIndex % 2;
           const flagLeft = abilityIndex < 2 ? 0 : 1;
-          const abPos = createPosition(
+          const abPos = createPosition(this.gameRefs.settings,
             "left", 250 + 170 * unitIndex + 75 * flagLeft, 70,
             "top", 830 + 75 * flagTop, 70,
           );
@@ -324,7 +323,7 @@ export class ExecScreen {
     // draw enemy units
     state.enUnits.units.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
-        const unitPos = enemyUnitPos(state, unitIndex);
+        const unitPos = enemyUnitPos(this.gameRefs.settings, state, unitIndex);
         const utilityPos = unitUtilityPositions(unitPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
@@ -416,7 +415,7 @@ export class ExecScreen {
     // AETHER
     groupOrder.forEach((tag, tagIndex) => {
       state.statusRows[tag].statuses.forEach((status, statusIndex) => {
-        const triggerPos = statusPos(state, this.statusesById!, this.statusOrder, status.id, statusIndex, tagIndex);
+        const triggerPos = statusPos(this.gameRefs.settings, state, this.statusesById!, this.statusOrder, status.id, statusIndex, tagIndex);
         const trSprite = this.triggerPool.newSprite(triggerPos.xMin, triggerPos.yMin, {}, { status });
         if (currentInputType !== undefined && ! matchUserInput(currentInputType, status.id)) {
           trSprite.alpha = 0.3;
@@ -431,9 +430,9 @@ export class ExecScreen {
           const start = center(triggerPos);
           let end: { x: number, y: number } = undefined as any;
           if (status.owner.type === "friendly") {
-            end = center(friendlyUnitPos(state, status.owner as EntityId<"friendly">));
+            end = center(friendlyUnitPos(this.gameRefs.settings, state, status.owner as EntityId<"friendly">));
           } else if (status.owner.type === "enemy") {
-            end = center(enemyUnitPos(state, status.owner as EntityId<"enemy">));
+            end = center(enemyUnitPos(this.gameRefs.settings, state, status.owner as EntityId<"enemy">));
           }
           drawLine(this.hoverGraphicsPool, start, end);
         }
@@ -444,7 +443,7 @@ export class ExecScreen {
   drawAnimControlBtns() {
     const types: ["pause", "play", "fast", "skip"] = ["pause", "play", "fast", "skip"];
     types.map((type, typeIndex) => {
-      const pos = createPosition(
+      const pos = createPosition(this.gameRefs.settings,
         "left", 20 + 61 * typeIndex, 60,
         "top", 900, 60,
       );
@@ -456,7 +455,7 @@ export class ExecScreen {
     this.treeControlBtnPool.clear();
     const types: ["remove"] = ["remove"];
     types.map((type, typeIndex) => {
-      const pos = createPosition(
+      const pos = createPosition(this.gameRefs.settings,
         "left", 50, 60,
         "top", 1000 + 50 * typeIndex, 60,
       );
@@ -470,7 +469,7 @@ export class ExecScreen {
 
   drawSwitchOrderBtns() {
     this.switchStatusOrderBtnPool.clear();
-    const pos = createPosition(
+    const pos = createPosition(this.gameRefs.settings,
       "left", unitEnMinX - 250, 60,
       "top", unitFrMinY - 50, 60,
     );
@@ -493,7 +492,7 @@ export class ExecScreen {
         if (
           this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id)
         ) {
-          const unitPos = friendlyUnitPos(state, unitIndex);
+          const unitPos = friendlyUnitPos(this.gameRefs.settings, state, unitIndex);
           const hoverBarPos = relativeTo(unitPos,
             [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
             0, 0,
@@ -509,7 +508,7 @@ export class ExecScreen {
         if (
           this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id)
         ) {
-          const unitPos = enemyUnitPos(state, unitIndex);
+          const unitPos = enemyUnitPos(this.gameRefs.settings, state, unitIndex);
           const hoverBarPos = relativeTo(unitPos,
             [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
             0, 0,
@@ -521,7 +520,7 @@ export class ExecScreen {
     });
     groupOrder.forEach((tag, tagIndex) => {
       state.statusRows[tag].statuses.forEach((status, statusIndex) => {
-        const triggerPos = statusPos(state, this.statusesById!, this.statusOrder, status.id, statusIndex, tagIndex);
+        const triggerPos = statusPos(this.gameRefs.settings, state, this.statusesById!, this.statusOrder, status.id, statusIndex, tagIndex);
         // hover graphics
         if (
           this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, status.id)
@@ -531,7 +530,7 @@ export class ExecScreen {
           const centerTriggerPos = center(triggerPos);
           this.hoverGraphicsPool.moveTo(centerTriggerPos.x, centerTriggerPos.y);
           if (status.owner.type === "friendly") {
-            const ownerPosCenter = center(friendlyUnitPos(state, new EntityId(status.owner.id, "friendly")));
+            const ownerPosCenter = center(friendlyUnitPos(this.gameRefs.settings, state, new EntityId(status.owner.id, "friendly")));
             this.hoverGraphicsPool.lineTo(ownerPosCenter.x, ownerPosCenter.y); 
           }
           this.hoverGraphicsPool.endFill();
@@ -548,7 +547,7 @@ export class ExecScreen {
 
         const unit: StStatus | undefined = getTarget(state, statusId);
         if (unit !== undefined) {
-          const pos1 = createPosition(
+          const pos1 = createPosition(this.gameRefs.settings,
             "left", 650, 150,
             "bot", 100, 300,
           );
@@ -596,7 +595,7 @@ export class ExecScreen {
       const typeIndex = x.typeIndex;
       const entry = getLogEntry(this.log!, x.logIndex);
 
-      const pos = createPosition(
+      const pos = createPosition(this.gameRefs.settings,
         "left", 20 + 50 * entryIndex, 40,
         "top", 120 + 80 * typeIndex, 40,
       );
@@ -647,7 +646,7 @@ export class ExecScreen {
     this.unitSelectBgPool.clear();
 
     if (this.selecting !== undefined) {
-      const bgPos = relativeTo(friendlyUnitPos(this.currentState(), this.selecting),
+      const bgPos = relativeTo(friendlyUnitPos(this.gameRefs.settings, this.currentState(), this.selecting),
         [{type: "above", amt: 10}], 550, 190
       );
       this.unitSelectBgPool.newSprite(bgPos.xMin, bgPos.yMin, {}, {});
@@ -747,17 +746,17 @@ export class ExecScreen {
       case "status": {
         const id = _id as StatusId;
 
-        return statusPos(state, this.statusesById!, this.statusOrder, id);
+        return statusPos(this.gameRefs.settings, state, this.statusesById!, this.statusOrder, id);
       }
       case "enemy": {
         const id = _id as EnemyId;
 
-        return enemyUnitPos(state, id);
+        return enemyUnitPos(this.gameRefs.settings, state, id);
       }
       case "friendly": {
         const id = _id as FriendlyId;
 
-        return friendlyUnitPos(state, id);
+        return friendlyUnitPos(this.gameRefs.settings, state, id);
       }
     }
   }
@@ -786,7 +785,7 @@ export class ExecScreen {
       introTween: (sprite: DataSprite<LogTriggerData>) => {
         const tween = this.logTriggerPool.introTween(sprite);
         if (tween !== undefined) {
-          const textPos = createPosition(
+          const textPos = createPosition(this.gameRefs.settings,
             "left", 680, 100,
             "top", 200, 100,
           );

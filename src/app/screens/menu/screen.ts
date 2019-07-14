@@ -6,7 +6,6 @@ import { drawCurrentLevel } from "../exec/events";
 import { DataSprite, clearShader, addShader } from "../../phaser/datasprite";
 import { loadActMenu } from "../act/events";
 import { transitionScreen, ScreenCodex, ScreenSettings } from "../transition";
-import { settings } from "../../data/settings";
 
 export class MenuScreen {
   menuBgPool: Pool<MenuBgData, {}>
@@ -36,7 +35,7 @@ export class MenuScreen {
       return new Create(
         () => {
           let sprite;
-          const pos = createPosition(
+          const pos = createPosition(this.gameRefs.settings,
             "right", (120 * i), 100,
             "bot", 20, 100,
           );

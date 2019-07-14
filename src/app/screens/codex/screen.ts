@@ -8,7 +8,6 @@ import { Pool } from "../../phaser/pool";
 import { aiIndices } from "../../../shared/game/ai";
 import { groupFromDesc } from "../../util/description";
 import { abilityDescription } from "../../../shared/game/ability";
-import { settings } from "../../data/settings";
 
 export type CodexTypes
   = { tag: "FrCardId", cardId: FrUnitId }
@@ -66,19 +65,19 @@ export class CodexScreen {
         "top", 50, 200,
       );
       this.pageTextPool.newText(pos, `${cardId}`);*/
-      const pos1 = createPosition(
+      const pos1 = createPosition(this.gameRefs.settings,
         "left", 550, 150,
         "top", 50, 150,
       );
       this.pageTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
-      const pos2 = createPosition(
+      const pos2 = createPosition(this.gameRefs.settings,
         "left", 550, 150,
         "top", 200, 150,
       );
       this.pageTextPool.newText(pos2, `${unit.charges} / ${unit.maxCharges}`);
       
       unit.abilities.forEach((ability, abilityIndex) => {
-        const pos = createPosition(
+        const pos = createPosition(this.gameRefs.settings,
           "left", 550 + 125 * abilityIndex, 100,
           "top", 350, 100,
         );
@@ -101,12 +100,12 @@ export class CodexScreen {
         "top", 50, 200,
       );
       this.pageTextPool.newText(pos, `${cardId}`);*/
-      const pos1 = createPosition(
+      const pos1 = createPosition(this.gameRefs.settings,
         "left", 550, 150,
         "top", 50, 150,
       );
       this.pageTextPool.newText(pos1, `${unit.hp} / ${unit.maxHp}`);
-      const pos2 = createPosition(
+      const pos2 = createPosition(this.gameRefs.settings,
         "left", 550, 150,
         "top", 200, 150,
       );
@@ -115,7 +114,7 @@ export class CodexScreen {
       aiIndices.forEach(aiIndex => {
         const ability = unit.abilities[aiIndex];
         if (ability !== undefined) {
-          const pos = createPosition(
+          const pos = createPosition(this.gameRefs.settings,
             "left", 550 + 125 * aiIndex, 100,
             "top", 350, 100,
           );
@@ -141,7 +140,7 @@ export class CodexScreen {
           if (this.showAbilityIndex !== undefined && this.showAbilityIndex === abilityIndex) {
             groupFromDesc(
               abilityDescription(ability.ability),
-              40, { x: 150, y: (settings.gameHeight - 220) }, () => { return {} }, sprite => { return { sprite }},
+              40, { x: 150, y: (this.gameRefs.settings.gameHeight - 220) }, () => { return {} }, sprite => { return { sprite }},
               this.abilityDescPool,
             );
           }
@@ -155,7 +154,7 @@ export class CodexScreen {
             if (this.showAbilityIndex !== undefined && this.showAbilityIndex === aiIndex) {
               groupFromDesc(
                 abilityDescription(ability.ability),
-                40, { x: 150, y: (settings.gameHeight - 220) }, () => { return {} }, sprite => { return { sprite }},
+                40, { x: 150, y: (this.gameRefs.settings.gameHeight - 220) }, () => { return {} }, sprite => { return { sprite }},
                 this.abilityDescPool,
               );
             }

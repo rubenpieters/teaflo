@@ -1,8 +1,11 @@
-import { settings } from "../data/settings";
+import { Settings } from "../data/settings";
 
 
 export default class Boot extends Phaser.State {
-  public init(): void {
+  settings: Settings = undefined as any;
+
+  public init(settings: Settings): void {
+    this.settings = settings;
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.scale.maxWidth = settings.gameWidth;
     this.scale.maxHeight = settings.gameHeight;
@@ -11,6 +14,6 @@ export default class Boot extends Phaser.State {
   }
 
   public create(): void {
-    this.game.state.start("load");
+    this.game.state.start("load", undefined, undefined, this.settings);
   }
 }

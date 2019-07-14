@@ -5,6 +5,7 @@ import { groupOrder } from "../../../shared/game/status";
 import { GameState } from "../../../shared/definitions/state";
 import { StStatus } from "src/shared/definitions/statusRow";
 import deepEqual = require("deep-equal");
+import { Settings } from "src/app/data/settings";
 
 /*
 
@@ -45,6 +46,7 @@ export const explY = unitEnMinY + 650;
 export const explArrowEnd = { x: explX - 30, y: explY + 40 };
 
 export function friendlyUnitPos(
+  settings: Settings,
   state: GameState,
   unitId: FriendlyId | number,
 ) {
@@ -58,13 +60,14 @@ export function friendlyUnitPos(
   } else {
     frPosition = unitId;
   }
-  return createPosition(
+  return createPosition(settings,
     "left", unitFrMinX + 170 * frPosition, unitSizeX,
     "top", unitFrMinY, unitSizeY,
   );
 }
 
 export function enemyUnitPos(
+  settings: Settings,
   state: GameState,
   unitId: EnemyId | number,
 ) {
@@ -78,7 +81,7 @@ export function enemyUnitPos(
   } else {
     enPosition = unitId;
   }
-  return createPosition(
+  return createPosition(settings,
     "left", unitEnMinX + 210 * enPosition, unitSizeX,
     "top", unitEnMinY, unitSizeY,
   );
@@ -122,6 +125,7 @@ export function unitUtilityPositions(
 }
 
 export function statusPos(
+  settings: Settings,
   state: GameState,
   statusesById: { fr: StStatus[][], en: StStatus[][], },
   statusOrder: "byOrder" | "byId",
@@ -140,7 +144,7 @@ export function statusPos(
       columnPosition = result.columnPosition;
       rowPosition = result.rowPosition;
     }
-    return createPosition(
+    return createPosition(settings,
       "left", 240 + 50 * columnPosition, 40,
       "top", 50 + 50 * rowPosition, 40,
     );
@@ -150,7 +154,7 @@ export function statusPos(
     if (statusInfo === undefined) {
       statusInfo = findStatus(statusesById.en, statusId);
     } else {
-      basePos = friendlyUnitPos(state, statusInfo.unitId);
+      basePos = friendlyUnitPos(settings, state, statusInfo.unitId);
       return relativeTo(basePos,
         [{ type: "above", amt: 100 }, { type: "right", amt: 40 * statusInfo.stId }],
         40, 40,
@@ -159,7 +163,7 @@ export function statusPos(
     if (statusInfo === undefined) {
       throw `can not find ${JSON.stringify(statusId)}`;
     } else {
-      basePos = enemyUnitPos(state, statusInfo.unitId);
+      basePos = enemyUnitPos(settings, state, statusInfo.unitId);
     }
 
     return relativeTo(basePos,

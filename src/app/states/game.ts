@@ -1,7 +1,7 @@
 import { ActScreen } from "../screens/act/screen";
 import { BgScreen } from "../screens/bg/screen";
 import { MenuScreen } from "../screens/menu/screen";
-import { settings } from "../data/settings";
+import { Settings } from "../data/settings";
 import { createPosition } from "../util/position";
 import { ExecScreen } from "../screens/exec/screen";
 import { CodexScreen } from "../screens/codex/screen";
@@ -22,18 +22,21 @@ export type GameRefs = {
   saveData: SaveData,
   filters: {
     [K in string]: Phaser.Filter
-  }
+  },
+  settings: Settings,
 }
 
 let gameRefs: GameRefs;
 
 export default class Game extends Phaser.State {
+  settings: Settings = undefined as any;
+
   public preload(): void {
     this.game.time.advancedTiming = true;
   }
 
-  public init(): void {
-
+  public init(settings: Settings): void {
+    this.settings = settings;
   }
 
   public create(): void {
@@ -51,18 +54,19 @@ export default class Game extends Phaser.State {
     gameRefs = {
       game: this.game,
       screens: {
-        bgScreen: <any>undefined,
-        actScreen: <any>undefined,
-        menuScreen: <any>undefined,
-        execScreen: <any>undefined,
-        codexScreen: <any>undefined,
-        settingsScreen: <any>undefined,
+        bgScreen: undefined as any,
+        actScreen: undefined as any,
+        menuScreen: undefined as any,
+        execScreen: undefined as any,
+        codexScreen: undefined as any,
+        settingsScreen: undefined as any,
       },
       saveData: emptySaveData(),
       filters: {
         "blue-glow": blueGlow,
         "blue-flame": blueFlame,
       },
+      settings: this.settings,
     }
 
     const bgScreen = new BgScreen(gameRefs);
@@ -89,16 +93,18 @@ export default class Game extends Phaser.State {
   }
 
   public render(): void {
-    const pos = createPosition(
-      "right", 70, settings.gameWidth,
-      "top", 20, settings.gameHeight,
-    );
-    this.game.debug.text(`${this.game.time.fps} FPS` || '--', pos.xMax, pos.yMin, "#00ff00");
-    const pos2 = createPosition(
-      "right", 140, settings.gameWidth,
-      "top", 40, settings.gameHeight,
-    );
-    this.game.debug.text(`x: ${this.game.input.x} y: ${this.game.input.y}`, pos2.xMax, pos2.yMin);
-    //this.game.debug.text(`${gameRefs.screens.levelScreen.buildCardPool.countLiving()}` || '--', pos2.xMax, pos2.yMin, "#00ff00");
+    if (gameRefs.settings.devMode) {
+      const pos = createPosition(this.settings,
+        "right", 70, this.settings.gameWidth,
+        "top", 20, this.settings.gameHeight,
+      );
+      this.game.debug.text(`${this.game.time.fps} FPS` || '--', pos.xMax, pos.yMin, "#00ff00");
+      const pos2 = createPosition(this.settings,
+        "right", 140, this.settings.gameWidth,
+        "top", 40, this.settings.gameHeight,
+      );
+      this.game.debug.text(`x: ${this.game.input.x} y: ${this.game.input.y}`, pos2.xMax, pos2.yMin);
+      //this.game.debug.text(`${gameRefs.screens.levelScreen.buildCardPool.countLiving()}` || '--', pos2.xMax, pos2.yMin, "#00ff00");
+    }
   }
 }

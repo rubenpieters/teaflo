@@ -1,5 +1,4 @@
 import { Pool, mkButtonPool } from "../../phaser/pool";
-import { settings } from "../../data/settings";
 import { createPosition, Position } from "../../util/position";
 import { chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween, ParAnimation, Create } from "../../phaser/animation";
 import { GameRefs } from "../../states/game";
@@ -48,14 +47,14 @@ export class ActScreen {
       let frame: "down" | "neutral" | "hover";
       if (selActId !== undefined && selActId === actId) {
         // this is the currently selected act
-        pos = createPosition(
+        pos = createPosition(this.gameRefs.settings,
           "left", 100 + 210 * i, 200,
           "top", 0, 400,
         );
         frame = "down";
       } else {
         // this is not the currently selected act
-        pos = createPosition(
+        pos = createPosition(this.gameRefs.settings,
           "left", 100 + 210 * i, 400,
           "top", 0, 200,
         );
@@ -89,7 +88,7 @@ export class ActScreen {
     const levels = actData[actId].levels;
     const anims = new ParAnimation(levels.map((levelData, levelIndex) => {
       const levelId = levelData.id;
-      const pos = createPosition(
+      const pos = createPosition(this.gameRefs.settings,
         "left", levelData.iconLocation.x, 400,
         "top", levelData.iconLocation.y, 200,
       );

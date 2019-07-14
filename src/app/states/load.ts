@@ -1,10 +1,13 @@
-import { settings } from "../data/settings";
+import { Settings } from "../data/settings";
 
 let loadingText: Phaser.Text;
 let ready: boolean = false;
 
 export default class Load extends Phaser.State {
-  public init(): void {
+  settings: Settings = undefined as any;
+
+  public init(settings: Settings): void {
+    this.settings = settings;
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.scale.maxWidth = settings.gameWidth;
     this.scale.maxHeight = settings.gameHeight;
@@ -56,6 +59,6 @@ export default class Load extends Phaser.State {
   }
 
   private startGame(): void {
-    this.game.state.start("game");
+    this.game.state.start("game", undefined, undefined, this.settings);
   }
 }

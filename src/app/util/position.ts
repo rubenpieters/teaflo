@@ -1,4 +1,4 @@
-import { settings } from "../data/settings";
+import { Settings } from "../data/settings";
 
 export type Position = {
   xMin: number,
@@ -8,6 +8,7 @@ export type Position = {
 }
 
 export function createPosition(
+  settings: Settings,
   fromX: "left" | "right",
   x: number,
   width: number,
