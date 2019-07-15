@@ -1,6 +1,7 @@
 import { GameRefs } from "../../states/game";
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { addText } from "../../phaser/datasprite";
+import { saveSettings } from "../../data/settings";
 
 export class SettingsScreen {
   btnPool: Pool<BtnData, "neutral" | "hover" | "down">
@@ -50,6 +51,7 @@ function mkBtnPool(
         click: (self) => {
           gameRefs.settings.devMode = ! gameRefs.settings.devMode;
           gameRefs.screens.settingsScreen.drawBtn();
+          saveSettings(gameRefs);
         },
       },
     },
