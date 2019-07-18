@@ -10,36 +10,24 @@ import { TargetInput, EnemyInput, FriendlyInput } from "../../definitions/input"
  * Fr Unit
  */
 export const a1l2_fr_ab1: Ability =
-  new A.Damage("Ability", "Target", new Ab.Static(5), new Ab.FromInput(0))
-  ;
-
-export const a1l2_fr_ab2: Ability =
   A.combinedAbility([
-    new A.UseCharge("Ability", "Target", new Ab.Static(5), new Ab.Self()),
-    new A.Damage("Ability", "Target", new Ab.Static(20), new Ab.FromInput(0)),
+    new A.UseCharge("Ability", "Target", new Ab.Static(9), new Ab.Self()),
+    new A.Damage("Ability", "Target", new Ab.Static(9), new Ab.FromInput(0)),
   ]);
 
 export const a1l2_fr: FrUnit = {
-  hp: 20,
-  maxHp: 20,
-  charges: 3,
-  maxCharges: 5,
+  hp: 40,
+  maxHp: 40,
+  charges: 0,
+  maxCharges: 50,
   abilities: [
     {
       ability: a1l2_fr_ab1,
       inputs: [
-        new FriendlyInput(),
+        new TargetInput(),
       ],
       spriteId: "ab3",
       name: "a1l2_fr_ab1",
-    },
-    {
-      ability: a1l2_fr_ab2,
-      inputs: [
-        new EnemyInput(),
-      ],
-      spriteId: "ab3",
-      name: "a1l2_fr_ab2",
     },
   ],
   essential: true,
@@ -51,18 +39,12 @@ export const a1l2_fr: FrUnit = {
  */
 export const a1l2_en_ab1: Ability =
   A.combinedAbility([
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(1), Ab.highestThreat()),
-    new A.MoveAI("Ability", "Target", new Ab.Static("right" as AIDirection), Ab.self()),
-  ]);
-
-export const a1l2_en_ab2: Ability =
-  A.combinedAbility([
-    new A.Damage("Ability", "Target", new Ab.Static(50), Ab.highestThreat()),
+    new A.Damage("Ability", "Target", new Ab.Static(5), Ab.highestThreat()),
   ]);
 
 export const a1l2_en: EnUnit = {
-  hp: 20,
-  maxHp: 20,
+  hp: 15,
+  maxHp: 15,
   charges: 5,
   maxCharges: 5,
   abilities: {
@@ -70,16 +52,6 @@ export const a1l2_en: EnUnit = {
       ability: a1l2_en_ab1,
       spriteId: "ab3",
       name: "a1l2_en_ab1",
-    },
-    1: {
-      ability: a1l2_en_ab1,
-      spriteId: "ab3",
-      name: "a1l2_en_ab1",
-    },
-    2: {
-      ability: a1l2_en_ab2,
-      spriteId: "ab3",
-      name: "a1l2_en_ab2",
     },
   },
   essential: true,

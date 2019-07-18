@@ -61,12 +61,12 @@ export const a1l3_fr2: FrUnit = {
  * En Unit
  */
 export const a1l3_en1_ab1: Ability =
-  new A.Damage("Ability", "Target", new Ab.Static(7), Ab.highestThreat())
+  new A.Damage("Ability", "Target", new Ab.Static(3), Ab.highestThreat())
   ;
 
 export const a1l3_en1: EnUnit = {
-  hp: 20,
-  maxHp: 20,
+  hp: 30,
+  maxHp: 30,
   charges: 5,
   maxCharges: 5,
   abilities: {
@@ -79,25 +79,4 @@ export const a1l3_en1: EnUnit = {
   essential: true,
   aiPosition: { x: 0, y: 0 },
   cardId: "a1l3_en1",
-}
-
-export const a1l3_en2_ab1: Ability =
-  new A.Damage("Ability", "Target", new Ab.Static(7), Ab.highestThreat())
-  ;
-
-export const a1l3_en2: EnUnit = {
-  hp: 20,
-  maxHp: 20,
-  charges: 5,
-  maxCharges: 5,
-  abilities: {
-    0: {
-      ability: a1l3_en2_ab1,
-      spriteId: "ab3",
-      name: "a1l3_en2_ab1",
-    },
-  },
-  essential: true,
-  aiPosition: { x: 0, y: 0 },
-  cardId: "a1l3_en2",
 }

@@ -10,7 +10,7 @@ import { TargetInput, EnemyInput } from "../../definitions/input";
  * Fr Unit
  */
 export const a1l1_fr_ab: Ability =
-  new A.Damage("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0))
+  new A.Damage("Ability", "Target", new Ab.Static(9), new Ab.FromInput(0))
   ;
 
 export const a1l1_fr: FrUnit = {
@@ -40,8 +40,8 @@ export const a1l1_en_ab: Ability =
   ;
 
 export const a1l1_en: EnUnit = {
-  hp: 20,
-  maxHp: 20,
+  hp: 15,
+  maxHp: 15,
   charges: 5,
   maxCharges: 5,
   abilities: {

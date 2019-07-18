@@ -28,9 +28,9 @@ export const a1l2: LevelData = {
   id: "a1l2",
   icon: "lvl_icon_150_150.png",
   iconLocation: { x: 250, y: 250 },
-  cardIds: [["a1l2_fr"]],
+  cardIds: [["a1l2_fr"], ["c_i"]],
   enemyIds: ["a1l2_en"],
-  slots: 1,
+  slots: 2,
 };
 
 export const a1l3: LevelData = {
@@ -38,8 +38,8 @@ export const a1l3: LevelData = {
   id: "a1l3",
   icon: "lvl_icon_150_150.png",
   iconLocation: { x: 400, y: 250 },
-  cardIds: [["a1l3_fr1"], ["a1l3_fr2"]],
-  enemyIds: ["a1l3_en1", "a1l3_en2"],
+  cardIds: [["d_i"], ["c_iii"]],
+  enemyIds: ["a1l3_en1"],
   slots: 2,
 };
 
