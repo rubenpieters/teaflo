@@ -12,15 +12,15 @@ import * as C from "../../definitions/condition";
  */
 export const a1l5_fr1_ab1: Ability =
   A.combinedAbility([
-    new A.UseCharge("Ability", "Target", new Ab.Static(1), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(2), new Ab.FromInput(0)),
+    new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(15), new Ab.FromInput(0)),
   ]);
 
 export const a1l5_fr1: FrUnit = {
   hp: 15,
   maxHp: 15,
-  charges: 5,
-  maxCharges: 5,
+  charges: 60,
+  maxCharges: 60,
   abilities: [
     {
       ability: a1l5_fr1_ab1,
@@ -37,15 +37,16 @@ export const a1l5_fr1: FrUnit = {
 
 export const a1l5_fr2_ab1: Ability =
   A.combinedAbility([
-    new A.UseCharge("Ability", "Target", new Ab.Static(2), new Ab.Self()),
-    new A.Damage("Ability", "Target", new Ab.Static(18), new Ab.FromInput(0)),
+    new A.UseCharge("Ability", "Target", new Ab.Static(15), new Ab.Self()),
+    new A.Damage("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0)),
+    new A.AddThreat("Ability", "Target", new Ab.Static(10), Ab.self(), new Ab.FromInput(0)),
   ]);
 
 export const a1l5_fr2: FrUnit = {
-  hp: 21,
-  maxHp: 21,
+  hp: 41,
+  maxHp: 41,
   charges: 0,
-  maxCharges: 6,
+  maxCharges: 60,
   abilities: [
     {
       ability: a1l5_fr2_ab1,
@@ -62,15 +63,16 @@ export const a1l5_fr2: FrUnit = {
 
 export const a1l5_fr3_ab1: Ability =
   A.combinedAbility([
-    new A.UseCharge("Ability", "Target", new Ab.Static(1), new Ab.Self()),
-    new A.Damage("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0)),
+    new A.UseCharge("Ability", "Target", new Ab.Static(20), new Ab.Self()),
+    new A.Damage("Ability", "Target", new Ab.Static(18), new Ab.FromInput(0)),
+    new A.AddThreat("Ability", "Target", new Ab.Static(18), Ab.self(), new Ab.FromInput(0)),
   ]);
 
 export const a1l5_fr3: FrUnit = {
-  hp: 15,
-  maxHp: 15,
+  hp: 53,
+  maxHp: 53,
   charges: 0,
-  maxCharges: 6,
+  maxCharges: 60,
   abilities: [
     {
       ability: a1l5_fr3_ab1,
@@ -90,36 +92,12 @@ export const a1l5_fr3: FrUnit = {
  */
 export const a1l5_en1_ab1: Ability =
   A.combinedAbility([
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(1), Ab.self()),
-    new A.MoveAI("Ability", "Target", new Ab.Static("right" as AIDirection), Ab.self()),
-  ]);
-
-export const a1l5_en1_ab2: Ability =
-  A.combinedAbility([
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(1), Ab.self()),
-    new A.MoveAI("Ability", "Target", new Ab.Static("right" as AIDirection), Ab.self()),
-  ]);
-
-export const a1l5_en1_ab3: Ability =
-  A.combinedAbility([
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(1), Ab.self()),
-    new A.MoveAI("Ability", "Target", new Ab.Static("down" as AIDirection), Ab.self()),
-  ]);
-
-export const a1l5_en1_ab4: Ability =
-  A.combinedAbility([
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(1), Ab.self()),
-    new A.MoveAI("Ability", "Target", new Ab.Static("left" as AIDirection), Ab.self()),
-  ]);
-
-export const a1l5_en1_ab5: Ability =
-  A.combinedAbility([
-    new A.Damage("Ability", "Target", new Ab.Static(30), Ab.highestThreat()),
+    new A.Damage("Ability", "Target", new Ab.Static(7), Ab.highestThreat()),
   ]);
 
 export const a1l5_en1: EnUnit = {
-  hp: 38,
-  maxHp: 38,
+  hp: 28,
+  maxHp: 28,
   charges: 0,
   maxCharges: 5,
   abilities: {
@@ -127,26 +105,6 @@ export const a1l5_en1: EnUnit = {
       ability: a1l5_en1_ab1,
       spriteId: "ab3",
       name: "a1l5_en1_ab1",
-    },
-    1: {
-      ability: a1l5_en1_ab2,
-      spriteId: "ab3",
-      name: "a1l5_en1_ab2",
-    },
-    2: {
-      ability: a1l5_en1_ab3,
-      spriteId: "ab3",
-      name: "a1l5_en1_ab3",
-    },
-    5: {
-      ability: a1l5_en1_ab4,
-      spriteId: "ab3",
-      name: "a1l5_en1_ab4",
-    },
-    4: {
-      ability: a1l5_en1_ab5,
-      spriteId: "ab1",
-      name: "a1l5_en1_ab5",
     },
   },
   essential: true,
@@ -156,13 +114,13 @@ export const a1l5_en1: EnUnit = {
 
 export const a1l5_en2_ab1: Ability =
   A.combinedAbility([
-    new A.Damage("Ability", "Target", new Ab.Static(3), Ab.highestThreat()),
+    new A.Damage("Ability", "Target", new Ab.Static(5), Ab.highestThreat()),
     // new A.MoveAI("Ability", "Target", new Ab.Static("right" as AIDirection), Ab.self()),
   ]);
 
 export const a1l5_en2: EnUnit = {
-  hp: 18,
-  maxHp: 18,
+  hp: 46,
+  maxHp: 46,
   charges: 5,
   maxCharges: 5,
   abilities: {

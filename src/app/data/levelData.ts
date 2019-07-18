@@ -58,7 +58,7 @@ export const a1l5: LevelData = {
   id: "a1l5",
   icon: "lvl_icon_150_150.png",
   iconLocation: { x: 100, y: 400 },
-  cardIds: [["a1l5_fr1"], ["a1l5_fr2"], ["a1l5_fr3"]],
+  cardIds: [["a1l5_fr3"], ["a1l5_fr2"], ["a1l5_fr1"]],
   enemyIds: ["a1l5_en1", "a1l5_en2"],
   slots: 3,
 };
