@@ -115,7 +115,6 @@ export const a1l5_en1: EnUnit = {
 export const a1l5_en2_ab1: Ability =
   A.combinedAbility([
     new A.Damage("Ability", "Target", new Ab.Static(5), Ab.highestThreat()),
-    // new A.MoveAI("Ability", "Target", new Ab.Static("right" as AIDirection), Ab.self()),
   ]);
 
 export const a1l5_en2: EnUnit = {

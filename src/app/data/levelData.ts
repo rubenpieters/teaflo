@@ -68,8 +68,8 @@ export const a1l6: LevelData = {
   id: "a1l6",
   icon: "lvl_icon_150_150.png",
   iconLocation: { x: 250, y: 400 },
-  cardIds: [["a1l6_fr1"], ["a1l6_fr2"], ["a1l6_fr3"]],
-  enemyIds: ["a1l6_en1"],
+  cardIds: [["a1l6_fr3"], ["a1l6_fr2"], ["a1l6_fr1"]],
+  enemyIds: ["a1l6_en1", "a1l6_en2"],
   slots: 3,
 };
 
