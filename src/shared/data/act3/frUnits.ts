@@ -66,8 +66,8 @@ export const d_ii: FrUnit = {
 export const d_iii_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(41), Ab.self()),
-    new A.Damage("Ability", "Target", new Ab.Static(27), new Ab.FromInput(0)),
-    new A.AddThreat("Ability", "Target", new Ab.Static(27), Ab.self(), new Ab.FromInput(0)),
+    new A.Damage("Ability", "Target", new Ab.Static(35), new Ab.FromInput(0)),
+    new A.AddThreat("Ability", "Target", new Ab.Static(35), Ab.self(), new Ab.FromInput(0)),
   ]);
 
 export const d_iii: FrUnit = {

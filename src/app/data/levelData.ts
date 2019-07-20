@@ -115,6 +115,26 @@ export const a3l2: LevelData = {
   slots: 3,
 };
 
+export const a3l2_1: LevelData = {
+  name: "A3 level2 -1",
+  id: "a3l2_1",
+  icon: "lvl_icon_150_150.png",
+  iconLocation: { x: 100, y: 500 },
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
+  enemyIds: ["a3l2_en1_1"],
+  slots: 3,
+};
+
+export const a3l2_2: LevelData = {
+  name: "A3 level2 -2",
+  id: "a3l2_2",
+  icon: "lvl_icon_150_150.png",
+  iconLocation: { x: 250, y: 500 },
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
+  enemyIds: ["a3l2_en1_2"],
+  slots: 3,
+};
+
 export const a3l3: LevelData = {
   name: "A3 level3",
   id: "a3l3",
@@ -125,6 +145,26 @@ export const a3l3: LevelData = {
   slots: 3,
 };
 
+export const a3l3_1: LevelData = {
+  name: "A3 level3 -1",
+  id: "a3l3_1",
+  icon: "lvl_icon_150_150.png",
+  iconLocation: { x: 100, y: 650 },
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
+  enemyIds: ["a3l3_en1_1", "a3l3_en2_1"],
+  slots: 3,
+};
+
+export const a3l3_2: LevelData = {
+  name: "A3 level3 -2",
+  id: "a3l3_2",
+  icon: "lvl_icon_150_150.png",
+  iconLocation: { x: 250, y: 650 },
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
+  enemyIds: ["a3l3_en1_2", "a3l3_en2_2"],
+  slots: 3,
+};
+
 export const a3l4: LevelData = {
   name: "A3 level4",
   id: "a3l4",
@@ -132,6 +172,26 @@ export const a3l4: LevelData = {
   iconLocation: { x: 550, y: 250 },
   cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
   enemyIds: ["a3l4_en1"],
+  slots: 3,
+};
+
+export const a3l4_1: LevelData = {
+  name: "A3 level4 -1",
+  id: "a3l4_1",
+  icon: "lvl_icon_150_150.png",
+  iconLocation: { x: 100, y: 800 },
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
+  enemyIds: ["a3l4_en1_1"],
+  slots: 3,
+};
+
+export const a3l4_2: LevelData = {
+  name: "A3 level4 -2",
+  id: "a3l4_2",
+  icon: "lvl_icon_150_150.png",
+  iconLocation: { x: 250, y: 800 },
+  cardIds: [["d_i", "d_iii", "d_iv"], ["c_i", "c_ii", "c_iii"], ["u_i", "u_ii", "u_iii"]],
+  enemyIds: ["a3l4_en1_2"],
   slots: 3,
 };
 
@@ -164,4 +224,10 @@ export const levelData = {
   "a3l3": a3l3,
   "a3l4": a3l4,
   "a3l5": a3l5,
+  "a3l2_1": a3l2_1,
+  "a3l2_2": a3l2_2,
+  "a3l3_1": a3l3_1,
+  "a3l3_2": a3l3_2,
+  "a3l4_1": a3l4_1,
+  "a3l4_2": a3l4_2,
 }

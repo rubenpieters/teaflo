@@ -10,24 +10,24 @@ import * as C from "../../definitions/condition";
 /**
  * En Unit
  */
-export const a3l4_en1_ab1: Ability =
+export const a3l2_en1_2_ab1: Ability =
   A.combinedAbility([
-    new A.Damage("Ability", "Target", new Ab.Static(4), Ab.lowestHp()),
+    new A.Damage("Ability", "Target", new Ab.Static(3), Ab.highestThreat()),
   ]);
 
-export const a3l4_en1: EnUnit = {
-  hp: 40,
-  maxHp: 40,
+export const a3l2_en1_2: EnUnit = {
+  hp: 50,
+  maxHp: 50,
   charges: 5,
   maxCharges: 5,
   abilities: {
     0: {
-      ability: a3l4_en1_ab1,
+      ability: a3l2_en1_2_ab1,
       spriteId: "ab3",
-      name: "a3l4_en1_ab1",
+      name: "a3l2_en1_2_ab1",
     },
   },
   essential: true,
   aiPosition: { x: 0, y: 0 },
-  cardId: "a3l4_en1",
+  cardId: "a3l2_en1_2",
 }
