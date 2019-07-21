@@ -1,6 +1,7 @@
-import { DataSprite } from "./datasprite";
+import { DataSprite, clearShader, addShader } from "./datasprite";
 import { createTween, createChainedTween } from "./animation";
 import { Group } from "phaser-ce";
+import { GameRefs } from "../states/game";
 
 // FrameType:
 // custom type to characterize different frames
@@ -205,9 +206,10 @@ function invokeIfDefined<A>(
 }
 
 export function mkButtonPool<Data>(
-  game: Phaser.Game,
+  gameRefs: GameRefs,
   poolInfo: PoolInfo<Data, "neutral" | "hover" | "down">,
   mLockCondition?: (self: DataSprite<Data>) => boolean,
+  mShaderFunc?: (state: "neutral" | "hover" | "down") => string | undefined,
 ): Pool<Data, "neutral" | "hover" | "down"> {
   const callbacks = poolInfo.callbacks;
   const lockCondition = mLockCondition === undefined ? () => false : mLockCondition;
@@ -215,12 +217,26 @@ export function mkButtonPool<Data>(
     onDown: (self: DataSprite<Data>) => {
       if (! lockCondition(self)) {
         pool.setFrame(self, "down");
+        if (mShaderFunc !== undefined) {
+          clearShader(self);
+          const mShader = mShaderFunc("down");
+          if (mShader !== undefined) {
+            addShader(gameRefs, self, mShader);
+          }
+        }
         if (callbacks.onDown !== undefined) callbacks.onDown(self);
       }
     },
     click: (self: DataSprite<Data>) => {
       if (! lockCondition(self)) {
         pool.setFrame(self, "hover");
+        if (mShaderFunc !== undefined) {
+          clearShader(self);
+          const mShader = mShaderFunc("hover");
+          if (mShader !== undefined) {
+            addShader(gameRefs, self, mShader);
+          }
+        }
         if (callbacks.click !== undefined) callbacks.click(self);
       }
     },
@@ -228,8 +244,22 @@ export function mkButtonPool<Data>(
       if (! lockCondition(self)) {
         if (self.props !== undefined && self.props.selecting) {
           pool.setFrame(self, "down");
+          if (mShaderFunc !== undefined) {
+            clearShader(self);
+            const mShader = mShaderFunc("down");
+            if (mShader !== undefined) {
+              addShader(gameRefs, self, mShader);
+            }
+          }
         } else {
           pool.setFrame(self, "hover");
+          if (mShaderFunc !== undefined) {
+            clearShader(self);
+            const mShader = mShaderFunc("hover");
+            if (mShader !== undefined) {
+              addShader(gameRefs, self, mShader);
+            }
+          }
         }
         if (callbacks.hoverOver !== undefined) callbacks.hoverOver(self);
       }
@@ -237,12 +267,19 @@ export function mkButtonPool<Data>(
     hoverOut: (self: DataSprite<Data>) => {
       if (! lockCondition(self)) {
         pool.setFrame(self, "neutral");
+        if (mShaderFunc !== undefined) {
+          clearShader(self);
+          const mShader = mShaderFunc("neutral");
+          if (mShader !== undefined) {
+            addShader(gameRefs, self, mShader);
+          }
+        }
         if (callbacks.hoverOut !== undefined) callbacks.hoverOut(self);
       }
     }
   };
   const pool: Pool<Data, "neutral" | "hover" | "down"> = new Pool(
-    game, { ...poolInfo, ...{ callbacks: newCallbacks } },
+    gameRefs.game, { ...poolInfo, ...{ callbacks: newCallbacks } },
   );
   return pool;
 }

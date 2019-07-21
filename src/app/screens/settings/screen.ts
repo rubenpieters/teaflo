@@ -32,7 +32,7 @@ function mkBtnPool(
   gameRefs: GameRefs,
 ): Pool<BtnData, "neutral" | "hover" | "down"> {
   return mkButtonPool(
-    gameRefs.game,
+    gameRefs,
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {

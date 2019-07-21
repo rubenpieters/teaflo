@@ -148,7 +148,7 @@ function mkActBtnPool(
   gameRefs: GameRefs,
 ): Pool<ActBtnData, "neutral" | "hover" | "down"> {
   return mkButtonPool(
-    gameRefs.game,
+    gameRefs,
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
@@ -164,29 +164,19 @@ function mkActBtnPool(
         }
       ],
       callbacks: {
-        onDown: (self) => {
-          clearShader(self);
-          addShader(gameRefs, self, "red-glow");
-        },
         click: (self) => {
           transitionScreen(gameRefs, new ScreenAct(self.data.actId));
-          clearShader(self);
-        },
-        hoverOver: (self) => {
-          if (self.props !== undefined) {
-            if (self.props.selecting) {
-              addShader(gameRefs, self, "red-glow");
-            } else {
-              addShader(gameRefs, self, "blue-glow");
-            }
-          }
-        },
-        hoverOut: (self) => {
-          clearShader(self);
         },
       },
     },
-    self => { return self.data.actId === selectedActId(gameRefs); }
+    self => { return self.data.actId === selectedActId(gameRefs); },
+    status => {
+      switch (status) {
+        case "down": return "red-glow";
+        case "hover": return "blue-glow";
+        case "neutral": return undefined;
+      }
+    },
   );
 }
 
@@ -200,7 +190,7 @@ function mkLevelBtnPool(
   gameRefs: GameRefs,
 ): Pool<LevelBtnData, "neutral" | "hover" | "down"> {
   return mkButtonPool(
-    gameRefs.game,
+    gameRefs,
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
@@ -219,15 +209,16 @@ function mkLevelBtnPool(
         click: (self) => {
           transitionScreen(gameRefs, new ScreenExec(self.data.levelId));
         },
-        hoverOver: (self) => {
-          addShader(gameRefs, self, "blue-glow");
-        },
-        hoverOut: (self) => {
-          clearShader(self);
-        },
       },
     },
-    self => { return false; }
+    self => { return false; },
+    status => {
+      switch (status) {
+        case "down": return "red-glow";
+        case "hover": return "blue-glow";
+        case "neutral": return undefined;
+      }
+    },
   );
 }
 
@@ -248,7 +239,7 @@ function mkSolBtnPool(
   gameRefs: GameRefs,
 ): Pool<SolBtnData, "neutral" | "hover" | "down"> {
   return mkButtonPool(
-    gameRefs.game,
+    gameRefs,
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
@@ -279,6 +270,13 @@ function mkSolBtnPool(
         },
       },
     },
-    self => { return false; }
+    self => { return false; },
+    status => {
+      switch (status) {
+        case "down": return "red-glow";
+        case "hover": return "blue-glow";
+        case "neutral": return undefined;
+      }
+    },
   );
 }

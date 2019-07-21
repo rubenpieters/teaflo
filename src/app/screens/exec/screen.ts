@@ -1,4 +1,4 @@
-import { Pool, mkButtonPool } from "../../phaser/pool";
+import { Pool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position, center } from "../../util/position";
 import { addText, DataSprite, addShader, clearShader } from "../../phaser/datasprite";
