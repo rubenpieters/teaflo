@@ -13,14 +13,14 @@ import * as C from "../../definitions/condition";
 export const a1l6_fr1_ab1: Ability =
   A.combinedAbility([
     new A.UseCharge("Ability", "Target", new Ab.Static(10), Ab.self()),
-    new A.RestoreCharge("Ability", "Target", new Ab.Static(15), new Ab.FromInput(0)),
+    new A.RestoreCharge("Ability", "Target", new Ab.Static(16), new Ab.FromInput(0)),
   ]);
 
 export const a1l6_fr1: FrUnit = {
   hp: 15,
   maxHp: 15,
-  charges: 60,
-  maxCharges: 60,
+  charges: 61,
+  maxCharges: 61,
   abilities: [
     {
       ability: a1l6_fr1_ab1,
