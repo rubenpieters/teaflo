@@ -1,6 +1,6 @@
 import { Pool, mkButtonPool } from "../../phaser/pool";
 import { createPosition, Position } from "../../util/position";
-import { chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween, ParAnimation, Create } from "../../phaser/animation";
+import { chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween, ParAnimation, Create, runAnim } from "../../phaser/animation";
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
 import { addText, DataSprite, clearShader, addShader } from "../../phaser/datasprite";
@@ -27,9 +27,9 @@ export class ActScreen {
     changeAct(this.gameRefs, actId);
   }
 
-  drawActBtn() {
+  drawActBtn(animations: boolean) {
     const anim = this.redrawActBtn();
-    runAsTween(this.gameRefs, anim);
+    runAnim(animations, this.gameRefs, anim);
   }
 
   redrawActBtn(): Animation {

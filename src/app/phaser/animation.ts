@@ -110,6 +110,19 @@ export function runCreateOnly(
   }
 }
 
+export function runAnim(
+  animations: boolean,
+  gameRefs: GameRefs,
+  animation: Animation,
+  type?: "log",
+) {
+  if (animations) {
+    runAsTween(gameRefs, animation, type);
+  } else {
+    runCreateOnly(animation);
+  }
+}
+
 function runSeqAsTween(
   gameRefs: GameRefs,
   seqAnimation: SeqAnimation,

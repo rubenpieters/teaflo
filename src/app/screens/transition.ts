@@ -71,43 +71,52 @@ export function transitionScreen(
       break;
     }
   }
-  gameRefs.screens.bgScreen.bgOnIntroComplete(
-    () => {
-      // draw new screen
-      gameRefs.screens.menuScreen.drawMenuBtn();
-      switch (newScreen.tag) {
-        case "ScreenAct": {
-          gameRefs.saveData.activeScreen = "menu";
-          const actId = newScreen.actId;
-          gameRefs.saveData.currentActId = actId;
-          gameRefs.screens.actScreen.actSelectMode();
-          gameRefs.screens.actScreen.drawActBtn();
-          gameRefs.screens.actScreen.drawLevelBtn(actId);
-          break;
-        }
-        case "ScreenExec": {
-          gameRefs.saveData.activeScreen = "exec";
-          const levelId = newScreen.levelId;
-          gameRefs.saveData.currentLevelId = levelId;
-          gameRefs.screens.execScreen.reset();
-          updateSolutionRep(gameRefs);
-          break;
-        }
-        case "ScreenCodex": {
-          gameRefs.saveData.activeScreen = "codex";
-          if (newScreen.page !== undefined) {
-            gameRefs.screens.codexScreen.page = newScreen.page;
-          }
-          gameRefs.screens.codexScreen.reset();
-          gameRefs.screens.codexScreen.drawPage();
-          break;
-        }
-        case "ScreenSettings": {
-          gameRefs.saveData.activeScreen = "settings";
-          gameRefs.screens.settingsScreen.drawBtn();
-          break;
-        }
-      }
+  if (newScreen.tag !== oldScreen.tag) {
+    gameRefs.screens.bgScreen.bgOnIntroComplete(
+      () => drawNewScreen(gameRefs, newScreen, true)
+    );
+  } else {
+    drawNewScreen(gameRefs, newScreen, false);
+  }
+}
+
+function drawNewScreen(
+  gameRefs: GameRefs,
+  newScreen: ScreenActive,
+  animations: boolean,
+) {
+  gameRefs.screens.menuScreen.drawMenuBtn();
+  switch (newScreen.tag) {
+    case "ScreenAct": {
+      gameRefs.saveData.activeScreen = "menu";
+      const actId = newScreen.actId;
+      gameRefs.saveData.currentActId = actId;
+      gameRefs.screens.actScreen.actSelectMode();
+      gameRefs.screens.actScreen.drawActBtn(animations);
+      gameRefs.screens.actScreen.drawLevelBtn(actId);
+      break;
     }
-  );
+    case "ScreenExec": {
+      gameRefs.saveData.activeScreen = "exec";
+      const levelId = newScreen.levelId;
+      gameRefs.saveData.currentLevelId = levelId;
+      gameRefs.screens.execScreen.reset();
+      updateSolutionRep(gameRefs);
+      break;
+    }
+    case "ScreenCodex": {
+      gameRefs.saveData.activeScreen = "codex";
+      if (newScreen.page !== undefined) {
+        gameRefs.screens.codexScreen.page = newScreen.page;
+      }
+      gameRefs.screens.codexScreen.reset();
+      gameRefs.screens.codexScreen.drawPage();
+      break;
+    }
+    case "ScreenSettings": {
+      gameRefs.saveData.activeScreen = "settings";
+      gameRefs.screens.settingsScreen.drawBtn();
+      break;
+    }
+  }
 }
