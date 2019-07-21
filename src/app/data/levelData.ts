@@ -84,6 +84,16 @@ export const a1l7: LevelData = {
   dev: true,
 };
 
+export const a1l8: LevelData = {
+  name: "A1 level8",
+  id: "a1l8",
+  icon: "lvl_icon_150_150.png",
+  iconLocation: { x: 550, y: 400 },
+  cardIds: [["d_i"], ["c_i"]],
+  enemyIds: ["a1l8_en1"],
+  slots: 2,
+  dev: false,
+};
 
 export const a2l1: LevelData = {
   name: "A2 level1",
@@ -218,6 +228,7 @@ export const levelData = {
   "a1l5": a1l5,
   "a1l6": a1l6,
   "a1l7": a1l7,
+  "a1l8": a1l8,
   "a2l1": a2l1,
   "a3l1": a3l1,
   "a3l2": a3l2,

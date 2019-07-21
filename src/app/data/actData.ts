@@ -18,7 +18,7 @@ export const actData = {
   0: {
     shortName: "1",
     longName: "Act 1",
-    levels: [L.a1l1, L.a1l2, L.a1l3, L.a1l4, L.a1l5, L.a1l6, L.a1l7],
+    levels: [L.a1l1, L.a1l2, L.a1l3, L.a1l4, L.a1l5, L.a1l6, L.a1l7, L.a1l8],
     bgSprite: "sel_act1.png",
   },
   1: {
