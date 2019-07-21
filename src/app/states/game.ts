@@ -46,6 +46,9 @@ export default class Game extends Phaser.State {
     const blueGlow = new Phaser.Filter(this.game, {},
       this.game.cache.getShader("blue-glow")
     );
+    const redGlow = new Phaser.Filter(this.game, {},
+      this.game.cache.getShader("red-glow")
+    );
     const blueFlame = new Phaser.Filter(this.game, {},
       this.game.cache.getShader("blue-flame")
     );
@@ -64,6 +67,7 @@ export default class Game extends Phaser.State {
       saveData: emptySaveData(),
       filters: {
         "blue-glow": blueGlow,
+        "red-glow": redGlow,
         "blue-flame": blueFlame,
       },
       settings: this.settings,

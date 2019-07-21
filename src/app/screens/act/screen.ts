@@ -164,18 +164,25 @@ function mkActBtnPool(
         }
       ],
       callbacks: {
+        onDown: (self) => {
+          clearShader(self);
+          addShader(gameRefs, self, "red-glow");
+        },
         click: (self) => {
           transitionScreen(gameRefs, new ScreenAct(self.data.actId));
+          clearShader(self);
         },
         hoverOver: (self) => {
-          addShader(gameRefs, self, "blue-glow");
-          //const tween = createTween(gameRefs.game, self, x => x.to({ y: -100 }, 75, Phaser.Easing.Linear.None, false, 0));
-          //tween.start();
+          if (self.props !== undefined) {
+            if (self.props.selecting) {
+              addShader(gameRefs, self, "red-glow");
+            } else {
+              addShader(gameRefs, self, "blue-glow");
+            }
+          }
         },
         hoverOut: (self) => {
           clearShader(self);
-          //const tween = createTween(gameRefs.game, self, x => x.to({ y: -200 }, 75, Phaser.Easing.Linear.None, false, 0));
-          //tween.start();
         },
       },
     },

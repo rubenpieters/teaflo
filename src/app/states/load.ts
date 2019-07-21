@@ -44,7 +44,8 @@ export default class Load extends Phaser.State {
     this.game.load.atlasJSONHash('atlas1', 'assets/atlas/atlas1.png', 'assets/atlas/atlas1.json');
 
     // load shaders
-    this.game.load.shader("blue-glow", "assets/shaders/gaussian.frag");
+    this.game.load.shader("blue-glow", "assets/shaders/gaussian-blue-pulse.frag");
+    this.game.load.shader("red-glow", "assets/shaders/gaussian-red-pulse.frag");
     this.game.load.shader("blue-flame", "assets/shaders/blue-flame.frag");
 
     // indicate loading is done
