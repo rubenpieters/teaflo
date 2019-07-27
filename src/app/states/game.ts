@@ -109,6 +109,8 @@ export default class Game extends Phaser.State {
       );
       this.game.debug.text(`x: ${this.game.input.x} y: ${this.game.input.y}`, pos2.xMax, pos2.yMin);
       //this.game.debug.text(`${gameRefs.screens.levelScreen.buildCardPool.countLiving()}` || '--', pos2.xMax, pos2.yMin, "#00ff00");
+
+      this.game.debug.text(`${(this.game.renderer.renderSession as any).drawCount} draws`, pos2.xMax, pos2.yMin + 30, "#00ff00");
     }
   }
 }
