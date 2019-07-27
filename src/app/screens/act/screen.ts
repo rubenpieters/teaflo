@@ -8,12 +8,15 @@ import { ScreenAct, transitionScreen, ScreenExec } from "../transition";
 import { selectedActId } from "../../data/saveData";
 import { actData, ActDataKeys } from "../../data/actData";
 import { LevelDataKeys } from "../../data/levelData";
+import { TextPool } from "../../phaser/textpool";
 
 export class ActScreen {
   actBtnPool: Pool<ActBtnData, "neutral" | "hover" | "down">
   levelBtnPool: Pool<LevelBtnData, "neutral" | "hover" | "down">
   solBtnPool: Pool<SolBtnData, "neutral" | "hover" | "down">
   bgSpritePool: Pool<BgSpriteData, {}>
+  hoverSpritePool: Pool<HoverSpriteData, {}>
+  hoverTextPool: TextPool
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -22,6 +25,8 @@ export class ActScreen {
     this.actBtnPool = mkActBtnPool(gameRefs);
     this.levelBtnPool = mkLevelBtnPool(gameRefs);
     this.solBtnPool = mkSolBtnPool(gameRefs);
+    this.hoverSpritePool = mkHoverSpritePool(gameRefs);
+    this.hoverTextPool = new TextPool(gameRefs.game);
   }
 
   draw() {
@@ -84,14 +89,14 @@ export class ActScreen {
         return this.actBtnPool.newSprite(pos.xMin, pos.yMin, frame, { actId, actIndex: i, sprite });
       }, self => {
         return new BaseAnimation(150, self, tween => {
-          tween.from({ y: -400 }, 150, Phaser.Easing.Linear.None, false, 40 * self.data.actIndex);
+          tween.from({ y: -30, alpha: 0.5 }, 35, Phaser.Easing.Linear.None, false, 0);
         });
       });
       anims.push(anim);
       i += 1;
     }
 
-    const parAnim = new ParAnimation(anims);
+    const parAnim = new SeqAnimation(anims);
     return parAnim;
   }
 
@@ -142,6 +147,7 @@ export class ActScreen {
   }
 
   actSelectMode() {
+    this.hoverSpritePool.clear();
     this.actBtnPool.visible = true;
     this.levelBtnPool.visible = true;
     this.solBtnPool.visible = false;
@@ -185,6 +191,14 @@ function mkActBtnPool(
         click: (self) => {
           transitionScreen(gameRefs, new ScreenAct(self.data.actId));
         },
+        hoverOver: (self) => {
+          const hoverBg = gameRefs.screens.actScreen.hoverSpritePool.newSprite(self.x + 200, self.y, {}, {});
+          addText(gameRefs, hoverBg, { xMin: 10, xMax: 100, yMin: 10, yMax: 100 }, `Act ${self.data.actId + 1}`, "#000000", 20);
+        },
+        hoverOut: (self) => {
+          gameRefs.screens.actScreen.hoverSpritePool.clear();
+          gameRefs.screens.actScreen.hoverTextPool.clear();
+        }
       },
     },
     self => { return self.data.actId === selectedActId(gameRefs); },
@@ -312,6 +326,27 @@ function mkBgSpritePool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         return self.data.sprite;
+      },
+      introAnim: [
+      ],
+      callbacks: {
+      },
+    },
+  );
+}
+
+type HoverSpriteData = {
+}
+
+function mkHoverSpritePool(
+  gameRefs: GameRefs,
+): Pool<HoverSpriteData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return "unit_select_bg.png";
       },
       introAnim: [
       ],
