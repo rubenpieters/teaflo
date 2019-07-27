@@ -93,6 +93,7 @@ function drawNewScreen(
       gameRefs.saveData.currentActId = actId;
       gameRefs.screens.actScreen.actSelectMode();
       gameRefs.screens.actScreen.drawActBtn(animations);
+      gameRefs.screens.actScreen.drawBg(animations);
       gameRefs.screens.actScreen.drawLevelBtn(actId);
       break;
     }

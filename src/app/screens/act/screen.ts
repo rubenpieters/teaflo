@@ -13,10 +13,12 @@ export class ActScreen {
   actBtnPool: Pool<ActBtnData, "neutral" | "hover" | "down">
   levelBtnPool: Pool<LevelBtnData, "neutral" | "hover" | "down">
   solBtnPool: Pool<SolBtnData, "neutral" | "hover" | "down">
+  bgSpritePool: Pool<BgSpriteData, {}>
 
   constructor(
     public readonly gameRefs: GameRefs
   ) {
+    this.bgSpritePool = mkBgSpritePool(gameRefs);
     this.actBtnPool = mkActBtnPool(gameRefs);
     this.levelBtnPool = mkLevelBtnPool(gameRefs);
     this.solBtnPool = mkSolBtnPool(gameRefs);
@@ -27,13 +29,30 @@ export class ActScreen {
     changeAct(this.gameRefs, actId);
   }
 
+  drawBg(animations: boolean) {
+    this.bgSpritePool.clear();
+
+    const actId = this.gameRefs.saveData.currentActId;
+    const bgSprite = actData[actId].bgSprite;
+    
+    const anim = new Create(() => {
+      return this.bgSpritePool.newSprite(bgSprite.x, bgSprite.y, {}, { sprite: bgSprite.sprite, });
+    }, self => {
+      return new BaseAnimation(300, self, tween => {
+        tween.from({ alpha: 0 }, 300, Phaser.Easing.Linear.None, false, 50);
+      });
+    });
+
+    runAnim(true, this.gameRefs, anim);
+  }
+
   drawActBtn(animations: boolean) {
     const anim = this.redrawActBtn();
     runAnim(animations, this.gameRefs, anim);
   }
 
   redrawActBtn(): Animation {
-    this.actBtnPool.killAll();
+    this.actBtnPool.clear();
 
     const selActId = selectedActId(this.gameRefs);
 
@@ -48,23 +67,24 @@ export class ActScreen {
       if (selActId !== undefined && selActId === actId) {
         // this is the currently selected act
         pos = createPosition(this.gameRefs.settings,
-          "left", 100 + 210 * i, 200,
+          "left", 100 + 150 * i, 200,
           "top", 0, 400,
         );
         frame = "down";
       } else {
         // this is not the currently selected act
         pos = createPosition(this.gameRefs.settings,
-          "left", 100 + 210 * i, 400,
+          "left", 100 + 150 * i, 400,
           "top", 0, 200,
         );
         frame = "neutral";
       }
+      const sprite = actData[actId].icon;
       const anim: Animation = new Create(() => {
-        return this.actBtnPool.newSprite(pos.xMin, pos.yMin, frame, { actId, actIndex: i, });
+        return this.actBtnPool.newSprite(pos.xMin, pos.yMin, frame, { actId, actIndex: i, sprite });
       }, self => {
         return new BaseAnimation(150, self, tween => {
-          tween.from({ y: -400 }, 150, Phaser.Easing.Linear.None, false, 30 * self.data.actIndex);
+          tween.from({ y: -400 }, 150, Phaser.Easing.Linear.None, false, 40 * self.data.actIndex);
         });
       });
       anims.push(anim);
@@ -118,6 +138,7 @@ export class ActScreen {
     this.actBtnPool.visible = visibility;
     this.levelBtnPool.visible = visibility;
     this.solBtnPool.visible = visibility;
+    this.bgSpritePool.visible = visibility;
   }
 
   actSelectMode() {
@@ -142,6 +163,7 @@ export class ActScreen {
 type ActBtnData = {
   actId: ActDataKeys,
   actIndex: number,
+  sprite: string,
 }
 
 function mkActBtnPool(
@@ -152,11 +174,7 @@ function mkActBtnPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        switch (frameType) {
-          case "down": return "test2_200_200.png";
-          case "hover": return "test2_200_200.png";
-          case "neutral": return "test2_200_200.png";
-        }
+        return self.data.sprite;
       },
       introAnim: [
         (self, tween) => {
@@ -277,6 +295,28 @@ function mkSolBtnPool(
         case "hover": return "blue-glow";
         case "neutral": return undefined;
       }
+    },
+  );
+}
+
+type BgSpriteData = {
+  sprite: string,
+};
+
+function mkBgSpritePool(
+  gameRefs: GameRefs,
+): Pool<BgSpriteData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return self.data.sprite;
+      },
+      introAnim: [
+      ],
+      callbacks: {
+      },
     },
   );
 }
