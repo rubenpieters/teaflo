@@ -42,6 +42,7 @@ export function updateSolutionRep(
 
     gameRefs.screens.execScreen.drawState(initState);
     gameRefs.screens.execScreen.drawStats(initState);
+    gameRefs.screens.execScreen.drawBgSprites();
     gameRefs.screens.execScreen.drawAnimControlBtns();
     gameRefs.screens.execScreen.drawTreeControlBtns();
     gameRefs.screens.execScreen.drawSwitchOrderBtns();
@@ -58,6 +59,7 @@ export function updateSolutionRep(
     gameRefs.screens.execScreen.clearAnimPools();
     gameRefs.screens.execScreen.drawTree(solData.solInfo);
     if (prevState === undefined) {
+      gameRefs.screens.execScreen.drawBgSprites();
       gameRefs.screens.execScreen.drawAnimControlBtns();
       gameRefs.screens.execScreen.drawTreeControlBtns();
       gameRefs.screens.execScreen.drawSwitchOrderBtns();

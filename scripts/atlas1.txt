@@ -248,3 +248,4 @@ textures/icon_a1l5_207_160.png
 textures/icon_a1l6_183_103.png
 textures/icon_a1l7_183_103.png
 textures/icon_a1l8_183_103.png
+textures/bulb_180_180.png

@@ -59,6 +59,7 @@ export class ExecScreen {
   logGraphicsPool: Phaser.Graphics
   unitSelectBgPool: Pool<UnitSelectBgData, {}>
   unitSelectPool: Pool<UnitSelectData, {}>
+  bgSpritePool: Pool<BgSpriteData, {}>
   
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
@@ -105,6 +106,7 @@ export class ExecScreen {
     this.logGraphicsPool = gameRefs.game.add.graphics();
     this.unitSelectBgPool = mkUnitSelectBgPool(gameRefs);
     this.unitSelectPool = mkUnitSelectPool(gameRefs);
+    this.bgSpritePool = mkBgSpritePool(gameRefs);
   }
 
   reset() {
@@ -440,7 +442,24 @@ export class ExecScreen {
     });
   }
 
+  drawBgSprites() {
+    this.bgSpritePool.clear();
+    const friendlyPos0 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 0);
+    const bgF0 = this.bgSpritePool.newSprite(friendlyPos0.xMin - 15, friendlyPos0.yMin - 15, {}, { sprite: "bulb_180_180.png" });
+    bgF0.inputEnabled = false;
+    const friendlyPos1 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 1);
+    const bgF1 = this.bgSpritePool.newSprite(friendlyPos1.xMin - 15, friendlyPos1.yMin - 15, {}, { sprite: "bulb_180_180.png" });
+    bgF1.inputEnabled = false;
+    const friendlyPos2 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 2);
+    const bgF2 = this.bgSpritePool.newSprite(friendlyPos2.xMin - 15, friendlyPos2.yMin - 15, {}, { sprite: "bulb_180_180.png" });
+    bgF2.inputEnabled = false;
+    const friendlyPos3 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 3);
+    const bgF3 = this.bgSpritePool.newSprite(friendlyPos3.xMin - 15, friendlyPos3.yMin - 15, {}, { sprite: "bulb_180_180.png" });
+    bgF3.inputEnabled = false;
+  }
+
   drawAnimControlBtns() {
+    this.animControlBtnPool.clear();
     const types: ["pause", "play", "fast", "skip"] = ["pause", "play", "fast", "skip"];
     types.map((type, typeIndex) => {
       const pos = createPosition(this.gameRefs.settings,
@@ -1686,6 +1705,31 @@ function mkUnitSelectBgPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         return "unit_select_bg.png";
+      },
+      introAnim: [
+      ],
+      callbacks: {
+        click: (self) => {
+
+        },
+      },
+    },
+  );
+}
+
+type BgSpriteData = {
+  sprite: string,
+};
+
+function mkBgSpritePool(
+  gameRefs: GameRefs,
+): Pool<BgSpriteData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return self.data.sprite;
       },
       introAnim: [
       ],
