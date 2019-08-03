@@ -464,7 +464,13 @@ export class ExecScreen {
     this.bgSpritePool.newSprite(enemyPos3.xMin - 15, enemyPos3.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
 
     const statusPosRow0 = statusPos(this.gameRefs.settings, undefined as any, undefined as any, "byOrder", undefined as any, 0, 0);
-    this.bgSpritePool.newSprite(statusPosRow0.xMin - 15, statusPosRow0.yMin - 15, {}, { sprite: "vial_720_40.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(statusPosRow0.xMin - 15, statusPosRow0.yMin, {}, { sprite: "vial_720_40.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    const statusPosRow1 = statusPos(this.gameRefs.settings, undefined as any, undefined as any, "byOrder", undefined as any, 0, 1);
+    this.bgSpritePool.newSprite(statusPosRow1.xMin - 15, statusPosRow1.yMin, {}, { sprite: "vial_720_40.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    const statusPosRow2 = statusPos(this.gameRefs.settings, undefined as any, undefined as any, "byOrder", undefined as any, 0, 2);
+    this.bgSpritePool.newSprite(statusPosRow2.xMin - 15, statusPosRow2.yMin, {}, { sprite: "vial_720_40.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    const statusPosRow3 = statusPos(this.gameRefs.settings, undefined as any, undefined as any, "byOrder", undefined as any, 0, 3);
+    this.bgSpritePool.newSprite(statusPosRow3.xMin - 15, statusPosRow3.yMin, {}, { sprite: "vial_720_40.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
   }
 
   drawAnimControlBtns() {

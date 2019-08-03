@@ -1,6 +1,6 @@
 import { Pool } from "../../phaser/pool";
 import { GameRefs } from "../../states/game";
-import { chainSpriteCreation, Create, SeqAnimation, runAsTween, runCreateOnly, BaseAnimation } from "../../phaser/animation";
+import { chainSpriteCreation, Create, SeqAnimation, runAsTween, runCreateOnly, BaseAnimation, runAnim } from "../../phaser/animation";
 import { createPosition } from "../../util/position";
 import { drawCurrentLevel } from "../exec/events";
 import { DataSprite, clearShader, addShader } from "../../phaser/datasprite";
@@ -10,21 +10,22 @@ import { transitionScreen, ScreenCodex, ScreenSettings } from "../transition";
 export class MenuScreen {
   menuBgPool: Pool<MenuBgData, {}>
   menuBtnPool: Pool<MenuBtnData, "selected" | "not_selected">
+  bgSpritePool: Pool<BgSpriteData, {}>
 
   constructor(
     public readonly gameRefs: GameRefs
   ) {
     this.menuBgPool = mkMenuBgPool(gameRefs);
     this.menuBtnPool = mkMenuBtnPool(gameRefs);
+    this.bgSpritePool = mkBgSpritePool(gameRefs);
   }
 
-  drawMenuBtn() {
-    this.redrawMenuBtn(true);
-    this.menuBtnPool.playIntroAnimations();
+  drawMenuBtn(animations: boolean = false) {
+    this.redrawMenuBtn(animations);
   }
 
   redrawMenuBtn(
-    animation: boolean = false,
+    animations: boolean = false,
   ) {
     this.menuBgPool.clear();
     this.menuBtnPool.clear();
@@ -37,7 +38,7 @@ export class MenuScreen {
           let sprite;
           const pos = createPosition(this.gameRefs.settings,
             "right", (120 * i), 100,
-            "bot", 20, 100,
+            "bot", 5, 100,
           );
           if (this.gameRefs.saveData.activeScreen === type) {
             // this is the currently selected menu type
@@ -53,17 +54,27 @@ export class MenuScreen {
             50,
             self,
             (tween) => {
-              tween.from({ x: self.x - 50, alpha: 0 }, 50, Phaser.Easing.Linear.None, false, 0);
+              tween.from({ y: self.y + 30, alpha: 0.5 }, 50, Phaser.Easing.Linear.None, false, 0);
             },
           );
         }
       )
     });
 
-    if (animation) {
-      runAsTween(this.gameRefs, new SeqAnimation(anims));
-    } else {
-      runCreateOnly(new SeqAnimation(anims));
+    runAnim(animations, this.gameRefs, new SeqAnimation(anims));
+  }
+
+  drawBg() {
+    this.bgSpritePool.clear();
+
+    this.bgSpritePool.newSprite(0, this.gameRefs.settings.gameHeight - 30, {}, { sprite: "menu_border_1920_25.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+
+    for (const i of [0,1,2,3]) {
+      const pos = createPosition(this.gameRefs.settings,
+        "right", (120 * i), 120,
+        "bot", 0, 100,
+      );
+      this.bgSpritePool.newSprite(pos.xMin, pos.yMin, {}, { sprite: "arc_130_130.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     }
   }
 }
@@ -83,10 +94,10 @@ function mkMenuBtnPool(
       atlas: "atlas1",
       toFrame: (self, frameType) => {
         switch (self.data.type) {
-          case "menu": return `menu_select_100_100.png`;
-          case "exec": return `menu_schem_100_100.png`;
-          case "codex": return `menu_codex_100_100.png`;
-          case "settings": return `menu_options_100_100.png`;
+          case "menu": return `menu_select2_100_100.png`;
+          case "exec": return `menu_schem2_100_100.png`;
+          case "codex": return `menu_codex2_100_100.png`;
+          case "settings": return `menu_options2_100_100.png`;
         }
       },
       introAnim: [
@@ -151,6 +162,31 @@ function mkMenuBgPool(
         },
       ],
       callbacks: {},
+    },
+  );
+}
+
+type BgSpriteData = {
+  sprite: string,
+};
+
+function mkBgSpritePool(
+  gameRefs: GameRefs,
+): Pool<BgSpriteData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return self.data.sprite;
+      },
+      introAnim: [
+      ],
+      callbacks: {
+        click: (self) => {
+
+        },
+      },
     },
   );
 }

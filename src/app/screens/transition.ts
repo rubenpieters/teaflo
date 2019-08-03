@@ -85,7 +85,8 @@ function drawNewScreen(
   newScreen: ScreenActive,
   animations: boolean,
 ) {
-  gameRefs.screens.menuScreen.drawMenuBtn();
+  gameRefs.screens.menuScreen.drawMenuBtn(animations);
+  gameRefs.screens.menuScreen.drawBg();
   switch (newScreen.tag) {
     case "ScreenAct": {
       gameRefs.saveData.activeScreen = "menu";
