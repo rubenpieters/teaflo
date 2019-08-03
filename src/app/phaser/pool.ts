@@ -51,6 +51,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
     frameType: FrameType,
     data: Data,
     alpha?: number,
+    inputEnabled: boolean = true,
   ): DataSprite<Data> {
     const sprite: DataSprite<Data> = this.getFirstExists(false, true, x, y);
     if (alpha !== undefined) {
@@ -70,52 +71,54 @@ export class Pool<Data, FrameType> extends Phaser.Group {
         sprite.frameName = frameName;
       }
     }
-    sprite.inputEnabled = true;
-    // initialize sprite if not initialized yet
-    if (sprite.props === undefined || sprite.props.init === false) {
-      sprite.events.onInputDown.removeAll();
-      sprite.events.onInputDown.add(() => {
-        if (sprite.props !== undefined) {
-          sprite.props.selecting = true;
-          invokeIfDefined(this.poolInfo.callbacks.onDown, sprite);
-        }
-      });
-      sprite.events.onInputUp.removeAll();
-      sprite.events.onInputUp.add(() => {
-        if (sprite.props !== undefined) {
-          const pX = this.game.input.activePointer.x;
-          const pY = this.game.input.activePointer.y;
-          if (
-            pX >= sprite.x
-            && pX <= sprite.x + sprite.width
-            && pY >= sprite.y
-            && pY <= sprite.y + sprite.height
-          ) {
-            invokeIfDefined(this.poolInfo.callbacks.click, sprite);
+    if (inputEnabled) {
+      sprite.inputEnabled = true;
+      // initialize sprite if not initialized yet
+      if (sprite.props === undefined || sprite.props.init === false) {
+        sprite.events.onInputDown.removeAll();
+        sprite.events.onInputDown.add(() => {
+          if (sprite.props !== undefined) {
+            sprite.props.selecting = true;
+            invokeIfDefined(this.poolInfo.callbacks.onDown, sprite);
           }
-          sprite.props.selecting = false;
-        }
-      });
-      sprite.events.onInputOver.removeAll();
-      sprite.events.onInputOver.add((obj: DataSprite<Data>, pointer: Phaser.Pointer) => {
-        if (obj.props !== undefined) {
-          obj.props.hovering = true;
-        }
-        invokeIfDefined(this.poolInfo.callbacks.hoverOver, sprite);
-      });
-      sprite.events.onInputOut.removeAll();
-      sprite.events.onInputOut.add((obj: DataSprite<Data>, pointer: Phaser.Pointer) => {
-        if (obj.props !== undefined && obj.props.hovering) {
-          invokeIfDefined(this.poolInfo.callbacks.hoverOut, sprite);
-          obj.props.hovering = false;
-        }
-      });
-
-      sprite.props = {
-        init: true,
-        selecting: false,
-        hovering: false,
-      };
+        });
+        sprite.events.onInputUp.removeAll();
+        sprite.events.onInputUp.add(() => {
+          if (sprite.props !== undefined) {
+            const pX = this.game.input.activePointer.x;
+            const pY = this.game.input.activePointer.y;
+            if (
+              pX >= sprite.x
+              && pX <= sprite.x + sprite.width
+              && pY >= sprite.y
+              && pY <= sprite.y + sprite.height
+            ) {
+              invokeIfDefined(this.poolInfo.callbacks.click, sprite);
+            }
+            sprite.props.selecting = false;
+          }
+        });
+        sprite.events.onInputOver.removeAll();
+        sprite.events.onInputOver.add((obj: DataSprite<Data>, pointer: Phaser.Pointer) => {
+          if (obj.props !== undefined) {
+            obj.props.hovering = true;
+          }
+          invokeIfDefined(this.poolInfo.callbacks.hoverOver, sprite);
+        });
+        sprite.events.onInputOut.removeAll();
+        sprite.events.onInputOut.add((obj: DataSprite<Data>, pointer: Phaser.Pointer) => {
+          if (obj.props !== undefined && obj.props.hovering) {
+            invokeIfDefined(this.poolInfo.callbacks.hoverOut, sprite);
+            obj.props.hovering = false;
+          }
+        });
+  
+        sprite.props = {
+          init: true,
+          selecting: false,
+          hovering: false,
+        };
+      }
     }
     return sprite;
   }

@@ -444,18 +444,27 @@ export class ExecScreen {
 
   drawBgSprites() {
     this.bgSpritePool.clear();
+
     const friendlyPos0 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 0);
-    const bgF0 = this.bgSpritePool.newSprite(friendlyPos0.xMin - 15, friendlyPos0.yMin - 15, {}, { sprite: "bulb_180_180.png" });
-    bgF0.inputEnabled = false;
+    this.bgSpritePool.newSprite(friendlyPos0.xMin - 15, friendlyPos0.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     const friendlyPos1 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 1);
-    const bgF1 = this.bgSpritePool.newSprite(friendlyPos1.xMin - 15, friendlyPos1.yMin - 15, {}, { sprite: "bulb_180_180.png" });
-    bgF1.inputEnabled = false;
+    this.bgSpritePool.newSprite(friendlyPos1.xMin - 15, friendlyPos1.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     const friendlyPos2 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 2);
-    const bgF2 = this.bgSpritePool.newSprite(friendlyPos2.xMin - 15, friendlyPos2.yMin - 15, {}, { sprite: "bulb_180_180.png" });
-    bgF2.inputEnabled = false;
+    this.bgSpritePool.newSprite(friendlyPos2.xMin - 15, friendlyPos2.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     const friendlyPos3 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 3);
-    const bgF3 = this.bgSpritePool.newSprite(friendlyPos3.xMin - 15, friendlyPos3.yMin - 15, {}, { sprite: "bulb_180_180.png" });
-    bgF3.inputEnabled = false;
+    this.bgSpritePool.newSprite(friendlyPos3.xMin - 15, friendlyPos3.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+
+    const enemyPos0 = enemyUnitPos(this.gameRefs.settings, undefined as any, 0);
+    this.bgSpritePool.newSprite(enemyPos0.xMin - 15, enemyPos0.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    const enemyPos1 = enemyUnitPos(this.gameRefs.settings, undefined as any, 1);
+    this.bgSpritePool.newSprite(enemyPos1.xMin - 15, enemyPos1.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    const enemyPos2 = enemyUnitPos(this.gameRefs.settings, undefined as any, 2);
+    this.bgSpritePool.newSprite(enemyPos2.xMin - 15, enemyPos2.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    const enemyPos3 = enemyUnitPos(this.gameRefs.settings, undefined as any, 3);
+    this.bgSpritePool.newSprite(enemyPos3.xMin - 15, enemyPos3.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+
+    const statusPosRow0 = statusPos(this.gameRefs.settings, undefined as any, undefined as any, "byOrder", undefined as any, 0, 0);
+    this.bgSpritePool.newSprite(statusPosRow0.xMin - 15, statusPosRow0.yMin - 15, {}, { sprite: "vial_720_40.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
   }
 
   drawAnimControlBtns() {
