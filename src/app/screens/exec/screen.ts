@@ -756,7 +756,8 @@ export class ExecScreen {
   ): Animation {
     const origin = lastAction.origin;
 
-    let originAnim: Animation = new BaseAnimation(0, self, t => { return; } );
+    let originAnimPre: Animation = new BaseAnimation(0, self, t => { return; } );
+    let originAnimPost: Animation = new BaseAnimation(0, self, t => { return; } );
     if (origin !== "noOrigin") {
       let originRef: DataSprite<UnitData> | undefined = undefined;
       this.unitPool.forEachAlive((ref: DataSprite<UnitData>) => {
@@ -765,18 +766,18 @@ export class ExecScreen {
         }
       });
       if (originRef !== undefined) {
-        originAnim = new SeqAnimation([
-          new BaseAnimation(1000, originRef, t => {
-            t.to({ x: 800, y: 600 }, 1000);
-          }),
-          new BaseAnimation(150, originRef, t => {
-            t.to({ alpha: 0.5 }, 150);
-          }),
-        ]);
+      originAnimPre = new BaseAnimation(1000, originRef, t => {
+        t.to({ x: 800, y: 600 }, 1000);
+      })
+      originAnimPost = new BaseAnimation(150, originRef, t => {
+          t.to({ alpha: 0.5 }, 150);
+        });
       }
     }
 
-    let targetAnim: Animation = new BaseAnimation(0, self, t => { return; } );
+    let targetAnimPre: Animation = new BaseAnimation(0, self, t => { return; } );
+    let targetAnimMid: Animation = new BaseAnimation(0, self, t => { return; } );
+    let targetAnimPost: Animation = new BaseAnimation(0, self, t => { return; } );
     const targets = actionTargets(lastAction);
     if (targets.length > 0) {
       const target0 = targets[0];
@@ -787,19 +788,30 @@ export class ExecScreen {
         }
       });
       if (targetRef !== undefined) {
-        targetAnim = new SeqAnimation([
-          new BaseAnimation(1000, targetRef, t => {
-            t.to({ x: 1000, y: 600 }, 1000);
-          }),
-          new BaseAnimation(150, targetRef, t => {
-            t.to({ alpha: 0.5 }, 150);
-          }),
-        ]);
+        targetAnimPre = new BaseAnimation(1000, targetRef, t => {
+          t.to({ x: 1000, y: 600 }, 1000);
+        })
+        targetAnimMid = new Create(() => {
+          return this.createLogTextSprite(1000, 600, lastAction);
+        }, self => {
+          return new BaseAnimation(1000, self, t => {
+            t.from({ y: self.y + 200 }, 1000);
+            t.onComplete.add(() => {
+              self.destroy();
+              this.logGraphicsPool.clear();
+            });
+          });
+        }),
+        targetAnimPost = new BaseAnimation(150, targetRef, t => {
+          t.to({ alpha: 0.5 }, 150);
+        })
       }
     }
 
     return new SeqAnimation([
-      new ParAnimation([originAnim, targetAnim]),
+      new ParAnimation([originAnimPre, targetAnimPre]),
+      targetAnimMid,
+      new ParAnimation([originAnimPost, targetAnimPost]),
       // this._createEffectAnimationWithZoom(state, lastAction, transforms, index + 1),
     ]);
 
