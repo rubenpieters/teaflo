@@ -223,6 +223,27 @@ export function ignoreTag(
   return actionTag === "Combined";
 }
 
+export function actionTargets(
+  action: Action,
+) {
+  switch (action.tag) {
+    case "RemoveThreat": // fallthrough
+    case "AddThreat": return [action.forAlly, action.atEnemy];
+    case "Damage": // fallthrough
+    case "Heal": // fallthrough
+    case "UseCharge": // fallthrough
+    case "RestoreCharge": // fallthrough
+    case "MoveAI": // fallthrough
+    case "Death": // fallthrough
+    case "AddStatus": return [action.target];
+    case "StartTurn": // fallthrough
+    case "Invalid": return []
+    case "Combined": {
+      throw "actionTargets: encountered a Combined action";
+    }
+  }
+}
+
 /**
  * Description shown when an action is performed on the state.
  */

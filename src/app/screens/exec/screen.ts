@@ -22,12 +22,12 @@ import { matchUserInput } from "../../../shared/game/input";
 import { aiIndices, indexToAiPos, aiPosToIndex } from "../../../shared/game/ai";
 import { GameState } from "../../../shared/definitions/state";
 import { FrAbility, EnAbility } from "../../../shared/definitions/unit";
-import { Action } from "../../../shared/definitions/action";
+import { Action, ActionWithOrigin } from "../../../shared/definitions/action";
 import { UserInput } from "../../../shared/definitions/input";
 import { Ability } from "../../../shared/definitions/ability";
 import { StatusTag } from "../../../shared/definitions/status";
 import { groupFromDesc } from "../../util/description";
-import { actionDescription } from "../../../shared/game/action";
+import { actionDescription, actionTargets } from "../../../shared/game/action";
 import { abilityDescription } from "../../../shared/game/ability";
 import { CardId } from "../../../shared/data/cardId";
 import { drawLine } from "../../phaser/line";
@@ -217,7 +217,7 @@ export class ExecScreen {
           { cardId: unit.cardId,
             globalId: unit.id,
             position: unitIndex,
-          }
+          }, 1,
         );
         if (currentInputType !== undefined && ! matchUserInput(currentInputType, unit.id)) {
           unitSprite.alpha = 0.3;
@@ -331,7 +331,7 @@ export class ExecScreen {
           { cardId: unit.cardId,
             globalId: unit.id,
             position: unitIndex,
-          }
+          }, 1,
         );
         if (currentInputType !== undefined && ! matchUserInput(currentInputType, unit.id)) {
           unitSprite.alpha = 0.3;
@@ -595,7 +595,7 @@ export class ExecScreen {
     state: GameState,
     log: Log,
   ): Animation {
-    const anims = allLogIndices(log).map(x => {
+    const anims: Animation[] = allLogIndices(log).map(x => {
       return new Create(
         () => { return; },
         () => {
@@ -603,7 +603,10 @@ export class ExecScreen {
         }
       );
     });
-    return new SeqAnimation(anims);
+    const drawAction = new BaseAnimation(1, undefined, tween => {
+      this.drawCurrentState();
+    });
+    return new SeqAnimation(anims.concat(drawAction));
   }
 
   drawIntermediateAction(
@@ -664,7 +667,7 @@ export class ExecScreen {
       }
     });
 
-    const effectAnim = this.createEffectAnimation(state, logEntry.action, logEntry.transforms);
+    const effectAnim = this.createEffectAnimationWithZoom(state, logEntry.action, logEntry.transforms);
     
     // draw difference with prev log
     if (prevLog !== undefined) {
@@ -715,7 +718,7 @@ export class ExecScreen {
     } else {
       action = lastAction;
     }
-    
+
     return new Create(() => {
       // draw connection line
       this.logGraphicsPool.clear();
@@ -744,6 +747,72 @@ export class ExecScreen {
         });
       }
     });
+  }
+
+  createEffectAnimationWithZoom(
+    state: GameState,
+    lastAction: ActionWithOrigin,
+    transforms: StatusLog[],
+  ): Animation {
+    const origin = lastAction.origin;
+
+    let originAnim: Animation = new BaseAnimation(0, self, t => { return; } );
+    if (origin !== "noOrigin") {
+      let originRef: DataSprite<UnitData> | undefined = undefined;
+      this.unitPool.forEachAlive((ref: DataSprite<UnitData>) => {
+        if (deepEqual(ref.data.globalId, origin)) {
+          originRef = ref;
+        }
+      });
+      if (originRef !== undefined) {
+        originAnim = new SeqAnimation([
+          new BaseAnimation(1000, originRef, t => {
+            t.to({ x: 800, y: 600 }, 1000);
+          }),
+          new BaseAnimation(150, originRef, t => {
+            t.to({ alpha: 0.5 }, 150);
+          }),
+        ]);
+      }
+    }
+
+    let targetAnim: Animation = new BaseAnimation(0, self, t => { return; } );
+    const targets = actionTargets(lastAction);
+    if (targets.length > 0) {
+      const target0 = targets[0];
+      let targetRef: DataSprite<UnitData> | undefined = undefined;
+      this.unitPool.forEachAlive((ref: DataSprite<UnitData>) => {
+        if (deepEqual(ref.data.globalId, target0)) {
+          targetRef = ref;
+        }
+      });
+      if (targetRef !== undefined) {
+        targetAnim = new SeqAnimation([
+          new BaseAnimation(1000, targetRef, t => {
+            t.to({ x: 1000, y: 600 }, 1000);
+          }),
+          new BaseAnimation(150, targetRef, t => {
+            t.to({ alpha: 0.5 }, 150);
+          }),
+        ]);
+      }
+    }
+
+    return new SeqAnimation([
+      new ParAnimation([originAnim, targetAnim]),
+      // this._createEffectAnimationWithZoom(state, lastAction, transforms, index + 1),
+    ]);
+
+    //return this._createEffectAnimationWithZoom(state, lastAction, transforms, 0);
+  }
+
+  _createEffectAnimationWithZoom(
+    state: GameState,
+    lastAction: ActionWithOrigin,
+    transforms: StatusLog[],
+    index: number,
+  ): Animation {
+    return undefined as any;
   }
 
   logLocation(
