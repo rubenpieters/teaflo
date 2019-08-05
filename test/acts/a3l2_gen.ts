@@ -1,18 +1,17 @@
 import { mkGameState, showGamestate } from "../../src/shared/game/state";
 import { trySolutions } from "../util";
 
+// u_i,c_iii,d_iv
+// u_iii,c_iii,d_iv
 
-// Sol 1
 const initState = mkGameState(
-  //["u_i", "c_iii", "d_iv"],
-  ["u_i", "c_ii", "d_iii"],
+  ["u_i", "c_iii", "d_iv"],
   ["a3l2_en1"],
 );
 
 console.log(showGamestate(initState));
 
-trySolutions(initState, 10);
-
+trySolutions(initState, 15);
 
 /*
 // Sol 1
@@ -30,7 +29,7 @@ trySolutions(initState, 15);
 possibilities(
   ["u_i", "u_ii", "u_iii"],
   ["c_i", "c_ii", "c_iii"],
-  ["d_i", "d_ii", "d_iii", "d_iv"]
+  ["d_i", "d_iii", "d_iv"]
 ).forEach(l => {
   console.log("-----------------------------------------------------");
   console.log(`PARAMS -- ${l}`)

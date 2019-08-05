@@ -16,8 +16,8 @@ export const a3l2_en1_ab1: Ability =
   ]);
 
 export const a3l2_en1: EnUnit = {
-  hp: 50,
-  maxHp: 50,
+  hp: 55,
+  maxHp: 55,
   charges: 5,
   maxCharges: 5,
   abilities: {

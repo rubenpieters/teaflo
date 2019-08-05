@@ -217,7 +217,7 @@ export class ExecScreen {
           { cardId: unit.cardId,
             globalId: unit.id,
             position: unitIndex,
-          }, 1,
+          },
         );
         if (currentInputType !== undefined && ! matchUserInput(currentInputType, unit.id)) {
           unitSprite.alpha = 0.3;
@@ -331,7 +331,7 @@ export class ExecScreen {
           { cardId: unit.cardId,
             globalId: unit.id,
             position: unitIndex,
-          }, 1,
+          },
         );
         if (currentInputType !== undefined && ! matchUserInput(currentInputType, unit.id)) {
           unitSprite.alpha = 0.3;
@@ -811,7 +811,7 @@ export class ExecScreen {
     return new SeqAnimation([
       new ParAnimation([originAnimPre, targetAnimPre]),
       targetAnimMid,
-      new ParAnimation([originAnimPost, targetAnimPost]),
+      // new ParAnimation([originAnimPost, targetAnimPost]),
       // this._createEffectAnimationWithZoom(state, lastAction, transforms, index + 1),
     ]);
 

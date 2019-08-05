@@ -177,8 +177,8 @@ export const c_iii_ab1: Ability =
 export const c_iii: FrUnit = {
   hp: 16,
   maxHp: 16,
-  charges: 40,
-  maxCharges: 40,
+  charges: 41,
+  maxCharges: 41,
   abilities: [
     {
       ability: c_iii_ab1,

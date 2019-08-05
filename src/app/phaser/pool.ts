@@ -55,7 +55,7 @@ export class Pool<Data, FrameType> extends Phaser.Group {
   ): DataSprite<Data> {
     const sprite: DataSprite<Data> = this.getFirstExists(false, true, x, y);
     if (alpha !== undefined) {
-      sprite.alpha == alpha;
+      sprite.alpha = alpha;
     } else {
       sprite.alpha = 1;
     }
