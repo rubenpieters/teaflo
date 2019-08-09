@@ -32,22 +32,11 @@ textures/menu_bar.png
 textures/menu_btn1.png
 textures/menu_btn2.png
 textures/menu_btn3.png
-textures/sel_act1.png
-textures/sel_level1.png
-textures/sel_level2.png
-textures/sel_level3.png
 textures/select3.png
 textures/unit1.png
 textures/unit2.png
 textures/unit3.png
 textures/unit4.png
-textures/menu_btn_half1.png
-textures/menu_btn_half2.png
-textures/menu_btn_joined.png
-textures/menu_btn_joined1.png
-textures/menu_btn_joined2.png
-textures/menu_btn_joined3.png
-textures/menu_btn_joined4.png
 textures/expl_0.png
 textures/expl_1.png
 textures/expl_2.png
@@ -257,3 +246,4 @@ textures/menu_select2_100_100.png
 textures/arc_130_130.png
 textures/menu_border_1920_25.png
 textures/circle_180_180.png
+textures/grey_border1.png

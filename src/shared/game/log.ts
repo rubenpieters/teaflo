@@ -8,8 +8,8 @@ export type LogEntry = {
   action: ActionWithOrigin,
   state: GameState,
   transforms: StatusLog[],
-  entryIndex: number, // start turn: 0, friendly action: 1, then +1 for each enemy action
-  typeIndex: number,
+  entryIndex: number, // entry within ability
+  typeIndex: number, // start turn: 0, friendly action: 1, then +1 for each enemy action
   actionIndex: number, // on original action: 0, then +1 for each trigger
 };
 

@@ -192,3 +192,14 @@ function findStatus(
   }
   return undefined;
 }
+
+export function logPosition(
+  settings: Settings,
+  entryIndex: number,
+  typeIndex: number,
+) {
+  return createPosition(settings,
+    "left", 20 + 50 * entryIndex, 40,
+    "top", 120 + 80 * typeIndex, 40,
+  );
+}

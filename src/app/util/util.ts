@@ -14,3 +14,9 @@ export function repeat<A>(
   }
   return l;
 }
+
+export function range0(
+  endExclusive: number,
+): number[] {
+  return Array(endExclusive).fill(undefined).map((_, i) => i);
+}
