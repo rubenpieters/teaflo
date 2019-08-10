@@ -101,3 +101,17 @@ export function nextLogIndex(
   }
   return newIndex;
 }
+
+export function splitLog(
+  log: Log,
+): { [K in number]: LogEntry[] } {
+  let obj: { [K in number]: LogEntry[] } = {};
+  log.forEach(entry => {
+    if (obj[entry.typeIndex] === undefined) {
+      obj[entry.typeIndex] = [entry];
+    } else {
+      obj[entry.typeIndex].push(entry);
+    }
+  });
+  return obj;
+}

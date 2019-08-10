@@ -1,6 +1,6 @@
 import { GameRefs } from "../../../app/states/game";
 import { runSolution, extendSolution, SolutionData, cutSolution } from "../../../shared/game/solution";
-import { Location } from "../../../shared/tree";
+import { Location, getLocation } from "../../../shared/tree";
 import { firstLogIndex } from "../../../shared/game/log";
 import { runAsTween } from "../../phaser/animation";
 import { clearAnimations } from "../util";
@@ -67,7 +67,16 @@ export function updateSolutionRep(
     }
     const logIndex = firstLogIndex();
     if (logIndex !== undefined) {
-      runAsTween(gameRefs, gameRefs.screens.execScreen.drawIntermediateActions(solResult.state, solResult.log), "log");
+      const solutionData = getLocation(solData.solInfo.solution.tree, solData.solInfo.loc);
+      // TODO: pass prevState to intermediateActions, instead of having to find it somehow
+      const anim = gameRefs.screens.execScreen.drawIntermediateActions(
+        solResult.state,
+        prevState,
+        solutionData.ability,
+        solutionData.origin,
+        solResult.log,
+      );
+      runAsTween(gameRefs, anim, "log");
     } else {
       gameRefs.screens.execScreen.drawState(solResult.state);
       gameRefs.screens.execScreen.drawStats(solResult.state);

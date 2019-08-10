@@ -3,10 +3,10 @@ import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position, center } from "../../util/position";
 import { addText, DataSprite, addShader, clearShader } from "../../phaser/datasprite";
 import { enFiltered, frFiltered, getTarget, statusById, position } from "../../../shared/game/state";
-import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex, StatusLog } from "../../../shared/game/log";
+import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex, StatusLog, splitLog } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
-import { EntityId, UnitId, friendlyId, TargetId, EnemyId, FriendlyId, StatusId } from "../../../shared/definitions/entityId";
+import { EntityId, UnitId, friendlyId, TargetId, EnemyId, FriendlyId, StatusId, UnitType } from "../../../shared/definitions/entityId";
 import { hoverUnit, clearHover, extendLevelSolution, changeLevelLoc, cutLevelSolution, showChangeUnitScreen, hideChangeUnitScreen, deployUnit } from "./events";
 import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation, runAsTween } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
@@ -76,6 +76,7 @@ export class ExecScreen {
   intermediate: LogIndex | undefined
   statusOrder: "byOrder" | "byId" = "byId"
   selecting: number | undefined
+  interactionEnabled: boolean = true
 
   treeCtrl: "remove" | undefined
 
@@ -121,6 +122,7 @@ export class ExecScreen {
     this.treeCtrl = undefined;
     this.statusOrder = "byOrder";
     this.selecting = undefined;
+    this.interactionEnabled = true;
   }
 
   solDataFromClickState(): SolutionData {
@@ -595,7 +597,7 @@ export class ExecScreen {
   }
 
   findUnit(
-    globalId: EntityId<"friendly" | "enemy"> | "noOrigin",
+    globalId: UnitId | "noOrigin",
   ): DataSprite<UnitData> | undefined {
     let returnRef: DataSprite<UnitData> | undefined = undefined;
     this.unitPool.forEachAlive((ref: DataSprite<UnitData>) => {
@@ -608,9 +610,13 @@ export class ExecScreen {
 
   drawIntermediateActions(
     state: GameState,
+    prevState: GameState | undefined,
+    ability: Ability,
+    origin: UnitId,
     log: Log,
   ): Animation {
     const maxTypeIndex = Math.max(...log.map(x => x.typeIndex));
+    const split = splitLog(log);
     const anims: Animation[] = range0(maxTypeIndex + 1).map(typeIndex => {
       const createBg = new Create(() => {
         this.logActionPool.clear();
@@ -618,9 +624,12 @@ export class ExecScreen {
         this.logTextSpritePool.clear();
         this.logTriggerPool.clear();
         this.intermediateBgPool.clear();
+        this.detailExplPool.clear();
         
+        this.interactionEnabled = false;
+
         this.drawCurrentState();
-        
+
         const pos = logPosition(this.gameRefs.settings, 0, typeIndex);
         const sprite = this.intermediateBgPool.newSprite(pos.xMin, pos.yMin, {}, { sprite: "grey_border1.png"});
         return sprite;
@@ -632,26 +641,65 @@ export class ExecScreen {
           });
         } else if (typeIndex === 1) {
           // friendly action
-          const logEntry = log.find(x => x.typeIndex === typeIndex);
-          if (logEntry === undefined) {
-            throw "Unexpected: no log entry for friendly unit";
-          }
-          const friendlyUnit = this.findUnit(logEntry.action.origin);
-          return new BaseAnimation(1000, friendlyUnit, t => {
-            t.to({ x: 800, y: 600 }, 1000);
+          const friendlyUnit = this.findUnit(origin);
+          const moveFr = new BaseAnimation(1000, friendlyUnit, t => {
+            t.to({ x: 650, y: 600 }, 1000);
           });
+          const showAbility = new Create(() => {
+            return groupFromDesc(abilityDescription(ability),
+              80, { x: explX, y: explY }, () => { return {} }, sprite => { return { sprite }},
+              this.detailExplPool,
+            );
+          }, self => {
+            return new BaseAnimation(1000, self, t => {
+              t.from({ alpha: 0 }, 1000);
+            });
+          });
+
+          const actionAnims = new SeqAnimation(split[1].map(entry => {
+            return this.drawAction(entry.action);
+          }));
+
+          return new SeqAnimation([
+            new ParAnimation([moveFr, showAbility]),
+            actionAnims,
+          ]);
         } else {
           // enemy action
-          const enemyUnit = undefined;
-          return new BaseAnimation(1000, self, t => {
-            t.from({ alpha: 0 }, 1000);
+          const en = state.enUnits.units[typeIndex - 2];
+          if (en === undefined) {
+            throw "drawIntermediateActions: enemy unit is not defined";
+          }
+          const enemyUnit = this.findUnit(en.id);
+          const moveEn = new BaseAnimation(1000, enemyUnit, t => {
+            t.to({ x: 650, y: 600 }, 1000);
           });
+          const showAbility = new Create(() => {
+            return groupFromDesc(abilityDescription(en.abilities[aiPosToIndex(en.aiPosition)].ability),
+              80, { x: explX, y: explY }, () => { return {} }, sprite => { return { sprite }},
+              this.detailExplPool,
+            );
+          }, self => {
+            return new BaseAnimation(1000, self, t => {
+              t.from({ alpha: 0 }, 1000);
+            });
+          });
+
+          const actionAnims = new SeqAnimation(split[typeIndex].map(entry => {
+            return this.drawAction(entry.action);
+          }));
+          return new SeqAnimation([
+            new ParAnimation([moveEn, showAbility]),
+            actionAnims,
+          ]);
         }
       });
       return createBg;
     });
     const drawAction = new BaseAnimation(1, undefined, tween => {
       this.drawCurrentState();
+        
+      this.interactionEnabled = true;
     });
     return new SeqAnimation(anims.concat(drawAction));
 
@@ -667,6 +715,47 @@ export class ExecScreen {
       this.drawCurrentState();
     });
     return new SeqAnimation(anims.concat(drawAction));*/
+  }
+
+  drawAction(
+    action: ActionWithOrigin,
+  ) {
+    const targets = actionTargets(action);
+    if (targets.length > 0) {
+      const target0 = targets[0];
+      let targetRef: DataSprite<UnitData> | undefined = undefined;
+      this.unitPool.forEachAlive((ref: DataSprite<UnitData>) => {
+        if (deepEqual(ref.data.globalId, target0)) {
+          targetRef = ref;
+        }
+      });
+      if (targetRef === undefined) {
+        throw "drawAction: target is not defined";
+      }
+      const targetAnimPre = new BaseAnimation(1000, targetRef, t => {
+        t.to({ x: 850, y: 600 }, 1000);
+      });
+      const targetAnimMid = new Create(() => {
+        return this.createLogTextSprite(850, 600, action);
+      }, self => {
+        return new BaseAnimation(1000, self, t => {
+          t.from({ y: self.y + 200 }, 1000);
+          t.onComplete.add(() => {
+            self.destroy();
+            this.logGraphicsPool.clear();
+          });
+        });
+      });
+      // NOTE: why is targetRef considered as 'never' here?
+      if (deepEqual((targetRef as any).data.globalId, action.origin)) {
+        return new SeqAnimation([targetAnimMid]);
+      }
+      return new SeqAnimation([targetAnimPre, targetAnimMid]);
+    } else {
+      // TODO: animation without target
+      return new BaseAnimation(1, undefined, tween => {
+      });
+    }
   }
 
   drawIntermediateAction(
@@ -1157,23 +1246,25 @@ function mkUnitPool(
       ],
       callbacks: {
         click: (self) => {
-          const clickState = gameRefs.screens.execScreen.clickState;
-          if (clickState !== undefined) {
-            const inputType: UserInput = clickState.ability.inputs[clickState.inputs.length];
-            if (matchUserInput(inputType, self.data.globalId)) {
-              clickState.inputs.push(self.data.globalId);
-              if (clickState.inputs.length === clickState.ability.inputs.length) {
-                extendLevelSolution(gameRefs, gameRefs.screens.execScreen.solDataFromClickState());
+          if (gameRefs.screens.execScreen.interactionEnabled) {
+            const clickState = gameRefs.screens.execScreen.clickState;
+            if (clickState !== undefined) {
+              const inputType: UserInput = clickState.ability.inputs[clickState.inputs.length];
+              if (matchUserInput(inputType, self.data.globalId)) {
+                clickState.inputs.push(self.data.globalId);
+                if (clickState.inputs.length === clickState.ability.inputs.length) {
+                  extendLevelSolution(gameRefs, gameRefs.screens.execScreen.solDataFromClickState());
+                }
               }
-            }
-          } else {
-            if (
-              gameRefs.screens.execScreen.selecting === undefined ||
-              gameRefs.screens.execScreen.selecting !== self.data.position
-            ) {
-              showChangeUnitScreen(gameRefs, self.data.position);
             } else {
-              hideChangeUnitScreen(gameRefs);
+              if (
+                gameRefs.screens.execScreen.selecting === undefined ||
+                gameRefs.screens.execScreen.selecting !== self.data.position
+              ) {
+                showChangeUnitScreen(gameRefs, self.data.position);
+              } else {
+                hideChangeUnitScreen(gameRefs);
+              }
             }
           }
         },
@@ -1318,7 +1409,8 @@ function mkAbilityPool(
           if (self.data.tag === "FrAbilityData") {
             if (
               gameRefs.screens.execScreen.canExtendState() &&
-              gameRefs.screens.execScreen.clickState === undefined
+              gameRefs.screens.execScreen.clickState === undefined &&
+              gameRefs.screens.execScreen.interactionEnabled
             ) {
               // start using ability, if applicable
               gameRefs.screens.execScreen.clickState = {
