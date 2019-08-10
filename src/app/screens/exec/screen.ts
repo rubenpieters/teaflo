@@ -14,7 +14,7 @@ import { Solution, SolutionData } from "../../../shared/game/solution";
 import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
 import { clearAnimations } from "../util";
-import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions, explX, explY, explArrowEnd, unitEnMinX, unitFrMinY, logPosition } from "./positions";
+import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions, explX, explY, explArrowEnd, unitEnMinX, unitFrMinY, logPosition, sourceUnitPos } from "./positions";
 import deepEqual from "deep-equal";
 import { groupOrder, statusTagDescription } from "../../../shared/game/status";
 import { StStatus } from "../../../shared/definitions/statusRow";
@@ -80,6 +80,8 @@ export class ExecScreen {
 
   treeCtrl: "remove" | undefined
 
+  sourceUnit: UnitId | undefined;
+
   constructor(
     public readonly gameRefs: GameRefs
   ) {
@@ -123,6 +125,7 @@ export class ExecScreen {
     this.statusOrder = "byOrder";
     this.selecting = undefined;
     this.interactionEnabled = true;
+    this.sourceUnit = undefined;
   }
 
   solDataFromClickState(): SolutionData {
@@ -216,8 +219,11 @@ export class ExecScreen {
         const unitPos = friendlyUnitPos(this.gameRefs.settings, state, unitIndex);
         this.emptySlotPool.newSprite(unitPos.xMin, unitPos.yMin, {}, { position: unitIndex });
       } else if (unit !== undefined) {
-        const unitPos = friendlyUnitPos(this.gameRefs.settings, state, unitIndex);
-        const utilityPos = unitUtilityPositions(unitPos);
+        const friendlyPos = friendlyUnitPos(this.gameRefs.settings, state, unitIndex);
+        const unitPos = deepEqual(this.sourceUnit, unit.id) ?
+          sourceUnitPos() :
+          friendlyPos;
+        const utilityPos = unitUtilityPositions(friendlyPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: unit.id,
@@ -240,7 +246,7 @@ export class ExecScreen {
         if (
           this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id)
         ) {
-          const hoverBarPos = relativeTo(unitPos,
+          const hoverBarPos = relativeTo(friendlyPos,
             [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
             0, 0,
           );
@@ -249,7 +255,7 @@ export class ExecScreen {
         }
 
         // HP
-        const unitHpPos = relativeTo(unitPos,
+        const unitHpPos = relativeTo(friendlyPos,
           [{ type: "left", amt: -5 }],
           10, 150,
         );
@@ -265,7 +271,7 @@ export class ExecScreen {
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
 
         // CH
-        const unitChPos = relativeTo(unitPos,
+        const unitChPos = relativeTo(friendlyPos,
           [{ type: "right", amt: -5 }],
           10, 150,
         );
@@ -330,8 +336,11 @@ export class ExecScreen {
     // draw enemy units
     state.enUnits.units.forEach((unit, unitIndex) => {
       if (unit !== undefined) {
-        const unitPos = enemyUnitPos(this.gameRefs.settings, state, unitIndex);
-        const utilityPos = unitUtilityPositions(unitPos);
+        const enemyPos = enemyUnitPos(this.gameRefs.settings, state, unitIndex);
+        const unitPos = deepEqual(this.sourceUnit, unit.id) ?
+          sourceUnitPos() :
+          enemyPos;
+        const utilityPos = unitUtilityPositions(enemyPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
             globalId: unit.id,
@@ -354,7 +363,7 @@ export class ExecScreen {
         if (
           this.hoveredUnit !== undefined && deepEqual(this.hoveredUnit, unit.id)
         ) {
-          const hoverBarPos = relativeTo(unitPos,
+          const hoverBarPos = relativeTo(enemyPos,
             [{ type: "above", amt: 5 }, { type: "left", amt: 5 }],
             0, 0,
           );
@@ -363,7 +372,7 @@ export class ExecScreen {
         }
 
         // HP
-        const unitHpPos = relativeTo(unitPos,
+        const unitHpPos = relativeTo(enemyPos,
           [{ type: "left", amt: -5 }],
           10, 150,
         );
@@ -379,7 +388,7 @@ export class ExecScreen {
         unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
 
         // CH
-        const unitChPos = relativeTo(unitPos,
+        const unitChPos = relativeTo(enemyPos,
           [{ type: "right", amt: -5 }],
           10, 150,
         );
@@ -399,7 +408,7 @@ export class ExecScreen {
           const ability = unit.abilities[index];
           if (ability !== undefined) {
             const aiPos = indexToAiPos(index);
-            const abPos = relativeTo(unitPos,
+            const abPos = relativeTo(enemyPos,
               [ { type: "below", amt: 95 + 70 * aiPos.y },
                 { type: "left", amt: -45 - 70 * aiPos.x }
               ],
@@ -640,10 +649,12 @@ export class ExecScreen {
             t.from({ alpha: 0 }, 1000);
           });
         } else if (typeIndex === 1) {
+          this.sourceUnit = origin;
           // friendly action
           const friendlyUnit = this.findUnit(origin);
           const moveFr = new BaseAnimation(1000, friendlyUnit, t => {
-            t.to({ x: 650, y: 600 }, 1000);
+            const sourcePos = sourceUnitPos();
+            t.to({ x: sourcePos.xMin, y: sourcePos.yMin }, 1000);
           });
           const showAbility = new Create(() => {
             return groupFromDesc(abilityDescription(ability),
@@ -660,19 +671,27 @@ export class ExecScreen {
             return this.drawAction(entry.action);
           }));
 
+          const fadeOut = new BaseAnimation(750, friendlyUnit, t => {
+            this.sourceUnit = undefined;
+            t.to({ alpha: 0 }, 750);
+          }); 
+
           return new SeqAnimation([
             new ParAnimation([moveFr, showAbility]),
             actionAnims,
+            fadeOut,
           ]);
         } else {
-          // enemy action
           const en = state.enUnits.units[typeIndex - 2];
           if (en === undefined) {
             throw "drawIntermediateActions: enemy unit is not defined";
           }
+          this.sourceUnit = en.id;
+          // enemy action
           const enemyUnit = this.findUnit(en.id);
           const moveEn = new BaseAnimation(1000, enemyUnit, t => {
-            t.to({ x: 650, y: 600 }, 1000);
+            const sourcePos = sourceUnitPos();
+            t.to({ x: sourcePos.xMin, y: sourcePos.yMin }, 1000);
           });
           const showAbility = new Create(() => {
             return groupFromDesc(abilityDescription(en.abilities[aiPosToIndex(en.aiPosition)].ability),
@@ -688,18 +707,25 @@ export class ExecScreen {
           const actionAnims = new SeqAnimation(split[typeIndex].map(entry => {
             return this.drawAction(entry.action);
           }));
+
+          const fadeOut = new BaseAnimation(750, enemyUnit, t => {
+            this.sourceUnit = undefined;
+            t.to({ alpha: 0 }, 750);
+          }); 
+
           return new SeqAnimation([
             new ParAnimation([moveEn, showAbility]),
             actionAnims,
+            fadeOut,
           ]);
         }
       });
       return createBg;
     });
-    const drawAction = new BaseAnimation(1, undefined, tween => {
-      this.drawCurrentState();
-        
+    const drawAction = new BaseAnimation(1, undefined, tween => {   
       this.interactionEnabled = true;
+
+      this.drawCurrentState();
     });
     return new SeqAnimation(anims.concat(drawAction));
 
@@ -733,6 +759,7 @@ export class ExecScreen {
         throw "drawAction: target is not defined";
       }
       const targetAnimPre = new BaseAnimation(1000, targetRef, t => {
+        this.drawCurrentState();
         t.to({ x: 850, y: 600 }, 1000);
       });
       const targetAnimMid = new Create(() => {
@@ -746,11 +773,14 @@ export class ExecScreen {
           });
         });
       });
+      const targetAnimPost = new BaseAnimation(750, targetRef, t => {
+        t.to({ alpha: 0 }, 750);
+      });
       // NOTE: why is targetRef considered as 'never' here?
       if (deepEqual((targetRef as any).data.globalId, action.origin)) {
         return new SeqAnimation([targetAnimMid]);
       }
-      return new SeqAnimation([targetAnimPre, targetAnimMid]);
+      return new SeqAnimation([targetAnimPre, targetAnimMid, targetAnimPost]);
     } else {
       // TODO: animation without target
       return new BaseAnimation(1, undefined, tween => {

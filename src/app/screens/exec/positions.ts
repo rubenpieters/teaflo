@@ -203,3 +203,8 @@ export function logPosition(
     "top", 120 + 80 * typeIndex, 40,
   );
 }
+
+export function sourceUnitPos(
+): Position {
+  return { xMin: 650, yMin: 600, xMax: 800, yMax: 750 };
+}
