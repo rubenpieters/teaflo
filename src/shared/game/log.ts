@@ -11,6 +11,7 @@ export type LogEntry = {
   entryIndex: number, // entry within ability
   typeIndex: number, // start turn: 0, friendly action: 1, then +1 for each enemy action
   actionIndex: number, // on original action: 0, then +1 for each trigger
+  actionWithinAbility: number, // the index of the action within the ability (TODO: what about index when action originates from status?)
 };
 
 export type StatusLog = {
@@ -104,13 +105,13 @@ export function nextLogIndex(
 
 export function splitLog(
   log: Log,
-): { [K in number]: LogEntry[] } {
-  let obj: { [K in number]: LogEntry[] } = {};
-  log.forEach(entry => {
+): { [K in number]: LogEntryI[] } {
+  let obj: { [K in number]: LogEntryI[] } = {};
+  log.forEach((entry, i) => {
     if (obj[entry.typeIndex] === undefined) {
-      obj[entry.typeIndex] = [entry];
+      obj[entry.typeIndex] = [{ ...entry, logIndex: i }];
     } else {
-      obj[entry.typeIndex].push(entry);
+      obj[entry.typeIndex].push({ ...entry, logIndex: i });
     }
   });
   return obj;

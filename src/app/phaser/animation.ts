@@ -2,6 +2,10 @@ import { DataSprite } from "./datasprite";
 import { GameRefs } from "../states/game";
 import { Pool } from "./pool";
 
+export const animationDummy: { value: number } = {
+  value: 0,
+};
+
 export class Create {
   constructor(
     public readonly f: () => any,

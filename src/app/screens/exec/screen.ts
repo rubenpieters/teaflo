@@ -8,7 +8,7 @@ import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { EntityId, UnitId, friendlyId, TargetId, EnemyId, FriendlyId, StatusId, UnitType } from "../../../shared/definitions/entityId";
 import { hoverUnit, clearHover, extendLevelSolution, changeLevelLoc, cutLevelSolution, showChangeUnitScreen, hideChangeUnitScreen, deployUnit } from "./events";
-import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation, runAsTween } from "../../../app/phaser/animation";
+import { chainSpriteCreation, createTween, addTextPopup, speedTypeToSpeed, SpeedType, addSpritePopup, Create, BaseAnimation, SeqAnimation, Animation, ParAnimation, runAsTween, animationDummy } from "../../../app/phaser/animation";
 import { drawPositions, Location } from "../../../shared/tree";
 import { Solution, SolutionData } from "../../../shared/game/solution";
 import { transitionScreen, ScreenCodex } from "../transition";
@@ -62,6 +62,7 @@ export class ExecScreen {
   unitSelectPool: Pool<UnitSelectData, {}>
   bgSpritePool: Pool<BgSpriteData, {}>
   intermediateBgPool: Pool<BgSpriteData, {}>
+  actionBgPool: Pool<ActionBgData, {}>
   
 
   animControlBtnPool: Pool<AnimControlBtn, {}>
@@ -81,6 +82,7 @@ export class ExecScreen {
   treeCtrl: "remove" | undefined
 
   sourceUnit: UnitId | undefined;
+  displayedAbility: Ability | undefined;
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -113,6 +115,7 @@ export class ExecScreen {
     this.unitSelectPool = mkUnitSelectPool(gameRefs);
     this.bgSpritePool = mkBgSpritePool(gameRefs);
     this.intermediateBgPool = mkIntermediateBgPool(gameRefs);
+    this.actionBgPool = mkActionBgDataPool(gameRefs);
   }
 
   reset() {
@@ -603,6 +606,15 @@ export class ExecScreen {
         }
       }
     }
+
+    // draw ability if currently showing
+    if (this.displayedAbility !== undefined) {
+      groupFromDesc(
+        abilityDescription(this.displayedAbility),
+        80, { x: explX, y: explY }, () => { return {} }, sprite => { return { sprite }},
+        this.detailExplPool,
+      );
+    }
   }
 
   findUnit(
@@ -628,7 +640,6 @@ export class ExecScreen {
     const split = splitLog(log);
     const anims: Animation[] = range0(maxTypeIndex + 1).map(typeIndex => {
       const createBg = new Create(() => {
-        this.logActionPool.clear();
         this.logTextPool.clear();
         this.logTextSpritePool.clear();
         this.logTriggerPool.clear();
@@ -636,18 +647,18 @@ export class ExecScreen {
         this.detailExplPool.clear();
         
         this.interactionEnabled = false;
+        this.displayedAbility = undefined;
 
         this.drawCurrentState();
 
         const pos = logPosition(this.gameRefs.settings, 0, typeIndex);
-        const sprite = this.intermediateBgPool.newSprite(pos.xMin, pos.yMin, {}, { sprite: "grey_border1.png"});
+        const sprite = this.intermediateBgPool.newSprite(pos.xMin, pos.yMin, {}, { sprite: "grey_border1.png"}, 0.3);
         return sprite;
       }, self => {
         if (typeIndex === 0) {
           // start turn
-          return new BaseAnimation(1000, self, t => {
-            t.from({ alpha: 0 }, 1000);
-          });
+          const logIcon = this.drawLogIcon(0, log);
+          return logIcon;
         } else if (typeIndex === 1) {
           this.sourceUnit = origin;
           // friendly action
@@ -657,6 +668,7 @@ export class ExecScreen {
             t.to({ x: sourcePos.xMin, y: sourcePos.yMin }, 1000);
           });
           const showAbility = new Create(() => {
+            this.displayedAbility = ability;
             return groupFromDesc(abilityDescription(ability),
               80, { x: explX, y: explY }, () => { return {} }, sprite => { return { sprite }},
               this.detailExplPool,
@@ -667,8 +679,11 @@ export class ExecScreen {
             });
           });
 
-          const actionAnims = new SeqAnimation(split[1].map(entry => {
-            return this.drawAction(entry.action);
+          const actionAnims = new SeqAnimation(split[1].map((entry, actionI) => {
+            return new ParAnimation([
+              this.drawAction(entry.action, entry.actionWithinAbility),
+              this.drawLogIcon(entry.logIndex, log),
+            ]);
           }));
 
           const fadeOut = new BaseAnimation(750, friendlyUnit, t => {
@@ -682,7 +697,7 @@ export class ExecScreen {
             fadeOut,
           ]);
         } else {
-          const en = state.enUnits.units[typeIndex - 2];
+          const en = prevState!.enUnits.units[typeIndex - 2];
           if (en === undefined) {
             throw "drawIntermediateActions: enemy unit is not defined";
           }
@@ -694,6 +709,7 @@ export class ExecScreen {
             t.to({ x: sourcePos.xMin, y: sourcePos.yMin }, 1000);
           });
           const showAbility = new Create(() => {
+            this.displayedAbility = en.abilities[aiPosToIndex(en.aiPosition)].ability;
             return groupFromDesc(abilityDescription(en.abilities[aiPosToIndex(en.aiPosition)].ability),
               80, { x: explX, y: explY }, () => { return {} }, sprite => { return { sprite }},
               this.detailExplPool,
@@ -704,8 +720,11 @@ export class ExecScreen {
             });
           });
 
-          const actionAnims = new SeqAnimation(split[typeIndex].map(entry => {
-            return this.drawAction(entry.action);
+          const actionAnims = new SeqAnimation(split[typeIndex].map((entry, actionI) => {
+            return new ParAnimation([
+              this.drawAction(entry.action, entry.actionWithinAbility),
+              this.drawLogIcon(entry.logIndex, log),
+            ]);
           }));
 
           const fadeOut = new BaseAnimation(750, enemyUnit, t => {
@@ -722,8 +741,10 @@ export class ExecScreen {
       });
       return createBg;
     });
-    const drawAction = new BaseAnimation(1, undefined, tween => {   
+    const drawAction = new BaseAnimation(1, undefined, tween => {
+      this.intermediateBgPool.clear();   
       this.interactionEnabled = true;
+      this.displayedAbility = undefined;
 
       this.drawCurrentState();
     });
@@ -745,6 +766,7 @@ export class ExecScreen {
 
   drawAction(
     action: ActionWithOrigin,
+    actionI: number,
   ) {
     const targets = actionTargets(action);
     if (targets.length > 0) {
@@ -759,28 +781,38 @@ export class ExecScreen {
         throw "drawAction: target is not defined";
       }
       const targetAnimPre = new BaseAnimation(1000, targetRef, t => {
-        this.drawCurrentState();
         t.to({ x: 850, y: 600 }, 1000);
       });
-      const targetAnimMid = new Create(() => {
-        return this.createLogTextSprite(850, 600, action);
+      const actionBg = new Create(() => {
+        this.drawCurrentState();
+        return this.actionBgPool.newSprite(explX, explY - 100 * actionI, {}, { sprite: "grey_border2.png"}, 0.3);
       }, self => {
-        return new BaseAnimation(1000, self, t => {
-          t.from({ y: self.y + 200 }, 1000);
-          t.onComplete.add(() => {
-            self.destroy();
-            this.logGraphicsPool.clear();
-          });
+        return new BaseAnimation(500, self, t => {
+          t.from({ alpha: 0 }, 500);
         });
       });
       const targetAnimPost = new BaseAnimation(750, targetRef, t => {
+        this.actionBgPool.clear();
         t.to({ alpha: 0 }, 750);
+      });
+      const removeBg = new BaseAnimation(1, animationDummy, t => {
+        this.actionBgPool.clear();
+        t.to({ value: 0 }, 1);
       });
       // NOTE: why is targetRef considered as 'never' here?
       if (deepEqual((targetRef as any).data.globalId, action.origin)) {
-        return new SeqAnimation([targetAnimMid]);
+        return new SeqAnimation([
+          actionBg,
+          this.targetAnimMid(action, 700),
+          removeBg,
+        ]);
       }
-      return new SeqAnimation([targetAnimPre, targetAnimMid, targetAnimPost]);
+      return new SeqAnimation([
+        new ParAnimation([targetAnimPre, actionBg]),
+        this.targetAnimMid(action, 850),
+        targetAnimPost,
+        removeBg,
+      ]);
     } else {
       // TODO: animation without target
       return new BaseAnimation(1, undefined, tween => {
@@ -788,21 +820,29 @@ export class ExecScreen {
     }
   }
 
-  drawIntermediateAction(
-    intermediate: LogIndex,
+  targetAnimMid(
+    action: Action,
+    x: number,
   ): Animation {
-    this.logActionPool.clear();
-    this.logTextPool.clear();
-    this.logTextSpritePool.clear();
-    this.logTriggerPool.clear();
-    this.intermediateBgPool.clear();
-    
-    this.intermediate = intermediate;
-    console.log(`INTERMEDIATE: ${JSON.stringify(this.intermediate)}`);
-    this.drawCurrentState();
+    return new Create(() => {
+      return this.createLogTextSprite(x, 600, action);
+    }, self => {
+      return new BaseAnimation(1000, self, t => {
+        t.from({ y: self.y + 200 }, 1000);
+        t.onComplete.add(() => {
+          self.destroy();
+          this.logGraphicsPool.clear();
+        });
+      });
+    });
+  }
+
+  drawLogIcon(
+    intermediate: LogIndex,
+    log: Log,
+  ): Animation {
 
     const state = this.currentState();
-    const log = this.log!;
     const logEntry = getLogEntry(log, intermediate);
     const prevLog = getPrevLogEntry(log, intermediate);
 
@@ -810,7 +850,7 @@ export class ExecScreen {
     const anims: Animation[] = allLogIndices(log).map(x => {
       const entryIndex = x.entryIndex;
       const typeIndex = x.typeIndex;
-      const entry = getLogEntry(this.log!, x.logIndex);
+      const entry = getLogEntry(log, x.logIndex);
 
       const pos = createPosition(this.gameRefs.settings,
         "left", 20 + 50 * entryIndex, 40,
@@ -847,14 +887,17 @@ export class ExecScreen {
       }
     });
 
-    const effectAnim = this.createEffectAnimationWithZoom(state, logEntry.action, logEntry.transforms);
-    
     // draw difference with prev log
     if (prevLog !== undefined) {
       // console.log(`PREV: ${JSON.stringify(prevLog.action)}`)
     }
 
-    return new ParAnimation(anims.concat(effectAnim));
+    return new Create(() => {
+      this.logActionPool.clear();
+      this.logTriggerPool.clear();
+    }, self => {
+      return new ParAnimation(anims);
+    });
   }
 
   drawUnitSelect(
@@ -2028,6 +2071,31 @@ type IntermediateBgData = {
 function mkIntermediateBgPool(
   gameRefs: GameRefs,
 ): Pool<IntermediateBgData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return self.data.sprite;
+      },
+      introAnim: [
+      ],
+      callbacks: {
+        click: (self) => {
+
+        },
+      },
+    },
+  );
+}
+
+type ActionBgData = {
+  sprite: string,
+};
+
+function mkActionBgDataPool(
+  gameRefs: GameRefs,
+): Pool<ActionBgData, {}> {
   return new Pool(
     gameRefs.game,
     {

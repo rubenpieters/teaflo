@@ -247,3 +247,4 @@ textures/arc_130_130.png
 textures/menu_border_1920_25.png
 textures/circle_180_180.png
 textures/grey_border1.png
+textures/grey_border2.png
