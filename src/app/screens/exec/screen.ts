@@ -681,7 +681,7 @@ export class ExecScreen {
 
           const actionAnims = new SeqAnimation(split[1].map((entry, actionI) => {
             return new ParAnimation([
-              this.drawAction(entry.action, entry.actionWithinAbility),
+              this.drawAction(entry),
               this.drawLogIcon(entry.logIndex, log),
             ]);
           }));
@@ -722,7 +722,7 @@ export class ExecScreen {
 
           const actionAnims = new SeqAnimation(split[typeIndex].map((entry, actionI) => {
             return new ParAnimation([
-              this.drawAction(entry.action, entry.actionWithinAbility),
+              this.drawAction(entry),
               this.drawLogIcon(entry.logIndex, log),
             ]);
           }));
@@ -745,6 +745,7 @@ export class ExecScreen {
       this.intermediateBgPool.clear();   
       this.interactionEnabled = true;
       this.displayedAbility = undefined;
+      this.intermediate = undefined;
 
       this.drawCurrentState();
     });
@@ -765,9 +766,11 @@ export class ExecScreen {
   }
 
   drawAction(
-    action: ActionWithOrigin,
-    actionI: number,
+    entry: LogEntry,
   ) {
+    const action: ActionWithOrigin = entry.action;
+    const actionI: number = entry.actionWithinAbility;
+    const intermediateIndex: number = entry.intermediateIndex;
     const targets = actionTargets(action);
     if (targets.length > 0) {
       const target0 = targets[0];
@@ -784,6 +787,8 @@ export class ExecScreen {
         t.to({ x: 850, y: 600 }, 1000);
       });
       const actionBg = new Create(() => {
+        this.intermediate = intermediateIndex;
+        console.log(`INTERMEDIATE: ${intermediateIndex}`);
         this.drawCurrentState();
         return this.actionBgPool.newSprite(explX, explY - 100 * actionI, {}, { sprite: "grey_border2.png"}, 0.3);
       }, self => {

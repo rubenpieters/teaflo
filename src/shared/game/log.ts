@@ -12,6 +12,7 @@ export type LogEntry = {
   typeIndex: number, // start turn: 0, friendly action: 1, then +1 for each enemy action
   actionIndex: number, // on original action: 0, then +1 for each trigger
   actionWithinAbility: number, // the index of the action within the ability (TODO: what about index when action originates from status?)
+  intermediateIndex: number, // overall index
 };
 
 export type StatusLog = {

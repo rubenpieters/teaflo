@@ -139,15 +139,15 @@ function runInitialTurn(
   let log: Log = emptyLog();
 
   // The initial turn applies a `StartTurn` action on the game
-  const startTurnResult = applyActionsToSolution([{...new StartTurn, origin: "noOrigin", index: 0 }], state, [], 0);
+  const startTurnResult = applyActionsToSolution([{...new StartTurn, origin: "noOrigin", index: 0 }], state, [], 0, 0);
   state = startTurnResult.state;
   const stFilteredLog = startTurnResult.log.filter(x => ! ignoreTag(x.action.tag));
   log = log.concat(stFilteredLog);
 
   if (state.type === "invalid") {
-    return { state, log: log, win: false };
+    return { state, log: log, win: false, intermediateIndex: startTurnResult.intermediateIndex, };
   }
-  return { state, log };
+  return { state, log, intermediateIndex: startTurnResult.intermediateIndex, };
 }
 
 export function runPhases(
@@ -169,7 +169,7 @@ export function runPhases(
   const frAbility: Ability = solData.ability;
   const frInputs: any[] = solData.inputs;
   const frContext = new FrAbilityContext(solData.origin, frInputs);
-  const frActionResult = applyAbilityToSolution(frAbility, frContext, state, 1);
+  const frActionResult = applyAbilityToSolution(frAbility, frContext, state, 1, startTurnResult.intermediateIndex);
   state = frActionResult.state;
   const frFilteredLog = frActionResult.log.filter(x => ! ignoreTag(x.action.tag));
   log = log.concat(frFilteredLog);
@@ -180,6 +180,7 @@ export function runPhases(
 
   // Action (En) Phase
   let i = 0;
+  let prevIntermediateIndex = frActionResult.intermediateIndex;
   enIds(state).forEach(t => {
     const enId = t.e;
     const result = overTarget(state, enId, x => x);
@@ -192,12 +193,13 @@ export function runPhases(
     ) {
       const enAbility: Ability = entity.abilities[aiPosToIndex(entity.aiPosition)].ability;
       const enContext = new EnAbilityContext(enId);
-      const enActionResult = applyAbilityToSolution(enAbility, enContext, state, i + 2);
+      const enActionResult = applyAbilityToSolution(enAbility, enContext, state, i + 2, prevIntermediateIndex);
       state = enActionResult.state;
       const enFilteredLog = enActionResult.log.filter(x => ! ignoreTag(x.action.tag));
       log = log.concat(enFilteredLog);
 
       i += 1;
+      prevIntermediateIndex = enActionResult.intermediateIndex;
     }
   });
 
@@ -228,9 +230,11 @@ function applyAbilityToSolution(
   context: Context,
   state: GameState,
   typeIndex: number,
+  intermediateIndex: number,
 ): {
   state: GameState,
   log: LogEntry[],
+  intermediateIndex: number,
 } {
   // resolve an ability into actions
   const actions = resolveAbility(ability, state, context);
@@ -239,7 +243,7 @@ function applyAbilityToSolution(
     return {...x, origin: context.self, index: i }
   });
   // apply each of the actions to the state
-  return applyActionsToSolution(actionsWithOrigins, state, [], typeIndex);
+  return applyActionsToSolution(actionsWithOrigins, state, [], typeIndex, intermediateIndex);
 }
 
 function applyActionsToSolution(
@@ -247,11 +251,13 @@ function applyActionsToSolution(
   state: GameState,
   log: LogEntry[],
   typeIndex: number,
+  intermediateIndex: number,
   entryIndex = 0,
   actionIndex = 0,
 ): {
   state: GameState,
   log: LogEntry[],
+  intermediateIndex: number,
 } {
   let newQueue: ActionWithOrigin[] = [];
   const addLog: LogEntry[] = [];
@@ -260,22 +266,24 @@ function applyActionsToSolution(
     const actionResult = resolveAction(state, transformed);
     state = actionResult.state;
     newQueue = newQueue.concat(actionResult.actions).concat(actions);
-    addLog.push({ action: transformed, state, transforms, typeIndex, entryIndex, actionIndex, actionWithinAbility: action.index });
+    // TODO: fix actionWithinAbility
+    addLog.push({ action: transformed, state, transforms, typeIndex, entryIndex, actionIndex, actionWithinAbility: action.index, intermediateIndex });
 
     if (state.type === "invalid") {
-      return { state, log: log.concat(addLog) };
+      return { state, log: log.concat(addLog), intermediateIndex, };
     }
     if (! ignoreTag(action.tag)) {
       entryIndex = entryIndex + 1;
+      intermediateIndex = intermediateIndex + 1;
     }
   }
   if (newQueue.length === 0) {
-    return { state, log: log.concat(addLog) };
+    return { state, log: log.concat(addLog), intermediateIndex, };
   } else {
     // TODO: probably the index here should reflect from which status the action originates
     const newQueueWithIndex = newQueue.map((x, i) => { return { ...x, index: i } });
     // TODO: here the original context stays unchanged, but the context should change throughout these calls
     // for example, the self property should change
-    return applyActionsToSolution(newQueueWithIndex, state, log.concat(addLog), typeIndex, entryIndex, actionIndex + 1);
+    return applyActionsToSolution(newQueueWithIndex, state, log.concat(addLog), typeIndex, intermediateIndex, entryIndex, actionIndex + 1);
   }
 }
