@@ -648,6 +648,7 @@ export class ExecScreen {
         
         this.interactionEnabled = false;
         this.displayedAbility = undefined;
+        this.intermediate = 0;
 
         this.drawCurrentState();
 
@@ -788,7 +789,6 @@ export class ExecScreen {
       });
       const actionBg = new Create(() => {
         this.intermediate = intermediateIndex;
-        console.log(`INTERMEDIATE: ${intermediateIndex}`);
         this.drawCurrentState();
         return this.actionBgPool.newSprite(explX, explY - 100 * actionI, {}, { sprite: "grey_border2.png"}, 0.3);
       }, self => {
