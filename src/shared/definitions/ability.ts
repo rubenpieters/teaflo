@@ -6,7 +6,7 @@ import { EnemyId, FriendlyId, TargetId, UnitId } from "./entityId";
  * An Ability is an action with ability variables which still need to be resolved.
  */
 export type Ability
-  = ActionF<Ability_URI, Target_URI>
+  = ActionF<Ability_URI, Target_URI>[]
   ;
 
 /**

@@ -10,8 +10,9 @@ import { TargetInput, EnemyInput } from "../../definitions/input";
  * Fr Unit
  */
 export const a1l1_fr_ab: Ability =
-  new A.Damage("Ability", "Target", new Ab.Static(9), new Ab.FromInput(0))
-  ;
+  A.combinedAbility([
+    new A.Damage("Ability", "Target", new Ab.Static(9), new Ab.FromInput(0)),
+  ]);
 
 export const a1l1_fr: FrUnit = {
   hp: 10,
@@ -36,8 +37,9 @@ export const a1l1_fr: FrUnit = {
  * En Unit
  */
 export const a1l1_en_ab: Ability =
-  new A.Damage("Ability", "Target", new Ab.Static(5), Ab.highestThreat())
-  ;
+  A.combinedAbility([
+   new A.Damage("Ability", "Target", new Ab.Static(5), Ab.highestThreat()),
+  ]);
 
 export const a1l1_en: EnUnit = {
   hp: 15,

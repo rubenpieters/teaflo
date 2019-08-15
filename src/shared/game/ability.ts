@@ -12,6 +12,8 @@ import { descSingleton, numberDescription } from "./description";
 import { statusDescription } from "./status";
 import { routeDirectionDescription } from "./ai";
 import deepEqual from "deep-equal";
+import { ActionF } from "../definitions/actionf";
+import { Ability_URI, Target_URI } from "../definitions/hkt";
 
 export function resolveSingleTargetAbility(
   ability: SingleTargetAbility,
@@ -47,13 +49,21 @@ export function resolveAbility(
   ability: Ability,
   state: GameState,
   context: Context,
-): Action[] {
-  const l = _resolveAbility(ability, state, context);
-  return l.map(x => resolveSingleTargetAbility(x, context));
+): (Action & { actionWithinAbility: number })[] {
+  const withIndex = ability.map((x, i) => {
+    return { ...x, actionWithinAbility: i };
+  });
+  const resolved = withIndex
+    .map(x => _resolveAbility(x, state, context))
+    .map((l, i) => l.map(x => {
+      return {...resolveSingleTargetAbility(x, context), actionWithinAbility: i};
+    }))
+    .reduce((acc, l) => acc.concat(l), []);
+  return resolved;
 }
 
 function _resolveAbility(
-  ability: Ability,
+  ability: ActionF<Ability_URI, Target_URI>,
   state: GameState,
   context: Context,
 ): SingleTargetAbility[] {
@@ -98,7 +108,7 @@ function _resolveAbility(
   }
 }
 
-function resolveToSingleTarget<A extends Ability>(
+function resolveToSingleTarget<A extends ActionF<Ability_URI, Target_URI>>(
   _ability: A,
   fields: (keyof A)[],
   state: GameState,
@@ -116,11 +126,11 @@ function resolveToSingleTarget<A extends Ability>(
 }
 
 function replaceField<A>(
-  abilities: Ability[],
+  abilities: ActionF<Ability_URI, Target_URI>[],
   field: any,
   resolved: { tag: "ids", ids: TargetId[] } | { tag: "var", var: AbilityVar<A> },
-): Ability[] {
-  const l: Ability[][] = abilities.map(ability => {
+): ActionF<Ability_URI, Target_URI>[] {
+  const l: ActionF<Ability_URI, Target_URI>[][] = abilities.map(ability => {
     switch (resolved.tag) {
       case "ids": {
         return resolved.ids.map(id => {
@@ -242,6 +252,19 @@ export function getLowestFriendlyHp(
 export function abilityDescription(
   ability: Ability,
 ): DescToken[] {
+  const desc: DescToken[] = ability.reduce((acc, x) => {
+    if (acc.length === 0) {
+      return _abilityDescription(x).concat(acc);
+    } else {
+      return acc.concat(new DescSeparator()).concat(_abilityDescription(x));
+    }
+  }, <DescToken[]>[]);
+  return desc;
+}
+
+function _abilityDescription(
+  ability: ActionF<Ability_URI, Target_URI>,
+): DescToken[] {
   switch (ability.tag) {
     case "AddThreat": {
       return descSingleton("icon_addthreat")
@@ -266,9 +289,9 @@ export function abilityDescription(
     case "Combined": {
       const desc: DescToken[] = ability.list.reduce((acc, x) => {
         if (acc.length === 0) {
-          return abilityDescription(x).concat(acc);
+          return _abilityDescription(x).concat(acc);
         } else {
-          return acc.concat(new DescSeparator()).concat(abilityDescription(x));
+          return acc.concat(new DescSeparator()).concat(_abilityDescription(x));
         }
       }, <DescToken[]>[]);
       return desc;

@@ -3,6 +3,7 @@ import { TargetId, UnitId, EnemyId, FriendlyId } from "./entityId";
 import { AIDirection } from "./ai";
 import { Status } from "./status";
 import { ActionWithOrigin } from "./action";
+import { Ability } from "./ability";
 
 /**
  * A generic shape of actions.
@@ -86,8 +87,8 @@ export function combinedAction(
 
 export function combinedAbility(
   list: ActionF<"Ability", "Target">[],
-): Combined<"Ability", "Target"> {
-  return new Combined(list);
+): Ability {
+  return list;
 }
 
 export class MoveAI<F extends URIS, G extends URIS> {

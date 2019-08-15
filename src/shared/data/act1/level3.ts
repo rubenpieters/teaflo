@@ -35,8 +35,9 @@ export const a1l3_fr1: FrUnit = {
 }
 
 export const a1l3_fr2_ab1: Ability =
-  new A.AddThreat("Ability", "Target", new Ab.Static(13), Ab.self(), new Ab.FromInput(0))
-  ;
+  A.combinedAbility([
+    new A.AddThreat("Ability", "Target", new Ab.Static(13), Ab.self(), new Ab.FromInput(0))
+  ]);
 
 export const a1l3_fr2: FrUnit = {
   hp: 50,
@@ -61,8 +62,9 @@ export const a1l3_fr2: FrUnit = {
  * En Unit
  */
 export const a1l3_en1_ab1: Ability =
-  new A.Damage("Ability", "Target", new Ab.Static(3), Ab.highestThreat())
-  ;
+  A.combinedAbility([
+    new A.Damage("Ability", "Target", new Ab.Static(3), Ab.highestThreat())
+  ]);
 
 export const a1l3_en1: EnUnit = {
   hp: 30,

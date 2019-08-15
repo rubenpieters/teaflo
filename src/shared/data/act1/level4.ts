@@ -34,8 +34,9 @@ export const a1l4_fr1: FrUnit = {
 }
 
 export const a1l4_fr2_ab1: Ability =
-  new A.AddThreat("Ability", "Target", new Ab.Static(13), Ab.self(), Ab.allEnemy())
-  ;
+  A.combinedAbility([
+    new A.AddThreat("Ability", "Target", new Ab.Static(13), Ab.self(), Ab.allEnemy())
+  ]);
 
 export const a1l4_fr2_ab2: Ability =
   A.combinedAbility([
@@ -85,8 +86,9 @@ export const a1l4_en1_ab2: Ability =
   ]);
 
 export const a1l4_en1_ab3: Ability =
-  new A.Damage("Ability", "Target", new Ab.Static(20), Ab.highestThreat())
-  ;
+  A.combinedAbility([
+    new A.Damage("Ability", "Target", new Ab.Static(20), Ab.highestThreat())
+  ]);
 
 export const a1l4_en1: EnUnit = {
   hp: 24,
@@ -128,8 +130,9 @@ export const a1l4_en2_ab2: Ability =
   ]);
 
 export const a1l4_en2_ab3: Ability =
-  new A.Damage("Ability", "Target", new Ab.Static(20), Ab.highestThreat())
-  ;
+  A.combinedAbility([
+    new A.Damage("Ability", "Target", new Ab.Static(20), Ab.highestThreat())
+  ]);
 
 export const a1l4_en2: EnUnit = {
   hp: 24,
