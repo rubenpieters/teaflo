@@ -84,12 +84,12 @@ export function runSolution(
   solution: Solution,
   loc: Location,
   state: GameState,
-): { state: GameState, log: Log, win: boolean } {
+): { state: GameState, prevState: GameState | undefined, log: Log, win: boolean } {
   if (loc.length === 0) {
     const result = runInitialTurn(state);
-    return { state: result.state, log: result.log, win: false };
+    return { state: result.state, prevState: undefined, log: result.log, win: false };
   } else {
-    return _runSolution(solution.tree, loc, state, emptyLog(), false);
+    return _runSolution(solution.tree, loc, state, emptyLog(), false, undefined);
   }
 }
 
@@ -99,15 +99,16 @@ export function _runSolution(
   state: GameState,
   log: Log,
   win: boolean,
-): { state: GameState, log: Log, win: boolean } {
+  prevState: GameState | undefined = undefined,
+): { state: GameState, prevState: GameState | undefined, log: Log, win: boolean } {
   if (loc.length === 0) {
-    return { state, log, win };
+    return { state, prevState, log, win };
   }
   const solData: SolutionData = tree.nodes[loc[0]].v;
 
   const phasesResult = runPhases(state, solData);
 
-  return _runSolution(tree.nodes[loc[0]].tree, loc.slice(1), phasesResult.state, phasesResult.log, phasesResult.win);
+  return _runSolution(tree.nodes[loc[0]].tree, loc.slice(1), phasesResult.state, phasesResult.log, phasesResult.win, state);
 }
 
 export function endStates(

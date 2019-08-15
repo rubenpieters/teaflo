@@ -71,7 +71,7 @@ export function updateSolutionRep(
       // TODO: pass prevState to intermediateActions, instead of having to find it somehow
       const anim = gameRefs.screens.execScreen.drawIntermediateActions(
         solResult.state,
-        prevState,
+        solResult.prevState,
         solutionData.ability,
         solutionData.origin,
         solResult.log,
