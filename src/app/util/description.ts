@@ -27,7 +27,7 @@ export function groupFromDesc<Data, FrameType>(
       case "DescSymbol": {
         const spriteName = `${descSym.symbol}_${size}_${size}.png`;
         const xPos = size * (descIndex - xOffset);
-        const yPos = - y * size;
+        const yPos = y * size;
         dataList.push({ x: xPos, y: yPos, frameType: mkFrameType(), data: mkData(spriteName) });
         break;
       }

@@ -268,7 +268,7 @@ export function abilityDescription(
         if (acc.length === 0) {
           return abilityDescription(x).concat(acc);
         } else {
-          return abilityDescription(x).concat(new DescSeparator()).concat(acc);
+          return acc.concat(new DescSeparator()).concat(abilityDescription(x));
         }
       }, <DescToken[]>[]);
       return desc;

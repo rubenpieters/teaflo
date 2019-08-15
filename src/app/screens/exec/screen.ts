@@ -320,7 +320,7 @@ export class ExecScreen {
             "left", 250 + 170 * unitIndex + 75 * flagLeft, 70,
             "top", 830 + 75 * flagTop, 70,
           );
-          this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
+          const abilityIcon = this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
             { tag: "FrAbilityData", spriteId: ability.spriteId, ability, index: abilityIndex,
               globalId: unit.id
             }
@@ -329,8 +329,9 @@ export class ExecScreen {
             deepEqual(this.clickState.origin, unit.id) &&
             abilityIndex === this.clickState.index
           ) {
-            const indicator = this.abilityPool.newSprite(abPos.xMin + 5, abPos.yMin + 5, {}, { tag: "Indicator"});
-            indicator.inputEnabled = false;
+            addShader(this.gameRefs, abilityIcon, "red-glow");
+            //const indicator = this.abilityPool.newSprite(abPos.xMin + 5, abPos.yMin + 5, {}, { tag: "Indicator"});
+            //indicator.inputEnabled = false;
           }
         });
       }
@@ -790,7 +791,7 @@ export class ExecScreen {
       const actionBg = new Create(() => {
         this.intermediate = intermediateIndex;
         this.drawCurrentState();
-        return this.actionBgPool.newSprite(explX, explY - 100 * actionI, {}, { sprite: "grey_border2.png"}, 0.3);
+        return this.actionBgPool.newSprite(explX, explY - 20 + 80 * actionI, {}, { sprite: "grey_border2.png"}, 0.3);
       }, self => {
         return new BaseAnimation(500, self, t => {
           t.from({ alpha: 0 }, 500);
@@ -1514,25 +1515,39 @@ function mkAbilityPool(
           }
         },
         hoverOver: (self) => {
-          addShader(gameRefs, self, "blue-glow");
-          if (self.data.tag === "FrAbilityData" || self.data.tag === "EnAbilityData") {
-            let ability: Ability;
-            if (self.data.tag === "FrAbilityData") {
-              ability = self.data.ability.ability;
-            } else {
-              ability = self.data.ai.ability;
+          if (gameRefs.screens.execScreen.interactionEnabled) {
+            if (! (self.data.tag === "FrAbilityData" &&
+              gameRefs.screens.execScreen.clickState !== undefined &&
+              deepEqual(gameRefs.screens.execScreen.clickState.origin, self.data.globalId) &&
+              self.data.index === gameRefs.screens.execScreen.clickState.index
+            )) {
+              addShader(gameRefs, self, "blue-glow");
             }
-            
-            return groupFromDesc(
-              abilityDescription(ability),
-              80, { x: explX, y: explY }, () => { return {} }, sprite => { return { sprite }},
-              gameRefs.screens.execScreen.detailExplPool,
-            );
+            if (self.data.tag === "FrAbilityData" || self.data.tag === "EnAbilityData") {
+              let ability: Ability;
+              if (self.data.tag === "FrAbilityData") {
+                ability = self.data.ability.ability;
+              } else {
+                ability = self.data.ai.ability;
+              }
+              
+              return groupFromDesc(
+                abilityDescription(ability),
+                80, { x: explX, y: explY }, () => { return {} }, sprite => { return { sprite }},
+                gameRefs.screens.execScreen.detailExplPool,
+              );
+            }
           }
           return undefined as any;
         },
         hoverOut: (self) => {
-          clearShader(self);
+          if (! (self.data.tag === "FrAbilityData" &&
+            gameRefs.screens.execScreen.clickState !== undefined &&
+            deepEqual(gameRefs.screens.execScreen.clickState.origin, self.data.globalId) &&
+            self.data.index === gameRefs.screens.execScreen.clickState.index
+          )) {
+            clearShader(self);
+          }
           gameRefs.screens.execScreen.detailExplPool.clear();
         },
       },
