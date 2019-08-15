@@ -701,7 +701,9 @@ export class ExecScreen {
         } else {
           const en = prevState!.enUnits.units[typeIndex - 2];
           if (en === undefined) {
-            throw "drawIntermediateActions: enemy unit is not defined";
+            return new BaseAnimation(1, animationDummy, t => {
+              t.to({ value: 0 }, 1);
+            });
           }
           this.sourceUnit = en.id;
           // enemy action
@@ -732,7 +734,7 @@ export class ExecScreen {
           const fadeOut = new BaseAnimation(750, enemyUnit, t => {
             this.sourceUnit = undefined;
             t.to({ alpha: 0 }, 750);
-          }); 
+          });
 
           return new SeqAnimation([
             new ParAnimation([moveEn, showAbility]),
@@ -1541,14 +1543,16 @@ function mkAbilityPool(
           return undefined as any;
         },
         hoverOut: (self) => {
-          if (! (self.data.tag === "FrAbilityData" &&
-            gameRefs.screens.execScreen.clickState !== undefined &&
-            deepEqual(gameRefs.screens.execScreen.clickState.origin, self.data.globalId) &&
-            self.data.index === gameRefs.screens.execScreen.clickState.index
-          )) {
-            clearShader(self);
+          if (gameRefs.screens.execScreen.interactionEnabled) {
+            if (! (self.data.tag === "FrAbilityData" &&
+              gameRefs.screens.execScreen.clickState !== undefined &&
+              deepEqual(gameRefs.screens.execScreen.clickState.origin, self.data.globalId) &&
+              self.data.index === gameRefs.screens.execScreen.clickState.index
+            )) {
+              clearShader(self);
+            }
+            gameRefs.screens.execScreen.detailExplPool.clear();
           }
-          gameRefs.screens.execScreen.detailExplPool.clear();
         },
       },
     },

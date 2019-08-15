@@ -18,7 +18,7 @@ export const a1l2_fr_ab1: Ability =
 export const a1l2_fr: FrUnit = {
   hp: 40,
   maxHp: 40,
-  charges: 0,
+  charges: 1,
   maxCharges: 50,
   abilities: [
     {

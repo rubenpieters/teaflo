@@ -20,7 +20,7 @@ export const d_i_ab1: Ability =
 export const d_i: FrUnit = {
   hp: 40,
   maxHp: 40,
-  charges: 0,
+  charges: 1,
   maxCharges: 50,
   abilities: [
     {
@@ -47,7 +47,7 @@ export const d_ii_ab1: Ability =
 export const d_ii: FrUnit = {
   hp: 35,
   maxHp: 35,
-  charges: 0,
+  charges: 1,
   maxCharges: 50,
   abilities: [
     {
@@ -73,7 +73,7 @@ export const d_iii_ab1: Ability =
 export const d_iii: FrUnit = {
   hp: 40,
   maxHp: 40,
-  charges: 0,
+  charges: 1,
   maxCharges: 80,
   abilities: [
     {
@@ -100,7 +100,7 @@ export const d_iv_ab1: Ability =
 export const d_iv: FrUnit = {
   hp: 40,
   maxHp: 40,
-  charges: 0,
+  charges: 1,
   maxCharges: 60,
   abilities: [
     {
