@@ -142,6 +142,7 @@ export class ExecScreen {
   clearAnimPools() {
     //this.logActionPool.clear();
     this.framePool.clear();
+    this.intermediateBgPool.clear();
   }
 
   canExtendState(): boolean {
@@ -649,7 +650,10 @@ export class ExecScreen {
         
         this.interactionEnabled = false;
         this.displayedAbility = undefined;
-        this.intermediate = 0;
+
+        if (split[typeIndex].length > 0) {
+          this.intermediate = split[typeIndex][0].intermediateIndex;
+        }
 
         this.drawCurrentState();
 
@@ -691,7 +695,7 @@ export class ExecScreen {
           const fadeOut = new BaseAnimation(750, friendlyUnit, t => {
             this.sourceUnit = undefined;
             t.to({ alpha: 0 }, 750);
-          }); 
+          });
 
           return new SeqAnimation([
             new ParAnimation([moveFr, showAbility]),
