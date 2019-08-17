@@ -1,6 +1,6 @@
 import { GameRefs } from "../../../app/states/game";
-import { runSolution, extendSolution, SolutionData, cutSolution } from "../../../shared/game/solution";
-import { Location, getLocation } from "../../../shared/tree";
+import { runSolution, extendSolution, SolutionData, cutSolution, emptySolution } from "../../../shared/game/solution";
+import { Location, getLocation, emptyTree } from "../../../shared/tree";
 import { firstLogIndex } from "../../../shared/game/log";
 import { runAsTween } from "../../phaser/animation";
 import { clearAnimations } from "../util";
@@ -31,13 +31,13 @@ export function updateSolutionRep(
 
   const composition = saveData.currentComposition;
   const solMap = saveData.solMap;
-  const solData = solMap[compositionToKey(composition)];
+  let solData = solMap[compositionToKey(composition)];
 
   const frUnits = composition;
   const enUnits = levelData[levelId].enemyIds;
   const initState = mkGameState(frUnits, enUnits);
 
-  if (solData === undefined || ! validComposition(composition, levelId)) {
+  if (! validComposition(composition, levelId)) {
     gameRefs.screens.execScreen.state = initState;
 
     gameRefs.screens.execScreen.drawState(initState);
@@ -48,9 +48,31 @@ export function updateSolutionRep(
     gameRefs.screens.execScreen.drawSwitchOrderBtns();
     gameRefs.screens.execScreen.drawClearBtn();
     gameRefs.screens.execScreen.clearTree();
+    gameRefs.screens.execScreen.logActionPool.clear();
+  } else if (solData === undefined || solData.solInfo.loc.length === 0) {
+    if (solData === undefined) {
+      solData = {
+        composition,
+        solInfo: {
+          solution: emptySolution,
+          loc: [],
+        },
+      };
+      solMap[compositionToKey(composition)] = solData;
+    }
+    gameRefs.screens.execScreen.state = initState;
+
+    gameRefs.screens.execScreen.drawState(initState);
+    gameRefs.screens.execScreen.drawStats(initState);
+    gameRefs.screens.execScreen.drawBgSprites();
+    gameRefs.screens.execScreen.drawAnimControlBtns();
+    gameRefs.screens.execScreen.drawTreeControlBtns();
+    gameRefs.screens.execScreen.drawSwitchOrderBtns();
+    gameRefs.screens.execScreen.drawClearBtn();
+    gameRefs.screens.execScreen.drawTree(solData.solInfo);
+    gameRefs.screens.execScreen.logActionPool.clear();
   } else {
     const solResult = runSolution(solData.solInfo.solution, solData.solInfo.loc, initState);
-
     const prevState = gameRefs.screens.execScreen.state;
     gameRefs.screens.execScreen.state = solResult.state;
     gameRefs.screens.execScreen.log = solResult.log;
