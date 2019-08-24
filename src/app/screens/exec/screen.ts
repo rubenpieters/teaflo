@@ -712,6 +712,13 @@ export class ExecScreen {
           this.sourceUnit = en.id;
           // enemy action
           const enemyUnit = this.findUnit(en.id);
+          // if 'enemyUnit' is undefined now, but 'en' was not undefined:
+          // this means that this enemy died during one of the previous actions
+          if (enemyUnit === undefined) {
+            return new BaseAnimation(1, animationDummy, t => {
+              t.to({ value: 0 }, 1);
+            });
+          }
           const moveEn = new BaseAnimation(1000, enemyUnit, t => {
             const sourcePos = sourceUnitPos();
             t.to({ x: sourcePos.xMin, y: sourcePos.yMin }, 1000);

@@ -17,6 +17,10 @@ export class ActScreen {
   bgSpritePool: Pool<BgSpriteData, {}>
   hoverSpritePool: Pool<HoverSpriteData, {}>
   hoverTextPool: TextPool
+  messageIconPool: Pool<MessageIconData, {}>
+  messagePool: Pool<MessageData, {}>
+  
+  openMessage: number | undefined = undefined
 
   constructor(
     public readonly gameRefs: GameRefs
@@ -27,6 +31,8 @@ export class ActScreen {
     this.solBtnPool = mkSolBtnPool(gameRefs);
     this.hoverSpritePool = mkHoverSpritePool(gameRefs);
     this.hoverTextPool = new TextPool(gameRefs.game);
+    this.messageIconPool = mkMessageIconPool(gameRefs);
+    this.messagePool = mkMessagePool(gameRefs);
   }
 
   draw() {
@@ -128,13 +134,59 @@ export class ActScreen {
           );
         }, self => {
           return new BaseAnimation(150, self, tween => {
-            tween.from({ alpha: 0 }, 300, Phaser.Easing.Linear.None, false, 50);
+            tween.from({ alpha: 0 }, 150, Phaser.Easing.Linear.None, false, 50);
           });
         });
       }
     }));
 
     runAsTween(this.gameRefs, anims);
+  }
+
+  drawMessageIcons(
+    actId: ActDataKeys,
+  ) {
+    this.messageIconPool.clear();
+
+    const messages = actData[actId].messages;
+    console.log("test");
+
+    messages.forEach((message, i) => {
+      this.messageIconPool.newSprite(50 + 50 * i, 900, {},
+        { 
+          messageId: i,
+        },
+      );
+    });
+  }
+
+  drawMessage(
+    messageId: number,
+  ) {
+    const actId = this.gameRefs.saveData.currentActId;
+    const message = actData[actId].messages[messageId];
+    if (message !== undefined) {
+      const anim = new Create(() => {
+        const sprite = this.messagePool.newSprite(300, 300, {}, {});
+        addText(this.gameRefs, sprite, { xMin: 10, yMin: 10, xMax: 100, yMax: 30 }, message, "#000000", 18);
+        this.openMessage = messageId;
+        return sprite;
+      }, self => {
+        return new BaseAnimation(150, self, tween => {
+          tween.from({ alpha: 0 }, 150, Phaser.Easing.Linear.None, false, 50);
+        });
+      });
+
+      this.messagePool.clear();
+      runAsTween(this.gameRefs, anim);
+    } else {
+      throw `drawMessage, unknown message id ${messageId} for act id ${actId}`;
+    }
+  }
+
+  clearMessage(
+  ) {
+    this.messagePool.clear();
   }
 
   setVisibility(
@@ -341,6 +393,56 @@ type HoverSpriteData = {
 function mkHoverSpritePool(
   gameRefs: GameRefs,
 ): Pool<HoverSpriteData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return "unit_select_bg.png";
+      },
+      introAnim: [
+      ],
+      callbacks: {
+      },
+    },
+  );
+}
+
+type MessageIconData = {
+  messageId: number,
+}
+
+function mkMessageIconPool(
+  gameRefs: GameRefs,
+): Pool<MessageIconData, {}> {
+  return new Pool(
+    gameRefs.game,
+    {
+      atlas: "atlas1",
+      toFrame: (self, frameType) => {
+        return "expl_ch.png";
+      },
+      introAnim: [
+      ],
+      callbacks: {
+        click: (self) => {
+          if (gameRefs.screens.actScreen.openMessage === self.data.messageId) {
+            gameRefs.screens.actScreen.clearMessage();
+          } else {
+            gameRefs.screens.actScreen.drawMessage(self.data.messageId);
+          }
+        },
+      },
+    },
+  );
+}
+
+type MessageData = {
+}
+
+function mkMessagePool(
+  gameRefs: GameRefs,
+): Pool<MessageData, {}> {
   return new Pool(
     gameRefs.game,
     {

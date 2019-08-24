@@ -19,6 +19,7 @@ export function changeAct(
   gameRefs.screens.actScreen.actSelectMode();
   gameRefs.screens.actScreen.redrawActBtn();
   gameRefs.screens.actScreen.drawLevelBtn(actId);
+  gameRefs.screens.actScreen.drawMessageIcons(actId);
 }
 
 export function changeLevel(
