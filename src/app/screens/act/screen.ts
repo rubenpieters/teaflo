@@ -149,11 +149,10 @@ export class ActScreen {
     this.messageIconPool.clear();
 
     const messages = actData[actId].messages;
-    console.log("test");
 
     messages.forEach((message, i) => {
       this.messageIconPool.newSprite(50 + 50 * i, 900, {},
-        { 
+        {
           messageId: i,
         },
       );
@@ -172,9 +171,15 @@ export class ActScreen {
         this.openMessage = messageId;
         return sprite;
       }, self => {
-        return new BaseAnimation(150, self, tween => {
-          tween.from({ alpha: 0 }, 150, Phaser.Easing.Linear.None, false, 50);
-        });
+        return new ParAnimation([
+          new BaseAnimation(150, self, tween => {
+            tween.from({ alpha: 0, x: 50, y: 900 }, 150, Phaser.Easing.Linear.None, false, 50);
+          }),
+          new BaseAnimation(150, self.scale, tween => {
+            tween.from({ x: 0, y:0 }, 150, Phaser.Easing.Linear.None, false, 50);
+          }),
+        ])
+        
       });
 
       this.messagePool.clear();
