@@ -669,6 +669,13 @@ export class ExecScreen {
           this.sourceUnit = origin;
           // friendly action
           const friendlyUnit = this.findUnit(origin);
+          if (friendlyUnit === undefined) {
+            return new BaseAnimation(1, animationDummy, t => {
+              t.to({ value: 0 }, 1);
+            });
+          }
+          const preX = friendlyUnit.x;
+          const preY = friendlyUnit.y;
           const moveFr = new BaseAnimation(1000, friendlyUnit, t => {
             const sourcePos = sourceUnitPos();
             t.to({ x: sourcePos.xMin, y: sourcePos.yMin }, 1000);
@@ -694,7 +701,7 @@ export class ExecScreen {
 
           const fadeOut = new BaseAnimation(750, friendlyUnit, t => {
             this.sourceUnit = undefined;
-            t.to({ alpha: 0 }, 750);
+            t.to({ x: preX, y: preY }, 750);
           });
 
           return new SeqAnimation([
@@ -719,6 +726,8 @@ export class ExecScreen {
               t.to({ value: 0 }, 1);
             });
           }
+          const preX = enemyUnit.x;
+          const preY = enemyUnit.y;
           const moveEn = new BaseAnimation(1000, enemyUnit, t => {
             const sourcePos = sourceUnitPos();
             t.to({ x: sourcePos.xMin, y: sourcePos.yMin }, 1000);
@@ -744,7 +753,7 @@ export class ExecScreen {
 
           const fadeOut = new BaseAnimation(750, enemyUnit, t => {
             this.sourceUnit = undefined;
-            t.to({ alpha: 0 }, 750);
+            t.to({ x: preX, y: preY }, 750);
           });
 
           return new SeqAnimation([
@@ -789,7 +798,7 @@ export class ExecScreen {
     const targets = actionTargets(action);
     if (targets.length > 0) {
       const target0 = targets[0];
-      let targetRef: DataSprite<UnitData> | undefined = undefined;
+      let targetRef: DataSprite<UnitData> | undefined;
       this.unitPool.forEachAlive((ref: DataSprite<UnitData>) => {
         if (deepEqual(ref.data.globalId, target0)) {
           targetRef = ref;
@@ -798,6 +807,8 @@ export class ExecScreen {
       if (targetRef === undefined) {
         throw "drawAction: target is not defined";
       }
+      const preX = targetRef.x;
+      const preY = targetRef.y;
       const targetAnimPre = new BaseAnimation(1000, targetRef, t => {
         t.to({ x: 850, y: 600 }, 1000);
       });
@@ -812,14 +823,13 @@ export class ExecScreen {
       });
       const targetAnimPost = new BaseAnimation(750, targetRef, t => {
         this.actionBgPool.clear();
-        t.to({ alpha: 0 }, 750);
+        t.to({ x: preX, y: preY }, 750);
       });
       const removeBg = new BaseAnimation(1, animationDummy, t => {
         this.actionBgPool.clear();
         t.to({ value: 0 }, 1);
       });
-      // NOTE: why is targetRef considered as 'never' here?
-      if (deepEqual((targetRef as any).data.globalId, action.origin)) {
+      if (deepEqual(targetRef.data.globalId, action.origin)) {
         return new SeqAnimation([
           actionBg,
           this.targetAnimMid(action, 700),
