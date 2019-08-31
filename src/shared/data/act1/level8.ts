@@ -8,6 +8,82 @@ import { TargetInput, EnemyInput, FriendlyInput } from "../../definitions/input"
 import * as C from "../../definitions/condition";
 
 /**
+ * Fr Unit
+ */
+export const a1l3_fr1_ab1: Ability =
+  A.combinedAbility([
+    new A.Damage("Ability", "Target", new Ab.Static(10), new Ab.FromInput(0)),
+    new A.AddThreat("Ability", "Target", new Ab.Static(10), Ab.self(), new Ab.FromInput(0)),
+  ]);
+
+export const a1l3_fr1: FrUnit = {
+  hp: 5,
+  maxHp: 5,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      ability: a1l3_fr1_ab1,
+      inputs: [
+        new TargetInput(),
+      ],
+      spriteId: "ab3",
+      name: "a1l3_fr1_ab1",
+    },
+  ],
+  essential: true,
+  cardId: "a1l3_fr1",
+}
+
+export const a1l3_fr2_ab1: Ability =
+  A.combinedAbility([
+    new A.AddThreat("Ability", "Target", new Ab.Static(13), Ab.self(), new Ab.FromInput(0))
+  ]);
+
+export const a1l3_fr2: FrUnit = {
+  hp: 50,
+  maxHp: 50,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      ability: a1l3_fr2_ab1,
+      inputs: [
+        new EnemyInput(),
+      ],
+      spriteId: "ab1",
+      name: "a1l3_fr2_ab1",
+    },
+  ],
+  essential: true,
+  cardId: "a1l3_fr2",
+}
+
+export const a1l3_fr3_ab1: Ability =
+  A.combinedAbility([
+    new A.AddThreat("Ability", "Target", new Ab.Static(13), Ab.self(), new Ab.FromInput(0))
+  ]);
+
+export const a1l3_fr3: FrUnit = {
+  hp: 50,
+  maxHp: 50,
+  charges: 5,
+  maxCharges: 5,
+  abilities: [
+    {
+      ability: a1l3_fr2_ab1,
+      inputs: [
+        new EnemyInput(),
+      ],
+      spriteId: "ab1",
+      name: "a1l3_fr2_ab1",
+    },
+  ],
+  essential: true,
+  cardId: "a1l3_fr2",
+}
+
+/**
  * En Unit
  */
 export const a1l8_en1_ab1: Ability =

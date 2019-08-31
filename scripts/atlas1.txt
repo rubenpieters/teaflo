@@ -248,3 +248,12 @@ textures/menu_border_1920_25.png
 textures/circle_180_180.png
 textures/grey_border1.png
 textures/grey_border2.png
+textures/act_1_icon_100_100.png
+textures/act_2_icon_100_100.png
+textures/act_3_icon_100_100.png
+textures/mail_icon_1_80_80.png
+textures/mail_icon_2_80_80.png
+textures/mail_icon_3_80_80.png
+textures/mail_menu_600_800.png
+textures/info_menu_600_800.png
+textures/menu_450_125.png

@@ -37,8 +37,8 @@ export class MenuScreen {
         () => {
           let sprite;
           const pos = createPosition(this.gameRefs.settings,
-            "right", (120 * i), 100,
-            "bot", 5, 100,
+            "right", 15 + (105 * i), 100,
+            "bot", 15, 100,
           );
           if (this.gameRefs.saveData.activeScreen === type) {
             // this is the currently selected menu type
@@ -67,15 +67,15 @@ export class MenuScreen {
   drawBg() {
     this.bgSpritePool.clear();
 
-    this.bgSpritePool.newSprite(0, this.gameRefs.settings.gameHeight - 30, {}, { sprite: "menu_border_1920_25.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(this.gameRefs.settings.gameWidth - 450  , this.gameRefs.settings.gameHeight - 130, {}, { sprite: "menu_450_125.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
 
-    for (const i of [0,1,2,3]) {
-      const pos = createPosition(this.gameRefs.settings,
-        "right", (120 * i), 120,
-        "bot", 0, 100,
-      );
-      this.bgSpritePool.newSprite(pos.xMin, pos.yMin, {}, { sprite: "arc_130_130.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
-    }
+    // for (const i of [0,1,2,3]) {
+    //   const pos = createPosition(this.gameRefs.settings,
+    //     "right", (120 * i), 120,
+    //     "bot", 0, 100,
+    //   );
+    //   this.bgSpritePool.newSprite(pos.xMin, pos.yMin, {}, { sprite: "arc_130_130.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    // }
   }
 }
 

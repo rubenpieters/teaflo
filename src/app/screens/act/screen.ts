@@ -35,6 +35,10 @@ export class ActScreen {
     this.messagePool = mkMessagePool(gameRefs);
   }
 
+  reset() {
+    this.openMessage = undefined;
+  }
+
   draw() {
     const actId = this.gameRefs.saveData.currentActId;
     changeAct(this.gameRefs, actId);
@@ -151,7 +155,7 @@ export class ActScreen {
     const messages = actData[actId].messages;
 
     messages.forEach((message, i) => {
-      this.messageIconPool.newSprite(50 + 50 * i, 900, {},
+      this.messageIconPool.newSprite(50 + 100 * i, 900, {},
         {
           messageId: i,
         },
@@ -166,8 +170,8 @@ export class ActScreen {
     const message = actData[actId].messages[messageId];
     if (message !== undefined) {
       const anim = new Create(() => {
-        const sprite = this.messagePool.newSprite(300, 300, {}, {});
-        addText(this.gameRefs, sprite, { xMin: 10, yMin: 10, xMax: 100, yMax: 30 }, message, "#000000", 18);
+        const sprite = this.messagePool.newSprite(450, 220, {}, {});
+        addText(this.gameRefs, sprite, { xMin: 350, yMin: 750, xMax: 650, yMax: 900 }, message, "#000000", 50);
         this.openMessage = messageId;
         return sprite;
       }, self => {
@@ -425,7 +429,7 @@ function mkMessageIconPool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return "expl_ch.png";
+        return "mail_icon_1_80_80.png";
       },
       introAnim: [
       ],
@@ -453,7 +457,7 @@ function mkMessagePool(
     {
       atlas: "atlas1",
       toFrame: (self, frameType) => {
-        return "unit_select_bg.png";
+        return "mail_menu_600_800.png";
       },
       introAnim: [
       ],
