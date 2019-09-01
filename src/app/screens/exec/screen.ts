@@ -87,6 +87,7 @@ export class ExecScreen {
   constructor(
     public readonly gameRefs: GameRefs
   ) {
+    this.bgSpritePool = mkBgSpritePool(gameRefs);
     this.clearBtnPool = mkClearBtnPool(gameRefs);
     this.unitPool = mkUnitPool(gameRefs);
     this.emptySlotPool = mkEmptySlotPool(gameRefs);
@@ -113,7 +114,6 @@ export class ExecScreen {
     this.logGraphicsPool = gameRefs.game.add.graphics();
     this.unitSelectBgPool = mkUnitSelectBgPool(gameRefs);
     this.unitSelectPool = mkUnitSelectPool(gameRefs);
-    this.bgSpritePool = mkBgSpritePool(gameRefs);
     this.intermediateBgPool = mkIntermediateBgPool(gameRefs);
     this.actionBgPool = mkActionBgDataPool(gameRefs);
   }
@@ -272,11 +272,11 @@ export class ExecScreen {
           }
         );
         unitHpSprite.width = 10;
-        unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
+        unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp) * 0.9;
 
         // CH
         const unitChPos = relativeTo(friendlyPos,
-          [{ type: "right", amt: -5 }],
+          [{ type: "right", amt: 5 }],
           10, 150,
         );
         const chHeight = unitChPos.yMax - unitChPos.yMin;
@@ -288,13 +288,13 @@ export class ExecScreen {
           }
         );
         unitChSprite.width = 10;
-        unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
+        unitChSprite.height = chHeight * (unit.charges / unit.maxCharges) * 0.9;
 
         // TH
         enIds.forEach((enId, enIndex) => {
           const unitThPos = createPosition(this.gameRefs.settings,
-            "left", 245 + 170 * unitIndex + 30 * enIndex, 25,
-            "top", 740, 50,
+            "left", 245 + 210 * unitIndex + 30 * enIndex, 25,
+            "top", 780, 50,
           );
           const unitThSprite = this.unitResPool.newSprite(unitThPos.xMin, unitThPos.yMin, {},
             { cardId: unit.cardId,
@@ -306,8 +306,8 @@ export class ExecScreen {
           unitThSprite.width = 25;
           unitThSprite.height = threat / maxThreat * 50;
           const thTextPos = createPosition(this.gameRefs.settings,
-            "left", 245 + 170 * unitIndex + 30 * enIndex, 25,
-            "top", 800, 20,
+            "left", 245 + 210 * unitIndex + 30 * enIndex, 25,
+            "top", 750, 20,
           );
           this.stateTextPool.newText(thTextPos, `${threat}`, 20);
         });
@@ -318,8 +318,8 @@ export class ExecScreen {
           const flagTop = abilityIndex % 2;
           const flagLeft = abilityIndex < 2 ? 0 : 1;
           const abPos = createPosition(this.gameRefs.settings,
-            "left", 250 + 170 * unitIndex + 75 * flagLeft, 70,
-            "top", 830 + 75 * flagTop, 70,
+            "left", 250 + 210 * unitIndex + 75 * flagLeft, 70,
+            "top", 485 + 75 * flagTop, 70,
           );
           const abilityIcon = this.abilityPool.newSprite(abPos.xMin, abPos.yMin, {},
             { tag: "FrAbilityData", spriteId: ability.spriteId, ability, index: abilityIndex,
@@ -390,11 +390,11 @@ export class ExecScreen {
           }
         );
         unitHpSprite.width = 10;
-        unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp);
+        unitHpSprite.height = hpHeight * (unit.hp / unit.maxHp) * 0.9;
 
         // CH
         const unitChPos = relativeTo(enemyPos,
-          [{ type: "right", amt: -5 }],
+          [{ type: "right", amt: 5 }],
           10, 150,
         );
         const chHeight = unitChPos.yMax - unitChPos.yMin;
@@ -406,7 +406,7 @@ export class ExecScreen {
           }
         );
         unitChSprite.width = 10;
-        unitChSprite.height = chHeight * (unit.charges / unit.maxCharges);
+        unitChSprite.height = chHeight * (unit.charges / unit.maxCharges) * 0.9;
 
         // show ai
         aiIndices.forEach(index => {
@@ -414,8 +414,8 @@ export class ExecScreen {
           if (ability !== undefined) {
             const aiPos = indexToAiPos(index);
             const abPos = relativeTo(enemyPos,
-              [ { type: "below", amt: 95 + 70 * aiPos.y },
-                { type: "left", amt: -45 - 70 * aiPos.x }
+              [ { type: "below", amt: 32 + 70 * aiPos.y },
+                { type: "left", amt: -63 - 70 * aiPos.x }
               ],
               70, 70,
             );
@@ -464,23 +464,29 @@ export class ExecScreen {
   drawBgSprites() {
     this.bgSpritePool.clear();
 
+    const xOffset = -30;
+    const yOffset = -67;
     const friendlyPos0 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 0);
-    this.bgSpritePool.newSprite(friendlyPos0.xMin - 15, friendlyPos0.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(friendlyPos0.xMin + xOffset, friendlyPos0.yMin + yOffset, {}, { sprite: "unit_bg_220_440.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     const friendlyPos1 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 1);
-    this.bgSpritePool.newSprite(friendlyPos1.xMin - 15, friendlyPos1.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(friendlyPos1.xMin + xOffset, friendlyPos1.yMin + yOffset, {}, { sprite: "unit_bg_220_440.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     const friendlyPos2 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 2);
-    this.bgSpritePool.newSprite(friendlyPos2.xMin - 15, friendlyPos2.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(friendlyPos2.xMin + xOffset, friendlyPos2.yMin + yOffset, {}, { sprite: "unit_bg_220_440.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     const friendlyPos3 = friendlyUnitPos(this.gameRefs.settings, undefined as any, 3);
-    this.bgSpritePool.newSprite(friendlyPos3.xMin - 15, friendlyPos3.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(friendlyPos3.xMin + xOffset, friendlyPos3.yMin + yOffset, {}, { sprite: "unit_bg_220_440.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
 
     const enemyPos0 = enemyUnitPos(this.gameRefs.settings, undefined as any, 0);
-    this.bgSpritePool.newSprite(enemyPos0.xMin - 15, enemyPos0.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(enemyPos0.xMin + xOffset, enemyPos0.yMin + yOffset, {}, { sprite: "unit_bg_220_440.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     const enemyPos1 = enemyUnitPos(this.gameRefs.settings, undefined as any, 1);
-    this.bgSpritePool.newSprite(enemyPos1.xMin - 15, enemyPos1.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(enemyPos1.xMin + xOffset, enemyPos1.yMin + yOffset, {}, { sprite: "unit_bg_220_440.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     const enemyPos2 = enemyUnitPos(this.gameRefs.settings, undefined as any, 2);
-    this.bgSpritePool.newSprite(enemyPos2.xMin - 15, enemyPos2.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(enemyPos2.xMin + xOffset, enemyPos2.yMin + yOffset, {}, { sprite: "unit_bg_220_440.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
     const enemyPos3 = enemyUnitPos(this.gameRefs.settings, undefined as any, 3);
-    this.bgSpritePool.newSprite(enemyPos3.xMin - 15, enemyPos3.yMin - 15, {}, { sprite: "bulb_180_180.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+    this.bgSpritePool.newSprite(enemyPos3.xMin + xOffset, enemyPos3.yMin + yOffset, {}, { sprite: "unit_bg_220_440.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
+
+    
+    const logBgPos = createPosition(this.gameRefs.settings, "left", 20, 200, "top", 20, 800);
+    this.bgSpritePool.newSprite(logBgPos.xMin - 5, logBgPos.yMin - 5, {}, { sprite: "log_bg_210_820.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
 
     const statusPosRow0 = statusPos(this.gameRefs.settings, undefined as any, undefined as any, "byOrder", undefined as any, 0, 0);
     this.bgSpritePool.newSprite(statusPosRow0.xMin - 15, statusPosRow0.yMin, {}, { sprite: "vial_720_40.png" }, /*alpha*/ undefined, /*inputEnabled*/ false);
@@ -881,10 +887,7 @@ export class ExecScreen {
       const typeIndex = x.typeIndex;
       const entry = getLogEntry(log, x.logIndex);
 
-      const pos = createPosition(this.gameRefs.settings,
-        "left", 20 + 50 * entryIndex, 40,
-        "top", 120 + 80 * typeIndex, 40,
-      );
+      const pos = logPosition(this.gameRefs.settings, entryIndex, typeIndex);
 
       if (logIndexLt(x.logIndex, intermediate)) {
         return new Create(() => {

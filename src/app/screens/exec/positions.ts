@@ -33,16 +33,16 @@ const unitSizeY = 150;
 const unitSpacing = 30;
 const unitSpaceNeeded = unitSizeX * 4 + unitSpacing * 3;
 
-export const unitFrMinY = 450;
-const unitFrMinX = 250;
+export const unitFrMinY = 300;
+const unitFrMinX = 260;
 const unitFrMaxX = unitFrMinX + unitSpaceNeeded;
 
-const unitEnMinY = 100;
-export const unitEnMinX = unitFrMaxX + 100;
+const unitEnMinY = 45;
+export const unitEnMinX = unitFrMaxX + 130;
 const unitEnMaxX = unitEnMinX + unitSpaceNeeded;
 
 export const explX = unitEnMinX;
-export const explY = unitEnMinY + 400;
+export const explY = unitEnMinY + 470;
 export const explArrowEnd = { x: explX - 30, y: explY + 40 };
 
 export function friendlyUnitPos(
@@ -61,7 +61,7 @@ export function friendlyUnitPos(
     frPosition = unitId;
   }
   return createPosition(settings,
-    "left", unitFrMinX + 170 * frPosition, unitSizeX,
+    "left", unitFrMinX + 205 * frPosition, unitSizeX,
     "top", unitFrMinY, unitSizeY,
   );
 }
@@ -82,7 +82,7 @@ export function enemyUnitPos(
     enPosition = unitId;
   }
   return createPosition(settings,
-    "left", unitEnMinX + 210 * enPosition, unitSizeX,
+    "left", unitEnMinX + 205 * enPosition, unitSizeX,
     "top", unitEnMinY, unitSizeY,
   );
 }
@@ -98,7 +98,7 @@ export function unitUtilityPositions(
   unitChPos: Position,
 } {
   const hpIconPos = relativeTo(unitPos,
-    [{ type: "below", amt: 10 }],
+    [{ type: "below", amt: 210 }],
     40, 40,
   );
   const hpTextPos = relativeTo(hpIconPos,
@@ -106,7 +106,7 @@ export function unitUtilityPositions(
     50, 20,
   );
   const chIconPos = relativeTo(unitPos,
-    [{ type: "below", amt: 50 }],
+    [{ type: "below", amt: 250 }],
     40, 40,
   );
   const chTextPos = relativeTo(chIconPos,
@@ -114,11 +114,11 @@ export function unitUtilityPositions(
     50, 20,
   );
   const unitHpPos = relativeTo(unitPos,
-    [{ type: "left", amt: -5 }],
+    [{ type: "left", amt: -5 }, { type: "below", amt: 25 }],
     10, 150,
   );
   const unitChPos = relativeTo(unitPos,
-    [{ type: "right", amt: -5 }],
+    [{ type: "right", amt: 2 }, { type: "below", amt: 25 }],
     10, 150,
   );
   return { hpIconPos, hpTextPos, unitHpPos, chIconPos, chTextPos, unitChPos, };
@@ -199,8 +199,8 @@ export function logPosition(
   typeIndex: number,
 ) {
   return createPosition(settings,
-    "left", 20 + 50 * entryIndex, 40,
-    "top", 120 + 80 * typeIndex, 40,
+    "left", 22 + 39 * entryIndex, 39,
+    "top", 39 + 39 * typeIndex, 39,
   );
 }
 

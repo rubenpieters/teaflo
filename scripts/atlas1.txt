@@ -29,10 +29,6 @@ textures/tree_node.png
 textures/tree_branch.png
 textures/tree_node_full.png
 textures/menu_bar.png
-textures/menu_btn1.png
-textures/menu_btn2.png
-textures/menu_btn3.png
-textures/select3.png
 textures/unit1.png
 textures/unit2.png
 textures/unit3.png
@@ -120,14 +116,6 @@ textures/icon_owner.png
 textures/icon_self.png
 textures/icon_transform_action.png
 textures/icon_variable.png
-textures/codex1.png
-textures/options1.png
-textures/schem1.png
-textures/select1.png
-textures/codex2.png
-textures/options2.png
-textures/schem2.png
-textures/select2.png
 textures/icon_0_40_40.png
 textures/icon_armor_40_40.png
 textures/icon_1_40_40.png
@@ -201,10 +189,6 @@ textures/icon_usecharge_80_80.png
 textures/icon_addthreat_80_80.png
 textures/icon_addstatus_80_80.png
 textures/test2_200_200.png
-textures/menu_schem_100_100.png
-textures/menu_codex_100_100.png
-textures/menu_options_100_100.png
-textures/menu_select_100_100.png
 textures/icon_restorecharge_80_80.png
 textures/icon_restorecharge_40_40.png
 textures/icon_deletetree_40_40.png
@@ -257,3 +241,9 @@ textures/mail_icon_3_80_80.png
 textures/mail_menu_600_800.png
 textures/info_menu_600_800.png
 textures/menu_450_125.png
+textures/controls_bg_330_45.png
+textures/info_bg_800_400.png
+textures/text_bg_80_40.png
+textures/tree_icon_55_55.png
+textures/unit_bg_220_440.png
+textures/log_bg_210_820.png
