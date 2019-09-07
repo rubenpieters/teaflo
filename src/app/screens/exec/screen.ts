@@ -699,6 +699,9 @@ export class ExecScreen {
           });
 
           const actionAnims = new SeqAnimation(split[1].map((entry, actionI) => {
+            /*const prev = actionI === 0 ?
+              undefined :
+              actionTargets(split[1][actionI - 1].action);*/
             return new ParAnimation([
               this.drawAction(entry),
               this.drawLogIcon(entry.logIndex, log),
@@ -1672,7 +1675,7 @@ function mkLogActionPool(
           clearAnimations(gameRefs.game, gameRefs.screens.execScreen);
           gameRefs.screens.execScreen.clearAnimPools();
 
-          runAsTween(gameRefs, gameRefs.screens.execScreen.drawIntermediateAction(self.data.logIndex), "log");
+          //runAsTween(gameRefs, gameRefs.screens.execScreen.drawIntermediateAction(self.data.logIndex), "log");
         },
         hoverOver: (self) => {
           // change state/stats
