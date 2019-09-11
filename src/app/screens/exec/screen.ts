@@ -3,7 +3,7 @@ import { GameRefs } from "../../states/game";
 import { createPosition, relativeTo, Position, center } from "../../util/position";
 import { addText, DataSprite, addShader, clearShader } from "../../phaser/datasprite";
 import { enFiltered, frFiltered, getTarget, statusById, position } from "../../../shared/game/state";
-import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex, StatusLog, splitLog } from "../../../shared/game/log";
+import { Log, LogEntry, getLogEntry, LogIndex, allLogIndices, logIndexLt, logIndexEq, getPrevLogEntry, LogEntryI, nextLogIndex, StatusLog, splitLog, ActionSource } from "../../../shared/game/log";
 import { cardMap } from "../../../app/data/cardMap";
 import { TextPool } from "../../phaser/textpool";
 import { EntityId, UnitId, friendlyId, TargetId, EnemyId, FriendlyId, StatusId, UnitType } from "../../../shared/definitions/entityId";
@@ -818,7 +818,7 @@ export class ExecScreen {
     nextTargets: TargetId[] | undefined,
   ) {
     const action: ActionWithOrigin = entry.action;
-    const actionI: number = entry.actionWithinAbility;
+    const actionI: ActionSource = entry.actionSource;
     const intermediateIndex: number = entry.intermediateIndex;
     const targets = actionTargets(action);
     if (targets.length > 0) {
@@ -845,11 +845,21 @@ export class ExecScreen {
       const actionBg = new Create(() => {
         this.intermediate = intermediateIndex;
         this.drawCurrentState();
-        return this.actionBgPool.newSprite(explX, explY - 20 + 80 * actionI, {}, { sprite: "grey_border2.png"}, 0.3);
+        if (actionI.tag === "AbilitySource") {
+          return this.actionBgPool.newSprite(explX, explY - 20 + 80 * actionI.id, {}, { sprite: "grey_border2.png"}, 0.3);
+        } else {
+          return undefined;
+        }
       }, self => {
-        return new BaseAnimation(500, self, t => {
-          t.from({ alpha: 0 }, 500);
-        });
+        if (actionI.tag === "AbilitySource") {
+          return new BaseAnimation(500, self, t => {
+            t.from({ alpha: 0 }, 500);
+          });
+        } else {
+          return new BaseAnimation(1, animationDummy, t => {
+            t.to({ value: 0 }, 1);
+          });
+        }
       });
       // move after action
       const targetAnimPost = new BaseAnimation(750, targetRef, t => {

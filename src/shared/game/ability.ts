@@ -14,6 +14,7 @@ import { routeDirectionDescription } from "./ai";
 import deepEqual from "deep-equal";
 import { ActionF } from "../definitions/actionf";
 import { Ability_URI, Target_URI } from "../definitions/hkt";
+import { ActionSource, AbilitySource } from "./log";
 
 export function resolveSingleTargetAbility(
   ability: SingleTargetAbility,
@@ -49,14 +50,14 @@ export function resolveAbility(
   ability: Ability,
   state: GameState,
   context: Context,
-): (Action & { actionWithinAbility: number })[] {
+): (Action & { actionSource: ActionSource })[] {
   const withIndex = ability.map((x, i) => {
-    return { ...x, actionWithinAbility: i };
+    return { ...x, actionSource: new AbilitySource(i) };
   });
   const resolved = withIndex
     .map(x => _resolveAbility(x, state, context))
     .map((l, i) => l.map(x => {
-      return {...resolveSingleTargetAbility(x, context), actionWithinAbility: i};
+      return {...resolveSingleTargetAbility(x, context), actionSource: new AbilitySource(i) };
     }))
     .reduce((acc, l) => acc.concat(l), []);
   return resolved;

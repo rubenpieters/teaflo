@@ -3,7 +3,7 @@ import { UnitId } from "../definitions/entityId";
 import { Tree, emptyTree, extendTree, Location, cutTree } from "../tree";
 import { focus, set } from "../iassign-util";
 import { enIds, overTarget, enFiltered } from "./state";
-import { Log, emptyLog, LogEntry } from "./log";
+import { Log, emptyLog, LogEntry, ActionSource, AbilitySource, RuleSource } from "./log";
 import { ignoreTag, resolveAction } from "./action";
 import { Context, FrAbilityContext, EnAbilityContext } from "../definitions/context";
 import { applyStatuses } from "./status";
@@ -140,7 +140,7 @@ function runInitialTurn(
   let log: Log = emptyLog();
 
   // The initial turn applies a `StartTurn` action on the game
-  const startTurnResult = applyActionsToSolution([{...new StartTurn, origin: "noOrigin", actionWithinAbility: 0 }], state, [], 0, 0);
+  const startTurnResult = applyActionsToSolution([{...new StartTurn, origin: "noOrigin", actionSource: new RuleSource(0) }], state, [], 0, 0);
   state = startTurnResult.state;
   const stFilteredLog = startTurnResult.log.filter(x => ! ignoreTag(x.action.tag));
   log = log.concat(stFilteredLog);
@@ -238,9 +238,9 @@ function applyAbilityToSolution(
   intermediateIndex: number,
 } {
   // resolve an ability into actions
-  const actions: (Action & { actionWithinAbility: number })[] = resolveAbility(ability, state, context);
+  const actions: (Action & { actionSource: ActionSource })[] = resolveAbility(ability, state, context);
   // attach an origin to the actions, if applicable
-  let actionsWithOrigins: (ActionWithOrigin & { actionWithinAbility: number })[] = actions.map((x, i) => { 
+  let actionsWithOrigins: (ActionWithOrigin & { actionSource: ActionSource })[] = actions.map((x, i) => { 
     return {...x, origin: context.self }
   });
   // apply each of the actions to the state
@@ -248,7 +248,7 @@ function applyAbilityToSolution(
 }
 
 function applyActionsToSolution(
-  actions: ( ActionWithOrigin & { actionWithinAbility: number })[],
+  actions: ( ActionWithOrigin & { actionSource: ActionSource })[],
   state: GameState,
   log: LogEntry[],
   typeIndex: number,
@@ -267,7 +267,7 @@ function applyActionsToSolution(
     const actionResult = resolveAction(state, transformed);
     state = actionResult.state;
     newQueue = newQueue.concat(actionResult.actions).concat(actions);
-    addLog.push({ action: transformed, state, transforms, typeIndex, entryIndex, actionIndex, actionWithinAbility: action.actionWithinAbility, intermediateIndex });
+    addLog.push({ action: transformed, state, transforms, typeIndex, entryIndex, actionIndex, actionSource: action.actionSource, intermediateIndex });
 
     if (state.type === "invalid") {
       return { state, log: log.concat(addLog), intermediateIndex, };
@@ -281,9 +281,7 @@ function applyActionsToSolution(
     return { state, log: log.concat(addLog), intermediateIndex, };
   } else {
     // TODO: probably the index here should reflect from which status the action originates
-    const newQueueWithIndex = newQueue.map((x, i) => { return { ...x, actionWithinAbility: i } });
-    // TODO: here the original context stays unchanged, but the context should change throughout these calls
-    // for example, the self property should change
+    const newQueueWithIndex = newQueue.map((x, i) => { return { ...x, actionSource: new RuleSource(i) } });
     return applyActionsToSolution(newQueueWithIndex, state, log.concat(addLog), typeIndex, intermediateIndex, entryIndex, actionIndex + 1);
   }
 }
