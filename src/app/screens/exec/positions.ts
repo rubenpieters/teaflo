@@ -208,3 +208,8 @@ export function sourceUnitPos(
 ): Position {
   return { xMin: 650, yMin: 600, xMax: 800, yMax: 750 };
 }
+
+export function targetUnitPos(
+): Position {
+  return { xMin: 850, yMin: 600, xMax: 1000, yMax: 750 };
+}

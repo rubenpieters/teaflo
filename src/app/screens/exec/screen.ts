@@ -14,7 +14,7 @@ import { Solution, SolutionData } from "../../../shared/game/solution";
 import { transitionScreen, ScreenCodex } from "../transition";
 import { CodexTypes } from "../codex/screen";
 import { clearAnimations } from "../util";
-import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions, explX, explY, explArrowEnd, unitEnMinX, unitFrMinY, logPosition, sourceUnitPos } from "./positions";
+import { friendlyUnitPos, enemyUnitPos, statusPos, unitUtilityPositions, explX, explY, explArrowEnd, unitEnMinX, unitFrMinY, logPosition, sourceUnitPos, targetUnitPos } from "./positions";
 import deepEqual from "deep-equal";
 import { groupOrder, statusTagDescription } from "../../../shared/game/status";
 import { StStatus } from "../../../shared/definitions/statusRow";
@@ -82,6 +82,7 @@ export class ExecScreen {
   treeCtrl: "remove" | undefined
 
   sourceUnit: UnitId | undefined;
+  targetUnit: TargetId | undefined;
   displayedAbility: Ability | undefined;
 
   constructor(
@@ -129,6 +130,7 @@ export class ExecScreen {
     this.selecting = undefined;
     this.interactionEnabled = true;
     this.sourceUnit = undefined;
+    this.targetUnit = undefined;
   }
 
   solDataFromClickState(): SolutionData {
@@ -225,8 +227,8 @@ export class ExecScreen {
       } else if (unit !== undefined) {
         const friendlyPos = friendlyUnitPos(this.gameRefs.settings, state, unitIndex);
         const unitPos = deepEqual(this.sourceUnit, unit.id) ?
-          sourceUnitPos() :
-          friendlyPos;
+          sourceUnitPos() : deepEqual(this.targetUnit, unit.id) ?
+          targetUnitPos() : friendlyPos;
         const utilityPos = unitUtilityPositions(friendlyPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
@@ -343,8 +345,8 @@ export class ExecScreen {
       if (unit !== undefined) {
         const enemyPos = enemyUnitPos(this.gameRefs.settings, state, unitIndex);
         const unitPos = deepEqual(this.sourceUnit, unit.id) ?
-          sourceUnitPos() :
-          enemyPos;
+          sourceUnitPos() : deepEqual(this.targetUnit, unit.id) ?
+          targetUnitPos() : enemyPos;
         const utilityPos = unitUtilityPositions(enemyPos);
         const unitSprite = this.unitPool.newSprite(unitPos.xMin, unitPos.yMin, {},
           { cardId: unit.cardId,
@@ -667,10 +669,12 @@ export class ExecScreen {
         const sprite = this.intermediateBgPool.newSprite(pos.xMin, pos.yMin, {}, { sprite: "grey_border1.png"}, 0.3);
         return sprite;
       }, self => {
+        // -----------------------------------------------------------
         if (typeIndex === 0) {
           // start turn
           const logIcon = this.drawLogIcon(0, log);
           return logIcon;
+        // -----------------------------------------------------------
         } else if (typeIndex === 1) {
           this.sourceUnit = origin;
           // friendly action
@@ -699,11 +703,14 @@ export class ExecScreen {
           });
 
           const actionAnims = new SeqAnimation(split[1].map((entry, actionI) => {
-            /*const prev = actionI === 0 ?
+            const prevTargets = actionI === 0 ?
               undefined :
-              actionTargets(split[1][actionI - 1].action);*/
+              actionTargets(split[1][actionI - 1].action);
+            const nextTargets = split[1][actionI + 1] === undefined ?
+              undefined :
+              actionTargets(split[1][actionI + 1].action);
             return new ParAnimation([
-              this.drawAction(entry),
+              this.drawAction(entry, prevTargets, nextTargets),
               this.drawLogIcon(entry.logIndex, log),
             ]);
           }));
@@ -718,6 +725,7 @@ export class ExecScreen {
             actionAnims,
             fadeOut,
           ]);
+        // -----------------------------------------------------------
         } else {
           const en = prevState!.enUnits.units[typeIndex - 2];
           if (en === undefined) {
@@ -754,8 +762,14 @@ export class ExecScreen {
           });
 
           const actionAnims = new SeqAnimation(split[typeIndex].map((entry, actionI) => {
+            const prevTargets = actionI === 0 ?
+              undefined :
+              actionTargets(split[typeIndex][actionI - 1].action);
+            const nextTargets = split[typeIndex][actionI + 1] === undefined ?
+              undefined :
+              actionTargets(split[typeIndex][actionI + 1].action);
             return new ParAnimation([
-              this.drawAction(entry),
+              this.drawAction(entry, prevTargets, nextTargets),
               this.drawLogIcon(entry.logIndex, log),
             ]);
           }));
@@ -800,6 +814,8 @@ export class ExecScreen {
 
   drawAction(
     entry: LogEntry,
+    prevTargets: TargetId[] | undefined,
+    nextTargets: TargetId[] | undefined,
   ) {
     const action: ActionWithOrigin = entry.action;
     const actionI: number = entry.actionWithinAbility;
@@ -807,6 +823,8 @@ export class ExecScreen {
     const targets = actionTargets(action);
     if (targets.length > 0) {
       const target0 = targets[0];
+      const prevTarget0 = prevTargets === undefined ? undefined : prevTargets[0];
+      const nextTarget0 = nextTargets === undefined ? undefined : nextTargets[0];
       let targetRef: DataSprite<UnitData> | undefined;
       this.unitPool.forEachAlive((ref: DataSprite<UnitData>) => {
         if (deepEqual(ref.data.globalId, target0)) {
@@ -818,9 +836,12 @@ export class ExecScreen {
       }
       const preX = targetRef.x;
       const preY = targetRef.y;
+      // move before action
       const targetAnimPre = new BaseAnimation(1000, targetRef, t => {
-        t.to({ x: 850, y: 600 }, 1000);
+        const targetUnit = targetUnitPos();
+        t.to({ x: targetUnit.xMin, y: targetUnit.yMin }, 1000);
       });
+      // background on action info
       const actionBg = new Create(() => {
         this.intermediate = intermediateIndex;
         this.drawCurrentState();
@@ -830,12 +851,19 @@ export class ExecScreen {
           t.from({ alpha: 0 }, 500);
         });
       });
+      // move after action
       const targetAnimPost = new BaseAnimation(750, targetRef, t => {
         this.actionBgPool.clear();
         t.to({ x: preX, y: preY }, 750);
       });
+      // remove background on action info
       const removeBg = new BaseAnimation(1, animationDummy, t => {
         this.actionBgPool.clear();
+        if (deepEqual(nextTarget0, target0)) {
+          this.targetUnit = target0;
+        } else {
+          this.targetUnit = undefined;
+        }
         t.to({ value: 0 }, 1);
       });
       if (deepEqual(targetRef.data.globalId, action.origin)) {
@@ -845,12 +873,27 @@ export class ExecScreen {
           removeBg,
         ]);
       }
-      return new SeqAnimation([
-        new ParAnimation([targetAnimPre, actionBg]),
-        this.targetAnimMid(action, 850),
-        targetAnimPost,
-        removeBg,
-      ]);
+      if (deepEqual(prevTarget0, target0)) {
+        return new SeqAnimation([
+          actionBg,
+          this.targetAnimMid(action, 850),
+          targetAnimPost,
+          removeBg,
+        ]);
+      } else if (deepEqual(nextTarget0, target0)) {
+        return new SeqAnimation([
+          new ParAnimation([targetAnimPre, actionBg]),
+          this.targetAnimMid(action, 850),
+          removeBg,
+        ]);
+      } else {
+        return new SeqAnimation([
+          new ParAnimation([targetAnimPre, actionBg]),
+          this.targetAnimMid(action, 850),
+          targetAnimPost,
+          removeBg,
+        ]);
+      }
     } else {
       // TODO: animation without target
       return new BaseAnimation(1, undefined, tween => {

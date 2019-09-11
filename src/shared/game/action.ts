@@ -11,7 +11,7 @@ import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, Move
 import { addStatus } from "./statusRow";
 import { descSingleton, numberDescription } from "./description";
 import { DescToken, DescSymbol } from "../definitions/description";
-import { HasId } from "../definitions/entityId";
+import { HasId, TargetId } from "../definitions/entityId";
 import { routeDirectionDescription } from "./ai";
 
 
@@ -225,7 +225,7 @@ export function ignoreTag(
 
 export function actionTargets(
   action: Action,
-) {
+): TargetId[] {
   switch (action.tag) {
     case "RemoveThreat": // fallthrough
     case "AddThreat": return [action.forAlly, action.atEnemy];
