@@ -825,14 +825,21 @@ export class ExecScreen {
       const target0 = targets[0];
       const prevTarget0 = prevTargets === undefined ? undefined : prevTargets[0];
       const nextTarget0 = nextTargets === undefined ? undefined : nextTargets[0];
-      let targetRef: DataSprite<UnitData> | undefined;
+      let targetRef: DataSprite<UnitData> | DataSprite<TriggerData> | undefined;
       this.unitPool.forEachAlive((ref: DataSprite<UnitData>) => {
         if (deepEqual(ref.data.globalId, target0)) {
           targetRef = ref;
         }
       });
       if (targetRef === undefined) {
-        throw "drawAction: target is not defined";
+        this.triggerPool.forEachAlive((ref: DataSprite<TriggerData>) => {
+          if (deepEqual(ref.data.status.id, target0)) {
+            targetRef = ref;
+          }
+        });
+        if (targetRef === undefined) {
+          throw "drawAction: target is not defined";
+        }
       }
       const preX = targetRef.x;
       const preY = targetRef.y;
@@ -876,14 +883,16 @@ export class ExecScreen {
         }
         t.to({ value: 0 }, 1);
       });
+      // @ts-ignore: globalId is defined only if data is of type UnitId
       if (deepEqual(targetRef.data.globalId, action.origin)) {
+        // targeting self
         return new SeqAnimation([
           actionBg,
           this.targetAnimMid(action, 700),
           removeBg,
         ]);
-      }
-      if (deepEqual(prevTarget0, target0)) {
+      } else if (deepEqual(prevTarget0, target0)) {
+        // prev target is same as current target, don't move from slot
         return new SeqAnimation([
           actionBg,
           this.targetAnimMid(action, 850),
@@ -891,12 +900,14 @@ export class ExecScreen {
           removeBg,
         ]);
       } else if (deepEqual(nextTarget0, target0)) {
+        // next target is same as current target, don't move to slot
         return new SeqAnimation([
           new ParAnimation([targetAnimPre, actionBg]),
           this.targetAnimMid(action, 850),
           removeBg,
         ]);
       } else {
+        // other cases
         return new SeqAnimation([
           new ParAnimation([targetAnimPre, actionBg]),
           this.targetAnimMid(action, 850),

@@ -13,6 +13,7 @@ import { descSingleton, numberDescription } from "./description";
 import { DescToken, DescSymbol } from "../definitions/description";
 import { HasId, TargetId } from "../definitions/entityId";
 import { routeDirectionDescription } from "./ai";
+import { ActionSource, RuleSource } from "./log";
 
 
 
@@ -25,7 +26,7 @@ export const actionTags: Action["tag"][]
 export function resolveAction(
   state: GameState,
   action: ActionWithOrigin,
-): { state: GameState, actions: ActionWithOrigin[] } {
+): { state: GameState, actions: (ActionWithOrigin & { actionSource: ActionSource })[] } {
   switch (action.tag) {
     case "Damage": {
       const result = overTarget(state,
@@ -51,7 +52,7 @@ export function resolveAction(
           }];
         }
       }
-      return { state: result.state, actions };
+      return { state: result.state, actions: actions.map((x, i) => { return { ...x, actionSource: new RuleSource(i) }}) };
     }
     case "Heal": {
       const result = overTarget(state,
@@ -61,7 +62,7 @@ export function resolveAction(
 
       const actions: ActionWithOrigin[] = [];
 
-      return { state: result.state, actions };
+      return { state: result.state, actions: actions.map((x, i) => { return { ...x, actionSource: new RuleSource(i) }}) };
     }
     case "UseCharge": {
       const result = overTarget(state,
@@ -74,7 +75,7 @@ export function resolveAction(
       if (entity !== undefined && entity.charges <= 0) {
         actions = [invalidNoOrigin];
       }
-      return { state: result.state, actions };
+      return { state: result.state, actions: actions.map((x, i) => { return { ...x, actionSource: new RuleSource(i) }}) };
     }
     case "RestoreCharge": {
       const result = overTarget(state,
@@ -84,7 +85,7 @@ export function resolveAction(
 
       const actions: ActionWithOrigin[] = [];
 
-      return { state: result.state, actions };
+      return { state: result.state, actions: actions.map((x, i) => { return { ...x, actionSource: new RuleSource(i) }}) };
     }
     case "AddThreat": {
       const result = overTarget(state,
@@ -130,13 +131,13 @@ export function resolveAction(
         actions = [invalidNoOrigin];
       }
 
-      return { state: result.state, actions };
+      return { state: result.state, actions: actions.map((x, i) => { return { ...x, actionSource: new RuleSource(i) }}) };
     }
     case "Combined": {
       const actions = action.list.map(x => {
         return {...x, origin: action.origin }
       });
-     return { state, actions };
+     return { state, actions: actions.map((x, i) => { return { ...x, actionSource: new RuleSource(i) }}) };
     }
     case "StartTurn": {
       return { state, actions: [] };

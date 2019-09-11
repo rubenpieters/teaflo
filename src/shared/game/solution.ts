@@ -248,7 +248,7 @@ function applyAbilityToSolution(
 }
 
 function applyActionsToSolution(
-  actions: ( ActionWithOrigin & { actionSource: ActionSource })[],
+  actions: (ActionWithOrigin & { actionSource: ActionSource })[],
   state: GameState,
   log: LogEntry[],
   typeIndex: number,
@@ -260,7 +260,7 @@ function applyActionsToSolution(
   log: LogEntry[],
   intermediateIndex: number,
 } {
-  let newQueue: ActionWithOrigin[] = [];
+  let newQueue: (ActionWithOrigin & { actionSource: ActionSource })[] = [];
   const addLog: LogEntry[] = [];
   for (const action of actions) {
     const { actions, transformed, transforms } = applyStatuses(action, state);
@@ -280,8 +280,6 @@ function applyActionsToSolution(
   if (newQueue.length === 0) {
     return { state, log: log.concat(addLog), intermediateIndex, };
   } else {
-    // TODO: probably the index here should reflect from which status the action originates
-    const newQueueWithIndex = newQueue.map((x, i) => { return { ...x, actionSource: new RuleSource(i) } });
-    return applyActionsToSolution(newQueueWithIndex, state, log.concat(addLog), typeIndex, intermediateIndex, entryIndex, actionIndex + 1);
+    return applyActionsToSolution(newQueue, state, log.concat(addLog), typeIndex, intermediateIndex, entryIndex, actionIndex + 1);
   }
 }

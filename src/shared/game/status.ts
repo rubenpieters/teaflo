@@ -1,6 +1,6 @@
 import * as C from "../definitions/condition";
 import * as ST from "../definitions/statusTransform";
-import { StatusLog } from "./log";
+import { StatusLog, StatusSource, ActionSource } from "./log";
 import { StStatus } from "../definitions/statusRow";
 import { Status, StatusGroup, StatusTag } from "../definitions/status";
 import { Damage, Death } from "../definitions/actionf";
@@ -110,16 +110,17 @@ export function applyStatuses(
   state: GameState,
 ): {
   transformed: ActionWithOrigin,
-  actions: ActionWithOrigin[],
+  actions: (ActionWithOrigin & { actionSource: ActionSource })[],
   transforms: StatusLog[],
 } {
-  let newActions: ActionWithOrigin[] = [];
+  let newActions: (ActionWithOrigin & { actionSource: ActionSource })[] = [];
   let transforms: StatusLog[] = [];
   for (const group of groupOrder) {
     for (const status of state.statusRows[group].statuses) {
       const { transformed, actions, statusLog } = applyStatus(status, onStackAction, state);
       onStackAction = transformed;
-      newActions = newActions.concat(actions);
+      const actionsWithSource = actions.map((x, i) => { return { ...x, actionSource: new StatusSource(i, status.id) }});
+      newActions = newActions.concat(actionsWithSource);
       if (statusLog !== undefined) {
         transforms = transforms.concat(statusLog);
       }
