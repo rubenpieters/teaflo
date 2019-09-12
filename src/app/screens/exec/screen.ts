@@ -131,6 +131,7 @@ export class ExecScreen {
     this.interactionEnabled = true;
     this.sourceUnit = undefined;
     this.targetUnit = undefined;
+    this.displayedAbility = undefined;
   }
 
   solDataFromClickState(): SolutionData {
@@ -145,6 +146,10 @@ export class ExecScreen {
     //this.logActionPool.clear();
     this.framePool.clear();
     this.intermediateBgPool.clear();
+    // reset these values since this is also part of aniamtions
+    this.sourceUnit = undefined;
+    this.targetUnit = undefined;
+    this.displayedAbility = undefined;
   }
 
   canExtendState(): boolean {
