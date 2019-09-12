@@ -893,14 +893,14 @@ export class ExecScreen {
         // targeting self
         return new SeqAnimation([
           actionBg,
-          this.targetAnimMid(action, 700),
+          this.targetAnimMid(entry, 700),
           removeBg,
         ]);
       } else if (deepEqual(prevTarget0, target0)) {
         // prev target is same as current target, don't move from slot
         return new SeqAnimation([
           actionBg,
-          this.targetAnimMid(action, 850),
+          this.targetAnimMid(entry, 850),
           targetAnimPost,
           removeBg,
         ]);
@@ -908,14 +908,14 @@ export class ExecScreen {
         // next target is same as current target, don't move to slot
         return new SeqAnimation([
           new ParAnimation([targetAnimPre, actionBg]),
-          this.targetAnimMid(action, 850),
+          this.targetAnimMid(entry, 850),
           removeBg,
         ]);
       } else {
         // other cases
         return new SeqAnimation([
           new ParAnimation([targetAnimPre, actionBg]),
-          this.targetAnimMid(action, 850),
+          this.targetAnimMid(entry, 850),
           targetAnimPost,
           removeBg,
         ]);
@@ -928,20 +928,85 @@ export class ExecScreen {
   }
 
   targetAnimMid(
-    action: Action,
+    entry: LogEntry,
     x: number,
   ): Animation {
-    return new Create(() => {
-      return this.createLogTextSprite(x, 600, action);
-    }, self => {
-      return new BaseAnimation(1000, self, t => {
-        t.from({ y: self.y + 200 }, 1000);
-        t.onComplete.add(() => {
-          self.destroy();
-          this.logGraphicsPool.clear();
+    if (entry.transforms.length === 0) {
+      return new Create(() => {
+        return this.createLogTextSprite(x, 600, entry.action);
+      }, self => {
+          const moveUpBefore = new BaseAnimation(1000, self, t => {
+            t.from({ y: self.y + 100, alpha: 0.2 }, 1000);
+          });
+          const moveUpAfter = new BaseAnimation(1000, self, t => {
+            t.to({ y: self.y - 100, alpha: 0.2 }, 1000);
+            t.onComplete.add(() => {
+              self.destroy();
+              this.logGraphicsPool.clear();
+            });
+          });
+          return new SeqAnimation([
+            moveUpBefore,
+            moveUpAfter,
+          ]);
+      });
+    } else {
+      return this.createTransformAnims(entry.transforms, x, 0);
+    }
+  }
+
+  createTransformAnims(
+    transforms: StatusLog[],
+    x: number,
+    index: number,
+  ): Animation {
+    if (index === 0) {
+      return new Create(() => {
+        return this.createLogTextSprite(x, 600, transforms[index].before);
+      }, self => {
+        return new SeqAnimation([
+          new BaseAnimation(1000, self, t => {
+            t.from({ y: self.y + 100, alpha: 0.2 }, 1000);
+          }),
+          new BaseAnimation(500, self, t => {
+            t.to({ alpha: 0.2 }, 500);
+            t.onComplete.add(() => {
+              self.destroy();
+            });
+          }),
+          this.createTransformAnims(transforms, x, index + 1),
+        ]);
+      });
+    } else if (index === transforms.length) {
+      return new Create(() => {
+        return this.createLogTextSprite(x, 600, transforms[index - 1].after);
+      }, self => {
+        return new BaseAnimation(1000, self, t => {
+          t.to({ y: self.y - 100, alpha: 0.2 }, 1000);
+          t.onComplete.add(() => {
+            self.destroy();
+            this.logGraphicsPool.clear();
+          });
         });
       });
-    });
+    } else {
+      return new Create(() => {
+        return this.createLogTextSprite(x, 600, transforms[index].before);
+      }, self => {
+        return new SeqAnimation([
+          new BaseAnimation(500, self, t => {
+            t.from({ alpha: 0 }, 500);
+          }),
+          new BaseAnimation(500, self, t => {
+            t.to({ alpha: 0.2 }, 500);
+            t.onComplete.add(() => {
+              self.destroy();
+            });
+          }),
+          this.createTransformAnims(transforms, x, index + 1),
+        ]);
+      });
+    }
   }
 
   drawLogIcon(
