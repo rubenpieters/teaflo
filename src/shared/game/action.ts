@@ -7,13 +7,14 @@ import { statusGroup, statusDescription } from "./status";
 import { addThreat, removeThreat } from "./threat";
 import { Action, ActionWithOrigin, ActionWithOriginF } from "../definitions/action";
 import { GameState, StFrUnit } from "../definitions/state";
-import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag, RestoreCharge, Heal, RemoveThreat } from "../definitions/actionf";
+import { invalidNoOrigin, ActionF, Damage, UseCharge, AddThreat, AddStatus, MoveAI, Death, Combined, ActionTag, RestoreCharge, Heal, RemoveThreat, victoryNoOrigin } from "../definitions/actionf";
 import { addStatus } from "./statusRow";
 import { descSingleton, numberDescription } from "./description";
 import { DescToken, DescSymbol } from "../definitions/description";
 import { HasId, TargetId } from "../definitions/entityId";
 import { routeDirectionDescription } from "./ai";
 import { ActionSource, RuleSource } from "./log";
+import { checkWin } from "./solution";
 
 
 
@@ -129,6 +130,8 @@ export function resolveAction(
       let actions: ActionWithOrigin[] = [];
       if (entity !== undefined && entity.id.type === "friendly" && (entity as any).essential) {
         actions = [invalidNoOrigin];
+      } else if (checkWin(state)) {
+        actions = [victoryNoOrigin];
       }
 
       return { state: result.state, actions: actions.map((x, i) => { return { ...x, actionSource: new RuleSource(i) }}) };
@@ -141,6 +144,12 @@ export function resolveAction(
     }
     case "StartTurn": {
       return { state, actions: [] };
+    }
+    case "Victory": {
+      const result = focus(state,
+        set(x => x.type, "win"),
+      );
+      return { state: result, actions: [] };
     }
   }
 }
@@ -205,6 +214,7 @@ export function hoistActionF<F extends URIS, G extends URIS, H extends URIS, I e
       return new Combined(l);
     }
     case "StartTurn": return actionF;
+    case "Victory": return actionF;
   }
 }
 
@@ -238,7 +248,8 @@ export function actionTargets(
     case "Death": // fallthrough
     case "AddStatus": return [action.target];
     case "StartTurn": // fallthrough
-    case "Invalid": return []
+    case "Victory": // fallthrough
+    case "Invalid": return [];
     case "Combined": {
       throw "actionTargets: encountered a Combined action";
     }
@@ -310,6 +321,10 @@ export function actionDescription(
     }
     case "Invalid": {
       return descSingleton("icon_invalid")
+        ;
+    }
+    case "Victory": {
+      return descSingleton("icon_win")
         ;
     }
   }

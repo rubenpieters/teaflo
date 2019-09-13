@@ -204,11 +204,11 @@ export function runPhases(
     }
   });
 
-  const win = checkWin(state);
+  /*const win = checkWin(state);
   if (win) {
     state = focus(state, set(x => x.type, "win"));
-  }
-  return { state, log, win };
+  }*/
+  return { state, log, win: state.type === "win" };
 }
 
 export function checkWin(

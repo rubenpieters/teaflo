@@ -144,6 +144,16 @@ export class StartTurn {
   ) {}
 }
 
+export class Victory {
+  public readonly tag: "Victory" = "Victory";
+
+  constructor(
+  ) {}
+}
+
+export const victoryNoOrigin: ActionWithOrigin =
+  {...new Victory, origin: "noOrigin" };
+
 export type ActionF<F extends URIS, G extends URIS>
   = Damage<F, G>
   | Heal<F, G>
@@ -157,6 +167,7 @@ export type ActionF<F extends URIS, G extends URIS>
   | RemoveThreat<F, G>
   | AddStatus<F, G>
   | StartTurn
+  | Victory
   ;
 
 export type ActionTag = ActionF<any, any>["tag"];

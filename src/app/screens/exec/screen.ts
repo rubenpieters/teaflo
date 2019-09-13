@@ -677,8 +677,13 @@ export class ExecScreen {
         // -----------------------------------------------------------
         if (typeIndex === 0) {
           // start turn
-          const logIcon = this.drawLogIcon(0, log);
-          return logIcon;
+          const actionAnims = new SeqAnimation(split[0].map((entry, actionI) => {
+            return new ParAnimation([
+              this.drawAction(entry, undefined, undefined),
+              this.drawLogIcon(entry.logIndex, log),
+            ]);
+          }));
+          return actionAnims;
         // -----------------------------------------------------------
         } else if (typeIndex === 1) {
           this.sourceUnit = origin;
@@ -826,7 +831,40 @@ export class ExecScreen {
     const actionI: ActionSource = entry.actionSource;
     const intermediateIndex: number = entry.intermediateIndex;
     const targets = actionTargets(action);
-    if (targets.length > 0) {
+    if (action.tag === "StartTurn") {
+      return new Create(() => {
+        return this.detailExplPool.newSprite(600, 350, {}, { sprite: "initium_500_300.png" }, 1, false);
+      }, self => {
+        return new BaseAnimation(1000, self, t => {
+          t.from({ y: self.y + 200 }, 1000);
+          t.onComplete.add(() => {
+            self.destroy();
+          });
+        });
+      });
+    } else if (action.tag === "Invalid") {
+      return new Create(() => {
+        return this.detailExplPool.newSprite(600, 350, {}, { sprite: "falsus_500_300.png" }, 1, false);
+      }, self => {
+        return new BaseAnimation(1000, self, t => {
+          t.from({ y: self.y + 200 }, 1000);
+          t.onComplete.add(() => {
+            self.destroy();
+          });
+        });
+      });
+    } else if (action.tag === "Victory") {
+      return new Create(() => {
+        return this.detailExplPool.newSprite(600, 350, {}, { sprite: "victoria_500_300.png" }, 1, false);
+      }, self => {
+        return new BaseAnimation(1000, self, t => {
+          t.from({ y: self.y + 200 }, 1000);
+          t.onComplete.add(() => {
+            self.destroy();
+          });
+        });
+      });
+    } else if (targets.length > 0) {
       const target0 = targets[0];
       const prevTarget0 = prevTargets === undefined ? undefined : prevTargets[0];
       const nextTarget0 = nextTargets === undefined ? undefined : nextTargets[0];
@@ -1239,6 +1277,7 @@ export class ExecScreen {
       case "Death": // fallthrough TODO: this should point to the location of where the status was?
       case "Combined": // fallthrough
       case "Invalid": // fallthrough
+      case "Victory": // fallthrough
       case "StartTurn": {
         return undefined;
       }
@@ -1793,6 +1832,7 @@ function mkLogActionPool(
           case "AddStatus": return "icon_addstatus_40_40.png";
           case "Death": return "icon_death_40_40.png";
           case "Invalid": return "icon_invalid_40_40.png";
+          case "Victory": return "icon_win_40_40.png";
           case "Combined": return "icon_b.png";
         }
       },

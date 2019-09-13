@@ -247,3 +247,6 @@ textures/text_bg_80_40.png
 textures/tree_icon_55_55.png
 textures/unit_bg_220_440.png
 textures/log_bg_210_820.png
+textures/initium_500_300.png
+textures/falsus_500_300.png
+textures/victoria_500_300.png

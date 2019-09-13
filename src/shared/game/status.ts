@@ -209,6 +209,9 @@ function _resolveStatusAbilityWithOrigin(
     case "StartTurn": {
       return [ability];
     }
+    case "Victory": {
+      return [ability];
+    }
   }
 }
 

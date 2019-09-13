@@ -106,6 +106,9 @@ function _resolveAbility(
     case "StartTurn": {
       return [ability];
     }
+    case "Victory": {
+      return [ability];
+    }
   }
 }
 
@@ -335,6 +338,10 @@ function _abilityDescription(
     }
     case "Invalid": {
       return descSingleton("icon_invalid")
+        ;
+    }
+    case "Victory": {
+      return descSingleton("icon_victory")
         ;
     }
   }
