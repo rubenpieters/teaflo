@@ -9,13 +9,14 @@ import { TargetId } from "../../../shared/definitions/entityId";
 import { FrUnitId } from "../../../shared/data/frUnitMap";
 import { selectedLevelId, getLevelSaveDataAndFillDefault, compositionToKey, validComposition, setLocation, currentSolution, setSolution } from "../../data/saveData";
 import { levelData } from "../../data/levelData";
+import { ScreenExec, transitionScreen } from "../transition";
 
 export function drawCurrentLevel(
   gameRefs: GameRefs,
 ) {
   const levelId = selectedLevelId(gameRefs);
   if (levelId !== undefined) {
-    // loadLevel(gameRefs, levelId);
+    transitionScreen(gameRefs, new ScreenExec(levelId));
   }
 }
 

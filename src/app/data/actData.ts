@@ -24,7 +24,7 @@ export const actData = {
     levels: [L.a1l1, L.a1l2, L.a1l3, L.a1l5, L.a1l6, L.a1l8, L.a1l9, L.a1l10],
     icon: "act_1_icon_100_100.png",
     bgSprite: { sprite: "bg_a1.png", x: 100, y: 150 },
-    messages: [`Welcome to Codex Aetherium ${initialSettings.version} (${initialSettings.versionVerbose}). This is a gameplay prototype for experimentation purposes and testing combat mechanics.`, "This act showcases the basic mechanics of the game. The gameplay is deterministic and consistent, but are intended to be mostly discovered. Feel free to experiment and discover how the rules of the game work."],
+    messages: [`Welcome to Codex Aetherium ${initialSettings.version} (${initialSettings.versionVerbose}). This is a gameplay prototype for experimentation purposes and testing combat mechanics.`, "This act showcases the basic mechanics of the game. The gameplay is deterministic and consistent. But the main intention is that the mechanics are discovered by the player. Feel free to experiment and discover how the rules of the game work."],
   },
   1: {
     shortName: "2",
