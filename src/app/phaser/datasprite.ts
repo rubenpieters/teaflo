@@ -1,5 +1,6 @@
 import { Position } from "../util/position";
 import { GameRefs } from "../states/game";
+import { PhaserTextStyle } from "phaser-ce";
 
 export interface DataSprite<Data> extends Phaser.Sprite {
   data: Data
@@ -26,15 +27,42 @@ export function addText<Data>(
   txtColor: string,
   fontSize: number,
 ) {
+  const style = {
+    fill: txtColor,
+    fontSize,
+    boundsAlignH: "center",
+    boundsAlignV: "middle",
+  };
+  addTextWithStyle(gameRefs, sprite, pos, btnString, style);
+}
+
+export function addTextWithStyle<Data>(
+  gameRefs: GameRefs,
+  sprite: DataSprite<Data>,
+  pos: Position,
+  btnString: string,
+  style: PhaserTextStyle,
+) {
+  const bounds = {
+    xMin: 0,
+    yMin: 0,
+    xMax: pos.xMax - pos.xMin,
+    yMax: pos.yMax - pos.yMin,
+  }
+  addTextWithStyleAndBounds(gameRefs, sprite, bounds, btnString, style);
+}
+
+export function addTextWithStyleAndBounds<Data>(
+  gameRefs: GameRefs,
+  sprite: DataSprite<Data>,
+  bounds: Position,
+  btnString: string,
+  style: PhaserTextStyle,
+) {
   const btnText = gameRefs.game.add.text(
-    0, 0, btnString, {
-      fill: txtColor,
-      fontSize,
-      boundsAlignH: "center",
-      boundsAlignV: "middle",
-    }
+    0, 0, btnString, style,
   );
-  btnText.setTextBounds(0, 0, pos.xMax - pos.xMin, pos.yMax - pos.yMin);
+  btnText.setTextBounds(bounds.xMin, bounds.yMin, bounds.xMax, bounds.yMax);
   sprite.addChild(btnText);
   
   sprite.events.onKilled.add(() => {

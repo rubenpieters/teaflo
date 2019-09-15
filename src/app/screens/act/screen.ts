@@ -3,7 +3,7 @@ import { createPosition, Position } from "../../util/position";
 import { chainSpriteCreation, SeqAnimation, BaseAnimation, Animation, runAsTween, ParAnimation, Create, runAnim } from "../../phaser/animation";
 import { GameRefs } from "../../states/game";
 import { changeAct, changeLevel, addNewSolution } from "./events";
-import { addText, DataSprite, clearShader, addShader } from "../../phaser/datasprite";
+import { addText, DataSprite, clearShader, addShader, addTextWithStyle, addTextWithStyleAndBounds } from "../../phaser/datasprite";
 import { ScreenAct, transitionScreen, ScreenExec } from "../transition";
 import { selectedActId } from "../../data/saveData";
 import { actData, ActDataKeys } from "../../data/actData";
@@ -171,7 +171,14 @@ export class ActScreen {
     if (message !== undefined) {
       const anim = new Create(() => {
         const sprite = this.messagePool.newSprite(450, 220, {}, {});
-        addText(this.gameRefs, sprite, { xMin: 350, yMin: 750, xMax: 650, yMax: 900 }, message, "#000000", 50);
+        addTextWithStyleAndBounds(this.gameRefs, sprite, { xMin: 80, yMin: 80, xMax: 800, yMax: 600 }, message, {
+          fill: "#000000",
+          fontSize: 30,
+          boundsAlignH: "left",
+          boundsAlignV: "top",
+          wordWrap: true,
+          wordWrapWidth: 450,
+        });
         this.openMessage = messageId;
         return sprite;
       }, self => {
@@ -196,6 +203,7 @@ export class ActScreen {
   clearMessage(
   ) {
     this.messagePool.clear();
+    this.openMessage = undefined;
   }
 
   setVisibility(

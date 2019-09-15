@@ -97,6 +97,7 @@ function drawNewScreen(
       gameRefs.screens.actScreen.drawBg(animations);
       gameRefs.screens.actScreen.drawLevelBtn(actId);
       gameRefs.screens.actScreen.drawMessageIcons(actId);
+      gameRefs.screens.actScreen.reset();
       break;
     }
     case "ScreenExec": {

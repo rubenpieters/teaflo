@@ -1435,17 +1435,17 @@ export type Atlas1 = {
         "width": 210,
         "height": 820
     },
-    "mail_menu_600_800.png": {
+    "info_menu_600_800.png": {
         "x": 2730,
         "y": 822,
         "width": 600,
         "height": 800
     },
-    "info_menu_600_800.png": {
+    "mail_menu_600_800.png": {
         "x": 3330,
         "y": 942,
         "width": 600,
-        "height": 800
+        "height": 819
     },
     "menu_bar.png": {
         "x": 3940,
@@ -2914,17 +2914,17 @@ export const atlas1: Atlas1 = {
         "width": 210,
         "height": 820
     },
-    "mail_menu_600_800.png": {
+    "info_menu_600_800.png": {
         "x": 2730,
         "y": 822,
         "width": 600,
         "height": 800
     },
-    "info_menu_600_800.png": {
+    "mail_menu_600_800.png": {
         "x": 3330,
         "y": 942,
         "width": 600,
-        "height": 800
+        "height": 819
     },
     "menu_bar.png": {
         "x": 3940,
