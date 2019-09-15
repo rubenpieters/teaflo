@@ -1,6 +1,7 @@
 import { LevelData } from "./levelData";
 import * as L from "./levelData";
 import { isTrue, Equal } from "../../shared/type-util";
+import { initialSettings } from "./settings";
 
 export type ActData = {
   shortName: string,
@@ -23,7 +24,7 @@ export const actData = {
     levels: [L.a1l1, L.a1l2, L.a1l3, L.a1l5, L.a1l6, L.a1l8, L.a1l9, L.a1l10],
     icon: "act_1_icon_100_100.png",
     bgSprite: { sprite: "bg_a1.png", x: 100, y: 150 },
-    messages: ["Welcome to Codex Aetherium v0.0.1 (first prototype). This is a gameplay prototype for experimentation purposes and testing combat mechanics."],
+    messages: [`Welcome to Codex Aetherium ${initialSettings.version} (${initialSettings.versionVerbose}). This is a gameplay prototype for experimentation purposes and testing combat mechanics.`],
   },
   1: {
     shortName: "2",

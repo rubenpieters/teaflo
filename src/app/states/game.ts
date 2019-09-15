@@ -1,7 +1,7 @@
 import { ActScreen } from "../screens/act/screen";
 import { BgScreen } from "../screens/bg/screen";
 import { MenuScreen } from "../screens/menu/screen";
-import { Settings } from "../data/settings";
+import { Settings, initialSettings } from "../data/settings";
 import { createPosition } from "../util/position";
 import { ExecScreen } from "../screens/exec/screen";
 import { CodexScreen } from "../screens/codex/screen";
@@ -112,5 +112,7 @@ export default class Game extends Phaser.State {
 
       this.game.debug.text(`${(this.game.renderer.renderSession as any).drawCount} draws`, pos2.xMax, pos2.yMin + 30, "#00ff00");
     }
+
+    this.game.debug.text(`${initialSettings.version} (${initialSettings.versionVerbose}) ${initialSettings.versionMessage}`, 30, this.settings.gameHeight - 30, "#ff0000");
   }
 }
